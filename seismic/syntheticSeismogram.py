@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+def getLogs(v,rho,d,usingT):
+    """
+    DocString here
+    """
 
 def syntheticSeismogram(v, rho, d, wavtyp, wavf, usingT):
     """
@@ -106,42 +109,68 @@ def syntheticSeismogram(v, rho, d, wavtyp, wavf, usingT):
     tseis = tseis[index]
     seis  = seis[index]
     ##
+
+
+    ##
     plt.figure(1)
 
     # Plot Density
     plt.subplot(141)
     plt.plot(rholog,dpth,linewidth=2)
-    plt.title('Density')
-    # xlim([min(rholog) max(rholog)] + [-1 1]*0.1*[max(rholog)-min(rholog)])
+    plt.title('$\\rho$')
+    rhoxmin = rholog.min() -1.*0.1*(rholog.max()-rholog.min())
+    rhoxmax = rholog.max() +1.*0.1*(rholog.max()-rholog.min())
+    plt.xlim((rhoxmin,rhoxmax))
     # ylim([min(dpth),max(dpth)])
-    # set(gca,'Ydir','reverse')
     plt.grid()
     plt.gca().invert_yaxis()
+    plt.xlabel('Density \n (kg m/s)',fontsize=9)
+    plt.ylabel('Depth (m)',fontsize=9)
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(142)
     plt.plot(vlog,dpth,linewidth=2)
-    plt.title('Velocity')
-    # xlim([min(vlog) max(vlog)] + [-1 1]*0.1*[max(vlog)-min(vlog)])
-    # ylim([min(dpth),max(dpth)])
-    # set(gca,'Ydir','reverse')
+    plt.title('$v$')
+    vxmin = vlog.min() -1.*0.1*(vlog.max()-vlog.min())
+    vxmax = vlog.max() +1.*0.1*(vlog.max()-vlog.min())
+    plt.xlim((vxmin,vxmax))
     plt.grid()
     plt.gca().invert_yaxis()
+    plt.xlabel('Velocity \n (m/s)',fontsize=9)
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
+
 
     plt.subplot(143)
-    plt.plot(zlog,dpth,linewidth=2)
-    plt.title('Acoustic Impedance')
-    # xlim([min(zlog) max(zlog)] + [-1 1]*0.1*[max(zlog)-min(zlog)])
-    # ylim([min(dpth),max(dpth)])
-    # set(gca,'Ydir','reverse')
+    plt.plot(zlog*10.**-6.,dpth,linewidth=2)
+    plt.gca().set_title('$Z = \\rho v$')
+    zxmin = (zlog.min() -1.*0.1*(zlog.max()-zlog.min()))*10.**-6
+    zxmax = (zlog.max() +1.*0.1*(zlog.max()-zlog.min()))*10.**-6
+    plt.xlim((zxmin,zxmax))
     plt.grid()
     plt.gca().invert_yaxis()
+    plt.gca().set_xlabel('Impedance \n $\\times 10^{6}$ (kg m$^{-2}$ s$^{-1}$)',fontsize=9)
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
+    # plt.ticklabel_format(style='sci',axis='x',scilimits=(0)
+    #ax.set_ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(144)
     plt.hlines(dpth,np.zeros(nd),rseries,linewidth=2) #,'marker','none'
-    plt.title('Reflectivity Series');
-    # set(gca,'cameraupvector',[-1, 0, 0]);
+    plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')
+    plt.title('Reflectivity');
+    rseriesxmin = rseries.min() -1.*0.1*(rseries.max()-rseries.min())
+    rseriesxmax = rseries.max() +1.*0.1*(rseries.max()-rseries.min())
+    plt.xlim((rseriesxmin,rseriesxmax))
+    plt.gca().set_xlabel('Reflectivity')
     plt.grid()
     plt.gca().invert_yaxis()
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
     # set(gca,'ydir','reverse');
 
     plt.figure(2)
@@ -152,6 +181,7 @@ def syntheticSeismogram(v, rho, d, wavtyp, wavf, usingT):
     # set(gca,'Ydir','reverse');
     plt.grid()
     plt.gca().invert_yaxis()
+
     ##
     plt.figure(3)
     # plt.subplot(141)
@@ -162,24 +192,36 @@ def syntheticSeismogram(v, rho, d, wavtyp, wavf, usingT):
     # set(gca,'Ydir','reverse');
     # plt.grid()
     plt.gca().invert_yaxis()
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(132)
     plt.hlines(tref,np.zeros(len(rseriesconv)),rseriesconv,linewidth=2) #,'marker','none'
     plt.title('Reflectivity Series')
     plt.grid()
     plt.gca().invert_yaxis()
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(131)
     plt.plot(wav,twav,linewidth=2)
     plt.title('Wavelet')
     plt.grid()
     plt.gca().invert_yaxis()
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
     # set(gca,'ydir','reverse')
 
     plt.subplot(133)
     plt.plot(seis,tseis,linewidth=2)
     plt.grid()
     plt.gca().invert_yaxis()
+    # plt.tight_layout()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
     # set(gca,'ydir','reverse')
 
     plt.show()
