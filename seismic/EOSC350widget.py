@@ -22,10 +22,7 @@ def ViewWiggle(syndata):
     ax.set_title("CMP gather")
 
 def NoisyNMOWidget(tintercept, v1, v2, v3):
-    # data = scipy.io.loadmat('data_syn.mat')
     syndata = np.load('obsdata1.npy')
-    # syndata = data['D'].T[:, :280]
-    # syndata = syndata.copy() + np.random.randn(syndata.shape[0], syndata.shape[1])*15.*abs(syndata).mean()
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
@@ -64,10 +61,7 @@ def NoisyNMOWidget(tintercept, v1, v2, v3):
     ax[1].set_title("NMO corrected CMP gather")
 
 def CleanNMOWidget(tintercept, v):
-    # data = scipy.io.loadmat('data_syn.mat')
     syndata = np.load('syndata1.npy')
-    # syndata = data['D'].T[:, :280]
-    # syndata = syndata.copy() + np.random.randn(syndata.shape[0], syndata.shape[1])*15.*abs(syndata).mean()
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
