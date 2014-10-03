@@ -8,6 +8,7 @@ def getPhysPropLogs(d, rho, v, usingT=True, resolution=400):
 
 
     """
+
     # Ensure that these are float numpy arrays
     v, rho, d = np.array(v, dtype=float),   np.array(rho, dtype=float), np.array(d, dtype=float)
     usingT    = np.array(usingT, dtype=bool)
@@ -16,9 +17,9 @@ def getPhysPropLogs(d, rho, v, usingT=True, resolution=400):
 
     # Check that the number of layers match
     assert len(rho) == nlayer, 'Number of layer densities must match number of layer velocities'
-    assert len(d)   == nlayer, 'Number of layer tops must match the number of layer velocities'
+    #assert len(d)   == nlayer, 'Number of layer tops must match the number of layer velocities'
 
-    dpth = np.linspace(0,np.max(d)+3*np.max(np.diff(d)),resolution) # create depth vector
+    dpth = np.linspace(0,300.,resolution) # create depth vector
     nd   = len(dpth)
 
     rholog  = np.zeros(nd)  # density
@@ -50,7 +51,7 @@ def getReflectivity(d,rho,v,usingT=True,resolution=400):
     R   = np.diff(Z)/(Z[:-1] + Z[1:]) # reflection coefficients
 
     nlayer = len(v) # number of layers
-    dpth = np.linspace(0,np.max(d)+3*np.max(np.diff(d)),resolution) # create depth vector
+    dpth = np.linspace(0,300.,resolution) # create depth vector
     nd   = len(dpth)
 
     rseries    = np.zeros(nd)  # velocity
@@ -75,12 +76,15 @@ def getTimeDepth(d,v,resolution=400):
     """
     docstring for getTimeDepth
     """
+
+    d = np.sort(d) 
+
     twttop  = 2.*np.diff(d)/v[:-1]     # 2-way travel time within each layer
     twttop  = np.cumsum(twttop)       # 2-way travel time from surface to top of each layer
 
     nlayer = len(d)
 
-    dpth = np.linspace(0,np.max(d)+3*np.max(np.diff(d)),resolution) # create depth vector
+    dpth = np.linspace(0,300.,resolution) # create depth vector
     nd   = len(dpth)
 
     t       = np.zeros(nd)  # time
@@ -107,16 +111,18 @@ def getLogs(d, rho, v, usingT=True, resolution=400):
     return rholog, vlog, zlog, rseries
 
 
-def plotLogFormat(log, dpth, col='blue'):
+def plotLogFormat(log, dpth,xlim, col='blue'):
     """
     docstring for plotLogFormat
     """
 
-    xmin = log.min() -1.*0.1*(log.max()-log.min())
-    xmax = log.max() +1.*0.1*(log.max()-log.min())
+    #xmin = log.min() -1.*0.1*(log.max()-log.min())
+    #xmax = log.max() +1.*0.1*(log.max()-log.min())
+    #xlim = (xmin,xmax)
 
     ax = plt.plot(log,dpth,linewidth=2,color=col)
-    plt.xlim((xmin,xmax))
+    plt.xlim(xlim)
+    plt.ylim((dpth.min(),dpth.max()))
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
@@ -130,42 +136,45 @@ def plotLogs(d, rho, v, usingT=True, resolution=400):
     """
     function plotLogs(d,rho,v,usingT)
     """
-
-    #v, rho, d = np.array(v, dtype=float),   np.array(rho, dtype=float), np.array(d, dtype=float)
+    d = np.sort(d)
 
     rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT, resolution)
     t = getTimeDepth(d,v,resolution)
 
-    dpth = np.array(np.linspace(0.,np.max(d)+3.*np.max(np.diff(d)),resolution)) # create depth vector
+    dpth = np.array(np.linspace(0.,300.,resolution)) # create depth vector
     nd   = len(dpth)
 
 
     plt.figure(1)
+
+    xlimrho = (1.99,5.01)
+    xlimv   = (0.29,4.01)
+    xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
+
     # Plot Density
     plt.subplot(141)
-    plotLogFormat(rholog,dpth)
+    plotLogFormat(rholog*10**-3,dpth,xlimrho)
     plt.title('$\\rho$')
-    plt.xlabel('Density \n (kg m/s)',fontsize=9)
+    plt.xlabel('Density \n ($\\times 10^3$ kg /m$^3$)',fontsize=9)
     plt.ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(142)
-    plotLogFormat(vlog,dpth)
+    plotLogFormat(vlog*10**-3,dpth,xlimv)
     plt.title('$v$')
-    plt.xlabel('Velocity \n (m/s)',fontsize=9)
+    plt.xlabel('Velocity \n ($\\times 10^3$ m/s)',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(143)
-    plotLogFormat(zlog*10.**-6.,dpth)
+    plotLogFormat(zlog*10.**-6.,dpth,xlimz)
     plt.gca().set_title('$Z = \\rho v$')
     plt.gca().set_xlabel('Impedance \n $\\times 10^{6}$ (kg m$^{-2}$ s$^{-1}$)',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(144)
-    print(rseries.shape)
     plt.hlines(dpth,np.zeros(nd),rseries,linewidth=2)
     plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')
     plt.title('Reflectivity');
-    rseriesxmin = rseries.min() -1.*0.1*(rseries.max()-rseries.min())
-    rseriesxmax = rseries.max() +1.*0.1*(rseries.max()-rseries.min())
-    plt.xlim((rseriesxmin,rseriesxmax))
+    plt.xlim((-1.,1.))
     plt.gca().set_xlabel('Reflectivity')
     plt.grid()
     plt.gca().invert_yaxis()
@@ -175,23 +184,11 @@ def plotLogs(d, rho, v, usingT=True, resolution=400):
     plt.show()
 
 
-def plotLogsInteract(d1,d2,d3,rho1,rho2,rho3,v1,v2,v3):
-    """
-    docstring plotLogsInteract
-    """
-    d   = np.array([d1,d2,d3], dtype=float)
-    rho = np.array((rho1,rho2,rho3), dtype=float)
-    v   = np.array((v1,v2,v3), dtype=float)
-    #d, rho, v = np.array(d, dtype=float),   np.array(rho, dtype=float), np.array(v, dtype=float)
-    plotLogs(d, rho, v)
-
-
-
 def plotTimeDepth(d,v,resolution=400):
     """
     docstring for plotTimeDepth
     """
-    dpth = np.linspace(0,np.max(d)+3*np.max(np.diff(d)),resolution) # create depth vector
+    dpth = np.linspace(0,300.,resolution) # create depth vector
     nd   = len(dpth)
 
     t = getTimeDepth(d,v,resolution)
@@ -201,8 +198,8 @@ def plotTimeDepth(d,v,resolution=400):
     plt.title('Depth-Time');
     plt.grid()
     plt.gca().invert_yaxis()
-    plt.gca().set_xlabel('Time',fontsize=9)
-    plt.gca().set_ylabel('Depth',fontsize=9)
+    plt.gca().set_xlabel('Time (s)',fontsize=9)
+    plt.gca().set_ylabel('Depth (m)',fontsize=9)
 
     plt.show()
 
@@ -248,7 +245,6 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, resolution=400):
     rholog, vlog = getPhysPropLogs(d, rho, v, usingT, resolution)
 
     t = getTimeDepth(d,v)
-
     rseries,R = getReflectivity(d,rho,v)
 
     # make wavelet
@@ -259,7 +255,7 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, resolution=400):
     wav = {'RICKER':getRicker, 'ORMSBY':getOrmsby, 'KLAUDER':getKlauder}[wavtyp](wavf,twav)
 
     # create synthetic seismogram
-    tref  = np.arange(0,np.max(t),dtwav) + np.min(twav)  # time discretization for reflectivity series
+    tref  = np.arange(0,np.max(t),dtwav) #+ np.min(twav)  # time discretization for reflectivity series
     tr    = t[np.abs(rseries) > 0]
     rseriesconv = np.zeros(len(tref))
 
@@ -279,28 +275,32 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, resolution=400):
     plt.subplot(131)
     plt.plot(wav,twav,linewidth=2)
     plt.title('Wavelet')
+    plt.xlim((-1.,1.))
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(132)
+    plt.plot(np.zeros(tref.size),tref,linewidth=2,color='black')
     plt.hlines(tref,np.zeros(len(rseriesconv)),rseriesconv,linewidth=2) #,'marker','none'
-    plt.title('Reflectivity Series')
+    plt.title('Reflectivity')
     plt.grid()
     plt.ylim((0,tseis.max()))
     plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(133)
     plt.plot(seis,tseis,linewidth=2)
+    plt.title('Seismogram')
     plt.grid()
     plt.ylim((0,tseis.max()))
     plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
-
     plt.show()
 
 
@@ -338,20 +338,36 @@ def getKlauder(f,t,T=5.0):
     wav = np.real(np.sin(pi*k*t*(T-t))/(pi*k*t)*np.exp(2*pi*1j*f0*t))
     return wav
 
+
+# INTERACTIVE PLOT WRAPPERS
+def plotLogsInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3):
+    """
+    docstring plotLogsInteract
+    """
+    d   = np.array((0.,d2,d3), dtype=float)
+    rho = np.array((rho1,rho2,rho3), dtype=float)
+    v   = np.array((v1,v2,v3), dtype=float)
+    plotLogs(d, rho, v)
+
+def plotTimeDepthInteract(d2,d3,v1,v2,v3):
+    """
+    docstring plotTimeDepthInteract
+    """
+    d   = np.array((0.,d2,d3), dtype=float)
+    v   = np.array((v1,v2,v3), dtype=float)
+    plotTimeDepth(d,v)
+
 if __name__ == '__main__':
 
     d      = [0., 50., 100.]      # Position of top of each layer (m)
     v      = [600.,  1000., 1500.]  # Velocity of each layer (m/s)
-    rho    = [1700., 2000., 2500.] # Density of each layer (kg/m^3)
+    rho    = [2000., 2300., 2500.] # Density of each layer (kg/m^3)
     wavtyp = 'RICKER'           # Wavelet type
     wavf   = [50.]              # Wavelet Frequency
     usingT = False               # Use Transmission Coefficients?
 
 #    syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
 
-    # plotLogs(d, rho, v, usingT)
+    #plotLogsInteract(d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
     #plotTimeDepth(d,v)
-    # syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
-    dpth = plotLogsInteract(d[0],d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
-    #print((d[0],d[1],d[2]))
-    print(dpth)
+    syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
