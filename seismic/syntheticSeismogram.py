@@ -103,7 +103,7 @@ def getLogs(d, rho, v, usingT=True, resolution=400):
     """
     rholog, vlog  = getPhysPropLogs(d, rho, v, usingT, resolution)
     zlog          = getImpedance(rholog,vlog)
-    rseries       = getReflectivity(d, rho, v, usingT, resolution)
+    rseries,_     = getReflectivity(d, rho, v, usingT, resolution)
     return rholog, vlog, zlog, rseries
 
 
@@ -131,12 +131,12 @@ def plotLogs(d, rho, v, usingT=True, resolution=400):
     function plotLogs(d,rho,v,usingT)
     """
 
-    v, rho, d = np.array(v, dtype=float),   np.array(rho, dtype=float), np.array(d, dtype=float)
+    #v, rho, d = np.array(v, dtype=float),   np.array(rho, dtype=float), np.array(d, dtype=float)
 
     rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT, resolution)
     t = getTimeDepth(d,v,resolution)
 
-    dpth = np.linspace(0,np.max(d)+3*np.max(np.diff(d)),resolution) # create depth vector
+    dpth = np.array(np.linspace(0.,np.max(d)+3.*np.max(np.diff(d)),resolution)) # create depth vector
     nd   = len(dpth)
 
 
@@ -159,6 +159,7 @@ def plotLogs(d, rho, v, usingT=True, resolution=400):
     plt.gca().set_xlabel('Impedance \n $\\times 10^{6}$ (kg m$^{-2}$ s$^{-1}$)',fontsize=9)
 
     plt.subplot(144)
+    print(rseries.shape)
     plt.hlines(dpth,np.zeros(nd),rseries,linewidth=2)
     plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')
     plt.title('Reflectivity');
@@ -178,11 +179,12 @@ def plotLogsInteract(d1,d2,d3,rho1,rho2,rho3,v1,v2,v3):
     """
     docstring plotLogsInteract
     """
-    d   = (d1,d2,d3)
-    rho = (rho1,rho2,rho3)
-    v   = (v1,v2,v3)
-    d, rho, v = np.array(d, dtype=float),   np.array(rho, dtype=float), np.array(v, dtype=float)
+    d   = np.array([d1,d2,d3], dtype=float)
+    rho = np.array((rho1,rho2,rho3), dtype=float)
+    v   = np.array((v1,v2,v3), dtype=float)
+    #d, rho, v = np.array(d, dtype=float),   np.array(rho, dtype=float), np.array(v, dtype=float)
     plotLogs(d, rho, v)
+
 
 
 def plotTimeDepth(d,v,resolution=400):
@@ -350,6 +352,6 @@ if __name__ == '__main__':
     # plotLogs(d, rho, v, usingT)
     #plotTimeDepth(d,v)
     # syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
-    plotLogsInteract(d[0],d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
+    dpth = plotLogsInteract(d[0],d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
     #print((d[0],d[1],d[2]))
-
+    print(dpth)
