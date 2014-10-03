@@ -153,19 +153,19 @@ def plotLogs(d, rho, v, usingT=True, resolution=400):
 
     # Plot Density
     plt.subplot(141)
-    plotLogFormat(rholog*10**-3,dpth,xlimrho)
+    plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
     plt.title('$\\rho$')
     plt.xlabel('Density \n ($\\times 10^3$ kg /m$^3$)',fontsize=9)
     plt.ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(142)
-    plotLogFormat(vlog*10**-3,dpth,xlimv)
+    plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
     plt.title('$v$')
     plt.xlabel('Velocity \n ($\\times 10^3$ m/s)',fontsize=9)
     plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(143)
-    plotLogFormat(zlog*10.**-6.,dpth,xlimz)
+    plotLogFormat(zlog*10.**-6.,dpth,xlimz,'green')
     plt.gca().set_title('$Z = \\rho v$')
     plt.gca().set_xlabel('Impedance \n $\\times 10^{6}$ (kg m$^{-2}$ s$^{-1}$)',fontsize=9)
     plt.setp(plt.yticks()[1],visible=False)
@@ -273,7 +273,7 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, resolution=400):
     plt.figure(3)
 
     plt.subplot(131)
-    plt.plot(wav,twav,linewidth=2)
+    plt.plot(wav,twav,linewidth=1,color='black')
     plt.title('Wavelet')
     plt.xlim((-1.,1.))
     plt.grid()
@@ -293,7 +293,7 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, resolution=400):
     plt.setp(plt.yticks()[1],fontsize=9)
 
     plt.subplot(133)
-    plt.plot(seis,tseis,linewidth=2)
+    plt.plot(seis,tseis,color='black',linewidth=1)
     plt.title('Seismogram')
     plt.grid()
     plt.ylim((0,tseis.max()))
