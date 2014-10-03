@@ -1,10 +1,10 @@
-from SimPEG.Utils import sub2ind, mkvc
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
-def ViewWiggle(syndata):
+
+def ViewWiggle(syndata, obsdata):
     dx = 20
-    fig, ax = plt.subplots(1, 1, figsize=(7, 8))
+    fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
     'skipt':1,
     'scale': 0.05,
@@ -15,11 +15,16 @@ def ViewWiggle(syndata):
     }
     extent = [0., 38*dx, 1.0, 0.]
 
-    ax.invert_yaxis()
-    wiggle(syndata, ax = ax, **kwargs)
-    ax.set_xlabel("Offset (m)")
-    ax.set_ylabel("Time (s)")
-    ax.set_title("CMP gather")
+    ax[0].invert_yaxis()
+    ax[1].invert_yaxis()
+    wiggle(syndata, ax = ax[0], **kwargs)
+    wiggle(obsdata, ax = ax[1], **kwargs)
+    ax[0].set_xlabel("Offset (m)")
+    ax[0].set_ylabel("Time (s)")
+    ax[0].set_title("Clean CMP gather")
+    ax[1].set_xlabel("Offset (m)")
+    ax[1].set_ylabel("Time (s)")
+    ax[1].set_title("Noisy CMP gather")
 
 def NoisyNMOWidget(tintercept, v1, v2, v3):
     syndata = np.load('obsdata1.npy')
@@ -199,3 +204,54 @@ def wiggle (traces, skipt=1,scale=1.,lwidth=.1,offsets=None,redvel=0., manthifts
             trace[j] = 0
         ax.fill(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=0)
 
+def sub2ind(shape, subs):
+    """
+    Extracted from SimPEG for temporary use (https://github.com/simpeg)
+
+    From the given shape, returns the index of the given subscript
+
+    """
+    if len(shape) == 1:
+        return subs
+    if type(subs) is not np.ndarray:
+        subs = np.array(subs)
+    if len(subs.shape) == 1:
+        subs = subs[np.newaxis,:]
+    assert subs.shape[1] == len(shape), 'Indexing must be done as a column vectors. e.g. [[3,6],[6,2],...]'
+    inds = np.ravel_multi_index(subs.T, shape, order='F')
+    return mkvc(inds)
+
+def mkvc(x, numDims=1):
+    """
+    Extracted from SimPEG for temporary use (https://github.com/simpeg)
+
+    Creates a vector with the number of dimension specified
+
+    e.g.::
+
+        a = np.array([1, 2, 3])
+
+        mkvc(a, 1).shape
+            > (3, )
+
+        mkvc(a, 2).shape
+            > (3, 1)
+
+        mkvc(a, 3).shape
+            > (3, 1, 1)
+
+    """
+    if type(x) == np.matrix:
+        x = np.array(x)
+
+    if hasattr(x, 'tovec'):
+        x = x.tovec()
+
+    assert isinstance(x, np.ndarray), "Vector must be a numpy array"
+
+    if numDims == 1:
+        return x.flatten(order='F')
+    elif numDims == 2:
+        return x.flatten(order='F')[:, np.newaxis]
+    elif numDims == 3:
+        return x.flatten(order='F')[:, np.newaxis, np.newaxis]
