@@ -4,3 +4,4 @@ import matplotlib
 from syntheticSeismogram import *
 set_matplotlib_formats('png')
 matplotlib.rcParams['savefig.dpi'] = 100 # Change this to adjust figure size
+import numpy as np
