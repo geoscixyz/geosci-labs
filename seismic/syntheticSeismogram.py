@@ -185,7 +185,6 @@ def plotLogs(d, rho, v, usingT=True):
     dpth, rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT)
     nd   = len(dpth)
 
-
     plt.figure()
     xlimrho = (1.99,5.01)
     xlimv   = (0.29,4.01)
@@ -283,7 +282,7 @@ def plotSeismogram(d, rho, v, wavtyp, wavf, usingT=True):
 
 
 ## INTERACTIVE PLOT WRAPPERS
-def plotLogsInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,usingT=True):
+def plotLogsInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,usingT=False):
     """
     docstring plotLogsInteract
     """
@@ -300,6 +299,8 @@ def plotTimeDepthInteract(d2,d3,v1,v2,v3):
     d   = np.array((0.,d2,d3), dtype=float)
     v   = np.array((v1,v2,v3), dtype=float)
     plotTimeDepth(d,v)
+
+def plotSeismogramInteract(f)
 
 if __name__ == '__main__':
 
