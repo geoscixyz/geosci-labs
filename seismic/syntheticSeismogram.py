@@ -25,7 +25,9 @@ def getImpedance(rholog,vlog):
 
 def getReflectivity(d,rho,v,usingT=True):
     Z   = getImpedance(rho,v)         # acoustic impedance
-    R   = np.diff(Z)/(Z[:-1] + Z[1:]) # reflection coefficients
+    dZ  = (Z[1:] - Z[:-1])
+    sZ  = (Z[:-1] + Z[1:])
+    R   = dZ/sZ # reflection coefficients
 
     nlayer = len(v) # number of layers
 
@@ -64,7 +66,7 @@ def getLogs(d, rho, v, usingT=True):
     return dpth, rholog, vlog, zlog, rseries
 
 
-def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, dt=0.0004, dmax=300):
+def syntheticSeismogram(d, rho, v, wavf, wavA=1., usingT=True, wavtyp = 'RICKER', dt=0.0001, dmax=300):
     """
     function syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
 
@@ -72,10 +74,13 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, dt=0.0004, dmax=30
     a simple 1-D layered model.
 
     Inputs:
-        v      : velocity of each layer (m/s)
-        rho    : density of each layer (kg/m^3)
         d      : depth to the top of each layer (m)
+        rho    : density of each layer (kg/m^3)
+        v      : velocity of each layer (m/s)
                     The last layer is assumed to be a half-space
+        wavf   : wavelet frequency
+        wavA   : wavelet amplitude
+        usintT : using Transmission coefficients?
         wavtyp : type of Wavelet
                     The wavelet options are:
                         Ricker: takes one frequency
@@ -107,6 +112,7 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, dt=0.0004, dmax=30
 
     # Get source wavelet
     wav = {'RICKER':getRicker, 'ORMSBY':getOrmsby, 'KLAUDER':getKlauder}[wavtyp](wavf,twav)
+    wav = wavA*wav
 
     rseriesconv = np.zeros(len(t))
     for i in range(len(tref)):
@@ -127,8 +133,8 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, dt=0.0004, dmax=30
 ## WAVELET DEFINITIONS
 pi = np.pi
 def getRicker(f,t):
-    assert len(f) == 1, 'Ricker wavelet needs 1 frequency as input'
-    f = f[0]
+    # assert len(f) == 1, 'Ricker wavelet needs 1 frequency as input'
+    # f = f[0]
     pift = pi*f*t
     wav = (1 - 2*pift**2)*np.exp(-pift**2)
     return wav
@@ -186,8 +192,8 @@ def plotLogs(d, rho, v, usingT=True):
     nd   = len(dpth)
 
     plt.figure()
-    xlimrho = (1.99,5.01)
-    xlimv   = (0.29,4.01)
+    xlimrho = (1.95,5.05)
+    xlimv   = (0.25,4.05)
     xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
 
     # Plot Density
@@ -240,19 +246,28 @@ def plotTimeDepth(d,v):
     plt.show()
 
 
-def plotSeismogram(d, rho, v, wavtyp, wavf, usingT=True):
+def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
     """
     docstring for plotSeismogram
     """
 
-    tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
+    tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavf, wavA, usingT,wavtyp)
+
+    noise  = noise*np.max(np.abs(seis))*np.random.randn(seis.size)
+    filt   = np.arange(1.,15.)
+    filtr  = filt[::-1]
+    filt   = np.append(filt,filtr[1:])*1./15.
+    noise  = np.convolve(noise,filt)
+    noise  = noise[0:seis.size]
+
+    seis = seis + noise
 
     plt.figure()
 
     plt.subplot(131)
     plt.plot(wav,twav,linewidth=1,color='black')
     plt.title('Wavelet')
-    plt.xlim((-1.,1.))
+    plt.xlim((-2.,2.))
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
@@ -268,6 +283,101 @@ def plotSeismogram(d, rho, v, wavtyp, wavf, usingT=True):
     plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+
+    plt.subplot(133)
+    plt.plot(seis,tseis,color='black',linewidth=1)
+    plt.title('Seismogram')
+    plt.grid()
+    plt.ylim((tseis.min(),tseis.max()))
+    plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+    plt.show()
+
+def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
+    """
+    docstring for plotSeismogram
+    """
+
+    tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavf, wavA, usingT,wavtyp)
+
+    noise  = noise*np.max(np.abs(seis))*np.random.randn(seis.size)
+    filt   = np.arange(1.,17.)
+    filtr  = filt[::-1]
+    filt   = np.append(filt,filtr[1:])*1./17.
+    noise  = np.convolve(noise,filt)
+    noise  = noise[0:seis.size]
+
+    seis = seis + noise
+
+    plt.figure()
+
+    plt.subplot(131)
+    plt.plot(wav,twav,linewidth=1,color='black')
+    plt.title('Wavelet')
+    plt.xlim((-2.,2.))
+    plt.grid()
+    plt.gca().invert_yaxis()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+
+    plt.subplot(132)
+    plt.plot(np.zeros(tref.size),(tseis.max(),tseis.min()),linewidth=2,color='black')
+    plt.hlines(tref,np.zeros(len(rseriesconv)),rseriesconv,linewidth=2) #,'marker','none'
+    plt.title('Reflectivity')
+    plt.grid()
+    plt.ylim((0,tseis.max()))
+    plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+
+    plt.subplot(133)
+    plt.plot(seis,tseis,color='black',linewidth=1)
+    plt.title('Seismogram')
+    plt.grid()
+    plt.ylim((tseis.min(),tseis.max()))
+    plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+    plt.show()
+
+def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
+    """
+    docstring for plotSeismogramV2
+    """
+
+    dpth, rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT)
+    tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavf, wavA, usingT,wavtyp)
+
+    noise  = noise*np.max(np.abs(seis))*np.random.randn(seis.size)
+    filt   = np.arange(1.,11.)
+    filtr  = filt[::-1]
+    filt   = np.append(filt,filtr[1:])*1./11.
+    noise  = np.convolve(noise,filt)
+    noise  = noise[0:seis.size]
+
+    xlimrho = (1.95,5.05)
+    xlimv   = (0.25,4.05)
+    xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
+
+    seis = seis + noise
+
+    plt.figure()
+
+    plt.subplot(131)
+    plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
+    plt.title('$\\rho$')
+    plt.xlabel('Density \n $\\times 10^3$ (kg /m$^3$)',fontsize=9)
+    plt.ylabel('Depth (m)',fontsize=9)
+
+    plt.subplot(132)
+    plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
+    plt.title('$v$')
+    plt.xlabel('Velocity \n $\\times 10^3$ (m/s)',fontsize=9)
+    plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(133)
     plt.plot(seis,tseis,color='black',linewidth=1)
@@ -300,12 +410,48 @@ def plotTimeDepthInteract(d2,d3,v1,v2,v3):
     v   = np.array((v1,v2,v3), dtype=float)
     plotTimeDepth(d,v)
 
-def plotSeismogramInteract(f)
+def plotSeismogramInteractFixMod(wavf,wavA):
+    """
+    doscrting for plotSeismogramInteractFixedD
+    """
+
+    d      = [0., 50., 100.]      # Position of top of each layer (m)
+    v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
+    rho    = [2000., 2300., 2500.] # Density of each layer (kg/m^3)
+    wavf   = np.array(wavf, dtype=float)
+    usingT = True
+    plotSeismogram(d, rho, v, wavf, wavA, 0., usingT)
+
+def plotSeismogramInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,wavf,wavA,AddNoise=False,usingT=True):
+    d   = np.array((0.,d2,d3), dtype=float)
+    v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
+    rho    = [2000., 2300., 2500.]
+
+    if AddNoise:
+        noise = 0.03
+    else:
+        noise = 0.
+
+    plotSeismogramV2(d, rho, v, wavf, wavA, noise,usingT)
+
+def plotSeismogramInteractRes(h2,wavf,AddNoise=False):
+    d      = [0., 50., 50.+h2]      # Position of top of each layer (m)
+    v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
+    rho    = [2000., 2300., 2500.] # Density of each layer (kg/m^3)
+    wavf   = np.array(wavf, dtype=float)
+    usingT = True
+
+    if AddNoise:
+        noise = 0.03
+    else:
+        noise = 0.
+
+    plotSeismogramV2(d, rho, v, wavf, 1., noise)
 
 if __name__ == '__main__':
 
     d      = [0., 50., 100.]      # Position of top of each layer (m)
-    v      = [1000.,  1000., 1500.]  # Velocity of each layer (m/s)
+    v      = [500.,  1000., 1500.]  # Velocity of each layer (m/s)
     rho    = [2000., 2300., 2500.] # Density of each layer (kg/m^3)
     wavtyp = 'RICKER'           # Wavelet type
     wavf   = [50.]              # Wavelet Frequency
@@ -313,6 +459,9 @@ if __name__ == '__main__':
 
 #    syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
 
-    plotLogsInteract(d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
+    #plotLogsInteract(d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
     #plotTimeDepth(d,v)
     #plotSeismogram(d, rho, v, wavtyp, wavf, usingT)
+    #plotSeismogramInteractFixedD(rho[0],rho[1],rho[2],v[0],v[1],v[2],30.,1.)
+    plotSeismogramInteractFixMod(wavf,1.)
+
