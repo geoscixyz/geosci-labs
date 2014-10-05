@@ -102,7 +102,7 @@ def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
     return time
 
-def NMOstackthree(data, v1, v2, v3):
+def NMOstackthree(data, tintercept, v1, v2, v3):
     dx = 20.
     xorig = np.arange(38)*dx
     time = np.load('time1.npy')
@@ -141,7 +141,7 @@ def NMOstack(data, xorig, time, v):
         singletrace[i] = (mkvc(data)[sub2ind(data.shape, np.c_[np.arange(data.shape[0]), indmin])]).sum()
     return singletrace
 
-def NMOstackSingle(data, v):
+def NMOstackSingle(data, tintercept, v):
     dx = 20.
     xorig = np.arange(38)*dx
     time = np.load('time1.npy')
