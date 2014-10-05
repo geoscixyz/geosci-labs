@@ -9,9 +9,9 @@ def getPlotLog(d,log,dmax=300):
     dplot   = np.kron(d,np.ones(2))
     logplot = np.kron(log,np.ones(2))
 
-    # dplot   = dplot[1:] 
+    # dplot   = dplot[1:]
     dplot   = np.append(dplot[1:],dmax)
-   
+
     return dplot, logplot
 
 
@@ -97,17 +97,17 @@ def syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT=True, dt=0.0004, dmax=30
     rseries,R = getReflectivity(d,rho,v)
 
     # time for reflectivity series
-    tref   = t[1:-1] 
+    tref   = t[1:-1]
 
     # create time vector
     t = np.arange(t.min(),t.max(),dt)
 
     # make wavelet
     twav   = np.arange(-2.0/np.min(wavf), 2.0/np.min(wavf), dt)
- 
+
     # Get source wavelet
     wav = {'RICKER':getRicker, 'ORMSBY':getOrmsby, 'KLAUDER':getKlauder}[wavtyp](wavf,twav)
-    
+
     rseriesconv = np.zeros(len(t))
     for i in range(len(tref)):
          index = np.abs(t - tref[i]).argmin()
@@ -195,13 +195,13 @@ def plotLogs(d, rho, v, usingT=True):
     plt.subplot(141)
     plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
     plt.title('$\\rho$')
-    plt.xlabel('Density \n ($\\times 10^3$ kg /m$^3$)',fontsize=9)
+    plt.xlabel('Density \n $\\times 10^3$ (kg /m$^3$)',fontsize=9)
     plt.ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(142)
     plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
     plt.title('$v$')
-    plt.xlabel('Velocity \n ($\\times 10^3$ m/s)',fontsize=9)
+    plt.xlabel('Velocity \n $\\times 10^3$ (m/s)',fontsize=9)
     plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(143)
@@ -236,7 +236,7 @@ def plotTimeDepth(d,v):
     plt.grid()
     plt.gca().set_xlabel('Depth (m)',fontsize=9)
     plt.gca().set_ylabel('Two Way Time (s)',fontsize=9)
-    
+
 
     plt.show()
 
