@@ -26,14 +26,14 @@ def ViewWiggle(syndata, obsdata):
     ax[1].set_ylabel("Time (s)")
     ax[1].set_title("Noisy CMP gather")
 
-def NoisyNMOWidget(tintercept, v1, v2, v3):
+def NoisyNMOWidget(t0, v1, v2, v3):
     syndata = np.load('obsdata1.npy')
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
-    time1 = HyperbolicFun(tintercept, xorig, v1)
-    time2 = HyperbolicFun(tintercept, xorig, v2)
-    time3 = HyperbolicFun(tintercept, xorig, v3)
+    time1 = HyperbolicFun(t0, xorig, v1)
+    time2 = HyperbolicFun(t0, xorig, v2)
+    time3 = HyperbolicFun(t0, xorig, v3)
 
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
@@ -49,7 +49,7 @@ def NoisyNMOWidget(tintercept, v1, v2, v3):
     ax[0].invert_yaxis()
     ax[1].invert_yaxis()
     wiggle(syndata, ax = ax[0], **kwargs)
-    toffset = np.sqrt(xorig**2/v2**2+tintercept**2)-tintercept
+    toffset = np.sqrt(xorig**2/v2**2+t0**2)-t0
     wiggle(syndata, ax = ax[1], manthifts=toffset, **kwargs)
 
     ax[0].axis(extent)
@@ -65,12 +65,12 @@ def NoisyNMOWidget(tintercept, v1, v2, v3):
     ax[0].set_title("CMP gather")
     ax[1].set_title("NMO corrected CMP gather")
 
-def CleanNMOWidget(tintercept, v):
+def CleanNMOWidget(t0, v):
     syndata = np.load('syndata1.npy')
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
-    time = HyperbolicFun(tintercept, xorig, v)
+    time = HyperbolicFun(t0, xorig, v)
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
     'skipt':1,
@@ -85,7 +85,7 @@ def CleanNMOWidget(tintercept, v):
     ax[0].invert_yaxis()
     ax[1].invert_yaxis()
     wiggle(syndata, ax = ax[0], **kwargs)
-    toffset = np.sqrt(xorig**2/v**2+tintercept**2)-tintercept
+    toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
     wiggle(syndata, ax = ax[1], manthifts=toffset, **kwargs)
 
     ax[0].axis(extent)
@@ -98,8 +98,8 @@ def CleanNMOWidget(tintercept, v):
     ax[0].set_title("CMP gather")
     ax[1].set_title("NMO corrected CMP gather")
 
-def HyperbolicFun(tintercept, x, velocity):
-    time = np.sqrt(x**2/velocity**2+tintercept**2)
+def HyperbolicFun(t0, x, velocity):
+    time = np.sqrt(x**2/velocity**2+t0**2)
     return time
 
 def NMOstackthree(data, v1, v2, v3):
