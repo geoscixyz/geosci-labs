@@ -50,6 +50,9 @@ def getReflectivity(d,rho,v,usingT=True):
         for i in range(nlayer-1):
             rseries[i+1:] = rseries[i+1:]*(1.-R[i]**2)
 
+    rseries = np.array(rseries, dtype=float)
+    R       = np.array(R, dtype = float)
+
     return rseries, R
 
 
@@ -456,7 +459,7 @@ if __name__ == '__main__':
     wavf   = 50.                   # Wavelet Frequency
     usingT = False                 # Use Transmission Coefficients?
 
-    #plotLogsInteract(d[1],d[2],rho[0],rho[1],rho[2],v[0],v[1],v[2])
+    plotLogs(d,rho,v)
     #plotTimeDepth(d,v)
     #plotSeismogram(d, rho, v, wavtyp, wavf, usingT)
     #plotSeismogramV2(d, rho, v, 50., wavA=1., noise = 0., usingT=True, wavtyp='RICKER')
