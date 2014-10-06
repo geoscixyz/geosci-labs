@@ -246,7 +246,7 @@ def plotLogs(d, rho, v, usingT=True):
     plt.setp(plt.yticks()[1],visible=False)
 
     plt.subplot(144)
-    plt.hlines(d[1:],np.zeros(nd-1),rseries,linewidth=2)
+    plt.hlines(d[1:],np.zeros(len(d)-1),rseries,linewidth=2)
     plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')
     plt.title('Reflectivity');
     plt.xlim((-1.,1.))
