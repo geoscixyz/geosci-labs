@@ -299,6 +299,7 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.plot(wav,twav,linewidth=1,color='black')
     plt.title('Wavelet')
     plt.xlim((-2.,2.))
+    plt.ylim((tseis.min()-tseis.mean(),tseis.max()-tseis.mean()))
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
@@ -313,7 +314,7 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.grid()
     plt.ylim((0,tseis.max()))
     plt.gca().invert_yaxis()
-    plt.xlim((-1.,1.))
+    plt.xlim((-2.,2.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
     plt.gca().set_xlabel('Amplitude',fontsize=9)
@@ -358,25 +359,37 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
 
     plt.figure(num=0, figsize = (8, 5))
 
-    plt.subplot(131)
+    plt.subplot(141)
+    plt.plot(wav,twav,linewidth=1,color='black')
+    plt.title('Wavelet')
+    plt.xlim((-1.,1.))
+    plt.ylim((tseis.min()-tseis.mean(),tseis.max()-tseis.mean()))
+    plt.grid()
+    plt.gca().invert_yaxis()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.subplot(142)
     plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
     plt.title('$\\rho$')
     plt.xlabel('Density \n $\\times 10^3$ (kg /m$^3$)',fontsize=9)
     plt.ylabel('Depth (m)',fontsize=9)
 
-    plt.subplot(132)
+    plt.subplot(143)
     plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
     plt.title('$v$')
     plt.xlabel('Velocity \n $\\times 10^3$ (m/s)',fontsize=9)
     plt.ylabel('Depth (m)',fontsize=9)
 
-    plt.subplot(133)
+    plt.subplot(144)
     plt.plot(seis,tseis,color='black',linewidth=1)
     plt.title('Seismogram')
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
     plt.gca().invert_yaxis()
-    plt.xlim((-0.5,0.5))
+    plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
     plt.gca().set_xlabel('Amplitude',fontsize=9)
@@ -422,9 +435,9 @@ def plotSeismogramInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,wavf,wavA,AddNoise=Fals
     """
     interactive wrapper for plot SeismogramV2 for a fixed geologic model
     """
-    d   = np.array((0.,d2,d3), dtype=float)
-    v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
-    rho    = [2000., 2300., 2500.]
+    d      = np.array((0.,d2,d3), dtype=float)
+    v      = np.array((v1,v2,v3), dtype=float)
+    rho    = np.array((rho1,rho2,rho3), dtype=float)
 
     if AddNoise:
         noise = 0.02
