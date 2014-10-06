@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
-def getPlotLog(d,log,dmax=300):
+def getPlotLog(d,log,dmax=200):
     d = np.array(d, dtype=float)
     log = np.array(log, dtype=float)
 
@@ -40,7 +40,7 @@ def getReflectivity(d,rho,v,usingT=True):
     return rseries, R
 
 
-def getTimeDepth(d,v,dmax=300):
+def getTimeDepth(d,v,dmax=200):
     """
     docstring for getTimeDepth
     """
@@ -66,7 +66,7 @@ def getLogs(d, rho, v, usingT=True):
     return dpth, rholog, vlog, zlog, rseries
 
 
-def syntheticSeismogram(d, rho, v, wavf, wavA=1., usingT=True, wavtyp = 'RICKER', dt=0.0001, dmax=300):
+def syntheticSeismogram(d, rho, v, wavf, wavA=1., usingT=True, wavtyp = 'RICKER', dt=0.0001, dmax=200):
     """
     function syntheticSeismogram(d, rho, v, wavtyp, wavf, usingT)
 
@@ -191,12 +191,14 @@ def plotLogs(d, rho, v, usingT=True):
     dpth, rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT)
     nd   = len(dpth)
 
-    plt.figure()
+
     xlimrho = (1.95,5.05)
     xlimv   = (0.25,4.05)
     xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
 
     # Plot Density
+    plt.figure(1)
+
     plt.subplot(141)
     plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
     plt.title('$\\rho$')
@@ -226,6 +228,7 @@ def plotLogs(d, rho, v, usingT=True):
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],visible=False)
 
+    plt.tight_layout()
     plt.show()
 
 
@@ -242,7 +245,7 @@ def plotTimeDepth(d,v):
     plt.gca().set_xlabel('Depth (m)',fontsize=9)
     plt.gca().set_ylabel('Two Way Time (s)',fontsize=9)
 
-
+    plt.tight_layout()
     plt.show()
 
 
@@ -272,6 +275,8 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.subplot(132)
     plt.plot(np.zeros(tref.size),(tseis.max(),tseis.min()),linewidth=2,color='black')
@@ -283,6 +288,8 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.subplot(133)
     plt.plot(seis,tseis,color='black',linewidth=1)
@@ -290,9 +297,13 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
     plt.gca().invert_yaxis()
-    plt.xlim((-1.,1.))
+    plt.xlim((-0.95,0.95))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.tight_layout()
     plt.show()
 
 def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
@@ -321,6 +332,8 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.subplot(132)
     plt.plot(np.zeros(tref.size),(tseis.max(),tseis.min()),linewidth=2,color='black')
@@ -332,6 +345,8 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.xlim((-1.,1.))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.subplot(133)
     plt.plot(seis,tseis,color='black',linewidth=1)
@@ -339,9 +354,13 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
     plt.gca().invert_yaxis()
-    plt.xlim((-1.,1.))
+    plt.xlim((-0.95,0.95))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.tight_layout()
     plt.show()
 
 def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
@@ -353,9 +372,9 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavf, wavA, usingT,wavtyp)
 
     noise  = noise*np.max(np.abs(seis))*np.random.randn(seis.size)
-    filt   = np.arange(1.,11.)
+    filt   = np.arange(1.,21.)
     filtr  = filt[::-1]
-    filt   = np.append(filt,filtr[1:])*1./11.
+    filt   = np.append(filt,filtr[1:])*1./21.
     noise  = np.convolve(noise,filt)
     noise  = noise[0:seis.size]
 
@@ -377,7 +396,7 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
     plt.title('$v$')
     plt.xlabel('Velocity \n $\\times 10^3$ (m/s)',fontsize=9)
-    plt.setp(plt.yticks()[1],visible=False)
+    plt.ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(133)
     plt.plot(seis,tseis,color='black',linewidth=1)
@@ -385,10 +404,15 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
     plt.gca().invert_yaxis()
-    plt.xlim((-1.,1.))
+    plt.xlim((-0.5,0.5))
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.tight_layout()
     plt.show()
+
 
 
 ## INTERACTIVE PLOT WRAPPERS
@@ -428,7 +452,7 @@ def plotSeismogramInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,wavf,wavA,AddNoise=Fals
     rho    = [2000., 2300., 2500.]
 
     if AddNoise:
-        noise = 0.03
+        noise = 0.02
     else:
         noise = 0.
 
@@ -442,7 +466,7 @@ def plotSeismogramInteractRes(h2,wavf,AddNoise=False):
     usingT = True
 
     if AddNoise:
-        noise = 0.03
+        noise = 0.02
     else:
         noise = 0.
 
@@ -463,5 +487,5 @@ if __name__ == '__main__':
     #plotTimeDepth(d,v)
     #plotSeismogram(d, rho, v, wavtyp, wavf, usingT)
     #plotSeismogramInteractFixedD(rho[0],rho[1],rho[2],v[0],v[1],v[2],30.,1.)
-    plotSeismogramInteractFixMod(wavf,1.)
+    plotSeismogramV2(d, rho, v, 50., wavA=1., noise = 0., usingT=True, wavtyp='RICKER')
 
