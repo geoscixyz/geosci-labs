@@ -1,4 +1,0 @@
-GeophysicsToy
-=============
-
-GeophysicsToy
