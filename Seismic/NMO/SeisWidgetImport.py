@@ -1,4 +1,6 @@
 from EOSC350widget import CleanNMOWidget, NoisyNMOWidget, NMOstackSingle, NMOstackthree, wiggle, ViewWiggle
+import warnings
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 from IPython.display import set_matplotlib_formats
 from IPython.html.widgets import *
 import matplotlib

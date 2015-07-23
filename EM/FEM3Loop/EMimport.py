@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 from IPython.display import HTML
 from IPython.display import set_matplotlib_formats
 import matplotlib
