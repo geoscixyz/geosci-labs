@@ -1,7 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# import warnings
-# warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+import warnings
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
+
 from IPython.html.widgets import *
-from fatiando import utils, mesher, gridder
-import fatiando.gravmag.prism as prism
+from fromFatiando import *
+from fromSimPEG import *
+from scipy.constants import mu_0
