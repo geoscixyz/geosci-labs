@@ -1,0 +1,3 @@
+import fatiandoGridMesh
+import fatiandoUtils
+import fatiandoMagPrism 
