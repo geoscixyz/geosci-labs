@@ -10,3 +10,5 @@ from IPython.html.widgets import *
 from fromFatiando import *
 from fromSimPEG import *
 from scipy.constants import mu_0
+
+# from importMag import *
