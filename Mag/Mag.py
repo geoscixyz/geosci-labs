@@ -90,8 +90,6 @@ def getFieldline(p,comp='tf',irt='induced'):
 
 def profiledataInd(x0, depth, susc):
     magnT = data["Anomaly"].values
-    ## Seogi
-    # Not sure why do I need to put -x0 ... 
     p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0)
     nx, ny = 100, 1
     surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
@@ -167,12 +165,11 @@ def fitlineRem(x0, depth0, susc0):
              rdec=widgets.FloatSliderWidget(min=-90., max=90.,step=1., value=0.))
     return Q
 
-def plotObj3D(p,elev,azim):
+def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
+              profile=None, x0=0., y0=0.):
 
     # define the survey area
-    nx, ny = 100,100
-    surveyArea = (-10., 10., -10., 10.)
-    z = 0. 
+    surveyArea = (-xmax, xmax, -ymax, ymax)
     shape = (nx,ny)
     xp, yp, zp = fatiandoGridMesh.regular(surveyArea,shape, z=z)    
 
@@ -189,7 +186,7 @@ def plotObj3D(p,elev,azim):
     ax.set_xlim3d(surveyArea[:2])
     ax.set_ylim3d(surveyArea[2:])
 #     ax.set_zlim3d(depth+np.array(surveyArea[:2]))
-    ax.set_zlim3d(0., surveyArea[-1]*2)
+    ax.set_zlim3d(-3, surveyArea[-1]*2)
 
     xpatch = [x1,x1,x2,x2]
     ypatch = [y1,y2,y2,y1]
@@ -218,22 +215,32 @@ def plotObj3D(p,elev,azim):
     xyz = simpegCoordUtils.rotatePointsFromNormals(np.vstack([xpatch,ypatch,zpatch]).T, np.r_[1., 0., 0.],fatiandoUtils.ang2vec(1.,pinc,pdec),np.r_[(x1+x2)/2., (y1+y2)/2., (z1+z2)/2.])
     ax.add_collection3d(Poly3DCollection([zip(xyz[:,0], xyz[:,1], xyz[:,2])])) 
     
-    ax.set_xlabel('Easting (m)')
-    ax.set_ylabel('Northing (m)')
-    ax.set_zlabel('Depth (m)')
-#     ax.plot(xp,yp,z,'.g')
+    ax.set_xlabel('Northing (X; m)')
+    ax.set_ylabel('Easting (Y; m)')
+    ax.set_zlabel('Depth (Z; m)')
+    ax.invert_zaxis()
+    ax.invert_yaxis()
+
+    ax.plot(xp,yp,z,'.g', alpha=0.1)
+    if profile == "X":    
+        ax.plot(np.r_[surveyArea[:2]],np.r_[0., 0.],np.r_[z, z],'r-')
+    elif profile == "Y":    
+        ax.plot(np.r_[0., 0.], np.r_[surveyArea[2:]],np.r_[z, z],'r-')
+    elif profile == "XY":
+        ax.plot(np.r_[surveyArea[:2]],np.r_[0., 0.],np.r_[z, z],'r-')
+        ax.plot(np.r_[0., 0.], np.r_[surveyArea[2:]],np.r_[z, z],'r-')
 
     ax.view_init(elev,azim) 
 
 def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
     p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
-    return plotObj3D(p, elev, azim)
+    return plotObj3D(p, elev, azim, profile="X")
 
 def ViewPrism(dx, dy, dz, depth):
     Q = widgets.interactive(Prism,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
                     ,depth=widgets.IntSlider(min=0,max=10,step=1,value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
-                    ,elev=widgets.FloatText(value=200), azim=widgets.FloatText(value=25))
+                    ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=-70))
     return Q
 
 
