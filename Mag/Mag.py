@@ -38,8 +38,8 @@ def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Ein
     
     Higrf = Bigrf * 1e-9 / mu_0
 
-    x1, x2 = -dx/2. - x0, dx/2. - x0
-    y1, y2 = -dy/2. - y0, dy/2. - y0
+    x1, x2 = -dx/2. + x0, dx/2. + x0
+    y1, y2 = -dy/2. + y0, dy/2. + y0
     z1, z2 = depth, depth + dz
     Mind = susc*Higrf
     rMag = Q*Mind
@@ -92,7 +92,7 @@ def profiledataInd(x0, depth, susc):
     magnT = data["Anomaly"].values
     ## Seogi
     # Not sure why do I need to put -x0 ... 
-    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=-x0)
+    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0)
     nx, ny = 100, 1
     surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
     z = 0. 
