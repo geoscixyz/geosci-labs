@@ -47,24 +47,18 @@ def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Ein
     # This is a bit of a hack: I am putting all of the parameters we will need later in the 'property' dictionary 
     return fatiandoGridMesh.Prism(x1, x2, y1, y2, z1, z2,{'magnetization': fatiandoUtils.ang2vec(rMag, rinc-pinc, rdec-pdec),'pinc':pinc,'pdec':pdec,'rinc':rinc,'rdec':rdec,'depth':depth,'Einc':Einc,'Edec':Edec,'Mind':Mind})
 
-def getFieldline(p,comp='tf',irt='induced'):
+def getField(p, XYZ, comp='tf',irt='induced'):
     
     pinc,pdec = p.props['pinc'], p.props['pdec']
     Einc, Edec = p.props['Einc'], p.props['Edec']
     rinc,rdec = p.props['rinc'], p.props['rdec']
     Mind = p.props['Mind']
     
-    nx, ny = 100, 1
-    surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
-    z = -1.9
-    shape = (nx,ny)
-    xp, yp, zp = fatiandoGridMesh.regular(surveyArea,shape, z=z)
     
     x1, x2 = p.x1, p.x2
     y1, y2 = p.y1, p.y2
     z1, z2 = p.z1, p.z2
     
-    XYZ = np.vstack([xp,yp,zp]).T
     XYZ = simpegCoordUtils.rotatePointsFromNormals(XYZ, fatiandoUtils.ang2vec(1., pinc, pdec), np.r_[1.,0.,0.], np.r_[(x1+x2)/2., (y1+y2)/2., (z1+z2)/2.] )
 
     xp_eval, yp_eval, zp_eval = XYZ[:,0], XYZ[:,1], XYZ[:,2]
@@ -91,12 +85,16 @@ def getFieldline(p,comp='tf',irt='induced'):
 def profiledataInd(x0, depth, susc):
     magnT = data["Anomaly"].values
     p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0)
+
     nx, ny = 100, 1
+    shape = (nx, ny)
     surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
-    z = 0. 
-    shape = (nx,ny)
+    z = -1.9
     xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+    xyz = np.vstack([xpl,ypl,zpl]).T
+
     fig, ax = plt.subplots(1,2, figsize = (12, 4))
+
     ax[0].plot(x0, depth, 'ko')
     ax[0].text(x0+0.5, depth, 'Rebar', color='k')
     ax[0].text(-1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
@@ -105,7 +103,7 @@ def profiledataInd(x0, depth, susc):
     ax[0].plot(np.r_[-5, 5], np.r_[0., 0.], 'k--')
     ax[0].set_xlim(-4, 4)
     ax[0].set_ylim(-3, 4)
-    ax[1].plot(xpl, getFieldline(p), 'k')
+    ax[1].plot(xpl, getField(p, xyz), 'k')
     ax[1].plot(loc-8, magnT[::-1], 'ko')
     ax[0].set_xlabel("Northing (m)")
     ax[0].set_ylabel("Depth (m)")
@@ -128,17 +126,20 @@ def profiledataRem(x0, depth, susc, Q, rinc, rdec):
     # Not sure why do I need to put -x0 ... 
     p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=-x0, Q=Q, rinc = rinc, rdec = rdec)
     nx, ny = 100, 1
+    shape = (nx, ny)
     surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
-    z = 0. 
-    shape = (nx,ny)
+    z = -1.9
     xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+    xyz = np.vstack([xpl,ypl,zpl]).T
+
+
     fig, ax = plt.subplots(1,2, figsize = (12, 4))
     ax[0].plot(x0, depth, 'ko')
     ax[0].text(x0+0.5, depth, 'Rebar', color='k')
     ax[0].text(-1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
     ax[0].plot(np.r_[-5, 5], np.r_[-1.9, -1.9], 'b--')
 
-    magi,magr = getFieldline(p, 'tf', 'total')
+    magi,magr = getField(p, xyz, 'tf', 'total')
 
     ax[0].plot(np.r_[-5, 5], np.r_[0., 0.], 'k--')
     ax[0].set_xlim(-4, 4)
@@ -243,7 +244,81 @@ def ViewPrism(dx, dy, dz, depth):
                     ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=-70))
     return Q
 
+def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
+    elev, azim = 30, -70
+    p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
+    return p, plotObj3D(p, elev, azim, profile=None, z=0., xmax=20, ymax=20)
+
+def ViewPrismSurvey(dx, dy, dz, depth):    
+    Q = widgets.interactive(PrismSurvey,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
+                    ,depth=widgets.IntSlider(min=0,max=10,step=1,value=depth)
+                    ,pinc=(-90, 90, 10), pdec=(-90, 90., 10))
+    return Q    
 
 
+def linefun(x1, x2, y1, y2, nx):
+    x = np.linspace(x1, x2, nx)
+    if x1==x2:
+        y = np.ones_like(x)*y1
+    else:
+        slope = (y2-y1)/(x2-x1)
+        y=slope*(x-x1)+y1
+    return x, y
 
+def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp, Q, rinc, rdec):
+    nx, ny = 101,101
+    surveyArea = (-20., 20., -20., 20.)
+    shape = (nx,ny)
+    xp, yp, zp = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+    xyz = np.vstack([xp,yp,zp]).T
+    X = xp.reshape((nx, ny))
+    Y = yp.reshape((nx, ny))
+    p = definePrism(h.kwargs['dx'], h.kwargs['dy'], h.kwargs['dz'], depth, pinc=h.kwargs['pinc'], pdec=h.kwargs['pdec'], susc = susc, Einc=Einc, Edec=Edec, Bigrf=Bigrf,
+                    Q = Q, rinc = rinc, rdec = rdec)
+    import matplotlib.gridspec as gridspec
+    x, y = linefun(x1, x2, y1, y2, npts)
+    xyz_line = np.c_[x, y, np.ones_like(x)*z]
+    fig = plt.figure(figsize=(18*1.5,4*1.5))
+    plt.rcParams.update({'font.size': 14})
+    gs1 = gridspec.GridSpec(2, 7)
+    gs1.update(left=0.05, right=0.48, wspace=0.05)
+    ax1 = plt.subplot(gs1[:2, :3])
+    ax2 = plt.subplot(gs1[0, 4:])
+    ax1.pcolor(X,Y, getField(p, xyz, comp=comp).reshape((shape)))
+    ax1.plot(x, y, 'w.', ms=3)
+    ax1.text(x[0], y[0], 'A', fontsize = 16, color='w')
+    ax1.text(x[-1], y[-1], 'B', fontsize = 16, color='w')
+    ax1.set_xlabel('Northing (m)')
+    ax1.set_ylabel('Easting (m)')
+    ax1.set_xlim(X.min(), X.max())
+    ax1.set_ylim(Y.min(), Y.max())
+    out_line = getField(p, xyz_line, comp=comp)
+    ax2.plot(out_line, 'b.-')
+    ax2.set_xlabel("Station number")
+    ax2.set_ylabel("Magnetic field (nT)")
+    ax2.text(0, out_line.max()*0.8, 'A', fontsize = 16)
+    ax2.text(npts, out_line.max()*0.8, 'B', fontsize = 16)
+    ax2.set_xlim(0, npts)
+    ax2.grid(True)
 
+def ViewMagSurvey2DInd(h):
+    
+    def MagSurvey2DInd(depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp):
+        Qm = 0.
+        rinc, rdec = 0., 0.
+        return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp, Qm, rinc, rdec)    
+    
+    Q = widgets.interactive (MagSurvey2DInd 
+                    ,depth=widgets.FloatSlider(min=0,max=10,step=1,value=h.kwargs['depth']) \
+                    ,susc=widgets.FloatSlider(min=0,max=1,step=0.01,value=0.01) \
+                    ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
+                    ,Bigrf=widgets.FloatText(value=52000.) \
+                    ,x1=widgets.FloatText(value=-10) \
+                    ,y1=widgets.FloatText(value=-10) \
+                    ,x2=widgets.FloatText(value=10) \
+                    ,y2=widgets.FloatText(value=10) \
+                    ,npts=widgets.IntSlider(min=5,max=200,step=1,value=20) \
+                    ,z=widgets.FloatText(value=-1.9) \
+                    ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz']) )
+    return Q
+# fig.tight_layout()
