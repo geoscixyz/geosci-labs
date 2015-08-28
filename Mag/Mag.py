@@ -72,7 +72,7 @@ def getField(p, XYZ, comp='tf',irt='induced'):
     if (irt is 'remnant') or (irt is 'total'):
         if comp is 'bx': fieldr = fatiandoMagPrism.bx(xp_eval,yp_eval,zp_eval,[p])
         elif comp is 'by': fieldr = fatiandoMagPrism.by(xp_eval,yp_eval,zp_eval,[p])
-        elif comp is 'bz': fieldr = fatiandoMagPrism.bz(xp_eval,yp_eval,zp_eval,zp,[p])
+        elif comp is 'bz': fieldr = fatiandoMagPrism.bz(xp_eval,yp_eval,zp_eval,[p])
         elif comp is 'tf': fieldr = fatiandoMagPrism.tf(xp_eval,yp_eval,zp_eval,[p],Einc-pinc,Edec-pdec)
         
     if irt is 'induced':
@@ -180,7 +180,7 @@ def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
     z1, z2 = p.z1, p.z2
     pinc, pdec = p.props['pinc'], p.props['pdec']
     
-    fig = plt.figure(figsize = (8,8))
+    fig = plt.figure(figsize = (7, 7))
     ax = fig.add_subplot(111, projection='3d')
     plt.rcParams.update({'font.size': 13})
     
@@ -241,11 +241,11 @@ def ViewPrism(dx, dy, dz, depth):
     Q = widgets.interactive(Prism,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
                     ,depth=widgets.IntSlider(min=0,max=10,step=1,value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
-                    ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=-70))
+                    ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=200))
     return Q
 
 def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
-    elev, azim = 30, -70
+    elev, azim = 30, 200
     p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
     return p, plotObj3D(p, elev, azim, profile=None, z=0., xmax=20, ymax=20)
 
@@ -265,8 +265,8 @@ def linefun(x1, x2, y1, y2, nx):
         y=slope*(x-x1)+y1
     return x, y
 
-def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp, Q, rinc, rdec):
-    nx, ny = 101,101
+def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt,  Q, rinc, rdec):
+    nx, ny = npts2D, npts2D
     surveyArea = (-20., 20., -20., 20.)
     shape = (nx,ny)
     xp, yp, zp = fatiandoGridMesh.regular(surveyArea,shape, z=z)
@@ -278,13 +278,20 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, 
     import matplotlib.gridspec as gridspec
     x, y = linefun(x1, x2, y1, y2, npts)
     xyz_line = np.c_[x, y, np.ones_like(x)*z]
-    fig = plt.figure(figsize=(18*1.5,4*1.5))
+    fig = plt.figure(figsize=(18*1.5,3.4*1.5))
     plt.rcParams.update({'font.size': 14})
     gs1 = gridspec.GridSpec(2, 7)
     gs1.update(left=0.05, right=0.48, wspace=0.05)
     ax1 = plt.subplot(gs1[:2, :3])
     ax2 = plt.subplot(gs1[0, 4:])
-    ax1.pcolor(X,Y, getField(p, xyz, comp=comp).reshape((shape)))
+    ax1.axis("equal")
+    if irt == 'total':
+        out = getField(p, xyz, comp, 'induced')+getField(p, xyz, comp, 'remnant')        
+    else:
+        out = getField(p, xyz, comp, irt)
+    dat = ax1.contourf(X,Y, out.reshape((shape)), 100)
+    cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
+    cb.set_label("nT")
     ax1.plot(x, y, 'w.', ms=3)
     ax1.text(x[0], y[0], 'A', fontsize = 16, color='w')
     ax1.text(x[-1], y[-1], 'B', fontsize = 16, color='w')
@@ -292,23 +299,30 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, 
     ax1.set_ylabel('Easting (m)')
     ax1.set_xlim(X.min(), X.max())
     ax1.set_ylim(Y.min(), Y.max())
-    out_line = getField(p, xyz_line, comp=comp)
-    ax2.plot(out_line, 'b.-')
+    ax1.set_title(irt+' '+comp)
+    out_linei = getField(p, xyz_line, comp,'induced')
+    out_liner = getField(p, xyz_line, comp,'remnant')
+    out_linet = out_linei+out_liner
+
+    ax2.plot(out_linei, 'b.-')
+    ax2.plot(out_liner, 'r.-')
+    ax2.plot(out_linet, 'k.-')
+
     ax2.set_xlabel("Station number")
     ax2.set_ylabel("Magnetic field (nT)")
-    ax2.text(0, out_line.max()*0.8, 'A', fontsize = 16)
-    ax2.text(npts, out_line.max()*0.8, 'B', fontsize = 16)
+
+    ax2.text(0, out_linei.max()*0.8, 'A', fontsize = 16)
+    ax2.text(npts, out_linei.max()*0.8, 'B', fontsize = 16)
     ax2.set_xlim(0, npts)
+    ax2.legend(("induced", "remnant", "total"), bbox_to_anchor=(0.5, -0.3))
     ax2.grid(True)
 
 def ViewMagSurvey2DInd(h):
     
-    def MagSurvey2DInd(depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp):
-        Qm = 0.
-        rinc, rdec = 0., 0.
-        return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts, z, comp, Qm, rinc, rdec)    
+    def MagSurvey2DInd(depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec):
+        return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec)    
     
-    Q = widgets.interactive (MagSurvey2DInd 
+    out = widgets.interactive (MagSurvey2DInd 
                     ,depth=widgets.FloatSlider(min=0,max=10,step=1,value=h.kwargs['depth']) \
                     ,susc=widgets.FloatSlider(min=0,max=1,step=0.01,value=0.01) \
                     ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
@@ -317,8 +331,13 @@ def ViewMagSurvey2DInd(h):
                     ,y1=widgets.FloatText(value=-10) \
                     ,x2=widgets.FloatText(value=10) \
                     ,y2=widgets.FloatText(value=10) \
+                    ,npts2D=widgets.IntSlider(min=5,max=200,step=1,value=20) \
                     ,npts=widgets.IntSlider(min=5,max=200,step=1,value=20) \
                     ,z=widgets.FloatText(value=-1.9) \
-                    ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz']) )
-    return Q
+                    ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz'])
+                    ,irt=widgets.ToggleButtons(options=['induced','remnant', 'total']) 
+                    ,Q=widgets.FloatText(value=0.)
+                    ,rinc=widgets.FloatText(value=0.), rdec=widgets.FloatText(value=0.) \
+                    )
+    return out
 # fig.tight_layout()

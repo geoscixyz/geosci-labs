@@ -100,7 +100,7 @@ def vectrogram(inc, dec):
     ax.set_zlabel("Depth (Z)", color='k', fontsize = 16)
     ax.invert_zaxis()
     ax.invert_yaxis()
-    ax.view_init(30,-70)
+    ax.view_init(30,200)
     return 
 
 def vectorwidget(inc0, dec0):
@@ -132,53 +132,7 @@ def projgram(inc1, dec1, inc2, dec2):
     ax.add_artist(vec3)
     ax.add_artist(vec4)
 
-    y0 = Arrow3D([-1,1],[1,1],[0,0], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-    x0 = Arrow3D([1,1],[-1,1],[0,0], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-    y1 = Arrow3D([-1,1],[-1.,-1.],[0,0], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-    x1 = Arrow3D([-1.,-1.],[-1,1],[0,0], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-    test = fatiandoUtils.ang2vec(1.,inc2, dec2)
-    x0_vec0 = Arrow3D([0.,test[0]],[test[1],test[1]],[0., 0.], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    x0_vec1 = Arrow3D([0.,test[0]],[0., 0.],[test[2], test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    x0_vec2 = Arrow3D([0.,test[0]],[0., 0.],[0., 0.], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-
-    y0_vec0 = Arrow3D([test[0],test[0]],[0.,test[1]],[0., 0.], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    y0_vec1 = Arrow3D([0., 0.],[0.,test[1]],[test[2],test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    y0_vec2 = Arrow3D([0., 0.],[0.,test[1]],[0.,0.], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    x0_vec = Arrow3D([0.,test[0]],[test[1],test[1]],[test[2],test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    y0_vec = Arrow3D([test[0],test[0]],[0.,test[1]],[test[2],test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    z0_vec = Arrow3D([test[0],test[0]],[test[1],test[1]],[0.,test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    z0_vec0 = Arrow3D([test[0],test[0]],[0.,0.],[0.,test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    z0_vec1 = Arrow3D([0.,0.],[test[1],test[1]],[0.,test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-    z0_vec2 = Arrow3D([0.,0.],[0.,0.],[0.,test[2]], mutation_scale=20, lw=1, arrowstyle="-", color="r", linestyle="dashed")
-
-    if test[2]>0.:
-        z0 = Arrow3D([1,1],[1,1],[0,1], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-    else:
-        z0 = Arrow3D([1,1],[1,1],[0,-1], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-        y2 = Arrow3D([-1,1],[1.,1.],[-1,-1], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-        x2 = Arrow3D([1.,1.],[-1,1],[-1,-1], mutation_scale=20, lw=1, arrowstyle="-", color="k", linestyle="dashed")
-        ax.add_artist(x2)
-        ax.add_artist(y2)        
-    
-    ax.add_artist(x0)
-    ax.add_artist(y0)
-    ax.add_artist(x1)
-    ax.add_artist(y1)    
-    ax.add_artist(z0)
-    
-    ax.add_artist(y0_vec)
-    ax.add_artist(x0_vec)
-    ax.add_artist(y0_vec0)
-    ax.add_artist(x0_vec0)
-    ax.add_artist(y0_vec1)
-    ax.add_artist(x0_vec1)
-    ax.add_artist(y0_vec2)
-    ax.add_artist(x0_vec2)
-
-    ax.add_artist(z0_vec)
-    ax.add_artist(z0_vec0)
-    ax.add_artist(z0_vec1)
-    ax.add_artist(z0_vec2)        
+      
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(-1, 1)
