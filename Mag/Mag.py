@@ -162,8 +162,8 @@ def fitlineRem(x0, depth0, susc0):
              depth=widgets.FloatSliderWidget(min=0,max=3,step=0.1,value=depth0), \
              susc=widgets.FloatSliderWidget(min=0., max=800.,step=5., value=susc0),\
              Q=widgets.FloatSliderWidget(min=0., max=1.,step=0.01, value=0.),\
-             rinc=widgets.FloatSliderWidget(min=-90., max=90.,step=1., value=0.),\
-             rdec=widgets.FloatSliderWidget(min=-90., max=90.,step=1., value=0.))
+             rinc=widgets.FloatSliderWidget(min=-180., max=180.,step=1., value=0.),\
+             rdec=widgets.FloatSliderWidget(min=-180., max=180.,step=1., value=0.))
     return Q
 
 def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
