@@ -69,7 +69,7 @@ def getField(p, XYZ, comp='tf',irt='induced'):
         if comp is 'bz': fieldi = fatiandoMagPrism.bz(xp_eval,yp_eval,zp_eval,[p],fatiandoUtils.ang2vec(Mind, Einc-pinc, Edec-pdec))
         if comp is 'tf': fieldi = fatiandoMagPrism.tf(xp_eval,yp_eval,zp_eval,[p],Einc-pinc,Edec-pdec,fatiandoUtils.ang2vec(Mind, Einc-pinc, Edec-pdec))
             
-    if (irt is 'remnant') or (irt is 'total'):
+    if (irt is 'remanent') or (irt is 'total'):
         if comp is 'bx': fieldr = fatiandoMagPrism.bx(xp_eval,yp_eval,zp_eval,[p])
         elif comp is 'by': fieldr = fatiandoMagPrism.by(xp_eval,yp_eval,zp_eval,[p])
         elif comp is 'bz': fieldr = fatiandoMagPrism.bz(xp_eval,yp_eval,zp_eval,[p])
@@ -77,7 +77,7 @@ def getField(p, XYZ, comp='tf',irt='induced'):
         
     if irt is 'induced':
         return fieldi
-    elif irt is 'remnant':
+    elif irt is 'remanent':
         return fieldr
     elif irt is 'total':
         return fieldi, fieldr
@@ -251,7 +251,7 @@ def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
 
 def ViewPrismSurvey(dx, dy, dz, depth):    
     Q = widgets.interactive(PrismSurvey,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
-                    ,depth=widgets.IntSlider(min=0,max=10,step=1,value=depth)
+                    ,depth=widgets.FloatSlider(min=0,max=10,step=0.3,value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10))
     return Q    
 
@@ -286,35 +286,35 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, n
     ax2 = plt.subplot(gs1[0, 4:])
     ax1.axis("equal")
     if irt == 'total':
-        out = getField(p, xyz, comp, 'induced')+getField(p, xyz, comp, 'remnant')        
+        out = getField(p, xyz, comp, 'induced')+getField(p, xyz, comp, 'remanent')        
     else:
         out = getField(p, xyz, comp, irt)
-    dat = ax1.contourf(X,Y, out.reshape((shape)), 100)
+    dat = ax1.contourf(Y,X, out.reshape((shape)), 100)
     cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
     ax1.plot(x, y, 'w.', ms=3)
     ax1.text(x[0], y[0], 'A', fontsize = 16, color='w')
     ax1.text(x[-1], y[-1], 'B', fontsize = 16, color='w')
-    ax1.set_xlabel('Northing (m)')
-    ax1.set_ylabel('Easting (m)')
+    ax1.set_xlabel('Easting (Y; m)')
+    ax1.set_ylabel('Northing (X; m)')
     ax1.set_xlim(X.min(), X.max())
     ax1.set_ylim(Y.min(), Y.max())
     ax1.set_title(irt+' '+comp)
     out_linei = getField(p, xyz_line, comp,'induced')
-    out_liner = getField(p, xyz_line, comp,'remnant')
+    out_liner = getField(p, xyz_line, comp,'remanent')
     out_linet = out_linei+out_liner
+    distance = np.sqrt((x-x1)**2+(y-y1)**2)
+    ax2.plot(distance,out_linei, 'b.-')
+    ax2.plot(distance,out_liner, 'r.-')
+    ax2.plot(distance,out_linet, 'k.-')
+    ax2.set_xlim(distance.min(), distance.max())
 
-    ax2.plot(out_linei, 'b.-')
-    ax2.plot(out_liner, 'r.-')
-    ax2.plot(out_linet, 'k.-')
-
-    ax2.set_xlabel("Station number")
+    ax2.set_xlabel("Distance (m)")
     ax2.set_ylabel("Magnetic field (nT)")
 
-    ax2.text(0, out_linei.max()*0.8, 'A', fontsize = 16)
-    ax2.text(npts, out_linei.max()*0.8, 'B', fontsize = 16)
-    ax2.set_xlim(0, npts)
-    ax2.legend(("induced", "remnant", "total"), bbox_to_anchor=(0.5, -0.3))
+    ax2.text(distance.min(), out_linei.max()*0.8, 'A', fontsize = 16)
+    ax2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
+    ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
     ax2.grid(True)
 
 def ViewMagSurvey2DInd(h):
@@ -324,7 +324,8 @@ def ViewMagSurvey2DInd(h):
     
     out = widgets.interactive (MagSurvey2DInd 
                     ,depth=widgets.FloatSlider(min=0,max=10,step=1,value=h.kwargs['depth']) \
-                    ,susc=widgets.FloatSlider(min=0,max=1,step=0.01,value=0.01) \
+                    # ,susc=widgets.FloatSlider(min=0,max=200,step=5,value=0) \
+                    ,susc=widgets.FloatText(value=1.) \
                     ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
                     ,Bigrf=widgets.FloatText(value=52000.) \
                     ,x1=widgets.FloatText(value=-10) \
@@ -335,7 +336,7 @@ def ViewMagSurvey2DInd(h):
                     ,npts=widgets.IntSlider(min=5,max=200,step=1,value=20) \
                     ,z=widgets.FloatText(value=-1.9) \
                     ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz'])
-                    ,irt=widgets.ToggleButtons(options=['induced','remnant', 'total']) 
+                    ,irt=widgets.ToggleButtons(options=['induced','remanent', 'total']) 
                     ,Q=widgets.FloatText(value=0.)
                     ,rinc=widgets.FloatText(value=0.), rdec=widgets.FloatText(value=0.) \
                     )
