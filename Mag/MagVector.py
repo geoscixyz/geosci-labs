@@ -104,8 +104,8 @@ def vectrogram(inc, dec):
     return 
 
 def vectorwidget(inc0, dec0):
-    Q = interactive(vectrogram, inc=widgets.FloatSliderWidget(min=-90,max=90,step=10,value=inc0)
-                ,dec=widgets.FloatSliderWidget(min=-180,max=180,step=10,value=dec0))
+    Q = interactive(vectrogram, inc=widgets.FloatSlider(min=-90,max=90,step=10,value=inc0)
+                ,dec=widgets.FloatSlider(min=-180,max=180,step=10,value=dec0))
     return Q
 
 def projatob(a, b):
@@ -145,10 +145,10 @@ def projgram(inc1, dec1, inc2, dec2):
 
 def projwidget(inc1, dec1, inc2, dec2):
     Q = interactive(projgram
-                ,inc1=widgets.FloatSliderWidget(min=-90,max=90,step=10,value=inc1)
-                ,dec1=widgets.FloatSliderWidget(min=-180,max=180,step=10,value=dec1)
-                ,inc2=widgets.FloatSliderWidget(min=-90,max=90,step=10,value=inc2)
-                ,dec2=widgets.FloatSliderWidget(min=-180,max=180,step=10,value=dec2)
+                ,inc1=widgets.FloatSlider(min=-90,max=90,step=10,value=inc1)
+                ,dec1=widgets.FloatSlider(min=-180,max=180,step=10,value=dec1)
+                ,inc2=widgets.FloatSlider(min=-90,max=90,step=10,value=inc2)
+                ,dec2=widgets.FloatSlider(min=-180,max=180,step=10,value=dec2)
                 )
     return Q
     

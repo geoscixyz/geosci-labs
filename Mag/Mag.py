@@ -115,9 +115,9 @@ def profiledataInd(x0, depth, susc):
     ax[0].invert_yaxis()
 
 def fitlineInd():
-    Q = widgets.interactive(profiledataInd, x0=widgets.FloatSliderWidget(min=-3, max=3, step=0.1, value=-3.), \
-             depth=widgets.FloatSliderWidget(min=0,max=3,step=0.1,value=2.5), \
-             susc=widgets.FloatSliderWidget(min=0., max=800.,step=5., value=1.))
+    Q = widgets.interactive(profiledataInd, x0=widgets.FloatSlider(min=-3, max=3, step=0.1, value=-3.), \
+             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=2.5), \
+             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.))
     return Q
 
 def profiledataRem(x0, depth, susc, Q, rinc, rdec):
@@ -158,12 +158,12 @@ def profiledataRem(x0, depth, susc, Q, rinc, rdec):
     ax[0].invert_yaxis()    
 
 def fitlineRem(x0, depth0, susc0):
-    Q = widgets.interactive(profiledataRem, x0=widgets.FloatSliderWidget(min=-3, max=3, step=0.1, value=x0), \
-             depth=widgets.FloatSliderWidget(min=0,max=3,step=0.1,value=depth0), \
-             susc=widgets.FloatSliderWidget(min=0., max=800.,step=5., value=susc0),\
-             Q=widgets.FloatSliderWidget(min=0., max=1.,step=0.01, value=0.),\
-             rinc=widgets.FloatSliderWidget(min=-180., max=180.,step=1., value=0.),\
-             rdec=widgets.FloatSliderWidget(min=-180., max=180.,step=1., value=0.))
+    Q = widgets.interactive(profiledataRem, x0=widgets.FloatSlider(min=-3, max=3, step=0.1, value=x0), \
+             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=depth0), \
+             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=susc0),\
+             Q=widgets.FloatSlider(min=0., max=1.,step=0.01, value=0.),\
+             rinc=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),\
+             rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.))
     return Q
 
 def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
