@@ -113,6 +113,8 @@ def profiledataInd(x0, depth, susc):
         ax[i].grid(True)
         ax[i].set_xlabel("Northing (m)")
     ax[0].invert_yaxis()
+    plt.show()
+    return True
 
 def fitlineInd():
     Q = widgets.interactive(profiledataInd, x0=widgets.FloatSliderWidget(min=-3, max=3, step=0.1, value=-3.), \
@@ -156,6 +158,10 @@ def profiledataRem(x0, depth, susc, Q, rinc, rdec):
         ax[i].grid(True)
         ax[i].set_xlabel("Northing (m)")
     ax[0].invert_yaxis()    
+    plt.show()
+    return True
+
+
 
 def fitlineRem(x0, depth0, susc0):
     Q = widgets.interactive(profiledataRem, x0=widgets.FloatSliderWidget(min=-3, max=3, step=0.1, value=x0), \
@@ -232,6 +238,9 @@ def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
         ax.plot(np.r_[0., 0.], np.r_[surveyArea[2:]],np.r_[z, z],'r-')
 
     ax.view_init(elev,azim) 
+    plt.show()
+    return True
+
 
 def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
     p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
@@ -316,6 +325,9 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, n
     ax2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
     ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
     ax2.grid(True)
+    plt.show()
+    return True
+    
 
 def ViewMagSurvey2DInd(h):
     
