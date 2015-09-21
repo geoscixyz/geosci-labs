@@ -15,7 +15,7 @@ data = pd.DataFrame(pd.read_csv(filename, header = 0))
 loc = data["Distance"].values
 
 
-def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e3, Q = 0., rinc = 0., rdec = 0.):
+def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e6, Q = 0., rinc = 0., rdec = 0.):
     """
         wrapper on fatiando prism construction
         
@@ -124,9 +124,7 @@ def fitlineInd():
 
 def profiledataRem(x0, depth, susc, Q, rinc, rdec):
     magnT = data["Anomaly"].values
-    ## Seogi
-    # Not sure why do I need to put -x0 ... 
-    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=-x0, Q=Q, rinc = rinc, rdec = rdec)
+    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
     nx, ny = 100, 1
     shape = (nx, ny)
     surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
