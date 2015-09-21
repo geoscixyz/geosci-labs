@@ -15,7 +15,7 @@ data = pd.DataFrame(pd.read_csv(filename, header = 0))
 loc = data["Distance"].values
 
 
-def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e6, Q = 0., rinc = 0., rdec = 0.):
+def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e5, Q = 0., rinc = 0., rdec = 0.):
     """
         wrapper on fatiando prism construction
         
@@ -258,7 +258,7 @@ def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
 
 def ViewPrismSurvey(dx, dy, dz, depth):    
     Q = widgets.interactive(PrismSurvey,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
-                    ,depth=widgets.FloatSlider(min=0,max=10,step=0.3,value=depth)
+                    ,depth=widgets.FloatSlider(min=0,max=25,step=0.5,value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10))
     return Q    
 
@@ -333,7 +333,7 @@ def ViewMagSurvey2DInd(h):
         return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec)    
     
     out = widgets.interactive (MagSurvey2DInd 
-                    ,depth=widgets.FloatSlider(min=0,max=10,step=1,value=h.kwargs['depth']) \
+                    ,depth=widgets.FloatSlider(min=0,max=25,step=0.5,value=h.kwargs['depth']) \
                     # ,susc=widgets.FloatSlider(min=0,max=200,step=5,value=0) \
                     ,susc=widgets.FloatText(value=1.) \
                     ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
@@ -342,8 +342,8 @@ def ViewMagSurvey2DInd(h):
                     ,y1=widgets.FloatText(value=-10) \
                     ,x2=widgets.FloatText(value=10) \
                     ,y2=widgets.FloatText(value=10) \
-                    ,npts2D=widgets.IntSlider(min=5,max=200,step=1,value=20) \
-                    ,npts=widgets.IntSlider(min=5,max=200,step=1,value=20) \
+                    ,npts2D=widgets.IntSlider(min=5,max=200,step=1,value=40) \
+                    ,npts=widgets.IntSlider(min=5,max=200,step=1,value=40) \
                     ,z=widgets.FloatText(value=-1.9) \
                     ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz'])
                     ,irt=widgets.ToggleButtons(options=['induced','remanent', 'total']) 
