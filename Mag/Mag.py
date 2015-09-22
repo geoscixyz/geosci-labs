@@ -246,7 +246,7 @@ def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
 
 def ViewPrism(dx, dy, dz, depth):
     Q = widgets.interactive(Prism,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
-                    ,depth=widgets.IntSlider(min=0,max=10,step=1,value=depth)
+                    ,depth=widgets.FloatText(value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
                     ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=200))
     return Q
@@ -258,7 +258,7 @@ def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
 
 def ViewPrismSurvey(dx, dy, dz, depth):    
     Q = widgets.interactive(PrismSurvey,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
-                    ,depth=widgets.FloatSlider(min=0,max=25,step=0.5,value=depth)
+                    ,depth=widgets.FloatText(value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10))
     return Q    
 
