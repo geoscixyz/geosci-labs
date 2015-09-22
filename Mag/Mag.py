@@ -245,12 +245,8 @@ def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
     return plotObj3D(p, elev, azim, profile="X")
 
 def ViewPrism(dx, dy, dz, depth):
-    dx=widgets.FloatText(value=dx)
-    dy=widgets.FloatText(value=dy)
-    dz=widgets.FloatText(value=dz)
 
-    ShapeContainer = widgets.Container(children = [dx, dy, dz])
-    Q = widgets.interactive(Prism,ShapeContainer\
+    Q = widgets.interactive(Prism, dx=widgets.FloatText(value=dx), dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
                     ,depth=widgets.FloatText(value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
                     ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=200))
