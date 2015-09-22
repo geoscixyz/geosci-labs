@@ -264,11 +264,19 @@ def ViewPrismSurvey(dx, dy, dz, depth):
     return Q    
 
 
-def linefun(x1, x2, y1, y2, nx):
-    x = np.linspace(x1, x2, nx)
-    if x1==x2:
-        y = np.ones_like(x)*y1
+def linefun(x1, x2, y1, y2, nx,tol=1e-3):
+    dx = x2-x1
+    dy = y2-y1
+
+    
+    if np.abs(dx)<tol:
+        y = np.linspace(y1, y2,nx)
+        x = np.ones_like(y)*x1
+    elif np.abs(dy)<tol:
+        x = np.linspace(x1, x2, nx)
+        y = np.ones_like(x)*x1
     else:
+        x = np.linspace(x1, x2, nx)
         slope = (y2-y1)/(x2-x1)
         y=slope*(x-x1)+y1
     return x, y
@@ -284,8 +292,10 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, n
     p = definePrism(h.kwargs['dx'], h.kwargs['dy'], h.kwargs['dz'], depth, pinc=h.kwargs['pinc'], pdec=h.kwargs['pdec'], susc = susc, Einc=Einc, Edec=Edec, Bigrf=Bigrf,
                     Q = Q, rinc = rinc, rdec = rdec)
     import matplotlib.gridspec as gridspec
+
     x, y = linefun(x1, x2, y1, y2, npts)
     xyz_line = np.c_[x, y, np.ones_like(x)*z]
+
     fig = plt.figure(figsize=(18*1.5,3.4*1.5))
     plt.rcParams.update({'font.size': 14})
     gs1 = gridspec.GridSpec(2, 7)
@@ -300,9 +310,11 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, n
     dat = ax1.contourf(Y,X, out.reshape((shape)), 100)
     cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
-    ax1.plot(x, y, 'w.', ms=3)
-    ax1.text(x[0], y[0], 'A', fontsize = 16, color='w')
-    ax1.text(x[-1], y[-1], 'B', fontsize = 16, color='w')
+    ax1.plot(y,x, 'w.', ms=3)
+
+    ax1.text(y[0], x[0], 'A', fontsize = 16, color='w')
+    ax1.text(y[-1], x[-1], 'B', fontsize = 16, color='w')
+
     ax1.set_xlabel('Easting (Y; m)')
     ax1.set_ylabel('Northing (X; m)')
     ax1.set_xlim(X.min(), X.max())
