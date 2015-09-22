@@ -245,7 +245,12 @@ def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
     return plotObj3D(p, elev, azim, profile="X")
 
 def ViewPrism(dx, dy, dz, depth):
-    Q = widgets.interactive(Prism,dx=widgets.FloatText(value=dx),dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
+    dx=widgets.FloatText(value=dx)
+    dy=widgets.FloatText(value=dy)
+    dz=widgets.FloatText(value=dz)
+
+    ShapeContainer = widgets.Container(children = [dx, dy, dz])
+    Q = widgets.interactive(Prism,ShapeContainer\
                     ,depth=widgets.FloatText(value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
                     ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=200))
@@ -333,7 +338,7 @@ def ViewMagSurvey2DInd(h):
         return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec)    
     
     out = widgets.interactive (MagSurvey2DInd 
-                    ,depth=widgets.FloatSlider(min=0,max=25,step=0.5,value=h.kwargs['depth']) \
+                    ,depth=widgets.FloatText(value=h.kwargs['depth']) \
                     # ,susc=widgets.FloatSlider(min=0,max=200,step=5,value=0) \
                     ,susc=widgets.FloatText(value=1.) \
                     ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
