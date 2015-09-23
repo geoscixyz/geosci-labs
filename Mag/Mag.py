@@ -274,7 +274,7 @@ def linefun(x1, x2, y1, y2, nx,tol=1e-3):
         x = np.ones_like(y)*x1
     elif np.abs(dy)<tol:
         x = np.linspace(x1, x2, nx)
-        y = np.ones_like(x)*x1
+        y = np.ones_like(x)*y1
     else:
         x = np.linspace(x1, x2, nx)
         slope = (y2-y1)/(x2-x1)
@@ -342,22 +342,22 @@ def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, n
 
 def ViewMagSurvey2DInd(h):
     
-    def MagSurvey2DInd(depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec):
-        return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt, Q, rinc, rdec)    
+    def MagSurvey2DInd(depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, rx_h, comp, irt, Q, rinc, rdec):
+        return plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, -rx_h, comp, irt, Q, rinc, rdec)    
     
     out = widgets.interactive (MagSurvey2DInd 
                     ,depth=widgets.FloatText(value=h.kwargs['depth']) \
                     # ,susc=widgets.FloatSlider(min=0,max=200,step=5,value=0) \
                     ,susc=widgets.FloatText(value=1.) \
-                    ,Einc=widgets.FloatText(value=70.), Edec=widgets.FloatText(value=16.) \
+                    ,Einc=widgets.FloatText(value=90.), Edec=widgets.FloatText(value=0.) \
                     ,Bigrf=widgets.FloatText(value=52000.) \
                     ,x1=widgets.FloatText(value=-10) \
-                    ,y1=widgets.FloatText(value=-10) \
+                    ,y1=widgets.FloatText(value=0) \
                     ,x2=widgets.FloatText(value=10) \
-                    ,y2=widgets.FloatText(value=10) \
+                    ,y2=widgets.FloatText(value=0) \
                     ,npts2D=widgets.IntSlider(min=5,max=200,step=1,value=40) \
                     ,npts=widgets.IntSlider(min=5,max=200,step=1,value=40) \
-                    ,z=widgets.FloatText(value=-1.9) \
+                    ,rx_h=widgets.FloatText(value=1.9) \
                     ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz'])
                     ,irt=widgets.ToggleButtons(options=['induced','remanent', 'total']) 
                     ,Q=widgets.FloatText(value=0.)
