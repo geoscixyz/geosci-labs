@@ -3,17 +3,25 @@ from fromSimPEG import *
 from scipy.constants import mu_0
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
-import IPython.html.widgets as widgets
+import ipywidgets as widgets
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+# monFile = "data2015/StudentData2015_Monday.csv"
+# monData = pd.DataFrame(pd.read_csv(filename, header = 0))
 
+# filename = "data2014/HZrebarProfile.csv"
+# data = pd.DataFrame(pd.read_csv(filename, header = 0))
+# loc = data["Distance"].values
 
-filename = "data/HZrebarProfile.csv"
-data = pd.DataFrame(pd.read_csv(filename, header = 0))
-loc = data["Distance"].values
+diameter = 1.4e-2 
+length = 3.   
 
+Eincd=70.205
+Edecd=16.63 
+Bigrfd=54399
 
 def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e5, Q = 0., rinc = 0., rdec = 0.):
     """
@@ -82,96 +90,165 @@ def getField(p, XYZ, comp='tf',irt='induced'):
     elif irt is 'total':
         return fieldi, fieldr
 
-def profiledataInd(x0, depth, susc):
-    magnT = data["Anomaly"].values
-    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0)
+
+def profiledataInd(data, x0, depth, susc, B0):
+    if data is 'Mon':
+        filename = "data2015/StudentData2015_Monday.csv"
+    elif data is 'Wed':
+        filename = "data2015/TAData2015_Wednesday.csv"
+
+    dat = pd.DataFrame(pd.read_csv(filename, header = 0))
+    tf  = dat["Corrected Total Field Data (nT)"].values
+    std = dat["Standard Deviation (nT)"].values
+    loc = dat["Location (m)"].values
+    teams = dat["Team"].values
+
+    tfa = tf - B0
+
+    xlim = np.r_[loc.min()-0.25, loc.max()+0.25]
+
+    p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0)
 
     nx, ny = 100, 1
     shape = (nx, ny)
-    surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
+
+    surveyArea = (xlim[0],xlim[1], 0., 0.)
     z = -1.9
     xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
     xyz = np.vstack([xpl,ypl,zpl]).T
 
-    fig, ax = plt.subplots(1,2, figsize = (12, 4))
+    f = plt.figure(figsize = (8, 5))
 
-    ax[0].plot(x0, depth, 'ko')
-    ax[0].text(x0+0.5, depth, 'Rebar', color='k')
-    ax[0].text(-1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
-    ax[0].plot(np.r_[-5, 5], np.r_[-1.9, -1.9], 'b--')
+    gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
 
-    ax[0].plot(np.r_[-5, 5], np.r_[0., 0.], 'k--')
-    ax[0].set_xlim(-4, 4)
-    ax[0].set_ylim(-3, 4)
-    ax[1].plot(xpl, getField(p, xyz), 'k')
-    ax[1].plot(loc-8, magnT[::-1], 'ko')
-    ax[0].set_xlabel("Northing (m)")
-    ax[0].set_ylabel("Depth (m)")
-    ax[1].set_ylabel("Total field anomaly (nT)")
+    ax0 = plt.subplot(gs[0])
+    ax1 = plt.subplot(gs[1])
+    # fig, ax = plt.subplots(2,1, figsize = (8, 8))
 
-    for i in range(2):
-        ax[i].grid(True)
-        ax[i].set_xlabel("Northing (m)")
-    ax[0].invert_yaxis()
-    plt.show()
-    return True
-
-def fitlineInd():
-    Q = widgets.interactive(profiledataInd, x0=widgets.FloatSlider(min=-3, max=3, step=0.1, value=-3.), \
-             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=2.5), \
-             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.))
-    return Q
-
-def profiledataRem(x0, depth, susc, Q, rinc, rdec):
-    magnT = data["Anomaly"].values
-    p = definePrism(3., 0.02, 0.03, depth, pinc=0., pdec=90., susc = susc, Einc=70.2, Edec=16.5, Bigrf=52000, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
-    nx, ny = 100, 1
-    shape = (nx, ny)
-    surveyArea = (loc.min()-8, loc.max()-8, 0., 0.)
-    z = -1.9
-    xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
-    xyz = np.vstack([xpl,ypl,zpl]).T
-
-
-    fig, ax = plt.subplots(1,2, figsize = (12, 4))
-    ax[0].plot(x0, depth, 'ko')
-    ax[0].text(x0+0.5, depth, 'Rebar', color='k')
-    ax[0].text(-1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
-    ax[0].plot(np.r_[-5, 5], np.r_[-1.9, -1.9], 'b--')
+    ax1.plot(x0, depth, 'ko')
+    ax1.text(x0+0.5, depth, 'Rebar', color='k')
+    ax1.text(xlim[0]+1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
+    ax1.plot(xlim, np.r_[-1.9, -1.9], 'b--')
 
     magi,magr = getField(p, xyz, 'tf', 'total')
 
-    ax[0].plot(np.r_[-5, 5], np.r_[0., 0.], 'k--')
-    ax[0].set_xlim(-4, 4)
-    ax[0].set_ylim(-3, 4)
-    ax[1].plot(xpl, magi+magr, 'k')
-    ax[1].plot(xpl, magi, 'b')
-    ax[1].plot(xpl, magr, 'r')
-    ax[1].plot(loc-8, magnT[::-1], 'ko')
-    ax[0].set_xlabel("Northing (m)")
-    ax[0].set_ylabel("Depth (m)")
-    ax[1].set_ylabel("Total field anomaly (nT)")
+    ax1.plot(xlim, np.r_[0., 0.], 'k--')
+    ax1.set_xlim(xlim)
+    ax1.set_ylim(-3, 4)
 
-    for i in range(2):
-        ax[i].grid(True)
-        ax[i].set_xlabel("Northing (m)")
-    ax[0].invert_yaxis()    
+    ax0.scatter(loc,tfa,c=teams)
+    ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
+    ax0.set_xlim(xlim)
+    ax0.grid(which="both")
+
+    ax0.plot(xpl, getField(p, xyz), 'k')
+
+    ax1.set_xlabel("Northing (m)")
+    ax1.set_ylabel("Depth (m)")
+
+    ax0.set_ylabel("Total field anomaly (nT)")
+
+    ax0.grid(True)
+    ax0.set_xlabel("Northing (m)")
+    ax1.grid(True)
+    ax1.set_xlabel("Northing (m)")
+    ax1.invert_yaxis() 
+
+    plt.tight_layout()   
     plt.show()
+
+    return True
+
+def fitlineInd():
+    Q = widgets.interactive(profiledataInd, data=widgets.ToggleButtons(options=['Mon','Wed']), x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=10.), \
+             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=2.5), \
+             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.), \
+             B0=widgets.FloatText(value=0.)) 
+    return Q
+
+def profiledataRem(data, x0, depth, susc, B0, Q, rinc, rdec):
+    if data is 'Mon':
+        filename = "data2015/StudentData2015_Monday.csv"
+    elif data is 'Wed':
+        filename = "data2015/TAData2015_Wednesday.csv"
+
+    dat = pd.DataFrame(pd.read_csv(filename, header = 0))
+    tf  = dat["Corrected Total Field Data (nT)"].values
+    std = dat["Standard Deviation (nT)"].values
+    loc = dat["Location (m)"].values
+    teams = dat["Team"].values
+
+    tfa = tf - B0
+    xlim = np.r_[loc.min()-0.25, loc.max()+0.25]    
+
+    p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
+    nx, ny = 100, 1
+    shape = (nx, ny)
+    surveyArea = (xlim[0],xlim[1], 0., 0.)
+    z = -1.9
+    xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+    xyz = np.vstack([xpl,ypl,zpl]).T
+
+    f = plt.figure(figsize = (8, 5))
+    gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
+
+    ax0 = plt.subplot(gs[0])
+    ax1 = plt.subplot(gs[1])
+
+    ax1.plot(x0, depth, 'ko')
+    ax1.text(x0+0.5, depth, 'Rebar', color='k')
+    ax1.text(xlim[0]+1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
+    ax1.plot(xlim, np.r_[-1.9, -1.9], 'b--')
+
+    magi,magr = getField(p, xyz, 'tf', 'total')
+
+    ax1.plot(xlim, np.r_[0., 0.], 'k--')
+    ax1.set_xlim(xlim)
+    ax1.set_ylim(-3, 4)
+
+    ax0.scatter(loc,tfa,c=teams)
+    ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
+    ax0.set_xlim(xlim)
+    ax0.grid(which="both")
+
+    ax0.plot(xpl, magi+magr, 'k')
+    ax0.plot(xpl, magi, 'b')
+    ax0.plot(xpl, magr, 'r')
+    # ax[1].plot(loc-8, magnT[::-1], )
+
+    ax1.set_xlabel("Northing (m)")
+    ax1.set_ylabel("Depth (m)")
+
+    ax0.set_ylabel("Total field anomaly (nT)")
+
+
+    ax0.grid(True)
+    ax0.set_xlabel("Northing (m)")
+
+    ax1.grid(True)
+    ax1.set_xlabel("Northing (m)")
+
+    ax1.invert_yaxis()    
+
+    plt.tight_layout()   
+    plt.show()
+
     return True
 
 
-
 def fitlineRem(x0, depth0, susc0):
-    Q = widgets.interactive(profiledataRem, x0=widgets.FloatSlider(min=-3, max=3, step=0.1, value=x0), \
+    Q = widgets.interactive(profiledataRem, data=widgets.ToggleButtons(options=['Mon','Wed']), x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=x0), \
              depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=depth0), \
-             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=susc0),\
-             Q=widgets.FloatSlider(min=0., max=1.,step=0.01, value=0.),\
-             rinc=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),\
-             rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.))
+             susc=widgets.FloatSlider(min=0., max=300.,step=5., value=susc0),\
+             B0=widgets.FloatText(value=0.),\
+             Q=widgets.FloatSlider(min=0., max=10.,step=0.1, value=0.),\
+             rinc=widgets.FloatSlider(min=-90., max=90.,step=1., value=0.),\
+             rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),
+             )
     return Q
 
 def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
-              profile=None, x0=0., y0=0.):
+              profile=None, x0=10., y0=0.):
 
     # define the survey area
     surveyArea = (-xmax, xmax, -ymax, ymax)
@@ -249,7 +326,7 @@ def ViewPrism(dx, dy, dz, depth):
     Q = widgets.interactive(Prism, dx=widgets.FloatText(value=dx), dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
                     ,depth=widgets.FloatText(value=depth)
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
-                    ,elev=widgets.FloatText(value=30), azim=widgets.FloatText(value=200))
+                    ,elev=widgets.FloatSlider(min=-90,max=90,step=5,value=30), azim=widgets.FloatSlider(min=0,max=360,step=5,value=200))
     return Q
 
 def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
@@ -267,7 +344,6 @@ def ViewPrismSurvey(dx, dy, dz, depth):
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     dx = x2-x1
     dy = y2-y1
-
     
     if np.abs(dx)<tol:
         y = np.linspace(y1, y2,nx)
@@ -280,6 +356,7 @@ def linefun(x1, x2, y1, y2, nx,tol=1e-3):
         slope = (y2-y1)/(x2-x1)
         y=slope*(x-x1)+y1
     return x, y
+
 
 def plogMagSurvey2D(h, depth, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, npts2D, npts, z, comp, irt,  Q, rinc, rdec):
     nx, ny = npts2D, npts2D
