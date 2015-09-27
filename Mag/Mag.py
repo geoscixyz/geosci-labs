@@ -5,7 +5,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
-import ipywidgets as widgets
+from IPython.html.widgets import *
+# import ipywidgets as widgets
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
