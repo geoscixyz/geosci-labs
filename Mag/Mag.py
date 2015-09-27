@@ -193,7 +193,7 @@ def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
     xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
     xyz = np.vstack([xpl,ypl,zpl]).T
 
-    f = plt.figure(figsize = (8, 5))
+    f = plt.figure(figsize = (10, 5))
     gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
 
     ax0 = plt.subplot(gs[0])
@@ -215,9 +215,10 @@ def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
     ax0.set_xlim(xlim)
     ax0.grid(which="both")
 
-    ax0.plot(xpl, magi+magr, 'k')
-    ax0.plot(xpl, magi, 'b')
-    ax0.plot(xpl, magr, 'r')
+    ax0.plot(xpl, magi, 'b', label='induced')
+    ax0.plot(xpl, magr, 'r', label='remnant')
+    ax0.plot(xpl, magi+magr, 'k', label='total')    
+    ax0.legend(loc=2)
     # ax[1].plot(loc-8, magnT[::-1], )
 
     ax1.set_xlabel("Northing (m)")
@@ -247,7 +248,7 @@ def fitlineRem():
              depth=widgets.FloatSlider(min=0,max=2,step=0.05,value=0.5), \
              susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.),\
              Q=widgets.FloatSlider(min=0., max=10.,step=0.1, value=0.),\
-             rinc=widgets.FloatSlider(min=-90., max=90.,step=1., value=0.),\
+             rinc=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),\
              rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),
              )
     return Q
