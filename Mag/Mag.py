@@ -18,10 +18,13 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 diameter = 1.4e-2 
 length = 3.   
+xlim = np.r_[5.,25.]
 
 Eincd=70.205
 Edecd=16.63 
 Bigrfd=54399
+
+# Depth of burial: Monday was 35cm. I believe that Wednesday was ~45cm
 
 def definePrism(dx, dy, dz, depth, susc = 1., x0=0.,y0=0., pinc=0., pdec=0., Einc=90., Edec=0., Bigrf=1e5, Q = 0., rinc = 0., rdec = 0.):
     """
@@ -91,10 +94,87 @@ def getField(p, XYZ, comp='tf',irt='induced'):
         return fieldi, fieldr
 
 
-def profiledataInd(data, x0, depth, susc, B0):
-    if data is 'Mon':
+# def profiledataInd(data, x0, depth, susc, B0):
+#     if data is 'Mon':
+#         filename = "data2015/StudentData2015_Monday.csv"
+#     elif data is 'Wed':
+#         filename = "data2015/TAData2015_Wednesday.csv"
+
+#     dat = pd.DataFrame(pd.read_csv(filename, header = 0))
+#     tf  = dat["Corrected Total Field Data (nT)"].values
+#     std = dat["Standard Deviation (nT)"].values
+#     loc = dat["Location (m)"].values
+#     teams = dat["Team"].values
+
+#     tfa = tf - B0
+
+#     xlim = np.r_[loc.min()-0.25, loc.max()+0.25]
+
+#     p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0)
+
+#     nx, ny = 100, 1
+#     shape = (nx, ny)
+
+#     surveyArea = (xlim[0],xlim[1], 0., 0.)
+#     z = -1.9
+#     xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+#     xyz = np.vstack([xpl,ypl,zpl]).T
+
+#     f = plt.figure(figsize = (8, 5))
+
+#     gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
+
+#     ax0 = plt.subplot(gs[0])
+#     ax1 = plt.subplot(gs[1])
+#     # fig, ax = plt.subplots(2,1, figsize = (8, 8))
+
+#     ax1.plot(x0, depth, 'ko')
+#     ax1.text(x0+0.5, depth, 'Rebar', color='k')
+#     ax1.text(xlim[0]+1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
+#     ax1.plot(xlim, np.r_[-1.9, -1.9], 'b--')
+
+#     magi,magr = getField(p, xyz, 'tf', 'total')
+
+#     ax1.plot(xlim, np.r_[0., 0.], 'k--')
+#     ax1.set_xlim(xlim)
+#     ax1.set_ylim(-2.5, 2.5)
+
+#     ax0.scatter(loc,tfa,c=teams)
+#     ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
+#     ax0.set_xlim(xlim)
+#     ax0.grid(which="both")
+
+#     ax0.plot(xpl, getField(p, xyz), 'k')
+
+#     ax1.set_xlabel("Northing (m)")
+#     ax1.set_ylabel("Depth (m)")
+
+#     ax0.set_ylabel("Total field anomaly (nT)")
+
+#     ax0.grid(True)
+#     ax0.set_xlabel("Northing (m)")
+#     ax1.grid(True)
+#     ax1.set_xlabel("Northing (m)")
+#     ax1.invert_yaxis() 
+
+#     plt.tight_layout()   
+#     plt.show()
+
+#     return True
+
+# def fitlineInd():
+#     Q = widgets.interactive(profiledataInd, data=widgets.ToggleButtons(options=['Mon','Wed']), x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=15.), \
+#              depth=widgets.FloatSlider(min=0,max=2,step=0.05,value=0.5), \
+#              susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.), \
+#              B0=widgets.FloatText(value=0.)) 
+#     return Q
+
+def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
+    if data is 'MonSt':
         filename = "data2015/StudentData2015_Monday.csv"
-    elif data is 'Wed':
+    elif data is 'WedSt':
+        filename = "data2015/StudentData2015_Wednesday.csv"
+    elif data is 'WedTA':
         filename = "data2015/TAData2015_Wednesday.csv"
 
     dat = pd.DataFrame(pd.read_csv(filename, header = 0))
@@ -104,82 +184,6 @@ def profiledataInd(data, x0, depth, susc, B0):
     teams = dat["Team"].values
 
     tfa = tf - B0
-
-    xlim = np.r_[loc.min()-0.25, loc.max()+0.25]
-
-    p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0)
-
-    nx, ny = 100, 1
-    shape = (nx, ny)
-
-    surveyArea = (xlim[0],xlim[1], 0., 0.)
-    z = -1.9
-    xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
-    xyz = np.vstack([xpl,ypl,zpl]).T
-
-    f = plt.figure(figsize = (8, 5))
-
-    gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
-
-    ax0 = plt.subplot(gs[0])
-    ax1 = plt.subplot(gs[1])
-    # fig, ax = plt.subplots(2,1, figsize = (8, 8))
-
-    ax1.plot(x0, depth, 'ko')
-    ax1.text(x0+0.5, depth, 'Rebar', color='k')
-    ax1.text(xlim[0]+1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
-    ax1.plot(xlim, np.r_[-1.9, -1.9], 'b--')
-
-    magi,magr = getField(p, xyz, 'tf', 'total')
-
-    ax1.plot(xlim, np.r_[0., 0.], 'k--')
-    ax1.set_xlim(xlim)
-    ax1.set_ylim(-3, 4)
-
-    ax0.scatter(loc,tfa,c=teams)
-    ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
-    ax0.set_xlim(xlim)
-    ax0.grid(which="both")
-
-    ax0.plot(xpl, getField(p, xyz), 'k')
-
-    ax1.set_xlabel("Northing (m)")
-    ax1.set_ylabel("Depth (m)")
-
-    ax0.set_ylabel("Total field anomaly (nT)")
-
-    ax0.grid(True)
-    ax0.set_xlabel("Northing (m)")
-    ax1.grid(True)
-    ax1.set_xlabel("Northing (m)")
-    ax1.invert_yaxis() 
-
-    plt.tight_layout()   
-    plt.show()
-
-    return True
-
-def fitlineInd():
-    Q = widgets.interactive(profiledataInd, data=widgets.ToggleButtons(options=['Mon','Wed']), x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=10.), \
-             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=2.5), \
-             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.), \
-             B0=widgets.FloatText(value=0.)) 
-    return Q
-
-def profiledataRem(data, x0, depth, susc, B0, Q, rinc, rdec):
-    if data is 'Mon':
-        filename = "data2015/StudentData2015_Monday.csv"
-    elif data is 'Wed':
-        filename = "data2015/TAData2015_Wednesday.csv"
-
-    dat = pd.DataFrame(pd.read_csv(filename, header = 0))
-    tf  = dat["Corrected Total Field Data (nT)"].values
-    std = dat["Standard Deviation (nT)"].values
-    loc = dat["Location (m)"].values
-    teams = dat["Team"].values
-
-    tfa = tf - B0
-    xlim = np.r_[loc.min()-0.25, loc.max()+0.25]    
 
     p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
     nx, ny = 100, 1
@@ -197,14 +201,14 @@ def profiledataRem(data, x0, depth, susc, B0, Q, rinc, rdec):
 
     ax1.plot(x0, depth, 'ko')
     ax1.text(x0+0.5, depth, 'Rebar', color='k')
-    ax1.text(xlim[0]+1.,-2.0, 'Magnetometer height (1.9 m)', color='b')
+    ax1.text(xlim[0]+1.,-1.2, 'Magnetometer height (1.9 m)', color='b')
     ax1.plot(xlim, np.r_[-1.9, -1.9], 'b--')
 
     magi,magr = getField(p, xyz, 'tf', 'total')
 
     ax1.plot(xlim, np.r_[0., 0.], 'k--')
     ax1.set_xlim(xlim)
-    ax1.set_ylim(-3, 4)
+    ax1.set_ylim(-2.5, 2.5)
 
     ax0.scatter(loc,tfa,c=teams)
     ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
@@ -236,11 +240,12 @@ def profiledataRem(data, x0, depth, susc, B0, Q, rinc, rdec):
     return True
 
 
-def fitlineRem(x0, depth0, susc0):
-    Q = widgets.interactive(profiledataRem, data=widgets.ToggleButtons(options=['Mon','Wed']), x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=x0), \
-             depth=widgets.FloatSlider(min=0,max=3,step=0.1,value=depth0), \
-             susc=widgets.FloatSlider(min=0., max=300.,step=5., value=susc0),\
+def fitlineRem():
+    Q = widgets.interactive(profiledataRem, data=widgets.ToggleButtons(options=['MonSt','WedTA','WedSt']),\
              B0=widgets.FloatText(value=0.),\
+             x0=widgets.FloatSlider(min=5., max=25., step=0.1, value=15.), \
+             depth=widgets.FloatSlider(min=0,max=2,step=0.05,value=0.5), \
+             susc=widgets.FloatSlider(min=0., max=800.,step=5., value=1.),\
              Q=widgets.FloatSlider(min=0., max=10.,step=0.1, value=0.),\
              rinc=widgets.FloatSlider(min=-90., max=90.,step=1., value=0.),\
              rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),
@@ -248,7 +253,7 @@ def fitlineRem(x0, depth0, susc0):
     return Q
 
 def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
-              profile=None, x0=10., y0=0.):
+              profile=None, x0=15., y0=0.):
 
     # define the survey area
     surveyArea = (-xmax, xmax, -ymax, ymax)
@@ -304,6 +309,7 @@ def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
     ax.invert_yaxis()
 
     ax.plot(xp,yp,z,'.g', alpha=0.1)
+
     if profile == "X":    
         ax.plot(np.r_[surveyArea[:2]],np.r_[0., 0.],np.r_[z, z],'r-')
     elif profile == "Y":    
@@ -317,16 +323,15 @@ def plotObj3D(p, elev, azim, xmax = 10., ymax = 10., z=-1.9, nx=100, ny=100,
     return True
 
 
-def Prism(dx, dy, dz, depth, pinc, pdec, elev, azim):
+def Prism(dx, dy, dz, depth, pinc, pdec, View_elev, View_azim):
     p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
-    return plotObj3D(p, elev, azim, profile="X")
+    return plotObj3D(p, View_elev, View_azim, profile="X")
 
 def ViewPrism(dx, dy, dz, depth):
-
-    Q = widgets.interactive(Prism, dx=widgets.FloatText(value=dx), dy=widgets.FloatText(value=dy), dz=widgets.FloatText(value=dz)\
-                    ,depth=widgets.FloatText(value=depth)
+    Q = widgets.interactive(Prism, dx=widgets.FloatText(value=dx), dy=widgets.FloatText(value=dy),             dz=widgets.FloatText(value=dz)\
+                    ,depth=widgets.FloatText(value=depth)\
                     ,pinc=(-90, 90, 10), pdec=(-90, 90., 10) \
-                    ,elev=widgets.FloatSlider(min=-90,max=90,step=5,value=30), azim=widgets.FloatSlider(min=0,max=360,step=5,value=200))
+                    ,View_elev=widgets.FloatSlider(min=-90,max=90,step=5,value=30), View_azim=widgets.FloatSlider(min=0,max=360,step=5,value=200))
     return Q
 
 def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
