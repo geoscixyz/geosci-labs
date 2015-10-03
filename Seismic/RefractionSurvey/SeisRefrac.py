@@ -1,9 +1,11 @@
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 try:
-    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText
+    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider
     pass
 except Exception, e:    
-    from ipywidgets import interactive, IntSlider, widget, FloatText
+    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -46,17 +48,21 @@ def funDR1R2(x, v1, v2, v3, z1, z2):
 	ref1[act1] = 1./v2*x[act1] + ti1    
 	ref2 = np.ones_like(x)*np.nan
 	ref2[act2] = 1./v3*x[act2] + ti2 + ti1
-	return np.c_[direct, ref1, ref2]
+	t0 = 2.*z1/v1
+	refl1 = np.sqrt(t0**2+x**2/v1**2)
+
+	return np.c_[direct, ref1, ref2, refl1]
 
 def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2):
     x = x0 + np.arange(12)*dx
-    fig, ax = plt.subplots(1,1, figsize = (8, 6))
+    fig, ax = plt.subplots(1,1, figsize = (7, 8))
     dum = funDR1R2(x, v1, v2, v3, z1, z2)
     ax.plot(x, dum[:,0], 'ro')
     ax.plot(x, dum[:,1], 'bo')
     ax.plot(x, dum[:,2], 'go')
-    ax.set_xlim(0., 120.)
-    ax.set_ylim(0., 0.24)
+    ax.plot(x, dum[:,3], 'ko')
+    ax.set_xlim(0., 130.)
+    ax.set_ylim(0., 0.25)
     ax.invert_yaxis()
     ax.set_xlabel("Offset (m)")
     ax.set_ylabel("Time (s)")
@@ -65,83 +71,106 @@ def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2):
     return True
 
 
-def viewWiggleTX(x0, dx, v1, v2, v3, z1, z2):
-    x = x0 + np.arange(12)*dx
-    dum = funDR1R2(x, v1, v2, v3, z1, z2)
-    dt = 1e-3
-    ntime = 241
-    time = np.arange(ntime)*dt
-    wave = getRicker(100., time)
-    data = np.zeros((ntime, 12))
-    for i in range(12):
-        inds = []
-        for j in range(3):
-            temp = np.argmin(abs(time-dum[i,j]))
-            if temp > 0:
-                inds.append(temp)
-        data[inds,i] = 1.
-    data_convolved = np.zeros_like(data)
-    for i in range(12):
-        temp = np.convolve(wave,data[:,i])[:ntime]
-        data_convolved[:,i] =  temp + np.random.randn(ntime)*0.2    
-    fig, ax = plt.subplots(1, 1, figsize=(7, 8))
-    wiggleVarx(data_convolved.T, x=x, sampr=dt, lwidth=1.,scale=0.2, ax=ax)
-    ax.invert_yaxis()
-    ax.set_xlim(-1., 120)
-    ax.set_xlabel("Offset (m)")
-    ax.set_ylabel("Time (s)")    
-    plt.show()
-    return ax
+def viewWiggleTX(x0, dx, tI, v, v1, v2, v3, z1, z2, Fit=False):
+	x = x0 + np.arange(12)*dx
+	dum = funDR1R2(x, v1, v2, v3, z1, z2)
+	dt = 1e-3
+	ntime = 241
+	time = np.arange(ntime)*dt
+	wave = getRicker(100., time)
+	data = np.zeros((ntime, 12))
+	for i in range(12):
+	    inds = []
+	    for j in range(4):
+	        temp = np.argmin(abs(time-dum[i,j]))
+	        if temp > 0:
+	            inds.append(temp)
+	    data[inds,i] = 1.
+	data_convolved = np.zeros_like(data)
+	if Fit == True:
+		np.random.seed(seed=1)
+
+	for i in range(12):
+	    temp = np.convolve(wave,data[:,i])[:ntime]
+	    data_convolved[:,i] =  temp+np.random.randn(ntime)*2.5*time    
+    
+	fig, ax = plt.subplots(1, 1, figsize=(7, 8))
+	wiggleVarx(data_convolved.T, x=x, sampr=dt, lwidth=1.,scale=0.2, ax=ax)
+	if Fit == True:
+		temp = tI + 1./v*x        
+		ax.plot(x, temp, 'r', lw=2)    
+	ax.set_ylim(0, 0.25)
+	ax.invert_yaxis()
+	ax.set_xlim(-1., 130)
+	ax.set_xlabel("Offset (m)")
+	ax.set_ylabel("Time (s)")    
+
+	plt.show()
+	return ax
 
 def makeinteractTXdiagram():
-	v1 = 400.
-	v2 = 1000. 
-	v3 = 1500.
+	v1 = 600.
+	v2 = 1200. 
+	v3 = 1700.
 	z1, z2 = 5., 10.
 	Q = interactive(lambda x0, dx: viewTXdiagram(x0, dx, v1=v1, v2=v2, v3=v3, z1=z1, z2=z2), 
 	             x0=IntSlider(min=1, max=10, step=1, value=4),
 	             dx=IntSlider(min=1, max=10, step=1,value=4))
+
 	return Q
 
 def makeinteractTXwigglediagram():
-	v1 = 400.
-	v2 = 1000. 
-	v3 = 1500.
+	v1 = 600.
+	v2 = 1200. 
+	v3 = 1700.
 	z1, z2 = 5., 10.
-	Q = interactive(lambda x0, dx: viewWiggleTX(x0, dx, v1=v1, v2=v2, v3=v3, z1=z1, z2=z2), 
+	Q = interactive(lambda x0, dx, tI, v, Fit=False: viewWiggleTX(x0, dx, tI, v, Fit=Fit, v1=v1, v2=v2, v3=v3, z1=z1, z2=z2), 
 	             x0=IntSlider(min=1, max=10, step=1, value=4),
-	             dx=IntSlider(min=1, max=10, step=1,value=4))
+	             dx=IntSlider(min=1, max=10, step=1,value=4),
+				 tI=FloatSlider(min=0., max=0.25, step=0.0025,value=0.05),
+				 v=FloatSlider(min=400, max=2000, step=50,value=1000.))
 	return Q
 
-def veiwSeisRefracSurvey(x0, dx):
+def veiwSeisRefracSurvey(x0, dx,):
     x = x0 + np.arange(12)*dx
     z = np.r_[0., 5., 15.]
-    fig, ax = plt.subplots(1,1, figsize = (7,3))
-    ax.plot(0., 0., 'ro')
+    fig, ax = plt.subplots(1,1, figsize = (7,5))    
+    ax.plot(0., 0., 'r*', ms=15)
     ax.plot(x, np.zeros_like(x), 'bo')
+    
     ax.legend(("shot", "geophone"), fontsize = 14, bbox_to_anchor=(1.4, 1.05))
     xtemp = np.r_[-1, 100.]
     for i in range(3):
         ax.plot(xtemp, np.ones_like(xtemp)*z[i],'k-', lw=2)    
     ax.set_xlim(-1, 100.)
     ax.set_ylim(20, -4.)
-    ax.text(50, 3, "Layer 1, v1 = 400 m/s", fontsize = 14)
-    ax.text(50, 11, "Layer 2, v2 = 1000 m/s", fontsize = 14)
-    ax.text(50, 18, "Layer 3, v3 = 1500 m/s", fontsize = 14)
+    ax.text(50, 3, "Layer 1, v1 = ?? m/s", fontsize = 14)
+    ax.text(50, 11, "Layer 2, v2 = ?? m/s", fontsize = 14)
+    ax.text(50, 18, "Layer 3, v3 = ?? m/s", fontsize = 14)
 
-    ax.arrow(x[4], 1, dx=dx, dy=0.)
+
+    
     ax.arrow(0, 1, dx=x0, dy=0.)
-    ax.text(x[4], 3.5, ("dx=%i m")%(dx) , fontsize = 14)
+    
     ax.text(0., 3.5, ("x0=%i m")%(x0) , fontsize = 14)
+    if np.logical_and(dx>3, dx<8):
+        ax.text(x[4], 3.5, ("dx=%i m")%(dx) , fontsize = 14)
+        ax.arrow(x[4], 1, dx=dx, dy=0.)
+    else:
+        ax.text(x[2], 3.5, ("dx=%i m")%(dx) , fontsize = 14)
+        ax.arrow(x[2], 1, dx=dx, dy=0.)
+    for i in range(12):
+        ax.text(x[i]-0.5, -1, str(i+1) , fontsize = 14)
     ax.set_xlabel("Offset (m)")
     ax.set_ylabel("Depth (m)")
+    ax.set_yticks([])
     plt.show()
     return True
 
 def makeinteractSeisRefracSruvey():
 	Q = interactive(veiwSeisRefracSurvey, 
-	             x0=IntSlider(min=1, max=10, step=1, value=4),
-	             dx=IntSlider(min=1, max=10, step=1,value=4))
+	             x0=IntSlider(min=0, max=10, step=1, value=0),
+	             dx=IntSlider(min=1, max=10, step=1,value=8))
 	return Q
 #========================================================================================================================
 # Visualziation for wiggle plot
