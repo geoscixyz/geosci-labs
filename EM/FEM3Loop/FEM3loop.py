@@ -113,8 +113,12 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
 	c_response=-M12*M23*f_factor/(M13*L)
 
 	# scaled to simulate a net volumetric effect
-	real_response=np.real(c_response)*1000.
-	imag_response=np.imag(c_response)*1000.
+	if np.logical_and(dincl==0., ddecl==0.):
+		real_response=np.real(c_response)*0.
+		imag_response=np.imag(c_response)*0.		
+	else:
+		real_response=np.real(c_response)*1000.
+		imag_response=np.imag(c_response)*1000.
 
 	fig, ax = plt.subplots(2,2, figsize = (10,6))
 

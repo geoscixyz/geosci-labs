@@ -5,6 +5,12 @@ from IPython.display import set_matplotlib_formats
 import matplotlib
 set_matplotlib_formats('png')
 matplotlib.rcParams['savefig.dpi'] = 100 # Change this to adjust figure size
-from IPython.html.widgets import *
+
+try:
+    from IPython.html.widgets import *
+    pass
+except Exception, e:    
+    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
+
 from FEM3loop import fem3loop, interactfem3loop
 
