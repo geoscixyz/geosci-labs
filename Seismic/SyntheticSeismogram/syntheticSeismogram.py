@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
+try:
+    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    pass
+except Exception, e:    
+    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
 def getPlotLog(d,log,dmax=200):
     d = np.array(d, dtype=float)
@@ -215,7 +220,6 @@ def plotLogs(d, rho, v, usingT=True):
     Plotting wrapper to plot density, velocity, acoustic impedance and reflectivity as a function of depth.
     """
     d = np.sort(d)
-
     dpth, rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT)
     nd   = len(dpth)
 
@@ -247,10 +251,14 @@ def plotLogs(d, rho, v, usingT=True):
 
     plt.subplot(144)
     plt.hlines(d[1:],np.zeros(len(d)-1),rseries,linewidth=2)
-    plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')
-    plt.title('Reflectivity');
+    plt.plot(np.zeros(nd),dpth,linewidth=2,color='black')    
     plt.xlim((-1.,1.))
-    plt.gca().set_xlabel('Reflectivity')
+    if usingT == True:
+        plt.title('Reflectivity', fontsize = 8.);
+        plt.gca().set_xlabel('Reflectivity', fontsize = 8.)
+    else:
+        plt.title('Reflection Coeff.', fontsize = 8.);
+        plt.gca().set_xlabel('Reflection Coeff.', fontsize = 8.)        
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
@@ -260,18 +268,48 @@ def plotLogs(d, rho, v, usingT=True):
     plt.show()
 
 
-def plotTimeDepth(d,v):
+def plotTimeDepth(d,rho,v):
     """
     Wrapper to plot time-depth conversion based on the provided velocity model
     """
-
+    rseries, _    = getReflectivity(d,rho,v,usingT=True)
     dpth,t = getTimeDepth(d,v)
-    plt.figure(num=0, figsize = (6, 4))
-    plt.plot(dpth,t,linewidth=2);
-    plt.title('Depth-Time');
-    plt.grid()
-    plt.gca().set_xlabel('Depth (m)',fontsize=9)
-    plt.gca().set_ylabel('Two Way Time (s)',fontsize=9)
+    nd   = len(dpth)
+
+    plt.figure(num=0, figsize = (10, 4))
+    ax1 = plt.subplot(131)
+    ax2 = plt.subplot(132)
+    ax3 = plt.subplot(133)
+
+    ax1.hlines(d[1:],np.zeros(len(d)-1),rseries,linewidth=2)
+    ax1.plot(np.zeros(nd),dpth,linewidth=2,color='black')    
+    ax1.invert_yaxis()
+    ax1.set_xlim(-1, 1)
+    ax1.grid(True)
+    ax1.set_xlabel("Reflectivity")
+    ax1.set_ylabel("Depth (m)")
+
+    ax3.hlines(t[1:-1],np.zeros(len(d)-1),rseries,linewidth=2)
+    ax3.plot(np.zeros(nd),t,linewidth=2,color='black')    
+    # ax3.set_ylim(0., 0.28)
+    ax3.invert_yaxis()
+    ax3.set_xlim(-1, 1)
+    ax3.grid(True)
+    ax3.set_xlabel("Reflectivity")
+    ax3.set_ylabel("Two Way Time (s)")
+
+
+    ax2.plot(t,dpth,linewidth=2)
+    ax2.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    ax1.set_title('Depth')
+    ax2.set_title('Depth to Time')
+    ax3.set_title('Time')
+    ax2.grid()
+
+    ax2.set_ylabel('Depth (m)',fontsize=9)
+    ax2.set_xlabel('Two Way Time (s)',fontsize=9)
+    ax1.set_ylabel('Depth (m)',fontsize=9)
+    ax3.set_ylabel('Two Way Time (s)',fontsize=9)
 
     plt.tight_layout()
     plt.show()
@@ -310,7 +348,10 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.subplot(132)
     plt.plot(np.zeros(tref.size),(tseis.max(),tseis.min()),linewidth=2,color='black')
     plt.hlines(tref,np.zeros(len(rseriesconv)),rseriesconv,linewidth=2) #,'marker','none'
-    plt.title('Reflectivity')
+    if usingT == True:
+        plt.title('Reflectivity')
+    else:
+        plt.title('Reflection Coeff.')
     plt.grid()
     plt.ylim((0,tseis.max()))
     plt.gca().invert_yaxis()
@@ -334,7 +375,6 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
 
     plt.tight_layout()
     plt.show()
-
 
 def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
     """
@@ -411,13 +451,13 @@ def plotLogsInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,usingT=False):
     plotLogs(d, rho, v, usingT)
 
 
-def plotTimeDepthInteract(d2,d3,v1,v2,v3):
+def plotTimeDepthInteract(d2,d3,v1,v2,v3,rho):
     """
     interactive wrapper for plotTimeDepth
     """
     d   = np.array((0.,d2,d3), dtype=float)
     v   = np.array((v1,v2,v3), dtype=float)
-    plotTimeDepth(d,v)
+    plotTimeDepth(d,rho,v)
 
 def plotSeismogramInteractFixMod(wavf,wavA):
     """
@@ -462,6 +502,43 @@ def plotSeismogramInteractRes(h2,wavf,AddNoise=False):
         noise = 0.
 
     plotSeismogramV2(d, rho, v, wavf, 1., noise)
+
+def InteractLogs(d2=50, d3=100, rho1=2300, rho2=2300, rho3=2300, v1=500, v2=1000, v3=1500):
+    logs = interactive(plotLogsInteract,
+        d2  =FloatSlider(min = 0.   ,max = 100. ,step = 5  , value = d2  ),
+        d3  =FloatSlider(min = 100. ,max = 200. ,step = 5  , value = d3  ),
+        rho1=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho1),
+        rho2=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho2),
+        rho3=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho3),
+        v1  =FloatSlider(min = 300. ,max = 4000.,step = 50., value = v1  ),
+        v2  =FloatSlider(min = 300. ,max = 4000.,step = 50., value = v2  ),
+        v3  =FloatSlider(min = 300. ,max = 4000.,step = 50., value = v3  ))
+    return logs
+
+def InteractDtoT(Model):
+    d20 = Model.kwargs["d2"]
+    d30 = Model.kwargs["d3"]
+    v10 = Model.kwargs["v1"]
+    v20 = Model.kwargs["v2"]
+    v30 = Model.kwargs["v3"]
+    rho10 = Model.kwargs["rho1"]
+    rho20 = Model.kwargs["rho2"]
+    rho30 = Model.kwargs["rho3"]
+    rho = np.r_[rho10, rho20, rho30]
+    func = lambda d2, d3, v1, v2, v3: plotTimeDepthInteract(d2, d3, v1, v2, v3, rho)
+    DtoT = interactive(func,d2=FloatSlider(min = 0.  ,max = 100. ,step=5  , value = d20) ,
+                            d3=FloatSlider(min = 100.,max = 200. ,step=5  , value = d30) ,
+                            v1=FloatSlider(min = 500.,max = 3000.,step=50., value = v10),
+                            v2=FloatSlider(min = 500.,max = 3000.,step=50., value = v20),
+                            v3=FloatSlider(min = 500.,max = 3000.,step=50., value = v30))
+
+    return DtoT
+
+def InteractWconvR():
+    return interact(plotSeismogramInteractFixMod,wavf=(5.,100.,5.),wavA=(-2.,2.,0.25))    
+
+def InteractSeismogram():
+    return interact(plotSeismogramInteract,d2=(0.,150.,1),d3=(50.,200.,1),rho1=(2000.,5000.,50.),rho2=(2000.,5000.,50.),rho3=(2000.,5000.,50.),v1=(300.,4000.,50.),v2=(300.,4000.,50.),v3=(300.,4000.,50.),wavf=(5.,100.,2.5),wavA=(-0.5,1.,0.25),addNoise=False,usingT=True) 
 
 if __name__ == '__main__':
 

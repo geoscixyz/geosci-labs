@@ -2,6 +2,13 @@ import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 
+try:
+    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    pass
+except Exception, e:    
+    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
+
+
 def ViewWiggle(syndata, obsdata):
     dx = 20
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
@@ -26,15 +33,15 @@ def ViewWiggle(syndata, obsdata):
     ax[1].set_ylabel("Time (s)")
     ax[1].set_title("Noisy CMP gather")
 
-def NoisyNMOWidget(t0, v1, v2, v3):
+def NoisyNMOWidget(t0, v):
     syndata = np.load('obsdata1.npy')
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
-    time1 = HyperbolicFun(t0, xorig, v1)
-    time2 = HyperbolicFun(t0, xorig, v2)
-    time3 = HyperbolicFun(t0, xorig, v3)
-
+    # time1 = HyperbolicFun(t0, xorig, v1)
+    # time2 = HyperbolicFun(t0, xorig, v2)
+    # time3 = HyperbolicFun(t0, xorig, v3)
+    time = HyperbolicFun(t0, xorig, v)
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
     'skipt':1,
@@ -49,14 +56,14 @@ def NoisyNMOWidget(t0, v1, v2, v3):
     ax[0].invert_yaxis()
     ax[1].invert_yaxis()
     wiggle(syndata, ax = ax[0], **kwargs)
-    toffset = np.sqrt(xorig**2/v2**2+t0**2)-t0
+    toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
     wiggle(syndata, ax = ax[1], manthifts=toffset, **kwargs)
 
     ax[0].axis(extent)
     ax[1].axis(extent)
-    ax[0].plot(xorig, time1, 'b', lw=2)
-    ax[0].plot(xorig, time2, 'r', lw=2)
-    ax[0].plot(xorig, time3, 'g', lw=2)
+    # ax[0].plot(xorig, time1, 'b', lw=2)
+    ax[0].plot(xorig, time, 'r', lw=2)
+    # ax[0].plot(xorig, time3, 'g', lw=2)
 
     ax[0].set_xlabel("Offset (m)")
     ax[1].set_xlabel("Offset (m)")
@@ -125,7 +132,8 @@ def NMOstackthree(data, tintercept, v1, v2, v3):
         ax[i].axis(extent)
         wiggle(traces[i,:].reshape([1,-1]), ax=ax[i], **kwargs)
         ax[i].set_xlabel("Amplitude")
-        ax[i].set_ylabel("Time (s)")
+        if i==0:
+            ax[i].set_ylabel("Time (s)")
         ax[i].set_title(("Velocity = %6.1f")%(vtemp[i]))
 
 def NMOstack(data, xorig, time, v):
@@ -255,3 +263,11 @@ def mkvc(x, numDims=1):
         return x.flatten(order='F')[:, np.newaxis]
     elif numDims == 3:
         return x.flatten(order='F')[:, np.newaxis, np.newaxis]
+
+def InteractClean():
+    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.))
+    return clean 
+
+def InteractNosiy():
+    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.))
+    return noisy
