@@ -335,6 +335,8 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
 
     plt.subplot(131)
     plt.plot(wav,twav,linewidth=1,color='black')
+    posind = wav > 0.
+    plt.fill_between(wav[posind], twav[posind], np.zeros_like(wav[posind]), color='k')    
     plt.title('Wavelet')
     plt.xlim((-2.,2.))
     plt.grid()
@@ -362,7 +364,9 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
     plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.subplot(133)
+    posind = seis > 0.
     plt.plot(seis,tseis,color='black',linewidth=1)
+    plt.fill_between(seis[posind], tseis[posind], np.zeros_like(seis[posind]), color='k', edgecolor='white')    
     plt.title('Seismogram')
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
@@ -401,6 +405,8 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
 
     plt.subplot(141)
     plt.plot(wav,twav,linewidth=1,color='black')
+    posind = wav > 0.
+    plt.fill_between(wav[posind], twav[posind], np.zeros_like(wav[posind]), color='k')    
     plt.title('Wavelet')
     plt.xlim((-1.,1.))
     plt.ylim((tseis.min()-tseis.mean(),tseis.max()-tseis.mean()))
@@ -424,7 +430,9 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     plt.ylabel('Depth (m)',fontsize=9)
 
     plt.subplot(144)
+    posind = seis > 0.
     plt.plot(seis,tseis,color='black',linewidth=1)
+    plt.fill_between(seis[posind], tseis[posind], np.zeros_like(seis[posind]), color='k', edgecolor='white')    
     plt.title('Seismogram')
     plt.grid()
     plt.ylim((tseis.min(),tseis.max()))
@@ -433,12 +441,83 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
     plt.gca().set_xlabel('Amplitude',fontsize=9)
-    plt.gca().set_ylabel('Time (s)',fontsize=9)
+    plt.gca().set_ylabel('Depth (m)',fontsize=9)
 
     plt.tight_layout()
     plt.show()
 
 
+
+def plotSeismogramV3(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RICKER'):
+    """
+    Plotting function to show physical property logs (in depth) and seismogram (in time).
+    """
+
+    dpth, rholog, vlog, zlog, rseries  = getLogs(d, rho, v, usingT)
+    tseis, seis, twav, wav, tref, rseriesconv = syntheticSeismogram(d, rho, v, wavf, wavA, usingT,wavtyp)
+
+    noise  = noise*np.max(np.abs(seis))*np.random.randn(seis.size)
+    filt   = np.arange(1.,21.)
+    filtr  = filt[::-1]
+    filt   = np.append(filt,filtr[1:])*1./21.
+    noise  = np.convolve(noise,filt)
+    noise  = noise[0:seis.size]
+
+    xlimrho = (1.95,5.05)
+    xlimv   = (0.25,4.05)
+    xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
+
+    seis = seis + noise
+
+    plt.figure(num=0, figsize = (8, 5))
+
+    plt.subplot(141)
+    plt.plot(wav,twav,linewidth=1,color='black')
+    posind = wav > 0.
+    plt.fill_between(wav[posind], twav[posind], np.zeros_like(wav[posind]), color='k')
+    plt.title('Wavelet')
+    plt.xlim((-1.,1.))
+    # plt.ylim((tseis.min()-tseis.mean(),tseis.max()-tseis.mean()))
+    plt.ylim((-0.1, 0.1))
+    plt.grid()
+    plt.gca().invert_yaxis()
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.subplot(142)
+    plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
+    plt.title('$\\rho$')
+    plt.xlabel('Density \n $\\times 10^3$ (kg /m$^3$)',fontsize=9)
+    plt.ylabel('Depth (m)',fontsize=9)
+    plt.xlim((0., 4.6))
+
+    plt.subplot(143)
+    plotLogFormat(vlog*10**-3,dpth,xlimv,'red')
+    plt.ylim((15., 0.))
+    plt.xlim((0., 1500*1e-3))
+    plt.title('$v$')
+    plt.xlabel('Velocity \n $\\times 10^3$ (m/s)',fontsize=9)
+    plt.ylabel('Depth (m)',fontsize=9)
+
+    plt.subplot(144)
+    posind = seis > 0.
+    plt.plot(seis,tseis,color='black',linewidth=1)
+    plt.fill_between(seis[posind], tseis[posind], np.zeros_like(seis[posind]), color='k', edgecolor='white')
+    plt.title('Seismogram')
+    plt.grid()
+    plt.ylim(( 0., 0.2))
+    plt.gca().invert_yaxis()
+    plt.xlim((-1.,1.))
+
+    plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
+    plt.setp(plt.yticks()[1],fontsize=9)
+    plt.gca().set_xlabel('Amplitude',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
+
+    plt.tight_layout()
+    plt.show()
 
 ## INTERACTIVE PLOT WRAPPERS
 def plotLogsInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,usingT=False):
@@ -485,6 +564,22 @@ def plotSeismogramInteract(d2,d3,rho1,rho2,rho3,v1,v2,v3,wavf,wavA,AddNoise=Fals
         noise = 0.
 
     plotSeismogramV2(d, rho, v, wavf, wavA, noise,usingT)
+
+def plotSeismogramInteractTBL(d2,d3,rho1,rho2,rho3,v1,v2,v3,wavf,wavA,AddNoise=False,usingT=True):
+    """
+    interactive wrapper for plot SeismogramV2 for a fixed geologic model
+    """
+    d      = np.array((0.,d2,d3), dtype=float)
+    v      = np.array((v1,v2,v3), dtype=float)
+    rho    = np.array((rho1,rho2,rho3), dtype=float)
+
+    if AddNoise:
+        noise = 0.02
+    else:
+        noise = 0.
+
+    plotSeismogramV3(d, rho, v, wavf, wavA, noise,usingT)
+
 
 def plotSeismogramInteractRes(h2,wavf,AddNoise=False):
     """
@@ -538,8 +633,21 @@ def InteractWconvR():
     return interact(plotSeismogramInteractFixMod,wavf=(5.,100.,5.),wavA=(-2.,2.,0.25))    
 
 def InteractSeismogram():
-    return interact(plotSeismogramInteract,d2=(0.,150.,1),d3=(50.,200.,1),rho1=(2000.,5000.,50.),rho2=(2000.,5000.,50.),rho3=(2000.,5000.,50.),v1=(300.,4000.,50.),v2=(300.,4000.,50.),v3=(300.,4000.,50.),wavf=(5.,100.,2.5),wavA=(-0.5,1.,0.25),addNoise=False,usingT=True) 
+    return interact(plotSeismogramInteract,d2=(0.,150.,1),d3=(0.,200.,1),rho1=(2000.,5000.,50.),rho2=(2000.,5000.,50.),rho3=(2000.,5000.,50.),v1=(100.,4000.,5.),v2=(100.,4000.,5.),v3=(300.,4000.,50.),wavf=(5.,100.,2.5),wavA=(-0.5,1.,0.25),addNoise=False,usingT=True) 
 
+def InteractSeismogramTBL(v1=125, v2=125, v3=125):
+    return interact(plotSeismogramInteractTBL,d2=FloatSlider(min = 1. ,max = 100.,step = 0.1, value = 9.),
+                                           d3=FloatSlider(min = 2. ,max = 100.,step = 0.1, value = 9.5),
+                                           rho1=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
+                                           rho2=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
+                                           rho3=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
+                                           v1=FloatSlider(min = 100.,max = 1200.,step = 5., value = v1),
+                                           v2=FloatSlider(min = 100.,max = 1200.,step = 5., value = v2),
+                                           v3=FloatSlider(min = 100.,max = 1200.,step = 5., value = v3),
+                                           wavf=FloatSlider(min = 5.,max = 100.,step = 1, value = 67),
+                                           wavA=FloatSlider(min = -0.5, max = 1., step = 0.25, value = 1.),
+                                           addNoise=False,
+                                           usingT=True) 
 if __name__ == '__main__':
 
     d      = [0., 50., 100.]       # Position of top of each layer (m)
