@@ -633,7 +633,18 @@ def InteractWconvR():
     return interact(plotSeismogramInteractFixMod,wavf=(5.,100.,5.),wavA=(-2.,2.,0.25))    
 
 def InteractSeismogram():
-    return interact(plotSeismogramInteract,d2=(0.,150.,1),d3=(0.,200.,1),rho1=(2000.,5000.,50.),rho2=(2000.,5000.,50.),rho3=(2000.,5000.,50.),v1=(100.,4000.,5.),v2=(100.,4000.,5.),v3=(300.,4000.,50.),wavf=(5.,100.,2.5),wavA=(-0.5,1.,0.25),addNoise=False,usingT=True) 
+    return interact(plotSeismogramInteract,d2=(0.,150.,1),
+                                           d3=(0.,200.,1),
+                                           rho1=(2000.,5000.,50.),
+                                           rho2=(2000.,5000.,50.),
+                                           rho3=(2000.,5000.,50.),
+                                           v1=(100.,4000.,5.),
+                                           v2=(100.,4000.,5.),
+                                           v3=(300.,4000.,50.),
+                                           wavf=(5.,100.,2.5),
+                                           wavA=FloatSlider(min = -0.5, max = 1., step = 0.25, value = 1.),
+                                           addNoise=False,
+                                           usingT=True) 
 
 def InteractSeismogramTBL(v1=125, v2=125, v3=125):
     return interact(plotSeismogramInteractTBL,d2=FloatSlider(min = 1. ,max = 100.,step = 0.1, value = 9.),
