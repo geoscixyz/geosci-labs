@@ -1,7 +1,7 @@
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
-
+import matplotlib.gridspec as gridspec
 try:
     from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
     pass
@@ -35,14 +35,11 @@ def ViewWiggle(syndata, obsdata):
 
 def NoisyNMOWidget(t0, v):
     syndata = np.load('obsdata1.npy')
-    np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
-    # time1 = HyperbolicFun(t0, xorig, v1)
-    # time2 = HyperbolicFun(t0, xorig, v2)
-    # time3 = HyperbolicFun(t0, xorig, v3)
     time = HyperbolicFun(t0, xorig, v)
-    fig, ax = plt.subplots(1, 2, figsize=(14, 8))
+    # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
+    fig = plt.figure(figsize=(20, 8))
     kwargs = {
     'skipt':1,
     'scale': 0.05,
@@ -51,26 +48,51 @@ def NoisyNMOWidget(t0, v):
     'sampr': 0.004,
     'clip' : dx*10.,
     }
+    gs1 = gridspec.GridSpec(1, 9)
+    gs1.update(left=0.05, right=0.48, wspace=0.05)
+    ax1 = plt.subplot(gs1[:, 0:3])
+    ax2 = plt.subplot(gs1[:, 4:7])
+    ax3 = plt.subplot(gs1[:, 8])
 
     extent = [0., 38*dx, 1.0, 0.]
-    ax[0].invert_yaxis()
-    ax[1].invert_yaxis()
-    wiggle(syndata, ax = ax[0], **kwargs)
+    ax1.invert_yaxis()
+    ax2.invert_yaxis()
+    wiggle(syndata, ax = ax1, **kwargs)
     toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
-    wiggle(syndata, ax = ax[1], manthifts=toffset, **kwargs)
+    wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
 
-    ax[0].axis(extent)
-    ax[1].axis(extent)
-    # ax[0].plot(xorig, time1, 'b', lw=2)
-    ax[0].plot(xorig, time, 'r', lw=2)
-    # ax[0].plot(xorig, time3, 'g', lw=2)
+    ax1.axis(extent)
+    ax2.axis(extent)    
+    ax1.plot(xorig, time, 'r', lw=2)
 
-    ax[0].set_xlabel("Offset (m)")
-    ax[1].set_xlabel("Offset (m)")
-    ax[0].set_ylabel("Time (s)")
-    ax[1].set_ylabel("Time (s)")
-    ax[0].set_title("CMP gather")
-    ax[1].set_title("NMO corrected CMP gather")
+    ax1.set_xlabel("Offset (m)")
+    ax2.set_xlabel("Offset (m)")
+    ax1.set_ylabel("Time (s)")
+    ax2.set_ylabel("Time (s)")
+    ax1.set_title("CMP gather")
+    ax2.set_title("NMO corrected CMP gather")
+    
+    time_data = np.load('time1.npy')
+    singletrace = NMOstack(syndata, xorig, time_data, v) 
+    # singletrace = singletrace 
+
+    kwargs = {
+    'skipt':1,
+    'scale': 2.,
+    'lwidth': 1.,
+    'sampr': 0.004,
+    'ax': ax3,
+    'clip' : 10,
+    }
+    extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
+    ax3.invert_yaxis()
+    ax3.axis(extent)
+    wiggle(singletrace.reshape([1,-1]), **kwargs)
+    ax3.set_xlabel("Amplitude")
+    ax3.set_ylabel("Time (s)")
+    ax3.set_xlim(-4.5, 4.5)
+    ax3.set_xticks([-4.5, 0., 4.5])
+    ax3.set_title("Stacked trace")
 
 def CleanNMOWidget(t0, v):
     syndata = np.load('syndata1.npy')
@@ -78,7 +100,8 @@ def CleanNMOWidget(t0, v):
     dx = 20
     xorig = np.arange(38)*dx
     time = HyperbolicFun(t0, xorig, v)
-    fig, ax = plt.subplots(1, 2, figsize=(14, 8))
+    # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
+    fig = plt.figure(figsize=(20, 8))
     kwargs = {
     'skipt':1,
     'scale': 0.05,
@@ -87,23 +110,51 @@ def CleanNMOWidget(t0, v):
     'sampr': 0.004,
     'clip' : dx*10.,
     }
+    gs1 = gridspec.GridSpec(1, 9)
+    gs1.update(left=0.05, right=0.48, wspace=0.05)
+    ax1 = plt.subplot(gs1[:, 0:3])
+    ax2 = plt.subplot(gs1[:, 4:7])
+    ax3 = plt.subplot(gs1[:, 8])
 
     extent = [0., 38*dx, 1.0, 0.]
-    ax[0].invert_yaxis()
-    ax[1].invert_yaxis()
-    wiggle(syndata, ax = ax[0], **kwargs)
+    ax1.invert_yaxis()
+    ax2.invert_yaxis()
+    wiggle(syndata, ax = ax1, **kwargs)
     toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
-    wiggle(syndata, ax = ax[1], manthifts=toffset, **kwargs)
+    wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
 
-    ax[0].axis(extent)
-    ax[1].axis(extent)
-    ax[0].plot(xorig, time, 'b', lw=2)
-    ax[0].set_xlabel("Offset (m)")
-    ax[1].set_xlabel("Offset (m)")
-    ax[0].set_ylabel("Time (s)")
-    ax[1].set_ylabel("Time (s)")
-    ax[0].set_title("CMP gather")
-    ax[1].set_title("NMO corrected CMP gather")
+    ax1.axis(extent)
+    ax2.axis(extent)    
+    ax1.plot(xorig, time, 'r', lw=2)
+
+    ax1.set_xlabel("Offset (m)")
+    ax2.set_xlabel("Offset (m)")
+    ax1.set_ylabel("Time (s)")
+    ax2.set_ylabel("Time (s)")
+    ax1.set_title("CMP gather")
+    ax2.set_title("NMO corrected CMP gather")
+    
+    time_data = np.load('time1.npy')
+    singletrace = NMOstack(syndata, xorig, time_data, v) 
+    # singletrace = singletrace 
+
+    kwargs = {
+    'skipt':1,
+    'scale': 2.,
+    'lwidth': 1.,
+    'sampr': 0.004,
+    'ax': ax3,
+    'clip' : 10,
+    }
+    extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
+    ax3.invert_yaxis()
+    ax3.axis(extent)
+    wiggle(singletrace.reshape([1,-1]), **kwargs)
+    ax3.set_xlabel("Amplitude")
+    ax3.set_ylabel("Time (s)")
+    ax3.set_xlim(-4.5, 4.5)
+    ax3.set_xticks([-4.5, 0., 4.5])
+    ax3.set_title("Stacked trace")
 
 def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
