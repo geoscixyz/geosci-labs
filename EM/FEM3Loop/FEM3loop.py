@@ -139,7 +139,7 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     kx = np.ceil(xp.size/2.)
     ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
     ax[0][1].plot(y[kx,:],imag_response[kx,:],'.--g')
-    ax[0][1].legend(['Real','Imag'],loc=2)
+    # ax[0][1].legend(['Real','Imag'],loc=2)
     ax[0][1].set_xlabel('Easting')
     ax[0][1].set_ylabel('H$_s$/H$_p$')
     ax[0][1].set_title('Plot 2: EW cross section along Northing = %1.1f' %(x[kx,0]))
