@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
+try:
+    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider
+    pass
+except Exception, e:    
+    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
+
 def mind(x,y,z,dincl,ddecl,x0,y0,z0,aincl,adecl):
 
     x = np.array(x, dtype=float)
@@ -129,13 +135,11 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     ax[0][0].set_title('Plot 1: EM responses of loop')
     ax[0][0].grid(which='major', color = '0.7', linestyle='-',linewidth='0.1')
     ax[0][0].grid(which='minor',color='0.4',linestyle='-',linewidth='0.1')
-
-    # plt.subplot(2,2,2)
-
+    
     kx = np.ceil(xp.size/2.)
     ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
     ax[0][1].plot(y[kx,:],imag_response[kx,:],'.--g')
-    # ax[0][1].legend(['Real','Imag'],loc=2)
+    ax[0][1].legend(['Real','Imag'],loc=2)
     ax[0][1].set_xlabel('Easting')
     ax[0][1].set_ylabel('H$_s$/H$_p$')
     ax[0][1].set_title('Plot 2: EW cross section along Northing = %1.1f' %(x[kx,0]))
@@ -166,22 +170,30 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     plt.tight_layout()
     plt.show()
 
-def interactfem3loop(L,R,xc,yc,zc,dincl,ddecl,f,dx,default=True):
-    if default == True:
-        dx = 0.25
-        xc = 0.
-        yc = 0.
-        zc = 1.
-        dincl = 0.
-        ddecl = 90.
-        L = 0.1
-        R = 2000.
+
+   
+def interactfem3loop():
 
     S = 4.
     ht = 1.
-    xmin = -40.*dx
-    xmax = 40.*dx
-    return fem3loop(L,R,-yc,xc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx)
+    # xmin = lambda dx: -40.*dx
+    # xmax = lambda dx: 40.*dx
+
+    fem3loopwrap = lambda L,R,yc,xc,zc,dincl,ddecl,f,dx: fem3loop(L,R,-yc,xc,zc,dincl,ddecl,S,ht,f,-40.*dx,40.*dx,dx)
+
+    Q = interactive(fem3loopwrap,
+        L = FloatSlider(min=0.00,max=0.20,step=0.01,value=0.10),
+        R = FloatSlider(min=0.0,max=20000.,step=1000.,value=2000.),
+        xc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
+        yc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
+        zc = FloatSlider(min=0.,max=20.,step=1.,value=1.),
+        dincl = FloatSlider(min=-90.,max=90.,step=1.,value=0.),
+        ddecl = FloatSlider(min=0.,max=180.,step=1.,value=90.),
+        f = FloatSlider(min=10.,max=19990.,step=10.,value=10000.),
+        dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25)
+        )
+
+    return Q
 
 
 if __name__ == '__main__':
