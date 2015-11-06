@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
+import warnings
+warnings.filterwarnings('ignore')
+
 try:
     from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider
     pass
@@ -133,8 +136,8 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     ax[0][0].set_xlabel('$\\alpha = \\omega L /R$')
     ax[0][0].set_ylabel('Frequency Response')
     ax[0][0].set_title('Plot 1: EM responses of loop')
-    ax[0][0].grid(which='major', color = '0.7', linestyle='-',linewidth='0.1')
-    ax[0][0].grid(which='minor',color='0.4',linestyle='-',linewidth='0.1')
+    ax[0][0].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
+    ax[0][0].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
     
     kx = np.ceil(xp.size/2.)
     ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
@@ -143,8 +146,8 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     ax[0][1].set_xlabel('Easting')
     ax[0][1].set_ylabel('H$_s$/H$_p$')
     ax[0][1].set_title('Plot 2: EW cross section along Northing = %1.1f' %(x[kx,0]))
-    ax[0][1].grid(which='major', color = '0.7', linestyle='-',linewidth='0.1')
-    ax[0][1].grid(which='minor',color='0.4',linestyle='-',linewidth='0.1')
+    ax[0][1].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
+    ax[0][1].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
 
     vminR = real_response.min()
     vmaxR = real_response.max()
