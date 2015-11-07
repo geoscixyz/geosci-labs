@@ -14,21 +14,21 @@ except Exception, e:
 
 def fempipeWidget(alpha, pipedepth):
     respEW, respNS, X, Y = fempipe(alpha, pipedepth)
-    fig = plt.figure(figsize = (12, 12))
+    fig = plt.figure(figsize = (8, 6))
     ax0 = plt.subplot2grid((2,2), (0,0))
     ax1 = plt.subplot2grid((2,2), (0,1))
     ax2 = plt.subplot2grid((2,2), (1,0), colspan=2)
 
-    dat0 = ax0.contourf(X, Y, respEW.real*100, 40)
-    dat1 = ax1.contourf(X, Y, respNS.real*100, 40)
+    dat0 = ax0.imshow(respEW.real*100, extent=[X.min(),X.max(),Y.min(),Y.max()])
+    dat1 = ax1.imshow(respNS.real*100, extent=[X.min(),X.max(),Y.min(),Y.max()])
     cb0 = plt.colorbar(dat0, ax = ax0)
     cb1 = plt.colorbar(dat1, ax = ax1)
-    ax0.set_title("In-phase EW boom (%)", fontsize = 16)
-    ax1.set_title("In-phase NS boom (%)", fontsize = 16)
-    ax0.set_xlabel("Easting (m)", fontsize = 16)
-    ax1.set_xlabel("Easting (m)", fontsize = 16)
-    ax0.set_ylabel("Northing (m)", fontsize = 16)
-    ax1.set_ylabel("Northing (m)", fontsize = 16)
+    ax0.set_title("In-phase EW boom (%)", fontsize = 12)
+    ax1.set_title("In-phase NS boom (%)", fontsize = 12)
+    ax0.set_xlabel("Easting (m)", fontsize = 12)
+    ax1.set_xlabel("Easting (m)", fontsize = 12)
+    ax0.set_ylabel("Northing (m)", fontsize = 12)
+    ax1.set_ylabel("Northing (m)", fontsize = 12)
     ax0.plot(np.r_[0., 0.], np.r_[-10., 10.], 'k--', lw=2)
     ax1.plot(np.r_[0., 0.], np.r_[-10., 10.], 'k--', lw=2)
 
@@ -41,6 +41,9 @@ def fempipeWidget(alpha, pipedepth):
     ax2.set_ylabel('Hs/Hp (%)', fontsize = 16)
     ax2.set_xlabel('Northing (m)', fontsize = 16)
     ax2.set_title('Northing profile line at Easting 0 m', fontsize = 16)
+
+    plt.tight_layout()
+    plt.show()
 
 def fempipe(a, pipedepth):
     """
@@ -174,6 +177,6 @@ if __name__ == '__main__':
     # print resp.shape
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(1,2, figsize = (12, 5))
-    ax[0].contourf(X, Y, respEW.real, 40)
-    ax[1].contourf(X, Y, respNS.real, 40)
+    ax[0].pcolor(X, Y, respEW.real, 40)
+    ax[1].pcolor(X, Y, respNS.real, 40)
     plt.show()
