@@ -2,11 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
+import warnings
+warnings.filterwarnings('ignore')
+
 try:
-    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider
+    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
     pass
 except Exception, e:    
-    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
+    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
+
 
 def mind(x,y,z,dincl,ddecl,x0,y0,z0,aincl,adecl):
 
@@ -59,7 +63,7 @@ def mind(x,y,z,dincl,ddecl,x0,y0,z0,aincl,adecl):
     return bx*ax+by*ay+bz*az
 
 
-def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
+def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
 
     L = np.array(L, dtype=float)
     R = np.array(R, dtype=float)
@@ -71,8 +75,6 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     S = np.array(S, dtype=float)
     ht = np.array(ht, dtype=float)
     f = np.array(f, dtype=float)
-    xmin = np.array(xmin, dtype=float)
-    xmax = np.array(xmax, dtype=float)
     dx = np.array(dx, dtype=float)
 
     ymin = xmin
@@ -133,8 +135,8 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     ax[0][0].set_xlabel('$\\alpha = \\omega L /R$')
     ax[0][0].set_ylabel('Frequency Response')
     ax[0][0].set_title('Plot 1: EM responses of loop')
-    ax[0][0].grid(which='major', color = '0.7', linestyle='-',linewidth='0.1')
-    ax[0][0].grid(which='minor',color='0.4',linestyle='-',linewidth='0.1')
+    ax[0][0].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
+    ax[0][0].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
     
     kx = np.ceil(xp.size/2.)
     ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
@@ -143,29 +145,39 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx):
     ax[0][1].set_xlabel('Easting')
     ax[0][1].set_ylabel('H$_s$/H$_p$')
     ax[0][1].set_title('Plot 2: EW cross section along Northing = %1.1f' %(x[kx,0]))
-    ax[0][1].grid(which='major', color = '0.7', linestyle='-',linewidth='0.1')
-    ax[0][1].grid(which='minor',color='0.4',linestyle='-',linewidth='0.1')
+    ax[0][1].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
+    ax[0][1].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
+    ax[0][1].set_xlim(np.r_[xmin,xmax])
 
     vminR = real_response.min()
     vmaxR = real_response.max()
     ax[1][0].plot(np.r_[xp.min(),xp.max()], np.zeros(2), 'k--', lw=1)
     clb = plt.colorbar(ax[1][0].imshow(real_response,extent=[xp.min(),xp.max(),yp.min(),yp.max()], vmin = vminR, vmax = vmaxR),ax=ax[1][0])
-
+    ax[1][0].set_xlim(np.r_[xmin,xmax])
+    ax[1][0].set_ylim(np.r_[xmin,xmax])
     ax[1][0].set_xlabel('Easting (m)')
     ax[1][0].set_ylabel('Northing (m)')
     ax[1][0].set_title('Plot 3: Real Component')
     # ax[1][0].colorbar()
     clb.set_label('H$_s$/H$_p$')
 
+    if showDataPts:
+        XP, YP = np.meshgrid(xp,yp)
+        ax[1][0].plot(XP,YP,'.',color=[0.2,0.2,0.2])
+
     vminI = imag_response.min()
     vmaxI = imag_response.max()
     ax[1][1].plot(np.r_[xp.min(),xp.max()], np.zeros(2), 'k--', lw=1)
     clb = plt.colorbar(ax[1][1].imshow(imag_response,extent=[xp.min(),xp.max(),yp.min(),yp.max()], vmin = vminI, vmax = vmaxI),ax=ax[1][1])
-
+    ax[1][1].set_xlim(np.r_[xmin,xmax])
+    ax[1][1].set_ylim(np.r_[xmin,xmax])
     ax[1][1].set_xlabel('Easting (m)')
     ax[1][1].set_ylabel('Northing (m)')
     ax[1][1].set_title('Plot 4: Imag Component')
     clb.set_label('H$_s$/H$_p$')
+
+    if showDataPts:
+        ax[1][1].plot(XP,YP,'.',color=[0.2,0.2,0.2])
     
     plt.tight_layout()
     plt.show()
@@ -176,21 +188,25 @@ def interactfem3loop():
 
     S = 4.
     ht = 1.
+    xmin = -10.
+    xmax = 10.
+    zmax = 10.
     # xmin = lambda dx: -40.*dx
     # xmax = lambda dx: 40.*dx
 
-    fem3loopwrap = lambda L,R,yc,xc,zc,dincl,ddecl,f,dx: fem3loop(L,R,-yc,xc,zc,dincl,ddecl,S,ht,f,-40.*dx,40.*dx,dx)
+    fem3loopwrap = lambda L,R,yc,xc,zc,dincl,ddecl,f,dx,showDataPts: fem3loop(L,R,-yc,xc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts)
 
     Q = interactive(fem3loopwrap,
         L = FloatSlider(min=0.00,max=0.20,step=0.01,value=0.10),
         R = FloatSlider(min=0.0,max=20000.,step=1000.,value=2000.),
         xc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
         yc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
-        zc = FloatSlider(min=0.,max=20.,step=1.,value=1.),
+        zc = FloatSlider(min=0.,max=zmax,step=0.5,value=1.),
         dincl = FloatSlider(min=-90.,max=90.,step=1.,value=0.),
         ddecl = FloatSlider(min=0.,max=180.,step=1.,value=90.),
         f = FloatSlider(min=10.,max=19990.,step=10.,value=10000.),
-        dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25)
+        dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25),
+        showDataPts = Checkbox(value=False)
         )
 
     return Q
