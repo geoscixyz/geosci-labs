@@ -48,7 +48,7 @@ def plot_ResponseFct(h_boom,h,sig1,sig2,orientation='vertical'):
     phisig = phi*sigvec
     
 
-    fig, ax = plt.subplots(1,3,figsize=(10,5))
+    fig, ax = plt.subplots(1,3,figsize=(11,6))
 
     fs = 13
 
@@ -72,14 +72,14 @@ def plot_ResponseFct(h_boom,h,sig1,sig2,orientation='vertical'):
     ax[2].invert_yaxis()
     ax[2].set_title('$\sigma \cdot$ %s'%(phi_title), fontsize = fs+4, position=[.5, 1.02])
     ax[2].set_xlabel('Weighted Conductivity (S/m)', fontsize=fs)
-    ax[2].set_xlim([0.,phi.max()*sigmax])
+    ax[2].set_xlim([0.,4.])
     ax[2].grid(which='both',linewidth=0.6,color=[0.5,0.5,0.5])
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.3)
 
     # place a text box in upper left in axes coords
     textstr = '$\sigma_a=%.2f$ S/m'%(sig_a)
-    ax[2].text(0.45*phi.max()*sigmax, 3.75, textstr, fontsize=fs+2,
+    ax[2].text(2.0, 3.75, textstr, fontsize=fs+2,
             verticalalignment='bottom', bbox=props)
 
     plt.tight_layout()
@@ -90,8 +90,8 @@ def plot_ResponseFct(h_boom,h,sig1,sig2,orientation='vertical'):
 def interactive_responseFct():
 	app = interactive(plot_ResponseFct,h_boom = FloatSlider(min=h_boom, max = h_boom_max, step = 0.1, value = h_boom),
                   h = FloatSlider(min=0., max=zmax,value=1.0, step = 0.1),
-                  sig1 = FloatSlider(min=sigmin,max = sigmax,value=(sigmin+sigmax)/4., step = 0.1),
-                  sig2 = FloatSlider(min=sigmin,max = sigmax,value=(sigmin+sigmax)/2., step = 0.1),
+                  sig1 = FloatSlider(min=sigmin,max = sigmax,value=1., step = 0.1),
+                  sig2 = FloatSlider(min=sigmin,max = sigmax,value=0.5, step = 0.1),
                   orientation=ToggleButtons(options=['vertical','horizontal']))
 	return app
 
