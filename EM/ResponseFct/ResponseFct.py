@@ -12,7 +12,7 @@ sigmin = 0.01
 sigmax = 0.1
 
 sigma_0 = 0 # conductivity of the air
-h = 1.
+h_1 = 1.
 h_boom = 0. 
 h_boom_max = 2. 
 
@@ -27,22 +27,22 @@ phi_h = lambda z: 2 - (4.*z) / (4.*z**2 + 1.)**(1./2.)
 R_v = lambda z: 1./(4.*z**2. + 1.)**(1./2.)
 R_h = lambda z: (4.*z**2 + 1.)**(1./2.) - 2.*z
 
-sigma_av = lambda h_boom, h, sigma_1, sigma_2: sigma_0*(1.-R_v(h_boom)) + sigma_1*(R_v(h_boom) - R_v(h+h_boom)) + sigma_2*R_v(h+h_boom)
-sigma_ah = lambda h_boom, h, sigma_1, sigma_2: sigma_0*(1.-R_h(h_boom)) + sigma_1*(R_h(h_boom) - R_h(h+h_boom)) + sigma_2*R_h(h+h_boom) 
+sigma_av = lambda h_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_v(h_boom)) + sigma_1*(R_v(h_boom) - R_v(h_1+h_boom)) + sigma_2*R_v(h_1+h_boom)
+sigma_ah = lambda h_1_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_h(h_boom)) + sigma_1*(R_h(h_boom) - R_h(h_1+h_boom)) + sigma_2*R_h(h_1+h_boom) 
 
 
-def plot_ResponseFct(h_boom,h,sigma_1,sigma_2,orientation='vertical'):
+def plot_ResponseFct(h_boom,h_1,sigma_1,sigma_2,orientation='vertical'):
     
     sigvec = sigma_1*np.ones(z.shape)
-    sigvec[z > h] = sigma_2
+    sigvec[z > h_1] = sigma_2
 
     if orientation is 'vertical':
         phi = phi_v(z + h_boom)
-        sig_a = sigma_av(h_boom,h,sigma_1,sigma_2)
+        sig_a = sigma_av(h_boom,h_1,sigma_1,sigma_2)
         phi_title = '$\phi_V$'
     elif orientation is 'horizontal':
         phi = phi_h(z + h_boom)
-        sig_a = sigma_ah(h_boom,h,sigma_1,sigma_2)
+        sig_a = sigma_ah(h_boom,h_1,sigma_1,sigma_2)
         phi_title = '$\phi_H$'
 
     phisig = phi*sigvec
@@ -78,8 +78,8 @@ def plot_ResponseFct(h_boom,h,sigma_1,sigma_2,orientation='vertical'):
     props = dict(boxstyle='round', facecolor='grey', alpha=0.3)
 
     # place a text box in upper left in axes coords
-    textstr = '$\sigma_a=%.2f$ S/m'%(sig_a)
-    ax[2].text(sigmax*1., 3.75, textstr, fontsize=fs+2,
+    textstr = '$\sigma_a=%.3f$ S/m'%(sig_a)
+    ax[2].text(sigmax*0.9, 3.75, textstr, fontsize=fs+2,
             verticalalignment='bottom', bbox=props)
 
     plt.tight_layout()
@@ -89,7 +89,7 @@ def plot_ResponseFct(h_boom,h,sigma_1,sigma_2,orientation='vertical'):
 
 def interactive_responseFct():
 	app = interactive(plot_ResponseFct,h_boom = FloatSlider(min=h_boom, max = h_boom_max, step = 0.1, value = h_boom),
-                  h = FloatSlider(min=0., max=zmax,value=0.1, step = 0.1),
+                  h_1 = FloatSlider(min=0., max=zmax,value=0.1, step = 0.1),
                   sigma_1 = FloatSlider(min=sigmin, max = sigmax,value=sigmin, step = sigmin),
                   sigma_2 = FloatSlider(min=sigmin, max = sigmax,value=sigmin, step = sigmin),
                   orientation=ToggleButtons(options=['vertical','horizontal']))
