@@ -28,7 +28,7 @@ R_v = lambda z: 1./(4.*z**2. + 1.)**(1./2.)
 R_h = lambda z: (4.*z**2 + 1.)**(1./2.) - 2.*z
 
 sigma_av = lambda h_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_v(h_boom)) + sigma_1*(R_v(h_boom) - R_v(h_1+h_boom)) + sigma_2*R_v(h_1+h_boom)
-sigma_ah = lambda h_1_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_h(h_boom)) + sigma_1*(R_h(h_boom) - R_h(h_1+h_boom)) + sigma_2*R_h(h_1+h_boom) 
+sigma_ah = lambda h_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_h(h_boom)) + sigma_1*(R_h(h_boom) - R_h(h_1+h_boom)) + sigma_2*R_h(h_1+h_boom) 
 
 
 def plot_ResponseFct(h_boom,h_1,sigma_1,sigma_2,orientation='vertical'):
