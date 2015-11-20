@@ -19,7 +19,7 @@ except Exception, e:
 
 
 
-def DC2Dsurvey():
+def DC2Dsurvey(flag="PoleDipole"):
     npad = 8
     cs = 1.
     hx = [(cs,npad, -1.3),(cs,100),(cs,npad, 1.3)]
@@ -36,14 +36,33 @@ def DC2Dsurvey():
     txList = []
     zloc = -2.5
     for i in range(ntx):
-        A = np.r_[xr[i]+dxr[i]*0.5, zloc]
-        B = np.r_[mesh.vectorCCx.min(), zloc]   
-        if i < ntx-nmax+1:
-            M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
-            N = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]                
-        else:
-            M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
-            N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]                
+        if flag == "PoleDipole":
+            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
+            B = np.r_[mesh.vectorCCx.min(), zloc]   
+            if i < ntx-nmax+1:
+                M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
+                N = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]                
+            else:
+                M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
+                N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]
+        elif flag =="DipolePole":
+            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
+            B = np.r_[xr[i+1]+dxr[i]*0.5, zloc]
+            if i < ntx-nmax+1:
+                M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
+                N = np.c_[mesh.vectorCCx.max(), np.ones(nmax)*zloc]                
+            else:
+                M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
+                N = np.c_[mesh.vectorCCx.max(), np.ones(nmax)*zloc] 
+        elif flag =="DipoleDipole":
+            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
+            B = np.r_[xr[i+1]+dxr[i]*0.5, zloc]    
+            if i < ntx-nmax+1:
+                M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
+                N = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]                
+            else:
+                M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
+                N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]                                           
         rx = DC.RxDipole(M, N)
         src = DC.SrcDipole([rx], A, B)
         txList.append(src)
