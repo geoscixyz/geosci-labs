@@ -28,16 +28,23 @@ def DC2Dsurvey(flag="PoleDipole"):
     circmap = Maps.CircleMap(mesh)
     circmap.slope = 1e5
     mapping = circmap
-    xr = np.linspace(-40, 40, 20)
+    dx = 5 
+    xr = np.arange(-40,41,dx)
     dxr = np.diff(xr)
-    ntx, nmax = xr.size-2, 8
+
+    if flag =="PoleDipole":
+        ntx, nmax = xr.size-2, 8
+    elif flag =="DipolePole":
+        ntx, nmax = xr.size-1, 8
+    elif flag =="DipoleDipole":
+        ntx, nmax = xr.size-3, 8
     xzlocs = getPseudoLocs(xr, ntx, nmax)
 
     txList = []
     zloc = -2.5
     for i in range(ntx):
         if flag == "PoleDipole":
-            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
+            A = np.r_[xr[i], zloc]
             B = np.r_[mesh.vectorCCx.min(), zloc]   
             if i < ntx-nmax+1:
                 M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
@@ -46,23 +53,23 @@ def DC2Dsurvey(flag="PoleDipole"):
                 M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
                 N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]
         elif flag =="DipolePole":
-            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
-            B = np.r_[xr[i+1]+dxr[i]*0.5, zloc]
+            A = np.r_[xr[i], zloc]
+            B = np.r_[xr[i+1], zloc]
             if i < ntx-nmax+1:
-                M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
-                N = np.c_[mesh.vectorCCx.max(), np.ones(nmax)*zloc]                
+                M = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]        
+                N = np.c_[np.ones(nmax)*mesh.vectorCCx.max(), np.ones(nmax)*zloc]                
             else:
-                M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
-                N = np.c_[mesh.vectorCCx.max(), np.ones(nmax)*zloc] 
+                M = np.c_[xr[i+2:ntx+2], np.ones(ntx-i)*zloc]        
+                N = np.c_[np.ones(ntx-i)*mesh.vectorCCx.max(), np.ones(ntx-i)*zloc] 
         elif flag =="DipoleDipole":
-            A = np.r_[xr[i]+dxr[i]*0.5, zloc]
-            B = np.r_[xr[i+1]+dxr[i]*0.5, zloc]    
-            if i < ntx-nmax+1:
-                M = np.c_[xr[i+1:i+1+nmax], np.ones(nmax)*zloc]        
-                N = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]                
+            A = np.r_[xr[i], zloc]
+            B = np.r_[xr[i+1], zloc]    
+            if i < ntx-nmax:
+                M = np.c_[xr[i+2:i+2+nmax], np.ones(len(xr[i+2:i+2+nmax]))*zloc]       
+                N = np.c_[xr[i+3:i+3+nmax], np.ones(len(xr[i+3:i+3+nmax]))*zloc]                
             else:
-                M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]        
-                N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]                                           
+                M = np.c_[xr[i+2:len(xr)-1], np.ones(len(xr[i+2:len(xr)-1]))*zloc]      
+                N = np.c_[xr[i+3:len(xr)], np.ones(len(xr[i+3:len(xr)]))*zloc]                                                
         rx = DC.RxDipole(M, N)
         src = DC.SrcDipole([rx], A, B)
         txList.append(src)
@@ -103,6 +110,80 @@ def getPseudoLocs(xr, ntx, nmax):
     ylocvec = np.hstack(yloc)
     return np.c_[xlocvec, ylocvec]
 
+def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
+    matplotlib.rcParams['font.size'] = 14
+    nmax = 8
+    dx = 5
+    xr = np.arange(-40,41,dx)
+    ntx = xr.size-2
+    dxr = np.diff(xr)
+    TxObj = survey.srcList
+    TxLoc = TxObj[i].loc
+    RxLoc = TxObj[i].rxList[0].locs
+    fig = plt.figure(figsize=(10, 3))
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(xr.min()-5, xr.max()+5), ylim=(nmax+1, -2))
+    plt.plot(xr, np.zeros_like(xr), 'ko', markersize=4)
+    if flag == "PoleDipole":
+        plt.plot(TxLoc[0][0], np.zeros(1), 'rv', markersize=10)
+        print([TxLoc[0][0],0])
+        ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+    else:
+        plt.plot([TxLoc[0][0],TxLoc[1][0]], np.zeros(2), 'rv', markersize=10)
+        print([[TxLoc[0][0],0],[TxLoc[1][0],0]])
+        ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        ax.annotate('B', xy=(TxLoc[1][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
+    # for i in range(ntx):
+    if i < ntx-nmax+1:
+        if flag == "PoleDipole":
+            txmid = TxLoc[0][0]
+        else:
+            txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
+        MLoc = RxLoc[0][j]
+        NLoc = RxLoc[1][j]
+        plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
+        ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
+
+        if flag == "DipolePole":
+            rxmid = MLoc[0]
+        else:
+            rxmid = (MLoc[0]+NLoc[0])*0.5
+        mid = (txmid+rxmid)*0.5
+        midSep = np.sqrt(np.square(txmid-rxmid))
+        plt.plot(txmid, np.zeros(1), 'ro')
+        plt.plot(rxmid, np.zeros(1), 'bo')
+        plt.plot(mid, midSep/2., 'go')
+        plt.plot(np.r_[txmid, mid], np.r_[0, midSep/2.], 'k:')    
+        # for j in range(nmax):
+            # plt.plot(np.r_[rxmid[j], mid[j]], np.r_[0, j+1], 'k:')
+        plt.plot(np.r_[rxmid, mid], np.r_[0, midSep/2.], 'k:')       
+
+    else:
+        if flag == "PoleDipole":
+            txmid = TxLoc[0][0]
+        else:
+            txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
+
+        MLoc = RxLoc[0][j]
+        NLoc = RxLoc[1][j]
+        plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
+        ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
+    
+        rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
+        mid = (txmid+rxmid)*0.5    
+        plt.plot((txmid+rxmid)*0.5, np.arange(mid.size)+1., 'bo')
+        plt.plot(rxmid, np.zeros(rxmid.size), 'go')
+        plt.plot(np.r_[txmid, mid[-1]], np.r_[0, mid.size], 'k:')    
+        for j in range(ntx-i):
+            plt.plot(np.r_[rxmid[j], mid[j]], np.r_[0, j+1], 'k:')    
+    plt.xlabel("X (m)")
+    plt.ylabel("N-spacing")    
+    plt.xlim(xr.min()-5, xr.max()+5)
+    plt.ylim(nmax*dx/2+dx, -2*dx)
+    plt.show()
+    return 
+
 def DipoleDipolefun(i):
     matplotlib.rcParams['font.size'] = 14
     plt.figure(figsize=(10, 3))
@@ -138,6 +219,19 @@ def DipoleDipolefun(i):
     plt.ylim(nmax+1, -1)
     plt.show()
     return 
+
+def PseudoSectionWidget(survey,flag):
+    dx = 5 
+    xr = np.arange(-40,41,dx)
+    if flag =="PoleDipole":
+        ntx, nmax = xr.size-2, 8
+    elif flag =="DipolePole":
+        ntx, nmax = xr.size-1, 8
+    elif flag =="DipoleDipole":
+        ntx, nmax = xr.size-3, 8
+    xzlocs = getPseudoLocs(xr, ntx, nmax)
+    PseudoSectionPlot = lambda i,j: PseudoSectionPlotfnc(i,j,survey,flag)
+    return interact(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
 
 def PoleDipoleWidget():
     ntx = 18
