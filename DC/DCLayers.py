@@ -27,11 +27,12 @@ mesh = Mesh.TensorMesh([hx, hy], "CN")
 rhomin = 1e2
 rhomax = 1e3
 
+eps = 1e-6 #to stabilize division
+
 def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=20):
 #     xyz = Utils.ndgrid(x,y,z)
     k = (rho2-rho1) / (rho2+rho1)
     
-    eps = 1e-6 #to stabilize division
     r = lambda src_loc: np.sqrt((xyz[:,0] - src_loc[0])**2 + (xyz[:,1] - src_loc[1])**2 + (xyz[:,2] - src_loc[2])**2)+eps
 
     m = Utils.mkvc(np.arange(1,infty+1))
@@ -44,7 +45,7 @@ def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=20):
     
     return VA+VB
 
-G = lambda A, B, M, N: 1. / ( 1./np.abs(A-M) - 1./np.abs(M-B) - 1./np.abs(N-A) + 1./np.abs(N-B) )
+G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
 rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 
@@ -82,24 +83,14 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
 
     txtsp = 1
 
-    if A < B:
-        if M <= A:
-            xytextM = (M-0.5,VM+txtsp)
-        elif M > A:
-            xytextM = (M+0.5,VM+txtsp)
+    xytextM = (M-0.5,np.max([np.min([VM,ylim.max()]),ylim.min()]))
+    xytextN = (N,np.max([np.min([VN,ylim.max()]),ylim.min()]))
 
-        if N <= B:
-            xytextN = (N+0.5,VN+txtsp)
-        elif N > B:
-            xytextN = (N+0.5,VN-txtsp)
-
-    elif A > B:
-        print 'here'
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
 
-    ax[0].annotate('%2.1e'%(VM), xy=(M,VM), xytext=xytextM,fontsize = 14)
-    ax[0].annotate('%2.1e'%(VN), xy=(N,VN), xytext=xytextN,fontsize = 14)
+    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = 14)
+    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = 14)
 
 #     ax[0].plot(np.r_[M,N],np.ones(2)*VN,color='k')
 #     ax[0].plot(np.r_[M,M],np.r_[VM, VN],color='k')
@@ -182,7 +173,7 @@ def plot_Layer_Potentials_app():
 if __name__ == '__main__':
     rho1, rho2 = rhomin, rhomax
     h = 5.
-    A,B = -30., 30. 
+    A,B = -10., 10. 
     M,N = -10., 10.
     Plot =  'potential'
     plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,Plot)
