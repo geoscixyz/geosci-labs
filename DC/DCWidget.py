@@ -37,12 +37,12 @@ def DC2Dsurvey(flag="PoleDipole"):
     if flag =="PoleDipole":
         ntx, nmax = xr.size-2, 8
     elif flag =="DipolePole":
-        ntx, nmax = xr.size-1, 8
+        ntx, nmax = xr.size-2, 8
     elif flag =="DipoleDipole":
         ntx, nmax = xr.size-3, 8
     else: 
         raise Exception('Not Implemented')
-    xzlocs = getPseudoLocs(xr, ntx, nmax)
+    xzlocs = getPseudoLocs(xr, ntx, nmax, flag)
 
     txList = []
     zloc = -2.5
@@ -73,7 +73,8 @@ def DC2Dsurvey(flag="PoleDipole"):
                 N = np.c_[xr[i+3:i+3+nmax], np.ones(len(xr[i+3:i+3+nmax]))*zloc]                
             else:
                 M = np.c_[xr[i+2:len(xr)-1], np.ones(len(xr[i+2:len(xr)-1]))*zloc]      
-                N = np.c_[xr[i+3:len(xr)], np.ones(len(xr[i+3:len(xr)]))*zloc]                                                
+                N = np.c_[xr[i+3:len(xr)], np.ones(len(xr[i+3:len(xr)]))*zloc]
+                                          
         rx = DC.RxDipole(M, N)
         src = DC.SrcDipole([rx], A, B)
         txList.append(src)
@@ -94,20 +95,40 @@ def DC2Dsurvey(flag="PoleDipole"):
 
     return dobs, uncert, survey, xzlocs
 
-def getPseudoLocs(xr, ntx, nmax):
-    dxr = np.diff(xr)
+def getPseudoLocs(xr, ntx, nmax, flag = "PoleDipole"):
     xloc = []
     yloc = []    
     for i in range(ntx):
         if i < ntx-nmax+1:
-            txmid = xr[i]+dxr[i]*0.5
-            rxmid = xr[i+1:i+1+nmax]+dxr[i+1:i+1+nmax]*0.5
+
+            if flag is 'DipoleDipole':
+                txmid = xr[i]+dxr[i]*0.5
+                rxmid = xr[i+1:i+1+nmax]+dxr[i+1:i+1+nmax]*0.5
+
+            elif flag is 'PoleDipole':
+                txmid = xr[i]
+                rxmid = xr[i+1:i+1+nmax]+dxr[i+1:i+1+nmax]*0.5
+
+            elif flag is 'DipolePole':
+                txmid = xr[i]+dxr[i]*0.5
+                rxmid = xr[i+1:i+1+nmax]
+
             mid = (txmid+rxmid)*0.5
             xloc.append(mid)
             yloc.append(np.arange(nmax)+1.)
         else:
-            txmid = xr[i]+dxr[i]*0.5
-            rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
+            if flag is 'DipoleDipole':
+                txmid = xr[i]+dxr[i]*0.5
+                rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
+
+            elif flag is 'PoleDipole':
+                txmid = xr[i]
+                rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
+
+            elif flag is 'DipolePole':
+                txmid = xr[i]+dxr[i]*0.5
+                rxmid = xr[i+1:ntx+1]
+
             mid = (txmid+rxmid)*0.5    
             xloc.append(mid)
             yloc.append(np.arange(mid.size)+1.)
@@ -130,11 +151,11 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
     plt.plot(xr, np.zeros_like(xr), 'ko', markersize=4)
     if flag == "PoleDipole":
         plt.plot(TxLoc[0][0], np.zeros(1), 'rv', markersize=10)
-        print([TxLoc[0][0],0])
+        # print([TxLoc[0][0],0])
         ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
     else:
         plt.plot([TxLoc[0][0],TxLoc[1][0]], np.zeros(2), 'rv', markersize=10)
-        print([[TxLoc[0][0],0],[TxLoc[1][0],0]])
+        # print([[TxLoc[0][0],0],[TxLoc[1][0],0]])
         ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
         ax.annotate('B', xy=(TxLoc[1][0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
     # for i in range(ntx):
@@ -230,11 +251,14 @@ def PseudoSectionWidget(survey,flag):
     xr = np.arange(-40,41,dx)
     if flag =="PoleDipole":
         ntx, nmax = xr.size-2, 8
+        dxr = np.diff(xr)
     elif flag =="DipolePole":
         ntx, nmax = xr.size-1, 7
+        dxr = xr
     elif flag =="DipoleDipole":
         ntx, nmax = xr.size-3, 8
-    xzlocs = getPseudoLocs(xr, ntx, nmax)
+        dxr = np.diff(xr)
+    xzlocs = getPseudoLocs(dxr, ntx, nmax,flag)
     PseudoSectionPlot = lambda i,j: PseudoSectionPlotfnc(i,j,survey,flag)
     return interact(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
 
