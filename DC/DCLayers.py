@@ -4,6 +4,7 @@ sys.path.append("./simpeg/")
 sys.path.append("./simpegdc/")
 from SimPEG import *
 import simpegDCIP as DC
+from scipy.constants import epsilon_0
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -83,8 +84,8 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
 
     txtsp = 1
 
-    xytextM = (M-0.5,np.max([np.min([VM,ylim.max()]),ylim.min()]))
-    xytextN = (N,np.max([np.min([VN,ylim.max()]),ylim.min()]))
+    xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
+    xytextN = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
 
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
@@ -106,6 +107,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         model = model.reshape(x.size,z.size, order='F')
         cb = ax[1].pcolor(xplt, zplt, model,norm=LogNorm())
         clim = [rhomin,rhomax]
+        clabel = 'Resistivity ($\Omega$m)'
 
     elif imgplt is 'potential':
         Vplt = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
@@ -114,6 +116,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         ax[1].contour(xplt,zplt,np.abs(Vplt),np.logspace(-2.,1.,10),colors='k',alpha=0.5)
         ax[1].set_ylabel('z (m)', fontsize=14)
         clim = ylim
+        clabel = 'Potential (V)'
 
     elif imgplt is 'e':
         Px = mesh.getInterpolationMat(pltgrid,'Fx')
@@ -126,6 +129,8 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         cb = ax[1].pcolor(xplt,zplt,E,norm=LogNorm())
         print E.max()
         ax[1].streamplot(x,z,Ex.T,Ez.T,color = 'k',linewidth= (np.log(E.T) - np.log(E).min())/np.max(np.log(E)))
+        clabel = 'Electric Field (V/m)'
+        clim = np.r_[3e-3,3e1]
 
     elif imgplt is 'j':
         rho_model = rho2*np.ones(pltgrid.shape[0])
@@ -145,17 +150,42 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
+        clim = np.r_[3e-5,1e-1]
+        clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'charges':
+    #     rho_model = rho2*np.ones(mesh.nC)
+    #     rho_model[mesh.gridCC[:,1] >= -h] = rho1
+
+    #     Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
+    #     Emesh = -mesh.cellGrad*Vmesh
+
+    #     P = mesh.getInterpolationMat(pltgrid,'CC')
+
+    #     charges = P * (mesh.faceDivy * Emesh[mesh.nFx:])* epsilon_0
+    #     # charges = ( P * (  Emesh) ) * epsilon_0
+    #     charges = charges.reshape(x.size,z.size,order='F')
+
+
+    #     cb = ax[1].pcolor(xplt,zplt,charges)  
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+    #     clabel = 'Charge Density (C/m$^3$)'
+
+
+
+
     ax[1].set_xlim([x.min(),x.max()])
     ax[1].set_ylim([z.min(),0.])
     ax[1].set_ylabel('z (m)', fontsize=14)
     cbar_ax = fig.add_axes([1., 0.08, 0.04, 0.4])
-    plt.colorbar(cb,cax=cbar_ax)
+    plt.colorbar(cb,cax=cbar_ax,label=clabel)
     if 'clim' in locals():
         cb.set_clim(clim)
     ax[1].set_xlabel('x(m)',fontsize=14)
 
     plt.tight_layout()
     plt.show()
+    return fig, ax
 
 
 def plot_Layer_Potentials_app():
