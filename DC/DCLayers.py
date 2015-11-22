@@ -122,8 +122,10 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         Emesh = -mesh.cellGrad*Vmesh
         Ex = (Px * Emesh).reshape(x.size,z.size,order='F')
         Ez = (Pz * Emesh).reshape(x.size,z.size,order='F')
-        cb = ax[1].pcolor(xplt,zplt,np.sqrt(Ex**2.+Ez**2.),norm=LogNorm())
-        ax[1].streamplot(x,z,Ex.T,Ez.T,color = 'k')
+        E = np.sqrt(Ex**2.+Ez**2.)
+        cb = ax[1].pcolor(xplt,zplt,E,norm=LogNorm())
+        print E.max()
+        ax[1].streamplot(x,z,Ex.T,Ez.T,color = 'k',linewidth= (np.log(E.T) - np.log(E).min())/np.max(np.log(E)))
 
     elif imgplt is 'j':
         rho_model = rho2*np.ones(pltgrid.shape[0])
@@ -140,7 +142,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         J = np.sqrt(Jx**2.+Jz**2.)
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
-        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k') #,linewidth = 2.5*(np.log(J.T)-np.log(J.T).min())/np.max(np.abs(np.log(J))))   
+        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
     ax[1].set_xlim([x.min(),x.max()])
