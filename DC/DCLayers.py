@@ -1,7 +1,7 @@
-from SimPEG import *
 import sys
 sys.path.append("./simpeg/")
 sys.path.append("./simpegdc/")
+
 from SimPEG import *
 import simpegDCIP as DC
 from scipy.constants import epsilon_0
