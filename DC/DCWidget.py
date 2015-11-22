@@ -18,19 +18,21 @@ except Exception, e:
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
+# Mesh, mapping can be globals global
+npad = 8
+cs = 1.
+hx = [(cs,npad, -1.3),(cs,100),(cs,npad, 1.3)]
+hy = [(cs,npad, -1.3),(cs,50)]
+mesh = Mesh.TensorMesh([hx, hy], "CN")
+circmap = Maps.CircleMap(mesh)
+circmap.slope = 1e5
+mapping = circmap
+dx = 5 
+xr = np.arange(-40,41,dx)
+dxr = np.diff(xr)
+
 
 def DC2Dsurvey(flag="PoleDipole"):
-    npad = 8
-    cs = 1.
-    hx = [(cs,npad, -1.3),(cs,100),(cs,npad, 1.3)]
-    hy = [(cs,npad, -1.3),(cs,50)]
-    mesh = Mesh.TensorMesh([hx, hy], "CN")
-    circmap = Maps.CircleMap(mesh)
-    circmap.slope = 1e5
-    mapping = circmap
-    dx = 5 
-    xr = np.arange(-40,41,dx)
-    dxr = np.diff(xr)
 
     if flag =="PoleDipole":
         ntx, nmax = xr.size-2, 8
@@ -38,6 +40,8 @@ def DC2Dsurvey(flag="PoleDipole"):
         ntx, nmax = xr.size-1, 8
     elif flag =="DipoleDipole":
         ntx, nmax = xr.size-3, 8
+    else: 
+        raise Exception('Not Implemented')
     xzlocs = getPseudoLocs(xr, ntx, nmax)
 
     txList = []
@@ -73,6 +77,7 @@ def DC2Dsurvey(flag="PoleDipole"):
         rx = DC.RxDipole(M, N)
         src = DC.SrcDipole([rx], A, B)
         txList.append(src)
+
     survey = DC.SurveyDC(txList)
     problem = DC.ProblemDC_CC(mesh, mapping = mapping)
     problem.pair(survey)    
@@ -87,7 +92,7 @@ def DC2Dsurvey(flag="PoleDipole"):
     uncert = np.random.randn(survey.nD)*perc + floor
     dobs = dtrue + uncert 
 
-    return dobs, uncert, mesh, survey, mapping, xr, xzlocs
+    return dobs, uncert, survey, xzlocs
 
 def getPseudoLocs(xr, ntx, nmax):
     dxr = np.diff(xr)
@@ -226,7 +231,7 @@ def PseudoSectionWidget(survey,flag):
     if flag =="PoleDipole":
         ntx, nmax = xr.size-2, 8
     elif flag =="DipolePole":
-        ntx, nmax = xr.size-1, 8
+        ntx, nmax = xr.size-1, 7
     elif flag =="DipoleDipole":
         ntx, nmax = xr.size-3, 8
     xzlocs = getPseudoLocs(xr, ntx, nmax)
@@ -292,17 +297,20 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
     plt.show()
     return 
 
+def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
+    dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
+    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, r, dobs, uncert, predmis)
+    return None
 
-def DC2DfwdWidget(mesh, survey, mapping, dobs, uncert, xr, xzlocs):
-    DC2Dfwd = lambda rhohalf, rhosph, xc, zc, r, predmis: DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, r, dobs, uncert, predmis)
-    ntx = 18
+def DC2DfwdWidget():
     # print xzlocs
-    Q = interact(DC2Dfwd,
+    Q = interact(DC2DfwdWrapper,
          rhohalf = FloatSlider(min=0, max=1000, step=1, value = 500),
          rhosph = FloatSlider(min=0, max=1000, step=1, value = 50),
          xc = FloatSlider(min=-40, max=40, step=1, value =  -15),
          zc = FloatSlider(min= -20, max=0, step=1, value =  -8),
          r = FloatSlider(min= 0, max=15, step=0.5, value = 4),
-         predmis = ToggleButtons(options=['pred','mis'])         
+         predmis = ToggleButtons(options=['pred','mis']),
+         surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])         
         )
     return Q
