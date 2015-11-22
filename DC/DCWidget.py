@@ -262,7 +262,7 @@ def PseudoSectionWidget(survey,flag):
     PseudoSectionPlot = lambda i,j: PseudoSectionPlotfnc(i,j,survey,flag)
     return interact(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
 
-def PoleDipoleWidget():
+def MidpointPseudoSectionWidget():
     ntx = 18
     return interact(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
 
