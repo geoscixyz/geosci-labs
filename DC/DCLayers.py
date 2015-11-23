@@ -223,9 +223,9 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 
         cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
 
-        clim = np.r_[3e-2,1e1]
+        clim = np.r_[1e-2,1e1]
 
-        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 1.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 1.25*(np.log(e.T) - np.log(e).min())/np.log(e).max())
         
         clabel = 'Electric Field (V/m)'
 
@@ -246,7 +246,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         J = np.sqrt(Jx**2.+Jz**2.)
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
-        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.25*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
         clim = np.r_[1e-4,3e-2]
