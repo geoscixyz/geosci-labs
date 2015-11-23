@@ -1,6 +1,10 @@
 import sys
 sys.path.append("./simpeg")
 sys.path.append("./simpegdc/")
+
+import warnings
+warnings.filterwarnings('ignore')
+
 from SimPEG import Mesh, Maps
 import numpy as np
 import simpegDCIP as DC

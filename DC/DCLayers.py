@@ -2,12 +2,12 @@ import sys
 sys.path.append("./simpeg/")
 sys.path.append("./simpegdc/")
 
+import warnings
+warnings.filterwarnings('ignore')
+
 from SimPEG import *
 import simpegDCIP as DC
 from scipy.constants import epsilon_0
-
-import warnings
-warnings.filterwarnings('ignore')
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -61,7 +61,7 @@ def get_Layer_E(rho1,rho2,h,A,B,xyz,infty=100):
     sum_term_deriv = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / (1. + (2.*h*m.T/Utils.mkvc(r,2))**2)**(3./2.) * (2.*h*m.T / Utils.mkvc(r,2)) ,1)
 
     deriv_1 = lambda r: (-1./r) * (1. + 2.*sum_term(r))
-    deriv_2 = lambda r: (1. + 2.*(1./r)*sum_term_deriv(r))
+    deriv_2 = lambda r: (2.*(1./r)*sum_term_deriv(r))
 
     Er = lambda I,r : - (I*rho1 / (2.*np.pi*r)) * (deriv_1(r) + deriv_2(r))
 
@@ -161,7 +161,11 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         ez = ez.reshape(x.size,z.size,order='F')
         e = np.sqrt(ex**2.+ez**2.)
         cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
-        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= (np.log(e.T) - np.log(e).min())/np.max(np.log(e)))
+
+        clim = np.r_[3e-2,1e2]
+
+        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        
         clabel = 'Electric Field (V/m)'
 
     elif imgplt is 'j':
@@ -173,10 +177,10 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         J = np.sqrt(Jx**2.+Jz**2.)
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
-        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
+        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
-        # clim = np.r_[3e-5,1e-1]
+        clim = np.r_[3e-5,1e-1]
         clabel = 'Current Density (A/m$^2$)'
 
     # elif imgplt is 'e':
@@ -313,7 +317,7 @@ def plot_Layer_Potentials_app():
                 B = FloatSlider(min=-40.,max=40.,step=1.,value=30.),
                 M = FloatSlider(min=-40.,max=40.,step=1.,value=-10.),
                 N = FloatSlider(min=-40.,max=40.,step=1.,value=10.),
-                Plot = ToggleButtons(options =['model','potential','e','j','jx','jz','E'],value='model'),
+                Plot = ToggleButtons(options =['model','potential','e','j'],value='model'),
                 )
     return app
 
@@ -322,5 +326,5 @@ if __name__ == '__main__':
     h = 5.
     A,B = -30., 30. 
     M,N = -10., 10.
-    Plot =  'J'
+    Plot =  'e'
     plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,Plot)
