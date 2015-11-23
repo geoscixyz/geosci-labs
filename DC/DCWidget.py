@@ -377,8 +377,8 @@ def DC2DPseudoWidgetWrapper(rhohalf,rhosph,xc,zc,r,surveyType):
 def DC2DPseudoWidget():
     # print xzlocs
     Q = interact(DC2DPseudoWidgetWrapper,
-         rhohalf = FloatSlider(min=0, max=1000, step=1, value = 1000),
-         rhosph = FloatSlider(min=0, max=1000, step=1, value = 50),
+         rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000),
+         rhosph = FloatSlider(min=10, max=1000, step=1, value = 50),
          xc = FloatSlider(min=-40, max=40, step=1, value =  0),
          zc = FloatSlider(min= -20, max=0, step=1, value =  -10),
          r = FloatSlider(min= 0, max=15, step=0.5, value = 5),
@@ -394,8 +394,8 @@ def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
 def DC2DfwdWidget():
     # print xzlocs
     Q = interact(DC2DfwdWrapper,
-         rhohalf = FloatSlider(min=0, max=1000, step=1, value = 1000),
-         rhosph = FloatSlider(min=0, max=1000, step=1, value = 50),
+         rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000),
+         rhosph = FloatSlider(min=10, max=1000, step=1, value = 50),
          xc = FloatSlider(min=-40, max=40, step=1, value =  0),
          zc = FloatSlider(min= -20, max=0, step=1, value =  -10),
          r = FloatSlider(min= 0, max=15, step=0.5, value = 5),
