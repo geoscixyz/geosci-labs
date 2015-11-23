@@ -249,7 +249,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.25*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
-        clim = np.r_[1e-4,3e-2]
+        clim = np.r_[6e-5,3e-2]
         clabel = 'Current Density (A/m$^2$)'
 
 
