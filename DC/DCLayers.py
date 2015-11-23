@@ -79,7 +79,7 @@ def get_Layer_J(rho1,rho2,h,A,B,xyz,infty=100):
     ex, ey, ez = get_Layer_E(rho1, rho2, h, A, B, xyz)
 
     sig = 1./rho2*np.ones_like(xyz[:,0])
-    sig[xyz[:,1] <= -h] = 1./rho1 # hack for 2D (assuming y is z)
+    sig[xyz[:,1] >= -h] = 1./rho1 # hack for 2D (assuming y is z)
 
     return sig * ex, sig * ey, sig * ez
 
@@ -181,6 +181,36 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         ax[1].set_ylabel('z (m)', fontsize=14)
 
         clim = np.r_[3e-5,1e-1]
+        clabel = 'Current Density (A/m$^2$)'
+
+    elif imgplt is 'jx':
+        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+
+        Jx = Jx.reshape(x.size,z.size,order='F')
+        Jz = Jz.reshape(x.size,z.size,order='F')
+
+        J = np.sqrt(Jx**2.+Jz**2.)
+
+        cb = ax[1].pcolor(xplt,zplt,Jx) #,norm=LogNorm())
+        # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+        ax[1].set_ylabel('z (m)', fontsize=14)
+
+        # clim = np.r_[3e-5,1e-1]
+        clabel = 'Current Density (A/m$^2$)'
+
+    elif imgplt is 'jz':
+        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+
+        Jx = Jx.reshape(x.size,z.size,order='F')
+        Jz = Jz.reshape(x.size,z.size,order='F')
+
+        J = np.sqrt(Jx**2.+Jz**2.)
+
+        cb = ax[1].pcolor(xplt,zplt,Jz) #,norm=LogNorm())
+        # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+        ax[1].set_ylabel('z (m)', fontsize=14)
+
+        # clim = np.r_[3e-5,1e-1]
         clabel = 'Current Density (A/m$^2$)'
 
     # elif imgplt is 'e':
