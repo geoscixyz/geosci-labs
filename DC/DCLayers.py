@@ -205,7 +205,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
         ax[1].contour(xplt,zplt,np.abs(Vplt),colors='k',alpha=0.5)
         ax[1].set_ylabel('z (m)', fontsize=14)
-        clim = ylim
+        clim = np.r_[-15., 15.]
         clabel = 'Potential (V)'
 
     elif imgplt is 'E':
@@ -226,9 +226,9 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 
         cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
         ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
-        clim = np.r_[1e-3,1e1]
+        clim = np.r_[3e-3,1e1]
 
-        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 1.25*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2*(np.log(e.T) - np.log(e).min())/(np.log(e).max() - np.log(e).min())) 
         
 
         clabel = 'Electric Field (V/m)'
@@ -251,10 +251,10 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
         ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
-        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.25*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2*(np.log(J.T)-np.log(J).min())/(np.log(J).max() - np.log(J).min()) )  
         ax[1].set_ylabel('z (m)', fontsize=14)
 
-        clim = np.r_[1e-5,3e-2]
+        clim = np.r_[3e-5,3e-2]
         clabel = 'Current Density (A/m$^2$)'
 
 
