@@ -19,19 +19,18 @@ except Exception, e:
     from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
-npad = 4
-cs = 2.
-hx = [(cs,npad, -1.3),(cs,50),(cs,npad, 1.3)]
-hy = [(cs,npad, -1.3),(cs,25)]
+npad = 30
+cs = 1
+hx = [(cs,npad, -1.3),(cs,100),(cs,npad, 1.3)]
+hy = [(cs,npad, -1.3),(cs,50)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
 
 rhomin = 1e2
 rhomax = 1e3
 
-eps = 1e-6 #to stabilize division
+eps = 1e-9 #to stabilize division
 
 def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=20):
-#     xyz = Utils.ndgrid(x,y,z)
     k = (rho2-rho1) / (rho2+rho1)
     
     r = lambda src_loc: np.sqrt((xyz[:,0] - src_loc[0])**2 + (xyz[:,1] - src_loc[1])**2 + (xyz[:,2] - src_loc[2])**2)+eps
@@ -45,6 +44,44 @@ def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=20):
     VB = V(-1.,B)
     
     return VA+VB
+
+def get_Layer_E(rho1,rho2,h,A,B,xyz,infty=100):
+    k = (rho2-rho1) / (rho2+rho1)
+    
+    r = lambda src_loc: np.sqrt((xyz[:,0] - src_loc[0])**2 + (xyz[:,1] - src_loc[1])**2 + (xyz[:,2] - src_loc[2])**2)+eps
+
+    dr_dx = lambda src_loc: (xyz[:,0] - src_loc[0]) / r(src_loc)
+    dr_dy = lambda src_loc: (xyz[:,1] - src_loc[1]) / r(src_loc)
+    dr_dz = lambda src_loc: (xyz[:,2] - src_loc[2]) / r(src_loc)
+
+    m = Utils.mkvc(np.arange(1,infty+1))
+
+    sum_term = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / np.sqrt(1. + (2.*h*m.T/Utils.mkvc(r,2))**2),1)
+
+    sum_term_deriv = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / (1. + (2.*h*m.T/Utils.mkvc(r,2))**2)**(3./2.) * (2.*h*m.T / Utils.mkvc(r,2)) ,1)
+
+    deriv_1 = lambda r: (-1./r) * (1. + 2.*sum_term(r))
+    deriv_2 = lambda r: (1. + 2.*(1./r)*sum_term_deriv(r))
+
+    Er = lambda I,r : - (I*rho1 / (2.*np.pi*r)) * (deriv_1(r) + deriv_2(r))
+
+    Ex = lambda I,src_loc : Er(I,r(src_loc)) * dr_dx(src_loc)
+    Ey = lambda I,src_loc : Er(I,r(src_loc)) * dr_dy(src_loc)
+    Ez = lambda I,src_loc : Er(I,r(src_loc)) * dr_dz(src_loc)
+    
+    ex = Ex(1.,A) + Ex(-1.,B)
+    ey = Ey(1.,A) + Ey(-1.,B)
+    ez = Ez(1.,A) + Ez(-1.,B)
+
+    return ex, ey, ez
+
+def get_Layer_J(rho1,rho2,h,A,B,xyz,infty=100):
+    ex, ey, ez = get_Layer_E(rho1, rho2, h, A, B, xyz)
+
+    sig = 1./rho2*np.ones_like(xyz[:,0])
+    sig[xyz[:,1] <= -h] = 1./rho1 # hack for 2D (assuming y is z)
+
+    return sig * ex, sig * ey, sig * ez
 
 G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
 rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
@@ -119,30 +156,19 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         clabel = 'Potential (V)'
 
     elif imgplt is 'e':
-        Px = mesh.getInterpolationMat(pltgrid,'Fx')
-        Pz = mesh.getInterpolationMat(pltgrid,'Fy')
-        Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
-        Emesh = -mesh.cellGrad*Vmesh
-        Ex = (Px * Emesh).reshape(x.size,z.size,order='F')
-        Ez = (Pz * Emesh).reshape(x.size,z.size,order='F')
-        E = np.sqrt(Ex**2.+Ez**2.)
-        cb = ax[1].pcolor(xplt,zplt,E,norm=LogNorm())
-        print E.max()
-        ax[1].streamplot(x,z,Ex.T,Ez.T,color = 'k',linewidth= (np.log(E.T) - np.log(E).min())/np.max(np.log(E)))
+        ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+        ex = ex.reshape(x.size,z.size,order='F')
+        ez = ez.reshape(x.size,z.size,order='F')
+        e = np.sqrt(ex**2.+ez**2.)
+        cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
+        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= (np.log(e.T) - np.log(e).min())/np.max(np.log(e)))
         clabel = 'Electric Field (V/m)'
-        clim = np.r_[3e-3,3e1]
 
     elif imgplt is 'j':
-        rho_model = rho2*np.ones(pltgrid.shape[0])
-        rho_model[pltgrid[:,1] >= -h] = rho1
+        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
 
-        Px = mesh.getInterpolationMat(pltgrid,'Fx')
-        Pz = mesh.getInterpolationMat(pltgrid,'Fy')
-        Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
-        Emesh = -mesh.cellGrad*Vmesh
-
-        Jx = (Utils.sdiag(1./rho_model) * Px * Emesh).reshape(x.size,z.size,order='F')
-        Jz = (Utils.sdiag(1./rho_model) * Pz * Emesh).reshape(x.size,z.size,order='F')
+        Jx = Jx.reshape(x.size,z.size,order='F')
+        Jz = Jz.reshape(x.size,z.size,order='F')
 
         J = np.sqrt(Jx**2.+Jz**2.)
 
@@ -150,8 +176,97 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
-        clim = np.r_[3e-5,1e-1]
+        # clim = np.r_[3e-5,1e-1]
         clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'e':
+    #     Px = mesh.getInterpolationMat(pltgrid,'Fx')
+    #     Pz = mesh.getInterpolationMat(pltgrid,'Fy')
+    #     Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
+    #     Emesh = -mesh.cellGrad*Vmesh
+    #     Ex = (Px * Emesh).reshape(x.size,z.size,order='F')
+    #     Ez = (Pz * Emesh).reshape(x.size,z.size,order='F')
+    #     E = np.sqrt(Ex**2.+Ez**2.)
+    #     cb = ax[1].pcolor(xplt,zplt,E,norm=LogNorm())
+    #     ax[1].streamplot(x,z,Ex.T,Ez.T,color = 'k',linewidth= (np.log(E.T) - np.log(E).min())/np.max(np.log(E)))
+    #     clabel = 'Electric Field (V/m)'
+    #     clim = np.r_[3e-3,3e1]
+
+    # elif imgplt is 'j':
+    #     rho_model = rho2*np.ones(mesh.nC)
+    #     rho_model[mesh.gridCC[:,1] >= -h] = rho1
+
+    #     Px = mesh.getInterpolationMat(pltgrid,'CC')
+    #     Pz = mesh.getInterpolationMat(pltgrid,'CC')
+
+    #     Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,-0.5],np.r_[B,0.,-0.5],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
+    #     G = mesh.cellGrad
+    #     # G[-1,-1] = 1*mesh.vol[-1]
+    #     Emesh = -G*Vmesh
+    #     # Jmesh = mesh.getFaceInnerProduct(1./Utils.mkvc(rho_model)) * Emesh
+    #     Jmesh = Utils.sdiag(np.r_[1./rho_model,1./rho_model]) * mesh.aveF2CCV * Emesh
+
+    #     Jx = (Px * Jmesh[:mesh.nC]).reshape(x.size,z.size,order='F')
+    #     Jz = (Pz * Jmesh[mesh.nC:]).reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
+    #     ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[3e-5,1e-1]
+    #     clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'jx':
+    #     rho_model = rho2*np.ones(mesh.nC)
+    #     rho_model[mesh.gridCC[:,1] >= -h] = rho1
+
+    #     Px = mesh.getInterpolationMat(pltgrid,'Fx')
+    #     Pz = mesh.getInterpolationMat(pltgrid,'Fy')
+    #     Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
+
+
+    #     G = mesh.cellGrad
+    #     G[-1,-1] = 1*mesh.vol[-1]
+    #     Emesh = -G*Vmesh
+    #     Jmesh = mesh.getFaceInnerProduct(1./Utils.mkvc(rho_model)) * Emesh
+
+    #     Jx = (Px * Jmesh).reshape(x.size,z.size,order='F')
+    #     Jz = (Pz * Jmesh).reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,Jx)
+    #     ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[3e-5,1e-1]
+    #     clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'jz':
+    #     rho_model = rho2*np.ones(mesh.nC)
+    #     rho_model[mesh.gridCC[:,1] >= -h] = rho1
+
+    #     Px = mesh.getInterpolationMat(pltgrid,'Fx')
+    #     Pz = mesh.getInterpolationMat(pltgrid,'Fy')
+    #     Vmesh = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[mesh.gridCC,np.zeros(mesh.nC)])
+    #     G = mesh.faceDiv.T
+    #     G[-1,-1] = 1
+    #     Emesh = -G*Vmesh
+    #     Jmesh = mesh.getFaceInnerProduct(1./Utils.mkvc(rho_model)) * Emesh
+
+    #     Jx = (Px * Jmesh).reshape(x.size,z.size,order='F')
+    #     Jz = (Pz * Jmesh).reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,Jz)
+    #     # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.abs(np.log(J))))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[3e-5,1e-1]
+    #     clabel = 'Current Density (A/m$^2$)'
 
     # elif imgplt is 'charges':
     #     rho_model = rho2*np.ones(mesh.nC)
@@ -198,14 +313,14 @@ def plot_Layer_Potentials_app():
                 B = FloatSlider(min=-40.,max=40.,step=1.,value=30.),
                 M = FloatSlider(min=-40.,max=40.,step=1.,value=-10.),
                 N = FloatSlider(min=-40.,max=40.,step=1.,value=10.),
-                Plot = ToggleButtons(options =['model','potential','e','j'],value='model'),
+                Plot = ToggleButtons(options =['model','potential','e','j','jx','jz','E'],value='model'),
                 )
     return app
 
 if __name__ == '__main__':
     rho1, rho2 = rhomin, rhomax
     h = 5.
-    A,B = -10., 10. 
+    A,B = -30., 30. 
     M,N = -10., 10.
-    Plot =  'potential'
+    Plot =  'J'
     plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,Plot)
