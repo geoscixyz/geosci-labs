@@ -19,7 +19,7 @@ except Exception, e:
     from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
-npad = 15
+npad = 20
 cs = 0.5
 hx = [(cs,npad, -1.3),(cs,200),(cs,npad, 1.3)]
 hy = [(cs,npad, -1.3),(cs,100)]
