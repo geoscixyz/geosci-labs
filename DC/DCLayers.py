@@ -177,6 +177,8 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         model[pltgrid[:,1] >= -h] = rho1
         model = model.reshape(x.size,z.size, order='F')
         cb = ax[1].pcolor(xplt, zplt, model,norm=LogNorm())
+        ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
+
         clim = [rhomin,rhomax]
         clabel = 'Resistivity ($\Omega$m)'
 
@@ -200,6 +202,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         fudgeFactor = get_Layer_Potentials(rho1,rho2,h, np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[x.min(),0.,0.] ) / Vplt[0,0] 
 
         cb = ax[1].pcolor(xplt,zplt,Vplt * fudgeFactor)
+        ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
         ax[1].contour(xplt,zplt,np.abs(Vplt),colors='k',alpha=0.5)
         ax[1].set_ylabel('z (m)', fontsize=14)
         clim = ylim
@@ -222,11 +225,12 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         e = np.sqrt(ex**2.+ez**2.)
 
         cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
-
-        clim = np.r_[1e-2,1e1]
+        ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
+        clim = np.r_[1e-3,1e1]
 
         ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 1.25*(np.log(e.T) - np.log(e).min())/np.log(e).max())
         
+
         clabel = 'Electric Field (V/m)'
 
     elif imgplt is 'J':
@@ -246,6 +250,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         J = np.sqrt(Jx**2.+Jz**2.)
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
+        ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
         ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.25*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
