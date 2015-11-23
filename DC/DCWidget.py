@@ -287,7 +287,7 @@ def MidpointPseudoSectionWidget():
     ntx = 18
     return interact(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
 
-def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, dobs, uncert, predmis, nmax=8):
+def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, dobs, uncert, predmis, nmax=8, plotFlag=None):
     matplotlib.rcParams['font.size'] = 14
     sighalf, sigblk = 1./rhohalf, 1./rhoblk
     m0 = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
@@ -298,49 +298,93 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
     appres = dpred/dini/sighalf
     appresobs = dobs/dini/sighalf
     pred = pylab.griddata(xzlocs[:,0], xzlocs[:,1], appres, xi, yi, interp='linear')
-    obs = pylab.griddata(xzlocs[:,0], xzlocs[:,1], appresobs, xi, yi, interp='linear')
-    fig = plt.figure(figsize = (12, 8))
-    ax1 = plt.subplot(311)
-    dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(0, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
-    cb1 = plt.colorbar(dat1[0], ticks=np.linspace(0, 3, 5), ax=ax1, format="$10^{%4.1f}$")
-    cb1.set_label("Resistivity (ohm-m)")
-    ax1.set_ylim(-30, 0.)
-    ax1.set_xlim(-40, 40)
-    ax1.set_xlabel("")
-    ax1.set_ylabel("Depth (m)")    
-    ax2 = plt.subplot(312)
-    dat2 = ax2.contourf(xi, yi, obs, 10)
-    ax2.contour(xi, yi, obs, 10, colors='k', alpha=0.5)
-    ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-    cb2 = plt.colorbar(dat2, ax=ax2, ticks=np.linspace(appresobs.min(), appresobs.max(), 5), format="%4.1f")
-   
-    cb2.set_label("Apparent Resistivity \n (ohm-m)")
-    ax2.set_ylim(nmax+1, 0.)
-    ax2.set_ylabel("N-spacing")    
-    ax2.text(-38, 7, "Observed")
     
-    ax3 = plt.subplot(313)
-    if predmis=="pred":
-        dat3 = ax3.contourf(xi, yi, pred, 10)
-        ax3.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
-        ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(appres.min(), appres.max(), 5),format="%4.0f")
-        cb3.set_label("Apparent Resistivity \n (ohm-m)")
-        ax3.text(-38, 7, "Predicted")
-    elif predmis=="mis":
-        mis = (appresobs-appres)/(0.1*appresobs)
-        Mis = pylab.griddata(xzlocs[:,0], xzlocs[:,1], mis, xi, yi, interp='linear')        
-        dat3 = ax3.contourf(xi, yi, Mis, 10)
-        ax3.contour(xi, yi, Mis, 10, colors='k', alpha=0.5)
-        ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(mis.min(), mis.max(), 5), format="%4.2f")
-        cb3.set_label("Normalized misfit")
-        ax3.text(-38, 7, "Misifit")    
-    ax3.set_ylim(nmax+1, 0.)
-    ax3.set_ylabel("N-spacing")    
-    ax3.set_xlabel("Distance (m)")    
+    if plotFlag is not None:
+        fig = plt.figure(figsize = (12, 6))
+        ax1 = plt.subplot(211)
+        ax2 = plt.subplot(212)
+
+        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(0, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
+        cb1 = plt.colorbar(dat1[0], ticks=np.linspace(0, 3, 5), ax=ax1, format="$10^{%4.1f}$")
+        cb1.set_label("Resistivity (ohm-m)")
+        ax1.set_ylim(-30, 0.)
+        ax1.set_xlim(-40, 40)
+        ax1.set_xlabel("")
+        ax1.set_ylabel("Depth (m)")    
+
+        dat2 = ax2.contourf(xi, yi, pred, 10)
+        ax2.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
+        ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
+        cb2 = plt.colorbar(dat2, ax=ax2, ticks=np.linspace(appres.min(), appres.max(), 5),format="%4.0f")
+        cb2.set_label("Apparent Resistivity \n (ohm-m)")
+        ax2.text(-38, 7, "Predicted")
+
+        ax2.set_ylim(nmax+1, 0.)
+        ax2.set_ylabel("N-spacing")    
+        ax2.set_xlabel("Distance (m)")    
+
+    else:
+        obs = pylab.griddata(xzlocs[:,0], xzlocs[:,1], appresobs, xi, yi, interp='linear')
+        fig = plt.figure(figsize = (12, 8))
+        ax1 = plt.subplot(311)
+        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(0, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
+        cb1 = plt.colorbar(dat1[0], ticks=np.linspace(0, 3, 5), ax=ax1, format="$10^{%4.1f}$")
+        cb1.set_label("Resistivity (ohm-m)")
+        ax1.set_ylim(-30, 0.)
+        ax1.set_xlim(-40, 40)
+        ax1.set_xlabel("")
+        ax1.set_ylabel("Depth (m)")    
+        ax2 = plt.subplot(312)
+        dat2 = ax2.contourf(xi, yi, obs, 10)
+        ax2.contour(xi, yi, obs, 10, colors='k', alpha=0.5)
+        ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
+        cb2 = plt.colorbar(dat2, ax=ax2, ticks=np.linspace(appresobs.min(), appresobs.max(), 5), format="%4.1f")
+       
+        cb2.set_label("Apparent Resistivity \n (ohm-m)")
+        ax2.set_ylim(nmax+1, 0.)
+        ax2.set_ylabel("N-spacing")    
+        ax2.text(-38, 7, "Observed")
+        
+        ax3 = plt.subplot(313)
+        if predmis=="pred":
+            dat3 = ax3.contourf(xi, yi, pred, 10)
+            ax3.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
+            ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
+            cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(appres.min(), appres.max(), 5),format="%4.0f")
+            cb3.set_label("Apparent Resistivity \n (ohm-m)")
+            ax3.text(-38, 7, "Predicted")
+        elif predmis=="mis":
+            mis = (appresobs-appres)/(0.1*appresobs)
+            Mis = pylab.griddata(xzlocs[:,0], xzlocs[:,1], mis, xi, yi, interp='linear')        
+            dat3 = ax3.contourf(xi, yi, Mis, 10)
+            ax3.contour(xi, yi, Mis, 10, colors='k', alpha=0.5)
+            ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
+            cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(mis.min(), mis.max(), 5), format="%4.2f")
+            cb3.set_label("Normalized misfit")
+            ax3.text(-38, 7, "Misifit")    
+        ax3.set_ylim(nmax+1, 0.)
+        ax3.set_ylabel("N-spacing")    
+        ax3.set_xlabel("Distance (m)")    
+
     plt.show()
     return 
+
+def DC2DPseudoWidgetWrapper(rhohalf,rhosph,xc,zc,r,surveyType):
+    dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
+    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, r, dobs, uncert, 'pred',plotFlag='PredOnly')
+    return None
+
+def DC2DPseudoWidget():
+    # print xzlocs
+    Q = interact(DC2DPseudoWidgetWrapper,
+         rhohalf = FloatSlider(min=0, max=1000, step=1, value = 500),
+         rhosph = FloatSlider(min=0, max=1000, step=1, value = 50),
+         xc = FloatSlider(min=-40, max=40, step=1, value =  -15),
+         zc = FloatSlider(min= -20, max=0, step=1, value =  -8),
+         r = FloatSlider(min= 0, max=15, step=0.5, value = 4),
+         surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])         
+        )
+    return Q
 
 def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
     dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
