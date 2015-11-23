@@ -164,16 +164,22 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
             txmid = TxLoc[0][0]
         else:
             txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
+
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
-        plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
-        ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
-        ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
-
+        # plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
+        # ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        # ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
         if flag == "DipolePole":
+            plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
+            ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
             rxmid = MLoc[0]
         else:
             rxmid = (MLoc[0]+NLoc[0])*0.5
+            plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
+            plt.plot(NLoc[0], np.zeros(1), 'b^', markersize=10)
+            ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+            ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
         mid = (txmid+rxmid)*0.5
         midSep = np.sqrt(np.square(txmid-rxmid))
         plt.plot(txmid, np.zeros(1), 'ro')
@@ -190,13 +196,24 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
         else:
             txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
 
+
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
-        plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
-        ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
-        ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
+        if flag == "DipolePole":
+            plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
+            ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+            rxmid = MLoc[0]
+        else:
+            rxmid = (MLoc[0]+NLoc[0])*0.5
+            plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
+            plt.plot(NLoc[0], np.zeros(1), 'b^', markersize=10)
+            ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+            ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        # plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
+        # ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+        # ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')        
     
-        rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
+        # rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
         mid = (txmid+rxmid)*0.5    
         plt.plot((txmid+rxmid)*0.5, np.arange(mid.size)+1., 'bo')
         plt.plot(rxmid, np.zeros(rxmid.size), 'go')
