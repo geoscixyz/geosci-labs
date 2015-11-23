@@ -19,10 +19,10 @@ except Exception, e:
     from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
-npad = 30
-cs = 1
-hx = [(cs,npad, -1.3),(cs,100),(cs,npad, 1.3)]
-hy = [(cs,npad, -1.3),(cs,50)]
+npad = 15
+cs = 0.5
+hx = [(cs,npad, -1.3),(cs,200),(cs,npad, 1.3)]
+hy = [(cs,npad, -1.3),(cs,100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
 
 rhomin = 1e2
@@ -30,7 +30,7 @@ rhomax = 1e3
 
 eps = 1e-9 #to stabilize division
 
-def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=20):
+def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=100):
     k = (rho2-rho1) / (rho2+rho1)
     
     r = lambda src_loc: np.sqrt((xyz[:,0] - src_loc[0])**2 + (xyz[:,1] - src_loc[1])**2 + (xyz[:,2] - src_loc[2])**2)+eps
@@ -58,10 +58,10 @@ def get_Layer_E(rho1,rho2,h,A,B,xyz,infty=100):
 
     sum_term = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / np.sqrt(1. + (2.*h*m.T/Utils.mkvc(r,2))**2),1)
 
-    sum_term_deriv = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / (1. + (2.*h*m.T/Utils.mkvc(r,2))**2)**(3./2.) * (2.*h*m.T / Utils.mkvc(r,2)) ,1)
+    sum_term_deriv = lambda r: np.sum(((k**m.T)*np.ones_like(Utils.mkvc(r,2))) / (1. + (2.*h*m.T/Utils.mkvc(r,2))**2)**(3./2.) * ((2.*h*m.T)**2 / Utils.mkvc(r,2)**3) ,1)
 
     deriv_1 = lambda r: (-1./r) * (1. + 2.*sum_term(r))
-    deriv_2 = lambda r: (2.*(1./r)*sum_term_deriv(r))
+    deriv_2 = lambda r: (2.*sum_term_deriv(r))
 
     Er = lambda I,r : - (I*rho1 / (2.*np.pi*r)) * (deriv_1(r) + deriv_2(r))
 
@@ -79,6 +79,7 @@ def get_Layer_J(rho1,rho2,h,A,B,xyz,infty=100):
     ex, ey, ez = get_Layer_E(rho1, rho2, h, A, B, xyz)
 
     sig = 1./rho2*np.ones_like(xyz[:,0])
+    # print sig
     sig[xyz[:,1] >= -h] = 1./rho1 # hack for 2D (assuming y is z)
 
     return sig * ex, sig * ey, sig * ez
@@ -86,8 +87,41 @@ def get_Layer_J(rho1,rho2,h,A,B,xyz,infty=100):
 G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
 rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
+def solve_2D_potentials(rho1, rho2, h, A, B):
+    sigma = 1./rho2*np.ones(mesh.nC)
+    sigma[mesh.gridCC[:,1] >= -h] = 1./rho1 # hack for 2D (assuming y is z)
 
-def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
+    q = np.zeros(mesh.nC)
+    a = Utils.closestPoints(mesh, A[:2])
+    b = Utils.closestPoints(mesh, B[:2])
+
+    q[a] = 1./mesh.vol[a]
+    q[b] = -1./mesh.vol[b]
+
+    # q = q * 1./mesh.vol
+
+    A = mesh.cellGrad.T * Utils.sdiag(1./(mesh.dim * mesh.aveF2CC.T * (1./sigma))) * mesh.cellGrad
+    Ainv = Solver(A)
+
+    V = Ainv * q
+    return V
+
+def solve_2D_E(rho1, rho2, h, A, B):
+    V = solve_2D_potentials(rho1, rho2, h, A, B)
+    E = -mesh.cellGrad * V
+    E = mesh.aveF2CCV * E
+    ex = E[:mesh.nC]
+    ez = E[mesh.nC:]
+    return ex, ez, V
+
+def solve_2D_J(rho1, rho2, h, A, B):
+    ex, ez, V = solve_2D_E(rho1, rho2, h, A, B)
+    sigma = 1./rho2*np.ones(mesh.nC)
+    sigma[mesh.gridCC[:,1] >= -h] = 1./rho1 # hack for 2D (assuming y is z)
+
+    return Utils.sdiag(sigma) * ex, Utils.sdiag(sigma) * ez, V  
+
+def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
     
     ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)
 
@@ -138,7 +172,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
     ax[0].text(x.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(rho_a(VM,VN,A,B,M,N)),
                 verticalalignment='bottom', bbox=props, fontsize = 14)
 
-    if imgplt is 'model':
+    if imgplt is 'Model':
         model = rho2*np.ones(pltgrid.shape[0])
         model[pltgrid[:,1] >= -h] = rho1
         model = model.reshape(x.size,z.size, order='F')
@@ -146,72 +180,164 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='model'):
         clim = [rhomin,rhomax]
         clabel = 'Resistivity ($\Omega$m)'
 
-    elif imgplt is 'potential':
-        Vplt = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    # elif imgplt is 'potential':
+    #     Vplt = get_Layer_Potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    #     Vplt = Vplt.reshape(x.size,z.size, order='F')
+    #     cb = ax[1].pcolor(xplt,zplt,Vplt)
+    #     ax[1].contour(xplt,zplt,np.abs(Vplt),np.logspace(-2.,1.,10),colors='k',alpha=0.5)
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+    #     clim = ylim
+    #     clabel = 'Potential (V)'
+
+    elif imgplt is 'Potential':
+        Pc = mesh.getInterpolationMat(pltgrid,'CC')
+
+        V = solve_2D_potentials(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.])
+
+        Vplt = Pc * V 
         Vplt = Vplt.reshape(x.size,z.size, order='F')
-        cb = ax[1].pcolor(xplt,zplt,Vplt)
-        ax[1].contour(xplt,zplt,np.abs(Vplt),np.logspace(-2.,1.,10),colors='k',alpha=0.5)
+
+        fudgeFactor = get_Layer_Potentials(rho1,rho2,h, np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[x.min(),0.,0.] ) / Vplt[0,0] 
+
+        cb = ax[1].pcolor(xplt,zplt,Vplt * fudgeFactor)
+        ax[1].contour(xplt,zplt,np.abs(Vplt),colors='k',alpha=0.5)
         ax[1].set_ylabel('z (m)', fontsize=14)
         clim = ylim
         clabel = 'Potential (V)'
 
-    elif imgplt is 'e':
-        ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
-        ex = ex.reshape(x.size,z.size,order='F')
-        ez = ez.reshape(x.size,z.size,order='F')
+    elif imgplt is 'E':
+
+        Pc = mesh.getInterpolationMat(pltgrid,'CC')
+
+        ex, ez, V = solve_2D_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.])
+
+        ex, ez = Pc * ex, Pc * ez 
+        Vplt = (Pc*V).reshape(x.size,z.size, order='F')
+        fudgeFactor = get_Layer_Potentials(rho1,rho2,h, np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[x.min(),0.,0.] ) / Vplt[0,0]
+        
+
+        # ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+        ex = fudgeFactor * ex.reshape(x.size,z.size,order='F')
+        ez = fudgeFactor * ez.reshape(x.size,z.size,order='F')
         e = np.sqrt(ex**2.+ez**2.)
+
         cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
 
-        clim = np.r_[3e-2,1e2]
+        clim = np.r_[3e-2,1e1]
 
-        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 1.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
         
         clabel = 'Electric Field (V/m)'
 
-    elif imgplt is 'j':
-        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    elif imgplt is 'J':
 
-        Jx = Jx.reshape(x.size,z.size,order='F')
-        Jz = Jz.reshape(x.size,z.size,order='F')
+        Pc = mesh.getInterpolationMat(pltgrid,'CC')
+
+        Jx, Jz, V = solve_2D_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.])
+
+        Jx, Jz = Pc * Jx, Pc * Jz 
+
+        Vplt = (Pc*V).reshape(x.size,z.size, order='F')
+        fudgeFactor = get_Layer_Potentials(rho1,rho2,h, np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[x.min(),0.,0.] ) / Vplt[0,0]
+
+        Jx = fudgeFactor * Jx.reshape(x.size,z.size,order='F')
+        Jz = fudgeFactor * Jz.reshape(x.size,z.size,order='F')
 
         J = np.sqrt(Jx**2.+Jz**2.)
 
         cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
-        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+        ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 1.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
         ax[1].set_ylabel('z (m)', fontsize=14)
 
-        clim = np.r_[3e-5,1e-1]
+        clim = np.r_[1e-4,3e-2]
         clabel = 'Current Density (A/m$^2$)'
 
-    elif imgplt is 'jx':
-        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
 
-        Jx = Jx.reshape(x.size,z.size,order='F')
-        Jz = Jz.reshape(x.size,z.size,order='F')
+    # elif imgplt is 'e':
+    #     ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    #     ex = ex.reshape(x.size,z.size,order='F')
+    #     ez = ez.reshape(x.size,z.size,order='F')
+    #     e = np.sqrt(ex**2.+ez**2.)
+    #     cb = ax[1].pcolor(xplt,zplt,e,norm=LogNorm())
 
-        J = np.sqrt(Jx**2.+Jz**2.)
+    #     clim = np.r_[3e-2,1e2]
 
-        cb = ax[1].pcolor(xplt,zplt,Jx) #,norm=LogNorm())
-        # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
-        ax[1].set_ylabel('z (m)', fontsize=14)
+    #     ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        
+    #     clabel = 'Electric Field (V/m)'
 
-        # clim = np.r_[3e-5,1e-1]
-        clabel = 'Current Density (A/m$^2$)'
+    # elif imgplt is 'ex':
+    #     ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    #     ex = ex.reshape(x.size,z.size,order='F')
+    #     ez = ez.reshape(x.size,z.size,order='F')
+    #     e = np.sqrt(ex**2.+ez**2.)
+    #     cb = ax[1].pcolor(xplt,zplt,ex) #,norm=LogNorm())
+        
+    #     clim = np.r_[-20, 20]
 
-    elif imgplt is 'jz':
-        Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    #     # clim = np.r_[3e-2,1e2]
 
-        Jx = Jx.reshape(x.size,z.size,order='F')
-        Jz = Jz.reshape(x.size,z.size,order='F')
+    #     # ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        
+    #     clabel = 'Electric Field (V/m)'
+    
+    # elif imgplt is 'ez':
+    #     ex, ez, _ = get_Layer_E(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+    #     ex = ex.reshape(x.size,z.size,order='F')
+    #     ez = ez.reshape(x.size,z.size,order='F')
+    #     e = np.sqrt(ex**2.+ez**2.)
+    #     cb = ax[1].pcolor(xplt,zplt,ez) #,norm=LogNorm())
 
-        J = np.sqrt(Jx**2.+Jz**2.)
+    #     clim = np.r_[-20, 20]
 
-        cb = ax[1].pcolor(xplt,zplt,Jz) #,norm=LogNorm())
-        # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
-        ax[1].set_ylabel('z (m)', fontsize=14)
+    #     # ax[1].streamplot(x,z,ex.T,ez.T,color = 'k',linewidth= 2.5*(np.log(e.T) - np.log(e).min())/np.log(e).max())
+        
+    #     clabel = 'Electric Field (V/m)'
 
-        # clim = np.r_[3e-5,1e-1]
-        clabel = 'Current Density (A/m$^2$)'
+    # elif imgplt is 'j':
+    #     Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+
+    #     Jx = Jx.reshape(x.size,z.size,order='F')
+    #     Jz = Jz.reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,J,norm=LogNorm())
+    #     ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[3e-5,1e-1]
+    #     clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'jx':
+    #     Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+
+    #     Jx = Jx.reshape(x.size,z.size,order='F')
+    #     Jz = Jz.reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,Jx) #,norm=LogNorm())
+    #     # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[-0.05,0.05]
+    #     clabel = 'Current Density (A/m$^2$)'
+
+    # elif imgplt is 'jz':
+    #     Jx, Jz, _ = get_Layer_J(rho1,rho2,h,np.r_[A,0.,0.],np.r_[B,0.,0.],np.c_[pltgrid,np.zeros_like(pltgrid[:,0])])
+
+    #     Jx = Jx.reshape(x.size,z.size,order='F')
+    #     Jz = Jz.reshape(x.size,z.size,order='F')
+
+    #     J = np.sqrt(Jx**2.+Jz**2.)
+
+    #     cb = ax[1].pcolor(xplt,zplt,Jz) #,norm=LogNorm())
+    #     # ax[1].streamplot(x,z,Jx.T,Jz.T,color = 'k',linewidth = 2.5*(np.log(J.T)-np.log(J).min())/np.max(np.log(J)))   
+    #     ax[1].set_ylabel('z (m)', fontsize=14)
+
+    #     clim = np.r_[-0.05,0.05]
+    #     clabel = 'Current Density (A/m$^2$)'
 
     # elif imgplt is 'e':
     #     Px = mesh.getInterpolationMat(pltgrid,'Fx')
@@ -347,7 +473,7 @@ def plot_Layer_Potentials_app():
                 B = FloatSlider(min=-40.,max=40.,step=1.,value=30.),
                 M = FloatSlider(min=-40.,max=40.,step=1.,value=-10.),
                 N = FloatSlider(min=-40.,max=40.,step=1.,value=10.),
-                Plot = ToggleButtons(options =['model','potential','e','j'],value='model'),
+                Plot = ToggleButtons(options =['Model','Potential','E','J',],value='Model'),
                 )
     return app
 
