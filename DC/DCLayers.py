@@ -205,7 +205,7 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
         ax[1].plot([xplt.min(),xplt.max()], -h*np.r_[1.,1],color=[0.5,0.5,0.5],linewidth = 1.5 )
         ax[1].contour(xplt,zplt,np.abs(Vplt),colors='k',alpha=0.5)
         ax[1].set_ylabel('z (m)', fontsize=14)
-        clim = ylim
+        clim = np.r_[-15., 15.]
         clabel = 'Potential (V)'
 
     elif imgplt is 'E':
