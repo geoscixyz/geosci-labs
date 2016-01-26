@@ -1,4 +1,5 @@
 numpy
 scipy
 matplotlib
-SimPEG
+ipywidgets
+https://github.com/simpeg/simpeg.git@master
