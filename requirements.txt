@@ -2,4 +2,4 @@ numpy
 scipy
 matplotlib
 ipywidgets
-https://github.com/simpeg/simpeg.git@master
+git+https://github.com/simpeg/simpeg.git@master
