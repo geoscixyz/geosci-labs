@@ -1,0 +1,9 @@
+name: em_examples
+
+dependencies:
+  - python=2.7
+  - numpy
+  - scipy
+  - matplotlib
+  - pip:
+    - git+git://github.com/simpeg/simpeg.git@master
