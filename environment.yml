@@ -7,3 +7,4 @@ dependencies:
   - matplotlib
   - pip:
     - git+git://github.com/simpeg/simpeg.git@master
+    - git+git://github.com/simpeg/simpegDC.git@Dom_Dev
