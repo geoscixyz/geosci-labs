@@ -470,7 +470,7 @@ def calculateEHzt(F,H,sig,chg,taux,c,mu,eps,n,zsample,tsample):
     
 
 #Function to Plot Apparent Resistivity and Phase
-def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenv,envelope):
+def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenvelope,PlotEnvelope):
 
     Res, Phase = appres(F,H,sig,chg,taux,c,mu,eps,n)
 
@@ -501,9 +501,8 @@ def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenv,envelope):
     ax[1].tick_params(labelsize=16)
     ax0.tick_params(labelsize=16)
     
-    if envelope == 1:
+    if PlotEnvelope:
         
-        fenvelope = F[fenv]
         widthn=np.logspace(np.log10(Res.min())-1., np.log10(Res.max())+1., num=100, endpoint=True, base=10.0)
         fenvelope1n=np.ones(100)*fenvelope
         ax[0].plot(widthn,fenvelope1n,linestyle='dashed',color='black')
@@ -543,7 +542,7 @@ def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenv,envelope):
     plt.show()
 
 #Interactive MT for Notebook
-def PlotAppRes3LayersInteract(h1,h2,sigl1,sigl2,sigl3,mul1,mul2,mul3,epsl1,epsl2,epsl3,fenvelope,envelope):
+def PlotAppRes3LayersInteract(h1,h2,sigl1,sigl2,sigl3,mul1,mul2,mul3,epsl1,epsl2,epsl3,PlotEnvelope,F_Envelope):
     
     frangn=frange(-5,5,100.)
     sig3= np.array([0.,0.001,0.1, 0.001])
@@ -570,7 +569,7 @@ def PlotAppRes3LayersInteract(h1,h2,sigl1,sigl2,sigl3,mul1,mul2,mul3,epsl1,epsl2
     thick3[1]=h1
     thick3[2]=h2
     
-    PlotAppRes(frangn,thick3,sig3,chg3_0,taux3,c3,mu3,eps3,3,fenvelope,envelope)
+    PlotAppRes(frangn,thick3,sig3,chg3_0,taux3,c3,mu3,eps3,3,F_Envelope,PlotEnvelope)
     
 
     
