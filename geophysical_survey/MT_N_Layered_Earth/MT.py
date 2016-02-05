@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 #from SimPEG.Utils import ndgrid, mkvc
 from ipywidgets import *
-from JSAnimation import IPython_display, HTMLWriter
-from matplotlib import animation
+
 
 #Evaluate k wavenumber
 kwave = lambda mu,sig,eps,f: np.sqrt(mu*mu_0*eps*epsilon_0*(2.*np.pi*f)**2.-1.j*mu*mu_0*sig*2.*np.pi*f)
