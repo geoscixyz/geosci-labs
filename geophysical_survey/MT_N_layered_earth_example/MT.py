@@ -1,14 +1,14 @@
-from scipy.constants import epsilon_0
-from scipy.constants import mu_0
+from scipy.constants import epsilon_0, mu_0
 import matplotlib.pyplot as plt
-#import matplotlib.colors as colors
 import numpy as np
-#from SimPEG.Utils import ndgrid, mkvc
 from ipywidgets import *
 
+# Lindsey doing things:
+
+# from SimPEG.EM.Utils import k, omega 
 
 #Evaluate k wavenumber
-kwave = lambda mu,sig,eps,f: np.sqrt(mu*mu_0*eps*epsilon_0*(2.*np.pi*f)**2.-1.j*mu*mu_0*sig*2.*np.pi*f)
+kwave = lambda mu,sig,eps,f: np.sqrt(mu*mu_0*eps*epsilon_0*(2.*np.pi*f)**2.-1j*mu*mu_0*sig*2.*np.pi*f)
 
 #Define a frquency range for a survey
 frange = lambda minfreq, maxfreq, step: np.logspace(minfreq,maxfreq,num = step, base = 10.)
@@ -30,18 +30,18 @@ eps = lambda mineps, maxeps, nlayer: np.append(np.array([1.]),
                                                np.ndarray.round(mineps + (maxeps-mineps)* np.random.rand(nlayer,1)
                                                                 ,decimals=1))
 
-#Evaluate Effective Conductivity
-sighat = lambda sig,eps,f: sig - 1.j*eps*epsilon_0*2.*np.pi*f
+#Evaluate Effective Conductivity - reomve this? 
+sighat = lambda sig,eps,f: sig - 1j*eps*epsilon_0*2.*np.pi*f
 
-#Evaluate wavelength
+#Evaluate wavelength - remove this? 
 wavelength = lambda k: 2.*np.pi/np.real(k)
 
 
 #Evaluate Impedance Z of a layer
 ImpZ = lambda f, mu, k: 2.*np.pi*f*mu*mu_0/k
 
-#Complex Cole-Cole Conductivity
-PCC= lambda siginf,m,t,c,f: siginf*(1.-(m/(1.+(1.j*2.*np.pi*f*t)**c)))
+#Complex Cole-Cole Conductivity - EM utils
+PCC= lambda siginf,m,t,c,f: siginf*(1.-(m/(1.+(1j*2.*np.pi*f*t)**c)))
 
 
 #Converted thickness array into top of layer array
@@ -58,7 +58,7 @@ def top(thick):
 #Propagation Matrix
 def PropagationMatrixUD(z1,z2,h,k): 
     
-    tran = np.matrix([[np.exp(-1.j*k*h),0.],[0.,np.exp(1.j*k*h)]],dtype='complex_')
+    tran = np.matrix([[np.exp(-1j*k*h),0.],[0.,np.exp(1j*k*h)]],dtype='complex_')
     
     prop2 = np.matrix([[1.,1,],[-1./z2,1./z2]],dtype='complex_')
     
@@ -68,9 +68,9 @@ def PropagationMatrixUD(z1,z2,h,k):
     
     return PropMatUD
 
-transi = lambda h,k: np.matrix([[np.exp(-1.j*k*h),0.],[0.,np.exp(1.j*k*h)]],dtype='complex_')
+transi = lambda h,k: np.matrix([[np.exp(-1j*k*h),0.],[0.,np.exp(1j*k*h)]],dtype='complex_')
 
-transi_1 = lambda h,k: np.matrix([[np.exp(1.j*k*h),0.],[0.,np.exp(-1.j*k*h)]],dtype='complex_')
+transi_1 = lambda h,k: np.matrix([[np.exp(1j*k*h),0.],[0.,np.exp(-1j*k*h)]],dtype='complex_')
 
 prop = lambda z: np.matrix([[1.,1,],[-1./z,1./z]],dtype='complex_')
 
@@ -79,8 +79,8 @@ propinv = lambda z: np.matrix([[1.,-z],[1.,z]],dtype='complex_')/2.
 UD_Z = lambda UD,z,zj,k : transi_1((z-zj),k)*UD
 
 #Time Variation of E and H
-E_ZT = lambda U,D,f,t : np.exp(1.j*2*np.pi*f*t)*(U+D)
-H_ZT = lambda U,D,Z,f,t : (1./Z)*np.exp(1.j*2*np.pi*f*t)*(D-U)
+E_ZT = lambda U,D,f,t : np.exp(1j*2*np.pi*f*t)*(U+D)
+H_ZT = lambda U,D,Z,f,t : (1./Z)*np.exp(1j*2*np.pi*f*t)*(D-U)
 
 #Plot the configuration of the problem
 def PlotConfiguration(thick,sig,eps,mu,ax,widthg,z):
@@ -462,8 +462,8 @@ def calculateEHzt(F,H,sig,chg,taux,c,mu,eps,n,zsample,tsample):
                 
                 Exzt[p,q]  = Exzt[p,q] + E_ZT(UDaux[0,p],UDaux[1,p],F[j],tsample[q])/len(F)
                 Hyzt[p,q] = Hyzt[p,q] + H_ZT(UDaux[0,p],UDaux[1,p],Z[layer[p]],F[j],tsample[q])/len(F)
-                Uz[p,q] = Uz[p,q] + UDaux[0,p]*np.exp(1.j*2*np.pi*F[j]*tsample[q])/len(F)
-                Dz[p,q] = Dz[p,q] + UDaux[1,p]*np.exp(1.j*2*np.pi*F[j]*tsample[q])/len(F)
+                Uz[p,q] = Uz[p,q] + UDaux[0,p]*np.exp(1j*2*np.pi*F[j]*tsample[q])/len(F)
+                Dz[p,q] = Dz[p,q] + UDaux[1,p]*np.exp(1j*2*np.pi*F[j]*tsample[q])/len(F)
     
     return  Exzt,Hyzt,Uz,Dz,UDaux,layer
     
@@ -571,7 +571,13 @@ def PlotAppRes3LayersInteract(h1,h2,sigl1,sigl2,sigl3,mul1,mul2,mul3,epsl1,epsl2
     PlotAppRes(frangn,thick3,sig3,chg3_0,taux3,c3,mu3,eps3,3,F_Envelope,PlotEnvelope)
     
 
-    
+def run(plotIt=True):
+    # something to make a plot
+    return None
+    PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope) 
+
+if __name__ == '__main__':
+    run()
        
     
     
