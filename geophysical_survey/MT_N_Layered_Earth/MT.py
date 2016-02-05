@@ -59,7 +59,7 @@ def top(thick):
 #Propagation Matrix
 def PropagationMatrixUD(z1,z2,h,k): 
     
-    tran = np.matrix([[np.exp(-1.j*k*h),0.],[0.,np.exp(-1.j*k*h)]],dtype='complex_')
+    tran = np.matrix([[np.exp(-1.j*k*h),0.],[0.,np.exp(1.j*k*h)]],dtype='complex_')
     
     prop2 = np.matrix([[1.,1,],[-1./z2,1./z2]],dtype='complex_')
     
