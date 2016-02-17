@@ -6,4 +6,4 @@ dependencies:
   - scipy
   - matplotlib
   - pip:
-    - git+git://github.com/simpeg/simpeg.git@dcip/dev
+    - git+git://github.com/simpeg/simpeg.git@ex/mt1d
