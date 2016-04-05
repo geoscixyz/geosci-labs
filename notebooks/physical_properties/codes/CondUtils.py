@@ -1,5 +1,6 @@
 from scipy.interpolate import interp1d
 import numpy as np
+import matplotlib.pyplot as plt
 
 def ColeColePelton(f, sigmaInf, eta, tau, c, option):
     """
