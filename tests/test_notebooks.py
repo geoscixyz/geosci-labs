@@ -24,6 +24,8 @@ def get(nbname, nbpath):
     # use nbconvert to execute the notebook
     def test_func(self):
         print '\nTesting {0}'.format(nbname)
+        print os.path.abspath('./')
+        print '{0}'.format(nbpath)
         check = subprocess.call(['jupyter', 'nbconvert', '{0}'.format(nbpath), '--execute'])
         assert check == 0
         subprocess.call(['rm', '{0}.html'.format(nbname)])

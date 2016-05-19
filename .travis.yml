@@ -15,7 +15,7 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda env update -f=environment.yml
+  - conda env update --file=environment.yml
 
 # Run test
 script:
