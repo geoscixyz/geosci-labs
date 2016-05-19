@@ -8,7 +8,5 @@ dependencies:
   - jupyter
   - ipython
   - ipywidgets
-  - os
-  - sys
   - pip:
     - git+git://github.com/simpeg/simpeg.git@dcip/dev
