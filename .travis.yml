@@ -20,6 +20,7 @@ install:
 
   - git clone https://github.com/simpeg/simpeg.git
   - cd simpeg; python setup.py build_ext --inplace; git checkout -b dcip/dev; cd ..
+  - export PATH=$PWD/simpeg:$PATH
 
 # Run test
 script:
