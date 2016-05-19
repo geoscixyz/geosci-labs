@@ -15,6 +15,7 @@ before_install:
   - conda update --yes conda
   - conda env create -f environment.yml
   - source activate em_examples
+  - conda update --all
 
 # Run test
 script:
