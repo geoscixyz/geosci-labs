@@ -16,19 +16,10 @@ before_install:
   - conda env create
   - source activate em_examples
 
-# # Install packages
-# install:
-#   - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib cython ipython nose jupyter
-#   - pip install nose-cov python-coveralls
-
 
 # Run test
 script:
   - nosetests $TEST_DIR
-
-# Calculate coverage
-after_success:
-  - coveralls --config_file .coveragerc
 
 notifications:
   email:
