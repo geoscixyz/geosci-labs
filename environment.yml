@@ -5,5 +5,9 @@ dependencies:
   - numpy
   - scipy
   - matplotlib
+  - jupyter
+  - ipython
+  - os
+  - sys
   - pip:
     - git+git://github.com/simpeg/simpeg.git@dcip/dev

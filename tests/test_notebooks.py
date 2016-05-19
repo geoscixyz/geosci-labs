@@ -15,11 +15,13 @@ def setUp():
     for dirname, dirnames, filenames in os.walk(TestDir):
         for filename in filenames:
             if filename.endswith('.ipynb') and not filename.endswith('-checkpoint.ipynb'):
-                nbpaths.append(os.path.abspath(dirname) + os.path.sep + filename)
-                nbnames.append(''.join(filename[:-6]))
+                nbpaths.append(os.path.abspath(dirname) + os.path.sep + filename) #get abspath of notebook
+                nbnames.append(''.join(filename[:-6])) # strip off the file extension
     return nbpaths, nbnames
 
 def get(nbname, nbpath):
+
+    # use nbconvert to execute the notebook
     def test_func(self):
         print '\nTesting {0}'.format(nbname)
         check = subprocess.call(['jupyter', 'nbconvert', '{0}'.format(nbpath), '--execute'])
