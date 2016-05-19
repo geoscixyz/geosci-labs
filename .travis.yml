@@ -13,7 +13,10 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=/home/travis/anaconda/bin:/home/travis/miniconda/bin:$PATH
   - conda update --yes conda
-  - source activate environment
+
+# install
+install:
+  conda install -n environment.yml
 
 # Run test
 script:
