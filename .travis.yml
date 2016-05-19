@@ -15,7 +15,7 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy, scipy, matplotlib, jupyter, ipython, ipywidgets
+  - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib jupyter ipython ipywidgets
   - pip install -r requirements.txt
 
 # Run test
