@@ -313,7 +313,7 @@ class DataView(object):
         plt.tight_layout()
     
     
-    def plot_1D_x(self,sigind,freqind):
+    def plot_1D_x(self,sigind,freqind,mode):
         
         #sigind = np.where( sigplt == self.sigvec)[0][0]
         #freqind = np.where( freqplt == self.fvec)[0][0]
@@ -405,7 +405,7 @@ class DataView(object):
         
         plt.tight_layout()
     
-    def plot_1D_z(self,sigind,freqind):
+    def plot_1D_z(self,sigind,freqind,mode):
         
         #sigind = np.where( sigplt == self.sigvec)[0][0]
         #freqind = np.where( freqplt == self.fvec)[0][0]
