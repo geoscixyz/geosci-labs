@@ -36,6 +36,19 @@ class DataView(object):
             self.X, self.Y = np.meshgrid(x, y)
             self.xyz = np.c_[self.X.flatten(), self.Y.flatten(), z*np.ones(self.ncx*self.ncy)]
 
+    def eval_loc(self, srcLoc,obsLoc, sigvec, fvec, orientation, func):
+        self.obsLoc = obsLoc
+        self.sigvec = sigvec
+        self.fvec = fvec
+        self.val_xfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
+        self.val_yfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
+        self.val_zfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
+   
+        for n in range(len(sigvec)):
+            #for k in range(len(fvec)):
+                self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, sigvec[n], fvec, orientation=orientation)
+    
+
     def eval_2D(self, srcLoc, sig, f, orientation, func):
         self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation)
         if self.normal =="X" or self.normal=="x":
@@ -130,6 +143,7 @@ class DataView(object):
 
         plt.show()
 
+
     def plot2D_FD_AP(self, view="vec", ncontour=20, logamp=True, clim=None,showcontour=True, cont_perc=0.75):
         """
 
@@ -204,3 +218,283 @@ class DataView(object):
             ax1.streamplot(a, b, phase(vec_a),  phase(vec_b), color="w", linewidth=0.5)
 
         plt.show()
+
+    def plot_1D_y(self,sigind,freqind,mode):
+        
+        #sigind = np.where( sigplt == self.sigvec)[0][0]
+        #freqind = np.where( freqplt == self.fvec)[0][0]
+            
+        fig = plt.figure(figsize=(14,5))
+        ax0 = plt.subplot(121)
+        ax2 = plt.subplot(122)
+        
+        ax1 = ax0.twinx()
+        ax3 = ax2.twinx()
+        
+        if mode =="RI":        
+        
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Real part (V/m)")
+            ax1.set_ylabel("E field, Imag part (V/m)")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Real part (V/m)")
+            ax3.set_ylabel("E field, Imag part (V/m)")
+            
+            ax0.plot(self.sigvec,self.val_yfs.real[:,freqind],color="blue")
+            ax1.plot(self.sigvec,self.val_yfs.imag[:,freqind],color="red")
+            
+            ax0ymin, ax0ymax = self.val_yfs.real[:,freqind].min(),self.val_yfs.real[:,freqind].max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,self.val_yfs.real[sigind,:],color="blue")
+            ax3.plot(self.fvec,self.val_yfs.imag[sigind,:],color="red")
+            
+            ax2ymin, ax2ymax = self.val_yfs.real[sigind,:].min(),self.val_yfs.real[sigind,:].max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs.imag[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs.imag[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+        
+        elif mode=="AP":
+            
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Amplitude (V/m)")
+            ax1.set_ylabel("E field, Phase")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Amplitude (V/m)")
+            ax3.set_ylabel("E field, Phase")
+            
+            ax0.plot(self.sigvec,np.absolute(self.val_yfs[:,freqind]),color="blue")
+            ax1.plot(self.sigvec,np.angle(self.val_yfs[:,freqind],deg=True),color="red")
+            
+            ax0ymin, ax0ymax = np.absolute(self.val_yfs[:,freqind]).min(),np.absolute(self.val_yfs[:,freqind]).max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,np.absolute(self.val_yfs[sigind,:]),color="blue")
+            ax3.plot(self.fvec,np.angle(self.val_yfs[sigind,:],deg=True),color="red")
+            
+            ax2ymin, ax2ymax = np.absolute(self.val_yfs[sigind,:]).min(),np.absolute(self.val_yfs[sigind,:]).max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+        
+      
+        #ax0.set_yscale('log')
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+        
+        ax2.set_xscale('log')
+        ax3.set_xscale('log')
+
+        #ax0.annotate(("$\f$ =%5.5f Hz")%(self.fvec[freqind]*10**(3)),
+        #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+         #   fontsize=14.)
+
+        #ax2.annotate(("$\sigma$ =%3.3f mS/m")%(self.sigvec[sigind]*10**(3)),
+        #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
+        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+        #    fontsize=14.)
+
+        
+        plt.tight_layout()
+    
+    
+    def plot_1D_x(self,sigind,freqind):
+        
+        #sigind = np.where( sigplt == self.sigvec)[0][0]
+        #freqind = np.where( freqplt == self.fvec)[0][0]
+            
+        fig = plt.figure(figsize=(14,5))
+        ax0 = plt.subplot(121)
+        ax2 = plt.subplot(122)
+        
+        ax1 = ax0.twinx()
+        ax3 = ax2.twinx()
+        
+        if mode =="RI":        
+        
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Real part (V/m)")
+            ax1.set_ylabel("E field, Imag part (V/m)")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Real part (V/m)")
+            ax3.set_ylabel("E field, Imag part (V/m)")
+            
+            ax0.plot(self.sigvec,self.val_xfs.real[:,freqind],color="blue")
+            ax1.plot(self.sigvec,self.val_xfs.imag[:,freqind],color="red")
+            
+            ax0ymin, ax0ymax = self.val_xfs.real[:,freqind].min(),self.val_xfs.real[:,freqind].max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,self.val_xfs.real[sigind,:],color="blue")
+            ax3.plot(self.fvec,self.val_xfs.imag[sigind,:],color="red")
+            
+            ax2ymin, ax2ymax = self.val_xfs.real[sigind,:].min(),self.val_xfs.real[sigind,:].max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs.imag[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs.imag[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+        
+        elif mode=="AP":
+            
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Amplitude (V/m)")
+            ax1.set_ylabel("E field, Phase")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Amplitude (V/m)")
+            ax3.set_ylabel("E field, Phase")
+            
+            ax0.plot(self.sigvec,np.absolute(self.val_xfs[:,freqind]),color="blue")
+            ax1.plot(self.sigvec,np.angle(self.val_xfs[:,freqind],deg=True),color="red")
+            
+            ax0ymin, ax0ymax = np.absolute(self.val_xfs[:,freqind]).min(),np.absolute(self.val_xfs[:,freqind]).max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,np.absolute(self.val_xfs[sigind,:]),color="blue")
+            ax3.plot(self.fvec,np.angle(self.val_xfs[sigind,:],deg=True),color="red")
+            
+            ax2ymin, ax2ymax = np.absolute(self.val_xfs[sigind,:]).min(),np.absolute(self.val_xfs[sigind,:]).max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+      
+        #ax0.set_yscale('log')
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+        
+        ax2.set_xscale('log')
+        ax3.set_xscale('log')
+
+        #ax0.annotate(("$\f$ =%5.5f Hz")%(self.fvec[freqind]*10**(3)),
+        #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+         #   fontsize=14.)
+
+        #ax2.annotate(("$\sigma$ =%3.3f mS/m")%(self.sigvec[sigind]*10**(3)),
+        #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
+        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+        #    fontsize=14.)
+
+        
+        plt.tight_layout()
+    
+    def plot_1D_z(self,sigind,freqind):
+        
+        #sigind = np.where( sigplt == self.sigvec)[0][0]
+        #freqind = np.where( freqplt == self.fvec)[0][0]
+            
+        fig = plt.figure(figsize=(14,5))
+        ax0 = plt.subplot(121)
+        ax2 = plt.subplot(122)
+        
+        ax1 = ax0.twinx()
+        ax3 = ax2.twinx()
+        
+        if mode =="RI":        
+        
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Real part (V/m)")
+            ax1.set_ylabel("E field, Imag part (V/m)")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Real part (V/m)")
+            ax3.set_ylabel("E field, Imag part (V/m)")
+            
+            ax0.plot(self.sigvec,self.val_zfs.real[:,freqind],color="blue")
+            ax1.plot(self.sigvec,self.val_zfs.imag[:,freqind],color="red")
+            
+            ax0ymin, ax0ymax = self.val_zfs.real[:,freqind].min(),self.val_zfs.real[:,freqind].max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,self.val_zfs.real[sigind,:],color="blue")
+            ax3.plot(self.fvec,self.val_zfs.imag[sigind,:],color="red")
+            
+            ax2ymin, ax2ymax = self.val_zfs.real[sigind,:].min(),self.val_zfs.real[sigind,:].max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs.imag[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs.imag[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+        
+        elif mode=="AP":
+            
+            ax0.set_xlabel("Conductivity (S/m)")
+            ax0.set_ylabel("E field, Amplitude (V/m)")
+            ax1.set_ylabel("E field, Phase")
+            
+            ax2.set_xlabel("Frequency (Hz)")
+            ax2.set_ylabel("E field, Amplitude (V/m)")
+            ax3.set_ylabel("E field, Phase")
+            
+            ax0.plot(self.sigvec,np.absolute(self.val_zfs[:,freqind]),color="blue")
+            ax1.plot(self.sigvec,np.angle(self.val_zfs[:,freqind],deg=True),color="red")
+            
+            ax0ymin, ax0ymax = np.absolute(self.val_zfs[:,freqind]).min(),np.absolute(self.val_zfs[:,freqind]).max()
+            
+            ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs[:,freqind]),
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs[:,freqind])),linestyle="dashed",color="black")
+            
+            ax0.set_ylim(ax0ymin, ax0ymax)
+            
+            ax2.plot(self.fvec,np.absolute(self.val_zfs[sigind,:]),color="blue")
+            ax3.plot(self.fvec,np.angle(self.val_zfs[sigind,:],deg=True),color="red")
+            
+            ax2ymin, ax2ymax = np.absolute(self.val_zfs[sigind,:]).min(),np.absolute(self.val_zfs[sigind,:]).max()
+            
+            ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs[sigind,:]),
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs[sigind,:])),linestyle="dashed",color="black")
+            
+            ax2.set_ylim(ax2ymin, ax2ymax)
+      
+        #ax0.set_yscale('log')
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+        
+        ax2.set_xscale('log')
+        ax3.set_xscale('log')
+
+        #ax0.annotate(("$\f$ =%5.5f Hz")%(self.fvec[freqind]*10**(3)),
+        #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+         #   fontsize=14.)
+
+        #ax2.annotate(("$\sigma$ =%3.3f mS/m")%(self.sigvec[sigind]*10**(3)),
+        #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
+        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+        #    fontsize=14.)
+
+        
+        plt.tight_layout()
+    
+    
