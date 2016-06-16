@@ -5,12 +5,12 @@ matplotlib.rcParams["font.size"] = 13
 
 def phase(z):
 #     val = np.arctan2(z.real, z.imag)
-    val = np.angle(z)
+    val = np.rad2deg(np.unwrap(np.angle((z))))
     return val
 
 class DataView(object):
     """
-        Provides viewing functions for Data
+        Provides viewingtions for Data
         This can be inherited by XXX
     """
     def __init__(self):
@@ -37,16 +37,19 @@ class DataView(object):
             self.xyz = np.c_[self.X.flatten(), self.Y.flatten(), z*np.ones(self.ncx*self.ncy)]
 
     def eval_loc(self, srcLoc,obsLoc, sigvec, fvec, orientation, func):
+        self.srcLoc=srcLoc
         self.obsLoc = obsLoc
         self.sigvec = sigvec
         self.fvec = fvec
+        self.orientation = orientation
+        self.func = func
         self.val_xfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
         self.val_yfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
         self.val_zfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
    
         for n in range(len(sigvec)):
             #for k in range(len(fvec)):
-                self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, sigvec[n], fvec, orientation=orientation)
+                self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, sigvec[n], fvec, orientation=self.orientation)
     
 
     def eval_2D(self, srcLoc, sig, f, orientation, func):
@@ -247,7 +250,7 @@ class DataView(object):
             ax0ymin, ax0ymax = self.val_yfs.real[:,freqind].min(),self.val_yfs.real[:,freqind].max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
@@ -257,7 +260,7 @@ class DataView(object):
             ax2ymin, ax2ymax = self.val_yfs.real[sigind,:].min(),self.val_yfs.real[sigind,:].max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs.imag[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs.imag[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs.imag[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
         
@@ -272,22 +275,22 @@ class DataView(object):
             ax3.set_ylabel("E field, Phase")
             
             ax0.plot(self.sigvec,np.absolute(self.val_yfs[:,freqind]),color="blue")
-            ax1.plot(self.sigvec,np.angle(self.val_yfs[:,freqind],deg=True),color="red")
+            ax1.plot(self.sigvec,phase(self.val_yfs[:,freqind]),color="red")
             
             ax0ymin, ax0ymax = np.absolute(self.val_yfs[:,freqind]).min(),np.absolute(self.val_yfs[:,freqind]).max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_yfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
             ax2.plot(self.fvec,np.absolute(self.val_yfs[sigind,:]),color="blue")
-            ax3.plot(self.fvec,np.angle(self.val_yfs[sigind,:],deg=True),color="red")
+            ax3.plot(self.fvec,phase(self.val_yfs[sigind,:]),color="red")
             
             ax2ymin, ax2ymax = np.absolute(self.val_yfs[sigind,:]).min(),np.absolute(self.val_yfs[sigind,:]).max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_yfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
         
@@ -312,8 +315,214 @@ class DataView(object):
         
         plt.tight_layout()
     
-    
-    def plot_1D_x(self,sigind,freqind,mode):
+    def plot_1D_RI_f_x(self,absloc,coordloc,ax0,ax1,sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        
+        ax0.set_xlabel("Frequency (Hz)")
+        ax1.set_xlabel("Frequency (Hz)")
+        ax0.set_ylabel("E field, Real part (V/m)")
+        ax1.set_ylabel("E field, Imag part (V/m)")
+            
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        
+        
+        ax0.plot(self.fvec,self.val_xfs.real[sigind,:],color="blue")
+        ax1.plot(self.fvec,self.val_xfs.imag[sigind,:],color="red")
+        
+        ax0ymin, ax0ymax = self.val_xfs.real[sigind,:].min(),self.val_xfs.real[sigind,:].max()
+        
+        ax1ymin, ax1ymax = self.val_xfs.imag[sigind,:].min(),self.val_xfs.imag[sigind,:].max()
+
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[sigind]),
+            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+            fontsize=14.)
+
+        ax1.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[sigind]),
+            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+            fontsize=14.)
+
+        return ax0,ax1
+
+    def plot_1D_AP_f_x(self,absloc,coordloc,ax0,ax1,sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        
+        ax0.set_xlabel("Frequency (Hz)")
+        ax1.set_xlabel("Frequency (Hz)")
+        ax0.set_ylabel("E field, Amplitude (V/m)")
+        ax1.set_ylabel("E field, Phase")
+            
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+
+        
+        ax0.plot(self.fvec,np.absolute(self.val_xfs[sigind,:]),color="blue")
+        ax1.plot(self.fvec,phase(self.val_xfs[sigind,:]),color="red")
+        
+        ax0ymin, ax0ymax = np.absolute(self.val_xfs[sigind,:]).min(),np.absolute(self.val_xfs[sigind,:]).max()
+        ax1ymin, ax1ymax = phase(self.val_xfs[sigind,:]).min(),phase(self.val_xfs[sigind,:]).max()
+
+        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs[sigind,:]),
+        #            np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
+        
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[sigind]),
+            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+            fontsize=14.)
+
+        ax1.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[sigind]),
+            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+            fontsize=14.)
+
+        return ax0,ax1
+
+    def plot_1D_RI_sig_x(self,absloc,coordloc,ax0,ax1,freqind):
+        
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+
+        ax0.set_xlabel("Conductivity (S/m)")
+        ax1.set_xlabel("Conductivity (S/m)")
+        ax0.set_ylabel("E field, Real part (V/m)")
+        ax1.set_ylabel("E field, Imag part (V/m)")
+        
+        ax0.plot(self.sigvec,self.val_xfs.real[:,freqind],color="blue")
+        ax1.plot(self.sigvec,self.val_xfs.imag[:,freqind],color="red")
+        
+        ax0ymin, ax0ymax = self.val_xfs.real[:,freqind].min(),self.val_xfs.real[:,freqind].max()
+        ax1ymin, ax1ymax = self.val_xfs.imag[:,freqind].min(),self.val_xfs.real[:,freqind].max()
+
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(("f =%0.5f Hz")%(self.fvec[freqind]),
+            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+           fontsize=14.)
+
+        ax1.annotate(("f =%0.5f Hz")%(self.fvec[freqind]),
+            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+           fontsize=14.)
+
+        return ax0,ax1
+        
+
+    def plot_1D_AP_sig_x(self,absloc,coordloc,ax0,ax1,freqind):
+
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+
+        ax0.set_xlabel("Conductivity (S/m)")
+        ax1.set_xlabel("Conductivity (S/m)")
+        ax0.set_ylabel("E field, Amplitude (V/m)")
+        ax1.set_ylabel("E field, Phase")
+
+        ax0.plot(self.sigvec,np.absolute(self.val_xfs[:,freqind]),color="blue")
+        ax1.plot(self.sigvec,phase(self.val_xfs[:,freqind]),color="red")
+        
+        ax0ymin, ax0ymax = np.absolute(self.val_xfs[:,freqind]).min(),np.absolute(self.val_xfs[:,freqind]).max()
+        ax1ymin, ax1ymax = phase(self.val_xfs[:,freqind]).min(),phase(self.val_xfs[:,freqind]).max()
+        
+        ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
+                 np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(("f =%0.5f Hz")%(self.fvec[freqind]),
+            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+           fontsize=14.)
+
+        ax1.annotate(("f =%0.5f Hz")%(self.fvec[freqind]),
+            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+           fontsize=14.)
+
+        return ax0,ax1
+
+    def plot_1D_phasor_f_x(self,absloc,coordloc,ax,sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+        
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+
+        ax.plot(self.val_xfs.real[sigind,:],self.val_xfs.imag[sigind,:])
+
+    def plot_1D_phasor_sig_x(self,absloc,coordloc,ax,freqind):
+
+        if self.normal.upper() == "Z":
+            obsLoc=np.c_[absloc,coordloc,self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc=np.c_[absloc,self.y,coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc=np.c_[self.x,absloc,coordloc]
+        
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+
+        ax.plot(self.val_xfs.real[:,freqind],self.val_xfs.imag[:,freqind])
+
+
+
+    def plot_1D_x(self,obslocx,obslocy,obslocz,sigind,freqind,mode):
         
         #sigind = np.where( sigplt == self.sigvec)[0][0]
         #freqind = np.where( freqplt == self.fvec)[0][0]
@@ -324,6 +533,9 @@ class DataView(object):
         
         ax1 = ax0.twinx()
         ax3 = ax2.twinx()
+
+        obsLoc=np.c_[obslocx,obslocy,obslocz]
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation, self.func)
         
         if mode =="RI":        
         
@@ -341,7 +553,7 @@ class DataView(object):
             ax0ymin, ax0ymax = self.val_xfs.real[:,freqind].min(),self.val_xfs.real[:,freqind].max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
@@ -351,7 +563,7 @@ class DataView(object):
             ax2ymin, ax2ymax = self.val_xfs.real[sigind,:].min(),self.val_xfs.real[sigind,:].max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs.imag[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs.imag[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs.imag[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
         
@@ -366,22 +578,22 @@ class DataView(object):
             ax3.set_ylabel("E field, Phase")
             
             ax0.plot(self.sigvec,np.absolute(self.val_xfs[:,freqind]),color="blue")
-            ax1.plot(self.sigvec,np.angle(self.val_xfs[:,freqind],deg=True),color="red")
+            ax1.plot(self.sigvec,phase(self.val_xfs[:,freqind]),color="red")
             
             ax0ymin, ax0ymax = np.absolute(self.val_xfs[:,freqind]).min(),np.absolute(self.val_xfs[:,freqind]).max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
             ax2.plot(self.fvec,np.absolute(self.val_xfs[sigind,:]),color="blue")
-            ax3.plot(self.fvec,np.angle(self.val_xfs[sigind,:],deg=True),color="red")
+            ax3.plot(self.fvec,phase(self.val_xfs[sigind,:]),color="red")
             
             ax2ymin, ax2ymax = np.absolute(self.val_xfs[sigind,:]).min(),np.absolute(self.val_xfs[sigind,:]).max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
       
@@ -392,15 +604,15 @@ class DataView(object):
         ax2.set_xscale('log')
         ax3.set_xscale('log')
 
-        #ax0.annotate(("$\f$ =%5.5f Hz")%(self.fvec[freqind]*10**(3)),
-        #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-         #   fontsize=14.)
+        ax0.annotate(("f =%0.5f Hz")%(self.fvec[freqind]),
+            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+           fontsize=14.)
 
-        #ax2.annotate(("$\sigma$ =%3.3f mS/m")%(self.sigvec[sigind]*10**(3)),
-        #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
-        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
-        #    fontsize=14.)
+        ax2.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[sigind]),
+            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
+            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+            fontsize=14.)
 
         
         plt.tight_layout()
@@ -433,7 +645,7 @@ class DataView(object):
             ax0ymin, ax0ymax = self.val_zfs.real[:,freqind].min(),self.val_zfs.real[:,freqind].max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
@@ -443,7 +655,7 @@ class DataView(object):
             ax2ymin, ax2ymax = self.val_zfs.real[sigind,:].min(),self.val_zfs.real[sigind,:].max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs.imag[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs.imag[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs.imag[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
         
@@ -458,22 +670,22 @@ class DataView(object):
             ax3.set_ylabel("E field, Phase")
             
             ax0.plot(self.sigvec,np.absolute(self.val_zfs[:,freqind]),color="blue")
-            ax1.plot(self.sigvec,np.angle(self.val_zfs[:,freqind],deg=True),color="red")
+            ax1.plot(self.sigvec,phase(self.val_zfs[:,freqind]),color="red")
             
             ax0ymin, ax0ymax = np.absolute(self.val_zfs[:,freqind]).min(),np.absolute(self.val_zfs[:,freqind]).max()
             
             ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs[:,freqind]),
-                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs[:,freqind])),linestyle="dashed",color="black")
+                     np.linspace(ax0ymin,ax0ymax,len(self.val_zfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax0.set_ylim(ax0ymin, ax0ymax)
             
             ax2.plot(self.fvec,np.absolute(self.val_zfs[sigind,:]),color="blue")
-            ax3.plot(self.fvec,np.angle(self.val_zfs[sigind,:],deg=True),color="red")
+            ax3.plot(self.fvec,phase(self.val_zfs[sigind,:]),color="red")
             
             ax2ymin, ax2ymax = np.absolute(self.val_zfs[sigind,:]).min(),np.absolute(self.val_zfs[sigind,:]).max()
             
             ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs[sigind,:]),
-                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs[sigind,:])),linestyle="dashed",color="black")
+                        np.linspace(ax2ymin,ax2ymax,len(self.val_zfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
             
             ax2.set_ylim(ax2ymin, ax2ymax)
       
