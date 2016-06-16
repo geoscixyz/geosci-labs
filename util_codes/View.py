@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import copy
 matplotlib.rcParams["font.size"] = 13
 
 def phase(z):
@@ -16,25 +17,46 @@ class DataView(object):
     def __init__(self):
         pass
 
-    def set_xyz(self, x, y, z, normal="Z"):
+    def set_xyz(self, x, y, z, normal="Z",geometry="grid"):
         self.normal = normal
-        if normal =="X" or normal=="x":
-            self.x, self.y, self.z = x, y, z
-            self.ncx, self.ncy, self.ncz = 1, y.size, z.size
-            self.Y, self.Z = np.meshgrid(y, z)
-            self.xyz = np.c_[x*np.ones(self.ncy*self.ncz), self.Y.flatten(), self.Z.flatten()]
+        if geometry.upper() == "GRID":
+            if normal =="X" or normal=="x":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = 1, y.size, z.size
+                self.Y, self.Z = np.meshgrid(y, z)
+                self.xyz = np.c_[x*np.ones(self.ncy*self.ncz), self.Y.flatten(), self.Z.flatten()]
+    
+            elif normal =="Y" or normal =="y":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = x.size, 1, z.size
+                self.X, self.Z = np.meshgrid(x, z)
+                self.xyz = np.c_[self.X.flatten(), y*np.ones(self.ncx*self.ncz), self.Z.flatten()]
+    
+            elif normal =="Z" or normal =="z":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = x.size, y.size, 1
+                self.X, self.Y = np.meshgrid(x, y)
+                self.xyz = np.c_[self.X.flatten(), self.Y.flatten(), z*np.ones(self.ncx*self.ncy)]
+        
+        elif geometry.upper() == "PROFILE":
+            if normal =="X" or normal=="x":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = 1, y.size, 1
+                self.Y, self.Z = self.y,self.z
+                self.xyz = np.c_[x*np.ones_like(self.y), self.Y, self.Z]
+    
+            elif normal =="Y" or normal =="y":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = x.size, 1, 1
+                self.Y, self.Z = self.y,self.z
+                self.xyz = np.c_[self.x,y*np.ones_like(self.x),self.Z]
+                
+            elif normal =="Z" or normal =="z":
+                self.x, self.y, self.z = x, y, z
+                self.ncx, self.ncy, self.ncz = x.size, 1, 1
+                self.Y, self.Z = self.y,self.z
+                self.xyz = np.c_[self.x, self.y, z*np.ones_like(self.x)]
 
-        elif normal =="Y" or normal =="y":
-            self.x, self.y, self.z = x, y, z
-            self.ncx, self.ncy, self.ncz = x.size, 1, z.size
-            self.X, self.Z = np.meshgrid(x, z)
-            self.xyz = np.c_[self.X.flatten(), y*np.ones(self.ncx*self.ncz), self.Z.flatten()]
-
-        elif normal =="Z" or normal =="z":
-            self.x, self.y, self.z = x, y, z
-            self.ncx, self.ncy, self.ncz = x.size, y.size, 1
-            self.X, self.Y = np.meshgrid(x, y)
-            self.xyz = np.c_[self.X.flatten(), self.Y.flatten(), z*np.ones(self.ncx*self.ncy)]
 
     def eval_loc(self, srcLoc,obsLoc, sigvec, fvec, orientation, func):
         self.srcLoc=srcLoc
@@ -42,7 +64,7 @@ class DataView(object):
         self.sigvec = sigvec
         self.fvec = fvec
         self.orientation = orientation
-        self.func = func
+        self.func1D = func
         self.val_xfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
         self.val_yfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
         self.val_zfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
@@ -53,6 +75,11 @@ class DataView(object):
     
 
     def eval_2D(self, srcLoc, sig, f, orientation, func):
+        self.func2D = func
+        self.srcLoc = srcLoc
+        self.sig = sig
+        self.f = f
+        self.orientation = orientation
         self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation)
         if self.normal =="X" or self.normal=="x":
             Freshape = lambda v: v.reshape(self.ncy, self.ncz)
@@ -222,6 +249,82 @@ class DataView(object):
 
         plt.show()
 
+    def plot_1D_RI_section(self,start,end,nbmp,view,ax0,ax1):
+
+        self1D = DataView()
+        
+        #Pr for Profile
+        Pr = np.zeros(shape=(nbmp,2))                            
+        Pr[:,0] = np.linspace(start[0],end[0],nbmp)
+        Pr[:,1] = np.linspace(start[1],end[1],nbmp)
+
+        #Distance from starting point
+        D = np.sqrt((Pr[0,0]-Pr[:,0])**2+(Pr[:,1]-Pr[0,1])**2)
+
+        if self.normal.upper() == "Z":
+            self1D.set_xyz(Pr[:,0],Pr[:,1],self.z,normal=self.normal,geometry="profile")
+        elif self.normal.upper() == "Y":
+            self1D.set_xyz(Pr[:,0],self.y,Pr[:,1],normal=self.normal,geometry="profile")
+        elif self.normal.upper() == "X":
+            self1D.set_xyz(self.x,Pr[:,0],Pr[:,1],normal=self.normal,geometry="profile")
+
+        self1D.eval_2D(self.srcLoc, self.sig, self.f, self.orientation, self.func2D)
+
+        if view.upper() == "X":
+            ax0.plot(D,self1D.val_x.real,color="blue")
+            ax1.plot(D,self1D.val_x.imag,color="red")
+        elif view.upper() == "Y":
+            ax0.plot(D,self1D.val_y.real,color="blue")
+            ax1.plot(D,self1D.val_y.imag,color="red")
+        elif view.upper() == "Z":
+            ax0.plot(D,self1D.val_z.real,color="blue")
+            ax1.plot(D,self1D.val_z.imag,color="red")
+
+        ax0.set_xlabel("Distance from startinng point (m)")
+        ax1.set_xlabel("Distance from startinng point (Hz)")
+        ax0.set_ylabel("E field, Real part (V/m)")
+        ax1.set_ylabel("E field, Imag part (V/m)")
+
+        return ax0,ax1
+
+    def plot_1D_AP_section(self,start,end,nbmp,view,ax0,ax1):
+
+        self1D = copy.deepcopy(self)
+        
+        #Pr for Profile
+        Pr = np.zeros(shape=(nbmp,2))                            
+        Pr[:,0] = np.linspace(start[0],end[0],nbmp)
+        Pr[:,1] = np.linspace(start[1],end[1],nbmp)
+
+        #Distance from starting point
+        D = np.sqrt((Pr[0,0]-Pr[:,0])**2+(Pr[:,1]-Pr[0,1])**2)
+
+        if self.normal.upper() == "Z":
+            self1D.set_xyz(Pr[:,0],Pr[:,1],self.z,normal=self.normal,geometry="profile")
+        elif self.normal.upper() == "Y":
+            self1D.set_xyz(Pr[:,0],self.y,Pr[:,1],normal=self.normal,geometry="profile")
+        elif self.normal.upper() == "X":
+            self1D.set_xyz(self.x,Pr[:,0],Pr[:,1],normal=self.normal,geometry="profile")
+
+        self1D.eval_2D(self.srcLoc, self.sig, self.f, self.orientation, self.func2D)
+
+        if view.upper() == "X":
+            ax0.plot(D,np.absolute(self1D.val_x),color="blue")
+            ax1.plot(D,phase(self1D.val_x),color="red")
+        elif view.upper() == "Y":
+            ax0.plot(D,np.absolute(self1D.val_y),color="blue")
+            ax1.plot(D,phase(self1D.val_y),color="red")
+        elif view.upper() == "Z":
+            ax0.plot(D,np.absolute(self1D.val_z),color="blue")
+            ax1.plot(D,phase(self1D.val_z),color="red")
+
+        ax0.set_xlabel("Distance from startinng point (m)")
+        ax1.set_xlabel("Distance from startinng point (Hz)")
+        ax0.set_ylabel("E field, Amplitude (V/m)")
+        ax1.set_ylabel("E field, Phase (deg)")
+
+        return ax0,ax1
+
     
     def plot_1D_RI_f_x(self,absloc,coordloc,ax0,ax1,sigind):
 
@@ -232,7 +335,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
@@ -277,12 +380,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
             
         #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
         #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
@@ -324,7 +427,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
@@ -368,12 +471,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
 
         ax0.plot(self.sigvec,np.absolute(self.val_xfs[:,freqind]),color="blue")
         ax1.plot(self.sigvec,phase(self.val_xfs[:,freqind]),color="red")
@@ -411,7 +514,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_xfs.real[sigind,:],self.val_xfs.imag[sigind,:])
 
@@ -424,7 +527,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_xfs.real[:,freqind],self.val_xfs.imag[:,freqind])
 
@@ -439,7 +542,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
@@ -484,12 +587,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
             
         #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:,freqind]),
         #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
@@ -531,7 +634,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
@@ -575,12 +678,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
 
         ax0.plot(self.sigvec,np.absolute(self.val_yfs[:,freqind]),color="blue")
         ax1.plot(self.sigvec,phase(self.val_yfs[:,freqind]),color="red")
@@ -618,7 +721,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_yfs.real[sigind,:],self.val_yfs.imag[sigind,:])
 
@@ -631,7 +734,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_yfs.real[:,freqind],self.val_yfs.imag[:,freqind])
 
@@ -645,7 +748,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
@@ -690,12 +793,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
         
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
             
         #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:,freqind]),
         #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
@@ -737,7 +840,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
@@ -781,12 +884,12 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase")
+        ax1.set_ylabel("E field, Phase (deg)")
 
         ax0.plot(self.sigvec,np.absolute(self.val_zfs[:,freqind]),color="blue")
         ax1.plot(self.sigvec,phase(self.val_zfs[:,freqind]),color="red")
@@ -824,7 +927,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_zfs.real[sigind,:],self.val_zfs.imag[sigind,:])
 
@@ -837,7 +940,7 @@ class DataView(object):
         elif self.normal.upper() == "X":
             obsLoc=np.c_[self.x,absloc,coordloc]
         
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
 
         ax.plot(self.val_zfs.real[:,freqind],self.val_zfs.imag[:,freqind])
 
@@ -858,7 +961,7 @@ class DataView(object):
         ax3 = ax2.twinx()
 
         obsLoc=np.c_[obslocx,obslocy,obslocz]
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation, self.func)
+        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation, self.func1D)
         
         if mode =="RI":        
         
@@ -894,11 +997,11 @@ class DataView(object):
             
             ax0.set_xlabel("Conductivity (S/m)")
             ax0.set_ylabel("E field, Amplitude (V/m)")
-            ax1.set_ylabel("E field, Phase")
+            ax1.set_ylabel("E field, Phase (deg)")
             
             ax2.set_xlabel("Frequency (Hz)")
             ax2.set_ylabel("E field, Amplitude (V/m)")
-            ax3.set_ylabel("E field, Phase")
+            ax3.set_ylabel("E field, Phase (deg)")
             
             ax0.plot(self.sigvec,np.absolute(self.val_xfs[:,freqind]),color="blue")
             ax1.plot(self.sigvec,phase(self.val_xfs[:,freqind]),color="red")
@@ -986,11 +1089,11 @@ class DataView(object):
             
             ax0.set_xlabel("Conductivity (S/m)")
             ax0.set_ylabel("E field, Amplitude (V/m)")
-            ax1.set_ylabel("E field, Phase")
+            ax1.set_ylabel("E field, Phase (deg)")
             
             ax2.set_xlabel("Frequency (Hz)")
             ax2.set_ylabel("E field, Amplitude (V/m)")
-            ax3.set_ylabel("E field, Phase")
+            ax3.set_ylabel("E field, Phase (deg)")
             
             ax0.plot(self.sigvec,np.absolute(self.val_yfs[:,freqind]),color="blue")
             ax1.plot(self.sigvec,phase(self.val_yfs[:,freqind]),color="red")
@@ -1079,11 +1182,11 @@ class DataView(object):
             
             ax0.set_xlabel("Conductivity (S/m)")
             ax0.set_ylabel("E field, Amplitude (V/m)")
-            ax1.set_ylabel("E field, Phase")
+            ax1.set_ylabel("E field, Phase (deg)")
             
             ax2.set_xlabel("Frequency (Hz)")
             ax2.set_ylabel("E field, Amplitude (V/m)")
-            ax3.set_ylabel("E field, Phase")
+            ax3.set_ylabel("E field, Phase (deg)")
             
             ax0.plot(self.sigvec,np.absolute(self.val_zfs[:,freqind]),color="blue")
             ax1.plot(self.sigvec,phase(self.val_zfs[:,freqind]),color="red")
