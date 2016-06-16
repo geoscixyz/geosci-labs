@@ -473,8 +473,8 @@ class DataView(object):
         ax0ymin, ax0ymax = np.absolute(self.val_xfs[:,freqind]).min(),np.absolute(self.val_xfs[:,freqind]).max()
         ax1ymin, ax1ymax = phase(self.val_xfs[:,freqind]).min(),phase(self.val_xfs[:,freqind]).max()
         
-        ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
-                 np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
         
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
