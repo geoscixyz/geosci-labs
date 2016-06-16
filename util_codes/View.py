@@ -427,7 +427,7 @@ class DataView(object):
         ax1.plot(self.sigvec,self.val_xfs.imag[:,freqind],color="red")
         
         ax0ymin, ax0ymax = self.val_xfs.real[:,freqind].min(),self.val_xfs.real[:,freqind].max()
-        ax1ymin, ax1ymax = self.val_xfs.imag[:,freqind].min(),self.val_xfs.real[:,freqind].max()
+        ax1ymin, ax1ymax = self.val_xfs.imag[:,freqind].min(),self.val_xfs.imag[:,freqind].max()
 
         #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
         #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
