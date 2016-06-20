@@ -187,7 +187,7 @@ class DataView(object):
 
         return ax, dat
 
-    def plot_profile_FD(self,start=None,end=None,component="real",view="x", logamp=True, ax=None, color="black"):
+    def plot_profile_FD(self,start,end,nbmp,component="real",view="x", logamp=True, ax=None, color="black"):
 
         if ax is None:
             fig = plt.figure(figsize=(6.5,5))
@@ -230,15 +230,15 @@ class DataView(object):
         if component.upper() == "REAL":
             ax.plot(D,pltvalue.real,color=color)
             ax.set_ylabel("E field, Real part (V/m)")
-        elif view.upper() == "IMAG":
+        elif component.upper() == "IMAG":
             ax.plot(D,pltvalue.imag,color=color)
             ax.set_ylabel("E field, Imag part (V/m)")
-        elif view.upper() == "AMPLITUDE":
-            if logamp == True:
-                pltvalue = np.log10(abs(pltvalue))
+        elif component.upper() == "AMPLITUDE":
+            if logamp == True: 
+                ax.set_yscale('log')
             ax.plot(D,np.absolute(pltvalue),color=color)
             ax.set_ylabel("E field, Amplitude (V/m)")
-        elif view.upper() == "PHASE":
+        elif component.upper() == "PHASE":
             ax.plot(D,phase(pltvalue),color=color)
             ax.set_ylabel("E field, Phase")
 
@@ -333,6 +333,11 @@ class DataView(object):
         slice_ind=0
         if slice is None:
             slice_ind=np.minimum(len(self.sigvec),len(self.fvec))/2
+            if abscisse.upper() == "CONDUCTIVITY":
+                slice = self.fvec[slice_ind]
+
+            elif abscisse.upper() == "FREQUENCY":
+                slice = self.sigvec[slice_ind]
 
         pltvalue =[]
 
@@ -354,7 +359,7 @@ class DataView(object):
             pltvalue=np.absolute(pltvalue)
             ax.set_ylabel("E field, Amplitude (V/m)")
             if logamp == True:
-                pltvalue = np.log10(abs(pltvalue))
+                ax.set_yscale('log')
         elif component.upper() =="PHASE":
             pltvalue=phase(pltvalue)
             ax.set_ylabel("E field, Phase")
@@ -368,8 +373,8 @@ class DataView(object):
 
                 axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
                 ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
-                    xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind],max())/2., axymin+(ax0ymax-axymin)/4.), xycoords='data',
-                    xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind],max())/2., axymin+(ax0ymax-axymin)/4.), textcoords='data',
+                    xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
+                    xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
                     fontsize=14.)
 
             elif abscisse.upper() == "FREQUENCY":
@@ -378,8 +383,8 @@ class DataView(object):
 
                 axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
                 ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
-                    xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:],max())/2., axymin+(ax0ymax-axymin)/4.), xycoords='data',
-                    xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:],max())/2., axymin+(ax0ymax-axymin)/4.), textcoords='data',
+                    xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
+                    xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
                     fontsize=14.)
                 
 
