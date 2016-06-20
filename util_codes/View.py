@@ -20,6 +20,8 @@ class DataView(object):
 
     def set_xyz(self, x, y, z, normal="Z",geometry="grid"):
         self.normal = normal
+        self.geometry = geometry
+
         if geometry.upper() == "GRID":
             if normal =="X" or normal=="x":
                 self.x, self.y, self.z = x, y, z
@@ -185,6 +187,67 @@ class DataView(object):
 
         return ax, dat
 
+    def plot_profile_FD(self,start=None,end=None,component="real",view="x", logamp=True, ax=None, color="black"):
+
+        if ax is None:
+            fig = plt.figure(figsize=(6.5,5))
+            ax = plt.subplot(111)
+
+        if self.geometry.upper() == "PROFILE":
+            start = self.xyz[0]
+            end   = self.xyz[-1]
+            self1D = copy.deepcopy(self)
+            #Pr for Profile
+            Pr = self.xyz
+        elif self.geometry.upper() == "GRID":
+            self1D = DataView()
+            Pr = np.zeros(shape=(nbmp,3))
+            Pr[:,0] = np.linspace(start[0],end[0],nbmp)
+            Pr[:,1] = np.linspace(start[1],end[1],nbmp)
+            Pr[:,2] = np.linspace(start[2],end[2],nbmp)
+            self1D.set_xyz(Pr[:,0],Pr[:,1],Pr[:,2],normal=self.normal,geometry="profile")
+            self1D.eval_2D(self.srcLoc, self.sig, self.f, self.orientation, self.func2D)
+
+        #Distance from starting point
+        D = np.sqrt((Pr[0,0]-Pr[:,0])**2+(Pr[:,1]-Pr[0,1])**2+(Pr[:,2]-Pr[0,2])**2)
+
+        #if self.normal.upper() == "Z":
+        #    self1D.set_xyz(Pr[:,0],Pr[:,1],self.z,normal=self.normal,geometry="profile")
+        #elif self.normal.upper() == "Y":
+        #    self1D.set_xyz(Pr[:,0],self.y,Pr[:,1],normal=self.normal,geometry="profile")
+        #elif self.normal.upper() == "X":
+        #    self1D.set_xyz(self.x,Pr[:,0],Pr[:,1],normal=self.normal,geometry="profile")
+
+        pltvalue = []
+
+        if view.upper() == "X":
+            pltvalue = self1D.val_x
+        elif view.upper() == "Y":
+            pltvalue = self1D.val_y
+        elif view.upper() == "Z":
+            pltvalue = self1D.val_z
+
+        if component.upper() == "REAL":
+            ax.plot(D,pltvalue.real,color=color)
+            ax.set_ylabel("E field, Real part (V/m)")
+        elif view.upper() == "IMAG":
+            ax.plot(D,pltvalue.imag,color=color)
+            ax.set_ylabel("E field, Imag part (V/m)")
+        elif view.upper() == "AMPLITUDE":
+            if logamp == True:
+                pltvalue = np.log10(abs(pltvalue))
+            ax.plot(D,np.absolute(pltvalue),color=color)
+            ax.set_ylabel("E field, Amplitude (V/m)")
+        elif view.upper() == "PHASE":
+            ax.plot(D,phase(pltvalue),color=color)
+            ax.set_ylabel("E field, Phase")
+
+        ax.set_xlabel("Distance from startinng point (m)")
+
+        return ax
+
+
+
     def plot_1D_RI_section(self,start,end,nbmp,view,ax0,ax1):
 
         self1D = DataView()
@@ -260,6 +323,96 @@ class DataView(object):
         ax1.set_ylabel("E field, Phase (deg)")
 
         return ax0,ax1
+    
+    def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slice=None, logamp=True, ax=None, color = 'black'):
+
+        if ax is None:
+            fig = plt.figure(figsize=(6.5,5))
+            ax = plt.subplot(111)
+
+        slice_ind=0
+        if slice is None:
+            slice_ind=np.minimum(len(self.sigvec),len(self.fvec))/2
+
+        pltvalue =[]
+
+        if view.upper() == "X":
+            pltvalue = self.val_xfs
+        elif view.upper() == "Y":
+            pltvalue = self.val_yfs
+        elif view.upper() == "Z":
+            pltvalue = self.val_zfs
+
+        if component.upper() == "REAL":
+            pltvalue=pltvalue.real
+            ax.set_ylabel("E field, Real part (V/m)")
+
+        elif component.upper() =="IMAG":
+            pltvalue=pltvalue.imag
+            ax.set_ylabel("E field, Imag part (V/m)")
+        elif component.upper() =="AMPLITUDE":
+            pltvalue=np.absolute(pltvalue)
+            ax.set_ylabel("E field, Amplitude (V/m)")
+            if logamp == True:
+                pltvalue = np.log10(abs(pltvalue))
+        elif component.upper() =="PHASE":
+            pltvalue=phase(pltvalue)
+            ax.set_ylabel("E field, Phase")
+
+        if component.upper() == "PHASOR":
+            if abscisse.upper() == "CONDUCTIVITY":
+                slice_ind = np.where( slice == self.fvec)[0][0]
+                ax.plot(pltvalue.real[:,slice_ind],pltvalue.imag[:,slice_ind],color = color)
+                ax.set_xlabel("E field, Real part (V/m)")
+                ax.set_ylabel("E field, Real Imag (V/m)")
+
+                axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
+                ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
+                    xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind],max())/2., axymin+(ax0ymax-axymin)/4.), xycoords='data',
+                    xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind],max())/2., axymin+(ax0ymax-axymin)/4.), textcoords='data',
+                    fontsize=14.)
+
+            elif abscisse.upper() == "FREQUENCY":
+                slice_ind = np.where( slice == self.sigvec)[0][0]
+                ax.plot(pltvalue.real[slice_ind,:],pltvalue.imag[slice_ind,:],color = color)
+
+                axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
+                ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
+                    xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:],max())/2., axymin+(ax0ymax-axymin)/4.), xycoords='data',
+                    xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:],max())/2., axymin+(ax0ymax-axymin)/4.), textcoords='data',
+                    fontsize=14.)
+                
+
+        else:
+            if abscisse.upper() == "CONDUCTIVITY":
+                ax.set_xlabel("Conductivity (S/m)")
+                ax.set_xscale('log')
+                slice_ind = np.where( slice == self.fvec)[0][0]
+                ax.plot(self.sigvec,pltvalue[:,slice_ind],color=color)
+
+                axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
+                ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
+                    xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
+                    xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
+                    fontsize=14.)
+
+            elif abscisse.upper() =="FREQUENCY":
+                ax.set_xlabel("Frequency (Hz)")
+                ax.set_xscale('log')
+                slice_ind = np.where( slice == self.sigvec)[0][0]
+                ax.plot(self.fvec,pltvalue[slice_ind,:],color=color)
+                
+                axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
+                ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
+                    xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
+                    xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
+                    fontsize=14.)
+
+        return ax
+
+
+        
+
 
 
     def plot_1D_RI_f_x(self,absloc,coordloc,ax0,ax1,sigind):
