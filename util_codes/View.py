@@ -369,9 +369,9 @@ class DataView(object):
                 slice_ind = np.where( slice == self.fvec)[0][0]
                 ax.plot(pltvalue.real[:,slice_ind],pltvalue.imag[:,slice_ind],color = color)
                 ax.set_xlabel("E field, Real part (V/m)")
-                ax.set_ylabel("E field, Real Imag (V/m)")
+                ax.set_ylabel("E field, Imag part(V/m)")
 
-                axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
+                axymin, axymax = pltvalue.imag[:,slice_ind].min(),pltvalue.imag[:,slice_ind].max()
                 ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
                     xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                     xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
@@ -380,8 +380,10 @@ class DataView(object):
             elif abscisse.upper() == "FREQUENCY":
                 slice_ind = np.where( slice == self.sigvec)[0][0]
                 ax.plot(pltvalue.real[slice_ind,:],pltvalue.imag[slice_ind,:],color = color)
+                ax.set_xlabel("E field, Real part (V/m)")
+                ax.set_ylabel("E field, Imag part(V/m)")
 
-                axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
+                axymin, axymax = pltvalue.imag[slice_ind,:].min(),pltvalue.imag[slice_ind,:].max()
                 ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                     xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                     xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
