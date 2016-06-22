@@ -18,12 +18,12 @@ class DataView(object):
     def __init__(self):
         pass
 
-    def set_xyz(self, x, y, z, normal="Z",geometry="grid"):
+    def set_xyz(self, x, y, z, normal="Z", geometry="grid"):
         self.normal = normal
         self.geometry = geometry
 
         if geometry.upper() == "GRID":
-            if normal =="X" or normal=="x":
+            if normal == "X" or normal=="x":
                 self.x, self.y, self.z = x, y, z
                 self.ncx, self.ncy, self.ncz = 1, y.size, z.size
                 self.Y, self.Z = np.meshgrid(y, z)
@@ -75,6 +75,10 @@ class DataView(object):
         for n in range(len(sigvec)):
             #for k in range(len(fvec)):
                 self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, sigvec[n], fvec, orientation=self.orientation)
+
+    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z"):
+        val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation)
+        return val_x, val_y, val_z
 
 
     def eval_2D(self, srcLoc, sig, f, orientation, func):
@@ -180,10 +184,20 @@ class DataView(object):
         ax.set_ylabel(ylabel)
 
         if view == "vec":
+            nx = self.x.size
+            nskip = int(nx/15)
             if component == "real":
+                # ax.quiver(a[::nskip], b[::nskip], (vec_a.real/VEC_amp)[::nskip,::nskip],  (vec_b.real/VEC_amp)[::nskip,::nskip], color="w", linewidth=0.5)
                 ax.streamplot(a, b, vec_a.real,  vec_b.real, color="w", linewidth=0.5)
             elif component == "imag":
+                # ax.quiver(a, b, vec_a.imag/VEC_amp,  vec_b.imag/VEC_amp, color="w", linewidth=0.5)
                 ax.streamplot(a, b, vec_a.imag,  vec_b.imag, color="w", linewidth=0.5)
+            if component == "amplitude":
+                # ax.quiver(a, b, abs(vec_a)/VEC_amp,  abs(vec_b)/VEC_amp, color="w", linewidth=0.5)
+                ax.streamplot(a, b, abs(vec_a),  abs(vec_b), color="w", linewidth=0.5)
+            elif component == "phase":
+                # ax.quiver(a, b, phase(vec_a)/VEC_amp,  phase(vec_b)/VEC_amp, color="w", linewidth=0.5)
+                ax.streamplot(a, b, phase(vec_a),  phase(vec_b), color="w", linewidth=0.5)
 
         return ax, dat
 
@@ -234,7 +248,7 @@ class DataView(object):
             ax.plot(D,pltvalue.imag,color=color)
             ax.set_ylabel("E field, Imag part (V/m)")
         elif component.upper() == "AMPLITUDE":
-            if logamp == True: 
+            if logamp == True:
                 ax.set_yscale('log')
             ax.plot(D,np.absolute(pltvalue),color=color)
             ax.set_ylabel("E field, Amplitude (V/m)")
@@ -323,7 +337,7 @@ class DataView(object):
         ax1.set_ylabel("E field, Phase (deg)")
 
         return ax0,ax1
-    
+
     def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slice=None, logamp=True, ax=None, color = 'black'):
 
         if ax is None:
@@ -388,7 +402,7 @@ class DataView(object):
                     xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                     xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
                     fontsize=14.)
-                
+
 
         else:
             if abscisse.upper() == "CONDUCTIVITY":
@@ -408,7 +422,7 @@ class DataView(object):
                 ax.set_xscale('log')
                 slice_ind = np.where( slice == self.sigvec)[0][0]
                 ax.plot(self.fvec,pltvalue[slice_ind,:],color=color)
-                
+
                 axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
                 ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                     xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
@@ -418,7 +432,7 @@ class DataView(object):
         return ax
 
 
-        
+
 
 
 
