@@ -257,14 +257,14 @@ class DipoleWidget(object):
 
         out = widgets.interactive (foo
                         ,dtype=widgets.ToggleButtons(options=['real','imag','amplitude', 'phase']) \
-                        ,vector=widgets.ToggleButtons(options=['scalar','vector','amplitude']) \
+                        ,vector=widgets.ToggleButtons(options=['scalar','vector','amplitude'], value="vector") \
                         ,rxdirection=widgets.ToggleButtons(options=['x','y','z'], value='z') \
                         ,fieldtype=widgets.ToggleButtons(options=["E", "H", "J"]) \
-                        ,frequency=widgets.FloatText(value=1e-8) \
+                        ,frequency=widgets.FloatText(value=0., continuous_update=False) \
                         ,flog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
-                        ,sigma=widgets.FloatText(value=0.01) \
+                        ,sigma=widgets.FloatText(value=0.01, continuous_update=False) \
                         ,siglog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
-                        ,offset=widgets.FloatText(value = offset_plane) \
+                        ,offset=widgets.FloatText(value = offset_plane, continuous_update=False) \
                         ,scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
                         )
         return out
