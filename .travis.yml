@@ -18,8 +18,8 @@ install:
   - conda install --yes pip python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib jupyter ipython ipywidgets
   # - pip install -r requirements.txt
 
-  - git clone https://github.com/simpeg/simpeg.git
-  - cd simpeg; python setup.py build_ext --inplace; git checkout -b dcip/dev; cd ..
+  - git clone https://github.com/simpeg/simpeg.git@dev
+  - cd simpeg; python setup.py build_ext --inplace; cd ..
   - export PATH=$PWD/simpeg:$PATH
 
 # Run test
