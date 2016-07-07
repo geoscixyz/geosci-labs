@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import copy
+import warnings
+warnings.filterwarnings("ignore")
 matplotlib.rcParams["font.size"] = 13
 
 def phase(z):
@@ -90,27 +92,28 @@ class DataView(object):
         self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation)
         if self.normal =="X" or self.normal=="x":
             Freshape = lambda v: v.reshape(self.ncy, self.ncz)
-            self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-            self.VEC_R_amp = np.sqrt(self.VAL_Z.real**2+self.VAL_Y.real**2)
-            self.VEC_I_amp = np.sqrt(self.VAL_Z.imag**2+self.VAL_Y.imag**2)
-            self.VEC_A_amp = np.sqrt(np.abs(self.VAL_Z)**2+np.abs(self.VAL_Y)**2)
-            self.VEC_P_amp = np.sqrt(phase(self.VAL_Z)**2+phase(self.VAL_Y)**2)
-
         elif self.normal =="Y" or self.normal =="y":
             Freshape = lambda v: v.reshape(self.ncx, self.ncz)
-            self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-            self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Z.real**2)
-            self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Z.imag**2)
-            self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Z)**2)
-            self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Z)**2)
-
         elif self.normal =="Z" or self.normal =="z":
             Freshape = lambda v: v.reshape(self.ncx, self.ncy)
-            self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-            self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2)
-            self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Y.imag**2)
-            self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2)
-            self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2)
+
+        self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
+        self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2+self.VAL_Z.real**2)
+        self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Y.imag**2+self.VAL_Z.imag**2)
+        self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2+np.abs(self.VAL_Z)**2)
+        self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2+phase(self.VAL_Z)**2)
+
+        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
+        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Z.real**2)
+        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Z.imag**2)
+        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Z)**2)
+        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Z)**2)
+
+        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
+        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2)
+        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Y.imag**2)
+        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2)
+        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2)
 
     # Modularize ax0, ax1
 
