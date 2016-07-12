@@ -137,6 +137,8 @@ class DataView(object):
         elif component == "phase":
             VAL_X, VAL_Y, VAL_Z = phase(self.VAL_X), phase(self.VAL_Y), phase(self.VAL_Z)
             VEC_amp = self.VEC_P_amp
+        else:
+            raise Exception ("component should be in real, imag, amplitude, or phase!")
 
         if view == "amp" or view == "vec":
             val = VEC_amp
@@ -149,8 +151,9 @@ class DataView(object):
             val = VAL_Z
 
         if logamp == True:
+            zeroind = val == 0
             val = np.log10(abs(val))
-
+            val[zeroind] = val[~zeroind].min()
         if self.normal =="X" or self.normal=="x":
             a, b = self.y, self.z
             vec_a, vec_b = self.VAL_Y, self.VAL_Z
