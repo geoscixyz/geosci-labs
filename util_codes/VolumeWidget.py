@@ -72,6 +72,7 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
     ax.plot(np.ones(2)*xoffset_rx, np.ones(2)*yoffset_rx, np.r_[Z1, Z2], 'k-', lw=1)
     ax.plot(np.ones(2)*0., np.ones(2)*0., np.r_[Z1, Z2], 'k-', lw=1)
     ax.plot(xoffset_rx*np.ones(nRx), yoffset_rx*np.ones(nRx), np.linspace(Z1, Z2, nRx), "r.", ms=4)
+    ax.plot(np.linspace(X1, X2, nRx), np.zeros(nRx), np.zeros(nRx), "b-", ms=4)
 
     a = Arrow3D([0,0], [0,0],
                 [8,-8], mutation_scale=10,
@@ -80,6 +81,7 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
 
     ax.text(0, 0, Z2, "Tx hole")
     ax.text(xoffset_rx, yoffset_rx, Z2, "Rx hole")
+    ax.text(X2, 0, 0, "Tx profile")
 
     ax.set_xlabel('X (m)')
     ax.set_ylabel('Y (m)')
@@ -96,17 +98,17 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
     return ax
 
 def InteractivePlanes():
-    def foo(plane, offset, nRx):
+    def foo(Plane, Offset, nRx):
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.
-        return plotObj3D(offset_plane=offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=plane)
+        return plotObj3D(offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=Plane)
     out = widgets.interactive (foo
-                    ,offset=widgets.FloatSlider(min=-100, max=100, step=5., value=0., continuous_update=False) \
+                    ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=50., continuous_update=False) \
                     # ,X0=widgets.FloatText(value=-20) \
                     # ,Y0=widgets.FloatText(value=-50.) \
                     # ,Z0=widgets.FloatText(value=-50.) \
                     ,nRx=widgets.IntSlider(min=4,max=200,step=2,value=40, continuous_update=False)
-                    ,plane=widgets.ToggleButtons(options=['XZ','YZ'], value="XZ") \
+                    ,Plane=widgets.ToggleButtons(options=['XZ','YZ'], value="YZ") \
                     )
     return out
 
