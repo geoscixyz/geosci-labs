@@ -344,7 +344,7 @@ class DataView(object):
 
         return ax0,ax1
 
-    def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slice=None, logamp=True, ax=None, color = 'black'):
+    def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slice=None, logamp=True, ax=None,legend=True, color = 'black'):
 
         if ax is None:
             fig = plt.figure(figsize=(6.5,5))
@@ -392,10 +392,11 @@ class DataView(object):
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[:,slice_ind].min(),pltvalue.imag[:,slice_ind].max()
-                ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
-                    xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
-                    xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
-                    fontsize=14.)
+                if legend:    
+                    ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
+                        xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
+                        xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
+                        fontsize=14.)
 
             elif abscisse.upper() == "FREQUENCY":
                 slice_ind = np.where( slice == self.sigvec)[0][0]
@@ -404,10 +405,11 @@ class DataView(object):
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[slice_ind,:].min(),pltvalue.imag[slice_ind,:].max()
-                ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
-                    xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
-                    xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
-                    fontsize=14.)
+                if legend:    
+                    ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
+                        xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
+                        xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
+                        fontsize=14.)
 
 
         else:
@@ -418,10 +420,11 @@ class DataView(object):
                 ax.plot(self.sigvec,pltvalue[:,slice_ind],color=color)
 
                 axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
-                ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
-                    xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
-                    xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
-                    fontsize=14.)
+                if legend:    
+                    ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
+                        xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
+                        xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
+                        fontsize=14.)
 
             elif abscisse.upper() =="FREQUENCY":
                 ax.set_xlabel("Frequency (Hz)")
@@ -430,10 +433,11 @@ class DataView(object):
                 ax.plot(self.fvec,pltvalue[slice_ind,:],color=color)
 
                 axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
-                ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
-                    xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
-                    xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
-                    fontsize=14.)
+                if legend:    
+                    ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
+                        xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
+                        xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
+                        fontsize=14.)
 
         return ax
 
