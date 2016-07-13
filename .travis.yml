@@ -16,9 +16,9 @@ before_install:
 
 install:
   - conda install --yes pip python=$TRAVIS_PYTHON_VERSION pip
-  # - pip install -r requirements.txt
-  - git clone https://github.com/simpeg/simpeg.git@dev
-  - cd simpeg; python setup.py build_ext --inplace; cd ..
+  - pip install -r requirements.txt
+  # - git clone https://github.com/simpeg/simpeg.git@dev
+  # - cd simpeg; python setup.py build_ext --inplace; cd ..
   - export PATH=$PWD/simpeg:$PATH
 
 # Run test
