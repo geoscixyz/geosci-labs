@@ -9,5 +9,4 @@ dependencies:
   - ipython
   - ipywidgets
   - pip:
-    # - git+git://github.com/simpeg/simpeg.git@dcip/dev
     - git+git://github.com/simpeg/simpeg.git@dev
