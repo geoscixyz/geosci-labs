@@ -26,11 +26,15 @@ def get(nbname, nbpath):
 
     # use nbconvert to execute the notebook
     def test_func(self):
-        print '\n-------- Testing {0} --------'.format(nbname)
+        print '\n--------------- Testing {0} ---------------'.format(nbname)
         print '   {0}'.format(nbpath)
-        check = subprocess.call(['jupyter', 'nbconvert', '{0}'.format(nbpath),
-                                 '--execute'])
-        print check
+        nbexe = subprocess.Popen(['jupyter', 'nbconvert', '{0}'.format(nbpath),
+                                  '--execute',
+                                  '--ExecutePreprocessor.timeout=60'],
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+        output, err = nbexe.communicate()
+        check = nbexe.returncode
         if check == 0:
             print '\n ..... {0} Passed ..... \n'.format(nbname)
             subprocess.call(['rm', '{0}'.format(os.path.abspath('./') +
@@ -38,6 +42,7 @@ def get(nbname, nbpath):
                                                 nbname + '.html')])
         else:
             print '\n <<<<< {0} FAILED >>>>> \n'.format(nbname)
+            print 'Captured Output: \n {0}'.format(err)
 
         self.assertTrue(check == 0)
     return test_func
