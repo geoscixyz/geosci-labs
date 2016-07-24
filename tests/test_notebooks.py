@@ -7,6 +7,7 @@ import subprocess
 # notebook
 
 TestDir = os.path.abspath('../') # where are the notebooks?
+curDir = os.path.abspath('./')
 
 
 def setUp():
@@ -37,7 +38,7 @@ def get(nbname, nbpath):
         check = nbexe.returncode
         if check == 0:
             print '\n ..... {0} Passed ..... \n'.format(nbname)
-            subprocess.call(['rm', '{0}'.format(os.path.abspath('./') +
+            subprocess.call(['rm', '{0}'.format(curDir +
                                                 os.path.sep +
                                                 nbname + '.html')])
         else:
