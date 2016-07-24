@@ -7,7 +7,6 @@ import subprocess
 # notebook
 
 TestDir = os.path.abspath('../') # where are the notebooks?
-curDir = os.path.abspath('./')
 
 
 def setUp():
@@ -31,22 +30,28 @@ def get(nbname, nbpath):
         print '   {0}'.format(nbpath)
         nbexe = subprocess.Popen(['jupyter', 'nbconvert', '{0}'.format(nbpath),
                                   '--execute',
-                                  '--ExecutePreprocessor.timeout=60'],
+                                  '--ExecutePreprocessor.timeout=120'],
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
         output, err = nbexe.communicate()
         check = nbexe.returncode
         if check == 0:
             print '\n ..... {0} Passed ..... \n'.format(nbname)
-            subprocess.call(['rm', '{0}'.format(curDir +
-                                                os.path.sep +
-                                                nbname + '.html')])
         else:
             print '\n <<<<< {0} FAILED >>>>> \n'.format(nbname)
             print 'Captured Output: \n {0}'.format(err)
 
         self.assertTrue(check == 0)
+
     return test_func
+
+
+def tearDown():
+    subprocess.call(['find', '{0}'.format(TestDir + os.path.sep + 'tests'),
+                    '-type', 'f', '-name', '*.html', '-delete'])
+
+
+
 
 attrs = dict()
 nbpaths, nbnames = setUp()
@@ -58,5 +63,7 @@ for i, nb in enumerate(nbnames):
 # create class to unit test notebooks
 TestNotebooks = type('TestNotebooks', (unittest.TestCase,), attrs)
 
+
 if __name__ == '__main__':
     unittest.main()
+    tearDown()
