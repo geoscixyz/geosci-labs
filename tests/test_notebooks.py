@@ -32,14 +32,11 @@ def get(nbname, nbpath):
                                  '--execute'])
         if check == 0:
             print '\n ..... {0} Passed ..... \n'.format(nbname)
+            subprocess.call(['rm', '{0}'.format(os.path.abspath('./') +
+                                                os.path.sep +
+                                                nbname + '.html')])
         else:
             print '\n <<<<< {0} FAILED >>>>> \n'.format(nbname)
-
-        self.assertTrue(check == 0, ('{0} FAILED :( '.format(nbname)))
-
-        subprocess.call(['rm', '{0}'.format(os.path.abspath('./') +
-                                            os.path.sep +
-                                            nbname + '.html')])
 
     return test_func
 
