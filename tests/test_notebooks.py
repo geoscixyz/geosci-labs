@@ -30,6 +30,7 @@ def get(nbname, nbpath):
         print '   {0}'.format(nbpath)
         check = subprocess.call(['jupyter', 'nbconvert', '{0}'.format(nbpath),
                                  '--execute'])
+        print check
         if check == 0:
             print '\n ..... {0} Passed ..... \n'.format(nbname)
             subprocess.call(['rm', '{0}'.format(os.path.abspath('./') +
@@ -38,6 +39,7 @@ def get(nbname, nbpath):
         else:
             print '\n <<<<< {0} FAILED >>>>> \n'.format(nbname)
 
+        self.assertTrue(check == 0)
     return test_func
 
 attrs = dict()
