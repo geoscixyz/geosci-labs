@@ -6,15 +6,16 @@ import subprocess
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook
 
-TestDir = os.path.abspath('../') # where are the notebooks?
 
+TESTDIR = os.path.abspath(__file__)
+NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + ['notebooks/']) # where are the notebooks?
 
 def setUp():
     nbpaths = []  # list of notebooks, with file paths
     nbnames = []  # list of notebook names (for making the tests)
 
     # walk the test directory and find all notebooks
-    for dirname, dirnames, filenames in os.walk(TestDir):
+    for dirname, dirnames, filenames in os.walk(NBDIR):
         for filename in filenames:
             if filename.endswith('.ipynb') and not filename.endswith('-checkpoint.ipynb'):
                 nbpaths.append(os.path.abspath(dirname) + os.path.sep + filename) # get abspath of notebook
@@ -47,10 +48,8 @@ def get(nbname, nbpath):
 
 
 def tearDown():
-    subprocess.call(['find', '{0}'.format(TestDir + os.path.sep + 'tests'),
+    subprocess.call(['find', '{0}'.format(os.path.sep.join(TESTDIR.split(os.path.sep)[:-1])),
                     '-type', 'f', '-name', '*.html', '-delete'])
-
-
 
 
 attrs = dict()
