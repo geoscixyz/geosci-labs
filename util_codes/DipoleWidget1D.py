@@ -46,8 +46,8 @@ class DipoleWidget1D(object):
     fmin, fmax = -4.,8.
     ns = 81
     nf = 121
-    sigvec = 10.**np.linspace(sigmin,sigmax,ns)
-    fvec = 10.**np.linspace(fmin,fmax,nf)
+    sigvec = np.linspace(sigmin,sigmax,ns)
+    fvec = np.linspace(fmin,fmax,nf)
 
     def __init__(self):
         self.dataview = DataView()
@@ -88,22 +88,22 @@ class DipoleWidget1D(object):
             ax3 = ax2.twinx()
     
             if mode =="RI":
-                ax0 = self.dataview.plot1D_FD(component="real",view=view,abscisse="Conductivity",slic=10.**freqsl, logamp=True, ax=ax0, color = 'blue')
-                ax1 = self.dataview.plot1D_FD(component="imag",view=view,abscisse="Conductivity",slic=10.**freqsl, logamp=True, ax=ax1,legend=False, color = 'red')
+                ax0 = self.dataview.plot1D_FD(component="real",view=view,abscisse="Conductivity",slic=freqsl, logamp=True, ax=ax0, color = 'blue')
+                ax1 = self.dataview.plot1D_FD(component="imag",view=view,abscisse="Conductivity",slic=freqsl, logamp=True, ax=ax1,legend=False, color = 'red')
             
-                ax2 = self.dataview.plot1D_FD(component="real",view=view,abscisse="Frequency",slic=10.**sigsl, logamp=True, ax=ax2, color = 'blue')
-                ax3 = self.dataview.plot1D_FD(component="imag",view=view,abscisse="Frequency",slic=10.**sigsl, logamp=True, ax=ax3,legend=False, color = 'red')
+                ax2 = self.dataview.plot1D_FD(component="real",view=view,abscisse="Frequency",slic=sigsl, logamp=True, ax=ax2, color = 'blue')
+                ax3 = self.dataview.plot1D_FD(component="imag",view=view,abscisse="Frequency",slic=sigsl, logamp=True, ax=ax3,legend=False, color = 'red')
             
             elif mode =="AP":
-                ax0 = self.dataview.plot1D_FD(component="Amplitude",view=view,abscisse="Conductivity",slic=10.**freqsl, logamp=True, ax=ax0, color = 'blue')
-                ax1 = self.dataview.plot1D_FD(component="Phase",view=view,abscisse="Conductivity",slic=10.**freqsl, logamp=True, ax=ax1,legend=False, color = 'red')
+                ax0 = self.dataview.plot1D_FD(component="Amplitude",view=view,abscisse="Conductivity",slic=freqsl, logamp=True, ax=ax0, color = 'blue')
+                ax1 = self.dataview.plot1D_FD(component="Phase",view=view,abscisse="Conductivity",slic=freqsl, logamp=True, ax=ax1,legend=False, color = 'red')
              
-                ax2 = self.dataview.plot1D_FD(component="Amplitude",view=view,abscisse="Frequency",slic=10.**sigsl, logamp=True, ax=ax3, color = 'blue')
-                ax3 = self.dataview.plot1D_FD(component="Phase",view=view,abscisse="Frequency",slic=10.**sigsl, logamp=True, ax=ax3,legend=False, color = 'red')
+                ax2 = self.dataview.plot1D_FD(component="Amplitude",view=view,abscisse="Frequency",slic=sigsl, logamp=True, ax=ax3, color = 'blue')
+                ax3 = self.dataview.plot1D_FD(component="Phase",view=view,abscisse="Frequency",slic=sigsl, logamp=True, ax=ax3,legend=False, color = 'red')
             
             elif mode =="Phasor":
-                ax0 = self.dataview.plot1D_FD(component="PHASOR",view=view,abscisse="Conductivity",slic=10.**freqsl, logamp=True, ax=ax0, color = 'black')
-                ax2 = self.dataview.plot1D_FD(component="PHASOR",view=view,abscisse="Frequency",slic=10.**sigsl, logamp=True, ax=ax2, color = 'black')
+                ax0 = self.dataview.plot1D_FD(component="PHASOR",view=view,abscisse="Conductivity",slic=freqsl, logamp=True, ax=ax0, color = 'black')
+                ax2 = self.dataview.plot1D_FD(component="PHASOR",view=view,abscisse="Frequency",slic=sigsl, logamp=True, ax=ax2, color = 'black')
                 
             plt.tight_layout()
 
