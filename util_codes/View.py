@@ -81,18 +81,18 @@ class DataView(object):
             #for k in range(len(fvec)):
                 self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, 10.**log_sigvec[n], 10.**log_fvec, orientation=self.orientation)
 
-    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z"):
-        val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation)
+    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z",t=0.):
+        val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation, t=t)
         return val_x, val_y, val_z
 
 
-    def eval_2D(self, srcLoc, sig, f, orientation, func):
+    def eval_2D(self, srcLoc, sig, f, orientation, func,t=0.):
         self.func2D = func
         self.srcLoc = srcLoc
         self.sig = sig
         self.f = f
         self.orientation = orientation
-        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation)
+        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation, t=t)
         if self.normal =="X" or self.normal=="x":
             Freshape = lambda v: v.reshape(self.ncy, self.ncz)
         elif self.normal =="Y" or self.normal =="y":
@@ -395,7 +395,7 @@ class DataView(object):
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[:,slice_ind].min(),pltvalue.imag[:,slice_ind].max()
-                if legend:    
+                if legend:
                     ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
                         xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
@@ -408,7 +408,7 @@ class DataView(object):
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[slice_ind,:].min(),pltvalue.imag[slice_ind,:].max()
-                if legend:    
+                if legend:
                     ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                         xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
@@ -423,7 +423,7 @@ class DataView(object):
                 ax.plot(self.sigvec,pltvalue[:,slice_ind],color=color)
 
                 axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
-                if legend:    
+                if legend:
                     ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
                         xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
@@ -436,7 +436,7 @@ class DataView(object):
                 ax.plot(self.fvec,pltvalue[slice_ind,:],color=color)
 
                 axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
-                if legend:    
+                if legend:
                     ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                         xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',

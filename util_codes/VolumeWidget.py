@@ -19,11 +19,11 @@ class Arrow3D(FancyArrowPatch):
 
 def polyplane(verts, alpha=0.2, color="green"):
     poly = Poly3DCollection(verts)
-    poly.set_alpha(0.2)
+    poly.set_alpha(alpha)
     poly.set_facecolor(color)
     return poly
 
-def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300, X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, nRx=10, plane="XZ"):
+def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300, X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, nRx=10, plane="XZ", **kwargs):
     plt.rcParams.update({'font.size': 13})
     # define the survey area
     if fig is None:
@@ -96,6 +96,7 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
 
     plt.show()
     return ax
+
 
 def InteractivePlanes():
     def foo(Plane, Offset, nRx):

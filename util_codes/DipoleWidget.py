@@ -63,6 +63,14 @@ class DipoleWidget(object):
             self.func = EM.Analytics.H_from_ElectricDipoleWholeSpace
         elif self.functype == "J_from_ED":
             self.func = EM.Analytics.J_from_ElectricDipoleWholeSpace
+        elif self.functype == "E_from_MD":
+            self.func = EM.Analytics.E_from_MagneticDipoleWholeSpace
+        elif self.functype == "H_from_MD":
+            self.func = EM.Analytics.H_from_MagneticDipoleWholeSpace
+        elif self.functype == "J_from_MD":
+            self.func = EM.Analytics.J_from_MagneticDipoleWholeSpace
+        else:
+            raise NotImplementedError()
 
         self.dataview.eval_2D(srcLoc, sig, f, orientation, self.func) # evaluate
 
@@ -92,7 +100,6 @@ class DipoleWidget(object):
             raise NotImplementedError()
 
         self.SetDataview(srcLoc, sig, f, orientation, normal, functype, na=nx, nb=ny, loc=loc)
-        print sig, f
         plot1D = False
         plotTxProflie = False
         if normal =="X" or normal=="x":
@@ -259,7 +266,7 @@ class DipoleWidget(object):
         self.ymin, self.ymax = Y1, Y2
         self.zmin, self.zmax = Z1, Z2
 
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma, Offset, Scale, FreqLog, SigLog, Slider=False):
+        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma, Offset, Scale, Slider, FreqLog, SigLog):
             if Slider ==True:
                 f = np.r_[10**FreqLog]
                 sig = np.r_[10**SigLog]
@@ -299,12 +306,13 @@ class DipoleWidget(object):
         out = widgets.interactive (foo
                         ,Field=widgets.ToggleButtons(options=["E", "H", "J"]) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
-                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z') \
+                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
                         ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
-                        ,Frequency=widgets.FloatText(value=0., continuous_update=False) \
-                        ,Sigma=widgets.FloatText(value=0.01, continuous_update=False) \
+                        ,Frequency=widgets.FloatText(value=0., continuous_update=False, description='f (Hz)') \
+                        ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
                         ,Offset=widgets.FloatText(value = offset_plane, continuous_update=False) \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
+                        ,Slider=widgets.widget_bool.Checkbox(value=False)\
                         ,FreqLog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
                         ,SigLog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
                         )
@@ -343,13 +351,13 @@ def DisPosNegvalues(val):
     return temp_p, temp_n
 
 
-def InteractiveDipoleProfile(self,sig, Field, Scale):
+def InteractiveDipoleProfile(self, sig, Field, Scale):
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
     nRx = 100.
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
-    def foo(Component, ComplexNumber, Profile, Scale, Frequency, FixedScale=False):
+    def foo(Component, ComplexNumber, Profile, F1, F2, F3, Scale, FixedScale=False):
     #     Scale = "log"
         orientation = "z"
         vals = []
@@ -372,7 +380,7 @@ def InteractiveDipoleProfile(self,sig, Field, Scale):
             unit = " (rad)"
         labeli = headeri+Field+Component+")-field " + unit
 
-        # F = [F1, F2, F3]
+        F = [F1, F2, F3]
         if Component == "x":
             icomp = 0
         elif Component == "y":
@@ -405,43 +413,43 @@ def InteractiveDipoleProfile(self,sig, Field, Scale):
             ax2 = ax1.twiny()
 
 
-        # for ifreq, f in enumerate(F):
-        vals.append(self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[Frequency], orientation, self.dataview.func2D))
-        # for ifreq, f in enumerate(F):
-        ifreq = 0
-        if ComplexNumber == "ReIm":
-            valr = vals[ifreq][icomp].real.flatten()
-            vali = vals[ifreq][icomp].imag.flatten()
-        elif ComplexNumber == "AmpPhase":
-            valr = abs(vals[ifreq][icomp]).flatten()
-            vali = np.angle(vals[ifreq][icomp]).flatten()
+        for ifreq, f in enumerate(F):
+            Frequency = f
+            vals.append(self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[f], orientation, self.dataview.func2D))
+            # for ifreq, f in enumerate(F):
+            if ComplexNumber == "ReIm":
+                valr = vals[ifreq][icomp].real.flatten()
+                vali = vals[ifreq][icomp].imag.flatten()
+            elif ComplexNumber == "AmpPhase":
+                valr = abs(vals[ifreq][icomp]).flatten()
+                vali = np.angle(vals[ifreq][icomp]).flatten()
 
-        if Scale == "log":
-            valr_p, valr_n = DisPosNegvalues(valr)
-            vali_p, vali_n = DisPosNegvalues(vali)
-            if Profile == "Rxhole" or Profile == "Txhole" :
-                ax1.plot(valr_p, r, 'k-')
-                ax1.plot(valr_n, r, 'k--')
-                if Frequency > 0.:
-                    ax2.plot(vali_p, r, 'r-')
-                    ax2.plot(vali_n, r, 'r--')
-            elif Profile == "TxProfile":
-                ax1.plot(r, valr_p, 'k-')
-                ax1.plot(r, valr_n, 'k--')
-                if Frequency > 0.:
-                    ax2.plot(r, vali_p, 'r-')
-                    ax2.plot(r, vali_n, 'r--')
+            if Scale == "log":
+                valr_p, valr_n = DisPosNegvalues(valr)
+                vali_p, vali_n = DisPosNegvalues(vali)
+                if Profile == "Rxhole" or Profile == "Txhole" :
+                    ax1.plot(valr_p, r, 'k-')
+                    ax1.plot(valr_n, r, 'k--')
+                    if Frequency > 0.:
+                        ax2.plot(vali_p, r, 'r-')
+                        ax2.plot(vali_n, r, 'r--')
+                elif Profile == "TxProfile":
+                    ax1.plot(r, valr_p, 'k-')
+                    ax1.plot(r, valr_n, 'k--')
+                    if Frequency > 0.:
+                        ax2.plot(r, vali_p, 'r-')
+                        ax2.plot(r, vali_n, 'r--')
 
-        elif Scale == "linear":
-            if Profile == "Rxhole" or Profile == "Txhole" :
-                ax1.plot(valr, r, 'k-')
-                if Frequency > 0.:
-                    ax1.plot(vali, r, 'r-')
+            elif Scale == "linear":
+                if Profile == "Rxhole" or Profile == "Txhole" :
+                    ax1.plot(valr, r, 'k-')
+                    if Frequency > 0.:
+                        ax1.plot(vali, r, 'r-')
 
-            elif Profile == "TxProfile":
-                ax1.plot(r, valr, 'k-')
-                if Frequency > 0.:
-                    ax1.plot(r, vali, 'r-')
+                elif Profile == "TxProfile":
+                    ax1.plot(r, valr, 'k-')
+                    if Frequency > 0.:
+                        ax1.plot(r, vali, 'r-')
 
         if Profile == "Rxhole" or Profile == "Txhole" :
             ax1.set_xscale(Scale)
@@ -517,11 +525,12 @@ def InteractiveDipoleProfile(self,sig, Field, Scale):
         ax1.grid(True)
     Q2 = widgets.interactive (foo
                     ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole')
-                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z') \
+                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
                     ,ComplexNumber=widgets.ToggleButtons(options=['ReIm','AmpPhase']) \
-                    ,Sigma=widgets.FloatText(value=0.01, continuous_update=False) \
+                    ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear'], value=Scale) \
-                    ,Frequency=widgets.FloatText(value=0.1, continuous_update=False))
-                    # ,F2=widgets.FloatText(value=100, continuous_update=False)\
-                    # ,F3=widgets.FloatText(value=1000, continuous_update=False))
+                    ,FixedScale=widgets.widget_bool.Checkbox(value=False, description='Fixed')
+                    ,F1=widgets.FloatText(value=0.1, continuous_update=False, description='$f_1$ (Hz)')
+                    ,F2=widgets.FloatText(value=100, continuous_update=False, description='$f_2$ (Hz)')\
+                    ,F3=widgets.FloatText(value=1000, continuous_update=False, description='$f_3$ (Hz)'))
     return Q2
