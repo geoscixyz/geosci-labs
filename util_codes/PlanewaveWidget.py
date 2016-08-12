@@ -72,7 +72,7 @@ class PolarEllipse(object):
         ax.add_collection3d(polyb)
         ax.add_collection3d(polyc)
 
-        ax.set_zlim(-1.2, 1.2)
+        ax.set_zlim(1.2, -1.2)
         ax.set_ylim(-1.2, 1.2)
         ax.set_xlim(t.min(), t.max())
         ax.set_xlabel("Time (s)")

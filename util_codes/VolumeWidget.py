@@ -98,18 +98,18 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
     return ax
 
 
-def InteractivePlanes():
+def InteractivePlanes(planevalue="YZ", offsetvalue=50.):
     def foo(Plane, Offset, nRx):
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.
         return plotObj3D(offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=Plane)
     out = widgets.interactive (foo
-                    ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=50., continuous_update=False) \
+                    ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=offsetvalue, continuous_update=False) \
                     # ,X0=widgets.FloatText(value=-20) \
                     # ,Y0=widgets.FloatText(value=-50.) \
                     # ,Z0=widgets.FloatText(value=-50.) \
                     ,nRx=widgets.IntSlider(min=4,max=200,step=2,value=40, continuous_update=False)
-                    ,Plane=widgets.ToggleButtons(options=['XZ','YZ'], value="YZ") \
+                    ,Plane=widgets.ToggleButtons(options=['XZ','YZ'], value=planevalue) \
                     )
     return out
 

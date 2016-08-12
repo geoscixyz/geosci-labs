@@ -259,14 +259,16 @@ class DipoleWidget(object):
         plt.show()
         pass
 
-    def InteractiveDipoleBH(self, nRx=20, npts2D=50, scale="log", offset_plane=50., X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, plane="YZ"):
+    def InteractiveDipoleBH(self, nRx=20, npts2D=50, scale="log", offset_plane=50.,\
+                            X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, \
+                            plane="YZ", SrcType="ED", fieldvalue="E", compvalue="z"):
 
         # x1, x2, y1, y2 = offset_rx, offset_rx, Z1, Z2
         self.xmin, self.xmax = X1, X2
         self.ymin, self.ymax = Y1, Y2
         self.zmin, self.zmax = Z1, Z2
 
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma, Offset, Scale, Slider, FreqLog, SigLog):
+        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma, Offset, Scale, Slider, FreqLog, SigLog, SrcType=SrcType):
             if Slider ==True:
                 f = np.r_[10**FreqLog]
                 sig = np.r_[10**SigLog]
@@ -299,14 +301,17 @@ class DipoleWidget(object):
                 ComplexNumber = "real"
                 Component = "amp"
 
-            Field = Field+"_from_ED"
+            if SrcType == "ED":
+                Field = Field+"_from_ED"
+            elif SrcType == "MD":
+                Field = Field+"_from_MD"
 
             return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="z", component=ComplexNumber, view=Component, normal=normal, functype=Field, loc=Offset, scale=Scale)
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["E", "H", "J"]) \
+                        ,Field=widgets.ToggleButtons(options=["E", "H", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
-                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
+                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
                         ,Frequency=widgets.FloatText(value=0., continuous_update=False, description='f (Hz)') \
                         ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
@@ -315,6 +320,7 @@ class DipoleWidget(object):
                         ,Slider=widgets.widget_bool.Checkbox(value=False)\
                         ,FreqLog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
                         ,SigLog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
+                        ,SrcType = fixed(SrcType)
                         )
         return out
 
