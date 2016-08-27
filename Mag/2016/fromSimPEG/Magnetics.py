@@ -1,0 +1,253 @@
+from scipy.constants import mu_0
+import re
+import numpy as np
+from fromSimPEG import simpegCoordUtils as Utils
+
+
+def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
+
+    """
+
+    Magnetic forward operator in integral form
+
+    flag        = 'ind' | 'full'
+
+      1- ind : Magnetization fixed by user
+
+      3- full: Full tensor matrix stored with shape([3*ndata, 3*nc])
+
+    Return
+    _G = Linear forward modeling operation
+
+     """
+
+    yn2, xn2, zn2 = np.meshgrid(yn[1:], xn[1:], zn[1:])
+    yn1, xn1, zn1 = np.meshgrid(yn[0:-1], xn[0:-1], zn[0:-1])
+
+    Yn = np.c_[Utils.mkvc(yn1), Utils.mkvc(yn2)]
+    Xn = np.c_[Utils.mkvc(xn1), Utils.mkvc(xn2)]
+    Zn = np.c_[Utils.mkvc(zn1), Utils.mkvc(zn2)]
+
+    ndata = rxLoc.shape[0]
+
+    # Pre-allocate forward matrix
+    G = np.zeros((int(3*ndata), 3))
+
+    for ii in range(ndata):
+
+        tx, ty, tz = get_T_mat(Xn, Yn, Zn, rxLoc[ii, :])
+
+        G[ii, :] = tx
+        G[ii+ndata, :] = ty
+        G[ii+2*ndata, :] = tz
+
+    return G
+
+
+def get_T_mat(Xn, Yn, Zn, rxLoc):
+    """
+    Load in the active nodes of a tensor mesh and computes the magnetic tensor
+    for a given observation location rxLoc[obsx, obsy, obsz]
+
+    INPUT:
+    Xn, Yn, Zn: Node location matrix for the lower and upper most corners of
+                all cells in the mesh shape[nC,2]
+    M
+    OUTPUT:
+    Tx = [Txx Txy Txz]
+    Ty = [Tyx Tyy Tyz]
+    Tz = [Tzx Tzy Tzz]
+
+    where each elements have dimension 1-by-nC.
+    Only the upper half 5 elements have to be computed since symetric.
+    Currently done as for-loops but will eventually be changed to vector
+    indexing, once the topography has been figured out.
+
+    Created on Oct, 20th 2015
+
+    @author: dominiquef
+
+     """
+
+    eps = 1e-10  # add a small value to the locations to avoid /0
+
+    nC = Xn.shape[0]
+
+    # Pre-allocate space for 1D array
+    Tx = np.zeros((1, 3*nC))
+    Ty = np.zeros((1, 3*nC))
+    Tz = np.zeros((1, 3*nC))
+
+    dz2 = rxLoc[2] - Zn[:, 0] + eps
+    dz1 = rxLoc[2] - Zn[:, 1] + eps
+
+    dy2 = Yn[:, 1] - rxLoc[1] + eps
+    dy1 = Yn[:, 0] - rxLoc[1] + eps
+
+    dx2 = Xn[:, 1] - rxLoc[0] + eps
+    dx1 = Xn[:, 0] - rxLoc[0] + eps
+
+    R1 = (dy2**2 + dx2**2)
+    R2 = (dy2**2 + dx1**2)
+    R3 = (dy1**2 + dx2**2)
+    R4 = (dy1**2 + dx1**2)
+
+    arg1 = np.sqrt(dz2**2 + R2)
+    arg2 = np.sqrt(dz2**2 + R1)
+    arg3 = np.sqrt(dz1**2 + R1)
+    arg4 = np.sqrt(dz1**2 + R2)
+    arg5 = np.sqrt(dz2**2 + R3)
+    arg6 = np.sqrt(dz2**2 + R4)
+    arg7 = np.sqrt(dz1**2 + R4)
+    arg8 = np.sqrt(dz1**2 + R3)
+
+    Tx[0, 0:nC] = np.arctan2(dy1 * dz2, (dx2 * arg5)) +\
+        - np.arctan2(dy2 * dz2, (dx2 * arg2)) +\
+        np.arctan2(dy2 * dz1, (dx2 * arg3)) +\
+        - np.arctan2(dy1 * dz1, (dx2 * arg8)) +\
+        np.arctan2(dy2 * dz2, (dx1 * arg1)) +\
+        - np.arctan2(dy1 * dz2, (dx1 * arg6)) +\
+        np.arctan2(dy1 * dz1, (dx1 * arg7)) +\
+        - np.arctan2(dy2 * dz1, (dx1 * arg4))
+
+    Ty[0, 0:nC] = np.log((dz2 + arg2) / (dz1 + arg3)) +\
+        -np.log((dz2 + arg1) / (dz1 + arg4)) +\
+        np.log((dz2 + arg6) / (dz1 + arg7)) +\
+        -np.log((dz2 + arg5) / (dz1 + arg8))
+
+    Ty[0, nC:2*nC] = np.arctan2(dx1 * dz2, (dy2 * arg1)) +\
+        - np.arctan2(dx2 * dz2, (dy2 * arg2)) +\
+        np.arctan2(dx2 * dz1, (dy2 * arg3)) +\
+        - np.arctan2(dx1 * dz1, (dy2 * arg4)) +\
+        np.arctan2(dx2 * dz2, (dy1 * arg5)) +\
+        - np.arctan2(dx1 * dz2, (dy1 * arg6)) +\
+        np.arctan2(dx1 * dz1, (dy1 * arg7)) +\
+        - np.arctan2(dx2 * dz1, (dy1 * arg8))
+
+    R1 = (dy2**2 + dz1**2)
+    R2 = (dy2**2 + dz2**2)
+    R3 = (dy1**2 + dz1**2)
+    R4 = (dy1**2 + dz2**2)
+
+    Ty[0, 2*nC:] = np.log((dx1 + np.sqrt(dx1**2 + R1)) /
+                          (dx2 + np.sqrt(dx2**2 + R1))) +\
+        -np.log((dx1 + np.sqrt(dx1**2 + R2)) / (dx2 + np.sqrt(dx2**2 + R2))) +\
+        np.log((dx1 + np.sqrt(dx1**2 + R4)) / (dx2 + np.sqrt(dx2**2 + R4))) +\
+        -np.log((dx1 + np.sqrt(dx1**2 + R3)) / (dx2 + np.sqrt(dx2**2 + R3)))
+
+    R1 = (dx2**2 + dz1**2)
+    R2 = (dx2**2 + dz2**2)
+    R3 = (dx1**2 + dz1**2)
+    R4 = (dx1**2 + dz2**2)
+
+    Tx[0, 2*nC:] = np.log((dy1 + np.sqrt(dy1**2 + R1)) /
+                          (dy2 + np.sqrt(dy2**2 + R1))) +\
+        -np.log((dy1 + np.sqrt(dy1**2 + R2)) / (dy2 + np.sqrt(dy2**2 + R2))) +\
+        np.log((dy1 + np.sqrt(dy1**2 + R4)) / (dy2 + np.sqrt(dy2**2 + R4))) +\
+        -np.log((dy1 + np.sqrt(dy1**2 + R3)) / (dy2 + np.sqrt(dy2**2 + R3)))
+
+    Tz[0, 2*nC:] = -(Ty[0, nC:2*nC] + Tx[0, 0:nC])
+    Tz[0, nC:2*nC] = Ty[0, 2*nC:]
+    Tx[0, nC:2*nC] = Ty[0, 0:nC]
+    Tz[0, 0:nC] = Tx[0, 2*nC:]
+
+    Tx = Tx/(4*np.pi)
+    Ty = Ty/(4*np.pi)
+    Tz = Tz/(4*np.pi)
+
+    return Tx, Ty, Tz
+
+
+def dipazm_2_xyz(dip, azm_N):
+    """
+    dipazm_2_xyz(dip,azm_N)
+
+    Function converting degree angles for dip and azimuth from north to a
+    3-components in cartesian coordinates.
+
+    INPUT
+    dip     : Value or vector of dip from horizontal in DEGREE
+    azm_N   : Value or vector of azimuth from north in DEGREE
+
+    OUTPUT
+    M       : [n-by-3] Array of xyz components of a unit vector in cartesian
+
+    Created on Dec, 20th 2015
+
+    @author: dominiquef
+    """
+
+    M = np.zeros((1, 3))
+
+    # Modify azimuth from North to Cartesian-X
+    azm_X = (450. - np.asarray(azm_N)) % 360.
+
+    D = np.deg2rad(np.asarray(dip))
+    I = np.deg2rad(azm_X)
+
+    M[:, 0] = np.cos(D) * np.cos(I)
+    M[:, 1] = np.cos(D) * np.sin(I)
+    M[:, 2] = np.sin(D)
+
+    return M.T
+
+
+def plot_obs_2D(rxLoc, d=None, varstr='TMI Obs',
+                vmin=None, vmax=None, levels=None, fig=None):
+    """ Function plot_obs(rxLoc,d)
+    Generate a 2d interpolated plot from scatter points of data
+
+    INPUT
+    rxLoc       : Observation locations [x,y,z]
+    d           : Data vector
+
+    OUTPUT
+    figure()
+
+    Created on Dec, 27th 2015
+
+    @author: dominiquef
+
+    """
+
+    from scipy.interpolate import griddata
+    import pylab as plt
+
+    # Plot result
+    if fig is None:
+        fig = plt.figure()
+
+    ax = plt.subplot()
+    plt.scatter(rxLoc[:, 0], rxLoc[:, 1], c='k', s=10)
+
+    if d is not None:
+
+        if (vmin is None):
+            vmin = d.min()
+
+        if (vmax is None):
+            vmax = d.max()
+
+        # Create grid of points
+        x = np.linspace(rxLoc[:, 0].min(), rxLoc[:, 0].max(), 100)
+        y = np.linspace(rxLoc[:, 1].min(), rxLoc[:, 1].max(), 100)
+
+        X, Y = np.meshgrid(x, y)
+
+        # Interpolate
+        d_grid = griddata(rxLoc[:, 0:2], d, (X, Y), method='linear')
+
+        plt.imshow(d_grid, extent=[x.min(), x.max(), y.min(), y.max()],
+                   origin='lower', vmin=vmin, vmax=vmax, cmap="plasma")
+        plt.colorbar(fraction=0.02)
+
+        if levels is None:
+            plt.contour(X, Y, d_grid, 10, vmin=vmin, vmax=vmax, cmap="plasma")
+        else:
+            plt.contour(X, Y, d_grid, levels=levels, colors='r',
+                        vmin=vmin, vmax=vmax, cmap="plasma")
+
+    plt.title(varstr)
+    plt.gca().set_aspect('equal', adjustable='box')
+
+    return fig
