@@ -37,9 +37,9 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
         tx, ty, tz = get_T_mat(Xn, Yn, Zn, rxLoc[ii, :])
 
-        G[ii, :] = tx
-        G[ii+ndata, :] = ty
-        G[ii+2*ndata, :] = tz
+        G[ii, :] = tx / 1e-9 * mu_0
+        G[ii+ndata, :] = ty / 1e-9 * mu_0
+        G[ii+2*ndata, :] = tz / 1e-9 * mu_0
 
     return G
 
@@ -81,11 +81,11 @@ def get_T_mat(Xn, Yn, Zn, rxLoc):
     dz2 = rxLoc[2] - Zn[:, 0] + eps
     dz1 = rxLoc[2] - Zn[:, 1] + eps
 
-    dy2 = Yn[:, 1] - rxLoc[1] + eps
-    dy1 = Yn[:, 0] - rxLoc[1] + eps
+    dy2 = rxLoc[1] - Yn[:, 1]  + eps
+    dy1 = rxLoc[1] - Yn[:, 0] + eps
 
-    dx2 = Xn[:, 1] - rxLoc[0] + eps
-    dx1 = Xn[:, 0] - rxLoc[0] + eps
+    dx2 = rxLoc[0] - Xn[:, 1]  + eps
+    dx1 = rxLoc[0] - Xn[:, 0]  + eps
 
     R1 = (dy2**2 + dx2**2)
     R2 = (dy2**2 + dx1**2)
@@ -158,42 +158,8 @@ def get_T_mat(Xn, Yn, Zn, rxLoc):
     return Tx, Ty, Tz
 
 
-def dipazm_2_xyz(dip, azm_N):
-    """
-    dipazm_2_xyz(dip,azm_N)
-
-    Function converting degree angles for dip and azimuth from north to a
-    3-components in cartesian coordinates.
-
-    INPUT
-    dip     : Value or vector of dip from horizontal in DEGREE
-    azm_N   : Value or vector of azimuth from north in DEGREE
-
-    OUTPUT
-    M       : [n-by-3] Array of xyz components of a unit vector in cartesian
-
-    Created on Dec, 20th 2015
-
-    @author: dominiquef
-    """
-
-    M = np.zeros((1, 3))
-
-    # Modify azimuth from North to Cartesian-X
-    azm_X = (450. - np.asarray(azm_N)) % 360.
-
-    D = np.deg2rad(np.asarray(dip))
-    I = np.deg2rad(azm_X)
-
-    M[:, 0] = np.cos(D) * np.cos(I)
-    M[:, 1] = np.cos(D) * np.sin(I)
-    M[:, 2] = np.sin(D)
-
-    return M.T
-
-
 def plot_obs_2D(rxLoc, d=None, varstr='TMI Obs',
-                vmin=None, vmax=None, levels=None, fig=None):
+                vmin=None, vmax=None, levels=None, fig=None, axs=None):
     """ Function plot_obs(rxLoc,d)
     Generate a 2d interpolated plot from scatter points of data
 
@@ -217,7 +183,10 @@ def plot_obs_2D(rxLoc, d=None, varstr='TMI Obs',
     if fig is None:
         fig = plt.figure()
 
-    ax = plt.subplot()
+    if axs is None:
+        axs = plt.subplot()
+
+    plt.sca(axs)
     plt.scatter(rxLoc[:, 0], rxLoc[:, 1], c='k', s=10)
 
     if d is not None:

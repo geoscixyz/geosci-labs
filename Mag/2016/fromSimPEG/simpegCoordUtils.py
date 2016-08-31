@@ -110,3 +110,39 @@ def mkvc(x, numDims=1):
         return x.flatten(order='F')[:, np.newaxis]
     elif numDims == 3:
         return x.flatten(order='F')[:, np.newaxis, np.newaxis]
+
+
+def dipazm_2_xyz(dip, azm_N):
+    """
+    dipazm_2_xyz(dip,azm_N)
+
+    Function converting degree angles for dip and azimuth from north to a
+    3-components in cartesian coordinates.
+
+    INPUT
+    dip     : Value or vector of dip from horizontal in DEGREE
+    azm_N   : Value or vector of azimuth from north in DEGREE
+
+    OUTPUT
+    M       : [n-by-3] Array of xyz components of a unit vector in cartesian
+
+    Created on Dec, 20th 2015
+
+    @author: dominiquef
+    """
+
+    M = np.zeros((1, 3))
+
+    # Modify azimuth from North to Cartesian-X
+    azm_X = (450. - np.asarray(azm_N)) % 360.
+
+    # The inclination is a clockwise rotation
+    # around x-axis to honor the convention of positive down
+    I = -np.deg2rad(np.asarray(dip))
+    D = np.deg2rad(azm_X)
+
+    M[:, 0] = np.cos(I) * np.cos(D)
+    M[:, 1] = np.cos(I) * np.sin(D)
+    M[:, 2] = np.sin(I)
+
+    return M.T
