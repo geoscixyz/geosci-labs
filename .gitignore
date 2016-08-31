@@ -53,5 +53,4 @@ docs/_build/
 # PyBuilder
 target/
 *.ipynb_checkpoints
-seismic/.ipynb_checkpoints/SeismicApp-checkpoint.ipynb
-seismic/.ipynb_checkpoints/Synthetic seismogram-checkpoint.ipynb
+*/.ipynb_checkpoints/*
