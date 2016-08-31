@@ -1,0 +1,26 @@
+language: python
+python:
+  - 2.7
+sudo: false
+
+env:
+    - TEST_DIR="tests"
+
+# Setup anaconda
+before_install:
+  - pip install --upgrade pip;
+  - pip install -r requirements.txt
+
+install:
+  # - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets
+  - git clone https://github.com/simpeg/simpeg.git
+  - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
+  - export PATH=$PWD/simpeg:$PATH
+
+# Run test
+script:
+  - nosetests $TEST_DIR
+
+notifications:
+  email:
+    - lindseyheagy@gmail.com

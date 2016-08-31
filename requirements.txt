@@ -1,0 +1,6 @@
+numpy
+scipy
+matplotlib
+ipywidgets
+pandas
+git+git://github.com/simpeg/simpeg.git@dev
