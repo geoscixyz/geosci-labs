@@ -162,8 +162,14 @@ class problem(object):
 
         if getattr(self, '_G', None) is None:
             print "Computing G"
+
+            rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
+
+            rxLoc = Utils.rotatePointsFromNormals(self.survey.rxLoc, rot, np.r_[0., 1., 0.],
+                                                 np.r_[0, 0, 0])
+
             # Create the linear forward system
-            self._G = MAG.Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, self.survey.rxLoc)
+            self._G = MAG.Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, rxLoc)
 
         return self._G
 
@@ -402,12 +408,24 @@ def linefun(x1, x2, y1, y2, nx, tol=1e-3):
     return x, y
 
 
-def plogMagSurvey2D(problem, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec):
+def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec):
 
     import matplotlib.gridspec as gridspec
 
-    x, y = linefun(x1, x2, y1, y2, problem.survey.npts2D)
-    xyz_line = np.c_[x, y, np.ones_like(x)*problem.survey.rx_h]
+    # Create a prism
+    p = definePrism()
+    p.dx, p.dy, p.dz = Box.kwargs['dx'], Box.kwargs['dy'], Box.kwargs['dz']
+    p.z0, p.pinc, p.pdec = -Box.kwargs['depth'], Box.kwargs['pinc'], Box.kwargs['pdec']
+
+    srvy = survey()
+    srvy.rx_h, srvy.npts2D, srvy.xylim = Box.kwargs['rx_h'],Box.kwargs['npts2D'], Box.kwargs['xylim']
+    # Create problem
+    prob = problem()
+    prob.prism = p
+    prob.survey = srvy
+
+    x, y = linefun(x1, x2, y1, y2, prob.survey.npts2D)
+    xyz_line = np.c_[x, y, np.ones_like(x)*prob.survey.rx_h]
 
     fig = plt.figure(figsize=(18*1.5,3.4*1.5))
     plt.rcParams.update({'font.size': 14})
@@ -417,13 +435,13 @@ def plogMagSurvey2D(problem, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,
     ax2 = plt.subplot(gs1[0, 4:])
     ax1.axis("equal")
 
-    problem.Bdec, problem.Binc, problem.Bigrf = Einc, Edec, Bigrf
-    problem.Q, problem.rinc, problem.rdec = Q, rinc, rdec
-    problem.uType, problem.mType = comp, 'total'
-    problem.susc = susc
+    prob.Bdec, prob.Binc, prob.Bigrf = Edec, Einc, Bigrf
+    prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
+    prob.uType, prob.mType = comp, 'total'
+    prob.susc = susc
 
     # Compute fields from prism
-    b_ind, b_rem = problem.fields()
+    b_ind, b_rem = prob.fields()
 
     if irt == 'total':
         out = b_ind + b_rem
@@ -434,9 +452,9 @@ def plogMagSurvey2D(problem, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,
     else:
         out = b_rem
 
-    X, Y = np.meshgrid(problem.survey.xr, problem.survey.yr)
+    X, Y = np.meshgrid(prob.survey.xr, prob.survey.yr)
 
-    dat = ax1.contourf(X,Y, np.reshape(out, (X.shape)).T, 100)
+    dat = ax1.contourf(X,Y, np.reshape(out, (X.shape)).T, 25)
     cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
     ax1.plot(x,y, 'w.', ms=3)
@@ -488,14 +506,15 @@ def fitlineRem():
     return Q
 
 
-def ViewMagSurvey2DInd(problem):
+def ViewMagSurvey2DInd(Box):
+
 
     def MagSurvey2DInd(susc, Einc, Edec, Bigrf, comp, irt, Q, rinc, rdec):
 
         # hardwire the survey line for now
         x1, x2, y1, y2 = -10., 10, 0., 0.
 
-        return plogMagSurvey2D(problem, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
+        return plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
 
     out = widgets.interactive (MagSurvey2DInd 
                     ,susc=widgets.FloatSlider(min=0,max=200,step=0.1,value=0.1,continuous_update=False) \
@@ -522,7 +541,7 @@ def Prism(dx, dy, dz, depth, pinc, pdec, npts2D, xylim, rx_h, View_elev, View_az
 
 def ViewPrism(dx, dy, dz, depth):
     elev, azim = 20, 250
-    npts2D, xylim = 10, 5.
+    npts2D, xylim = 20, 5.
     Q = widgets.interactive(Prism \
                             , dx=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dx, continuous_update=False) \
                             , dy=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dy, continuous_update=False) \
