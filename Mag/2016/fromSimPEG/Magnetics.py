@@ -4,6 +4,142 @@ import numpy as np
 from fromSimPEG import simpegCoordUtils as Utils
 
 
+class survey(object):
+
+    rx_h = 1.9
+    npts2D = 20
+    xylim = 5.
+    rxLoc = None
+
+    @property
+    def rxLoc(self):
+        if getattr(self, '_rxLoc', None) is None:
+            # Create survey locations
+            X, Y = np.meshgrid(self.xr, self.yr)
+            Z = np.ones(np.shape(X))*self.rx_h
+
+            self._rxLoc = np.c_[Utils.mkvc(X), Utils.mkvc(Y), Utils.mkvc(Z)]
+
+        return self._rxLoc
+
+    @property
+    def xr(self):
+        nx = self.npts2D
+        self._xr = np.linspace(-self.xylim, self.xylim, nx)
+
+        return self._xr
+
+    @property
+    def yr(self):
+        ny = self.npts2D
+        self._yr = np.linspace(-self.xylim, self.xylim, ny)
+
+        return self._yr
+
+
+class problem(object):
+    """
+            Earth's field:
+            - Binc, Bdec : inclination and declination of Earth's mag field
+            - Bigrf : amplitude of earth's field in units of nT
+
+        Remnance:
+            - Q : Koenigsberger ratio
+            - Rinc, Rdec : inclination and declination of remnance in block
+
+    """
+    Bdec, Binc, Bigrf = 90., 0., 50000.
+    Q, rinc, rdec = 0., 0., 0.
+    uType, mType = 'tf', 'induced'
+    susc = 1.
+    prism = None
+    survey = None
+
+    @property
+    def Mind(self):
+        # Define magnetization direction as sum of induced and remanence
+        Mind = self.susc*self.Higrf*Utils.dipazm_2_xyz(self.Binc - self.prism.pinc,
+                                                       self.Bdec - self.prism.pdec)
+
+        return Mind
+
+    @property
+    def Mrem(self):
+        Mrem = self.Q*self.susc*self.Higrf * \
+               Utils.dipazm_2_xyz(self.rinc - self.prism.pinc, self.rdec - self.prism.pdec)
+
+        return Mrem
+
+    @property
+    def Higrf(self):
+        Higrf = self.Bigrf * 1e-9 / mu_0
+
+        return Higrf
+
+    @property
+    def G(self):
+
+        if getattr(self, '_G', None) is None:
+            print "Computing G"
+
+            rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
+
+            rxLoc = Utils.rotatePointsFromNormals(self.survey.rxLoc, rot, np.r_[0., 1., 0.],
+                                                 np.r_[0, 0, 0])
+
+            # Create the linear forward system
+            self._G = Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, rxLoc)
+
+        return self._G
+
+    def fields(self):
+
+        if (self.mType == 'induced') or (self.mType == 'total'):
+
+            b = self.G.dot(self.Mind)
+            self.fieldi = self.extractFields(b)
+
+        if (self.mType == 'remanent') or (self.mType == 'total'):
+
+            b = self.G.dot(self.Mrem)
+
+            self.fieldr = self.extractFields(b)
+
+        if self.mType == 'induced':
+            return self.fieldi
+        elif self.mType == 'remanent':
+            return self.fieldr
+        elif self.mType == 'total':
+            return self.fieldi, self.fieldr
+
+    def extractFields(self, bvec):
+
+        nD = bvec.shape[0]/3
+        bvec = np.reshape(bvec, (3, nD))
+
+        rot = Utils.mkvc(Utils.dipazm_2_xyz(-self.prism.pinc, -self.prism.pdec))
+
+        bvec = Utils.rotatePointsFromNormals(bvec.T, rot, np.r_[0., 1., 0.],
+                                             np.r_[0, 0, 0]).T
+
+        if self.uType == 'bx':
+            u = Utils.mkvc(bvec[0, :])
+
+        if self.uType == 'by':
+            u = Utils.mkvc(bvec[1, :])
+
+        if self.uType == 'bz':
+            u = Utils.mkvc(bvec[2, :])
+
+        if self.uType == 'tf':
+            # Projection matrix
+            Ptmi = Utils.dipazm_2_xyz(self.Binc, self.Bdec).T
+
+            u = Utils.mkvc(Ptmi.dot(bvec))
+
+        return u
+
+
 def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
     """
@@ -220,3 +356,4 @@ def plot_obs_2D(rxLoc, d=None, varstr='TMI Obs',
     plt.gca().set_aspect('equal', adjustable='box')
 
     return fig
+

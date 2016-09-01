@@ -85,141 +85,6 @@ class definePrism(object):
         return zc
 
 
-class survey(object):
-
-    rx_h = 1.9
-    npts2D = 20
-    xylim = 5.
-    rxLoc = None
-
-    @property
-    def rxLoc(self):
-        if getattr(self, '_rxLoc', None) is None:
-            # Create survey locations
-            X, Y = np.meshgrid(self.xr, self.yr)
-            Z = np.ones(np.shape(X))*self.rx_h
-
-            self._rxLoc = np.c_[Utils.mkvc(X), Utils.mkvc(Y), Utils.mkvc(Z)]
-
-        return self._rxLoc
-
-    @property
-    def xr(self):
-        nx = self.npts2D
-        self._xr = np.linspace(-self.xylim, self.xylim, nx)
-
-        return self._xr
-
-    @property
-    def yr(self):
-        ny = self.npts2D
-        self._yr = np.linspace(-self.xylim, self.xylim, ny)
-
-        return self._yr
-
-
-class problem(object):
-    """
-            Earth's field:
-            - Binc, Bdec : inclination and declination of Earth's mag field
-            - Bigrf : amplitude of earth's field in units of nT
-
-        Remnance:
-            - Q : Koenigsberger ratio
-            - Rinc, Rdec : inclination and declination of remnance in block
-
-    """
-    Bdec, Binc, Bigrf = 90., 0., 50000.
-    Q, rinc, rdec = 0., 0., 0.
-    uType, mType = 'tf', 'induced'
-    susc = 1.
-    prism = None
-    survey = None
-
-    @property
-    def Mind(self):
-        # Define magnetization direction as sum of induced and remanence
-        Mind = self.susc*self.Higrf*Utils.dipazm_2_xyz(self.Binc - self.prism.pinc,
-                                                       self.Bdec - self.prism.pdec)
-
-        return Mind
-
-    @property
-    def Mrem(self):
-        Mrem = self.Q*self.susc*self.Higrf * \
-               Utils.dipazm_2_xyz(self.rinc - self.prism.pinc, self.rdec - self.prism.pdec)
-
-        return Mrem
-
-    @property
-    def Higrf(self):
-        Higrf = self.Bigrf * 1e-9 / mu_0
-
-        return Higrf
-
-    @property
-    def G(self):
-
-        if getattr(self, '_G', None) is None:
-            print "Computing G"
-
-            rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
-
-            rxLoc = Utils.rotatePointsFromNormals(self.survey.rxLoc, rot, np.r_[0., 1., 0.],
-                                                 np.r_[0, 0, 0])
-
-            # Create the linear forward system
-            self._G = MAG.Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, rxLoc)
-
-        return self._G
-
-    def fields(self):
-
-        if (self.mType == 'induced') or (self.mType == 'total'):
-
-            b = self.G.dot(self.Mind)
-            self.fieldi = self.extractFields(b)
-
-        if (self.mType == 'remanent') or (self.mType == 'total'):
-
-            b = self.G.dot(self.Mrem)
-
-            self.fieldr = self.extractFields(b)
-
-        if self.mType == 'induced':
-            return self.fieldi
-        elif self.mType == 'remanent':
-            return self.fieldr
-        elif self.mType == 'total':
-            return self.fieldi, self.fieldr
-
-    def extractFields(self, bvec):
-
-        nD = bvec.shape[0]/3
-        bvec = np.reshape(bvec, (3, nD))
-
-        rot = Utils.mkvc(Utils.dipazm_2_xyz(-self.prism.pinc, -self.prism.pdec))
-
-        bvec = Utils.rotatePointsFromNormals(bvec.T, rot, np.r_[0., 1., 0.],
-                                             np.r_[0, 0, 0]).T
-
-        if self.uType == 'bx':
-            u = Utils.mkvc(bvec[0, :])
-
-        if self.uType == 'by':
-            u = Utils.mkvc(bvec[1, :])
-
-        if self.uType == 'bz':
-            u = Utils.mkvc(bvec[2, :])
-
-        if self.uType == 'tf':
-            # Projection matrix
-            Ptmi = Utils.dipazm_2_xyz(self.Binc, self.Bdec).T
-
-            u = Utils.mkvc(Ptmi.dot(bvec))
-
-        return u
-
 def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
     if data is 'MonSt':
         filename = "data2015/StudentData2015_Monday.csv"
@@ -412,20 +277,8 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
 
     import matplotlib.gridspec as gridspec
 
-    # Create a prism
-    p = definePrism()
-    p.dx, p.dy, p.dz = Box.kwargs['dx'], Box.kwargs['dy'], Box.kwargs['dz']
-    p.z0, p.pinc, p.pdec = -Box.kwargs['depth'], Box.kwargs['pinc'], Box.kwargs['pdec']
-
-    srvy = survey()
-    srvy.rx_h, srvy.npts2D, srvy.xylim = Box.kwargs['rx_h'],Box.kwargs['npts2D'], Box.kwargs['xylim']
-    # Create problem
-    prob = problem()
-    prob.prism = p
-    prob.survey = srvy
-
-    x, y = linefun(x1, x2, y1, y2, prob.survey.npts2D)
-    xyz_line = np.c_[x, y, np.ones_like(x)*prob.survey.rx_h]
+    # The MAG problem created is stored in result[1]
+    prob2D = Box.result[1]
 
     fig = plt.figure(figsize=(18*1.5,3.4*1.5))
     plt.rcParams.update({'font.size': 14})
@@ -435,13 +288,13 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
     ax2 = plt.subplot(gs1[0, 4:])
     ax1.axis("equal")
 
-    prob.Bdec, prob.Binc, prob.Bigrf = Edec, Einc, Bigrf
-    prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
-    prob.uType, prob.mType = comp, 'total'
-    prob.susc = susc
+    prob2D.Bdec, prob2D.Binc, prob2D.Bigrf = Edec, Einc, Bigrf
+    prob2D.Q, prob2D.rinc, prob2D.rdec = Q, rinc, rdec
+    prob2D.uType, prob2D.mType = comp, 'total'
+    prob2D.susc = susc
 
     # Compute fields from prism
-    b_ind, b_rem = prob.fields()
+    b_ind, b_rem = prob2D.fields()
 
     if irt == 'total':
         out = b_ind + b_rem
@@ -452,15 +305,46 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
     else:
         out = b_rem
 
-    X, Y = np.meshgrid(prob.survey.xr, prob.survey.yr)
+    X, Y = np.meshgrid(prob2D.survey.xr, prob2D.survey.yr)
 
     dat = ax1.contourf(X,Y, np.reshape(out, (X.shape)).T, 25)
     cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
+
+
+    # Compute fields on the line by creating a similar mag problem
+    x, y = linefun(x1, x2, y1, y2, prob2D.survey.npts2D)
+    xyz_line = np.c_[x, y, np.ones_like(x)*prob2D.survey.rx_h]
+    # Create problem
+    prob1D = MAG.problem()
+    srvy1D = MAG.survey()
+    srvy1D._rxLoc = xyz_line
+
+    prob1D.prism = prob2D.prism
+    prob1D.survey = srvy1D
+
+    prob1D.Bdec, prob1D.Binc, prob1D.Bigrf = Edec, Einc, Bigrf
+    prob1D.Q, prob1D.rinc, prob1D.rdec = Q, rinc, rdec
+    prob1D.uType, prob1D.mType = comp, 'total'
+    prob1D.susc = susc
+
+    # Compute fields from prism
+    out_linei, out_liner = prob1D.fields()
+
+    #out_linei, out_liner = getField(p, xyz_line, comp, 'total')
+    #out_linei = getField(p, xyz_line, comp,'induced')
+    #out_liner = getField(p, xyz_line, comp,'remanent')
+
+    out_linet = out_linei+out_liner
+
+    distance = np.sqrt((x-x1)**2.+(y-y1)**2.)
+
+
     ax1.plot(x,y, 'w.', ms=3)
 
-    ax1.text(x[0], y[0], 'A', fontsize = 16, color='w')
-    ax1.text(x[-1], y[-1], 'B', fontsize = 16, color='w')
+    ax1.text(x[0], y[0], 'A', fontsize=16, color='w')
+    ax1.text(x[-1], y[-1], 'B', fontsize=16,
+             color='w', horizontalalignment='right')
 
     ax1.set_xlabel('Easting (X; m)')
     ax1.set_ylabel('Northing (Y; m)')
@@ -468,27 +352,19 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
     ax1.set_ylim(Y.min(), Y.max())
     ax1.set_title(irt+' '+comp)
 
-    # Compute fields on the line
-    #out_linei, out_liner = getField(p, xyz_line, comp, 'total')
-    #out_linei = getField(p, xyz_line, comp,'induced')
-    #out_liner = getField(p, xyz_line, comp,'remanent')
+    ax2.plot(distance, out_linei, 'b.-')
+    ax2.plot(distance, out_liner, 'r.-')
+    ax2.plot(distance, out_linet, 'k.-')
+    ax2.set_xlim(distance.min(), distance.max())
 
-    #out_linet = out_linei+out_liner
+    ax2.set_xlabel("Distance (m)")
+    ax2.set_ylabel("Magnetic field (nT)")
 
-    # distance = np.sqrt((x-x1)**2.+(y-y1)**2.)
-    # ax2.plot(distance, out_linei, 'b.-')
-    # ax2.plot(distance, out_liner, 'r.-')
-    # ax2.plot(distance, out_linet, 'k.-')
-    # ax2.set_xlim(distance.min(), distance.max())
-
-    # ax2.set_xlabel("Distance (m)")
-    # ax2.set_ylabel("Magnetic field (nT)")
-
-    # ax2.text(distance.min(), out_linei.max()*0.8, 'A', fontsize = 16)
-    # ax2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
-    # ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
-    # ax2.grid(True)
-    # plt.show()
+    ax2.text(distance.min(), out_linei.max()*0.8, 'A', fontsize = 16)
+    ax2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
+    ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
+    ax2.grid(True)
+    plt.show()
 
     return True
 
@@ -511,8 +387,9 @@ def ViewMagSurvey2DInd(Box):
 
     def MagSurvey2DInd(susc, Einc, Edec, Bigrf, comp, irt, Q, rinc, rdec):
 
-        # hardwire the survey line for now
-        x1, x2, y1, y2 = -10., 10, 0., 0.
+        # Get the line extent from the 2D survey for now
+        prob = Box.result[1]
+        x1, x2, y1, y2 = -prob.survey.xylim, prob.survey.xylim, 0., 0.
 
         return plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
 
@@ -536,12 +413,20 @@ def Prism(dx, dy, dz, depth, pinc, pdec, npts2D, xylim, rx_h, View_elev, View_az
     p = definePrism()
     p.dx, p.dy, p.dz, p.z0 = dx, dy, dz, -depth
     p.pinc, p.pdec = pinc, pdec
-    return plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X")
 
+    srvy = MAG.survey()
+    srvy.rx_h, srvy.npts2D, srvy.xylim = rx_h, npts2D, xylim
+
+    # Create problem
+    prob = MAG.problem()
+    prob.prism = p
+    prob.survey = srvy
+
+    return plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X"), prob
 
 def ViewPrism(dx, dy, dz, depth):
     elev, azim = 20, 250
-    npts2D, xylim = 20, 5.
+    npts2D, xylim = 20, 3.
     Q = widgets.interactive(Prism \
                             , dx=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dx, continuous_update=False) \
                             , dy=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dy, continuous_update=False) \
@@ -556,6 +441,7 @@ def ViewPrism(dx, dy, dz, depth):
                             , View_azim=widgets.FloatSlider(min=0, max=360, step=5, value=azim, continuous_update=False))
 
     return Q
+
 
 # def PrismSurvey(dx, dy, dz, depth, pinc, pdec):
 #     elev, azim = 20, 250
