@@ -85,88 +85,88 @@ class definePrism(object):
         return zc
 
 
-def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
-    if data is 'MonSt':
-        filename = "data2015/StudentData2015_Monday.csv"
-    elif data is 'WedSt':
-        filename = "data2015/StudentData2015_Wednesday.csv"
-    elif data is 'WedTA':
-        filename = "data2015/TAData2015_Wednesday.csv"
+# def profiledataRem(data, B0, x0, depth, susc, Q, rinc, rdec):
+#     if data is 'MonSt':
+#         filename = "data2015/StudentData2015_Monday.csv"
+#     elif data is 'WedSt':
+#         filename = "data2015/StudentData2015_Wednesday.csv"
+#     elif data is 'WedTA':
+#         filename = "data2015/TAData2015_Wednesday.csv"
 
-    dat = pd.DataFrame(pd.read_csv(filename, header = 0))
-    tf  = dat["Corrected Total Field Data (nT)"].values
-    std = dat["Standard Deviation (nT)"].values
-    loc = dat["Location (m)"].values
-    teams = dat["Team"].values
+#     dat = pd.DataFrame(pd.read_csv(filename, header = 0))
+#     tf  = dat["Corrected Total Field Data (nT)"].values
+#     std = dat["Standard Deviation (nT)"].values
+#     loc = dat["Location (m)"].values
+#     teams = dat["Team"].values
 
-    tfa = tf - B0
+#     tfa = tf - B0
 
-    # p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
-    p = definePrism()
-    p.x0, p.y0, p.z0, p.dx, p.dy, p.dz = x0, 0., -depth, length, diameter, diameter
-    p.susc,  p.pinc, p.pdec = susc, 0., 0.
-    p.Binc, p.Bdec, p.Bigrf = Bincd, Bdecd, Bigrfd
-    p.Q, p.rinc, p.rdec = Q, rinc, rdec
+#     # p = definePrism(length, diameter, diameter, depth, pinc=0., pdec=90., susc = susc, Einc=Eincd, Edec=Edecd, Bigrf=Bigrfd, x0=x0, Q=Q, rinc = rinc, rdec = rdec)
+#     p = definePrism()
+#     p.x0, p.y0, p.z0, p.dx, p.dy, p.dz = x0, 0., -depth, length, diameter, diameter
+#     p.susc,  p.pinc, p.pdec = susc, 0., 0.
+#     p.Binc, p.Bdec, p.Bigrf = Bincd, Bdecd, Bigrfd
+#     p.Q, p.rinc, p.rdec = Q, rinc, rdec
 
-    nx, ny = 100, 1
-    shape = (nx, ny)
-    xLoc = np.linspace(xlim[0], xlim[1], nx)
+#     nx, ny = 100, 1
+#     shape = (nx, ny)
+#     xLoc = np.linspace(xlim[0], xlim[1], nx)
 
-    zLoc = np.ones(np.shape(xLoc))*rx_h
-    yLoc = np.zeros(np.shape(xLoc))
+#     zLoc = np.ones(np.shape(xLoc))*rx_h
+#     yLoc = np.zeros(np.shape(xLoc))
 
-    #xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
-    rxLoc = np.c_[Utils.mkvc(xLoc), Utils.mkvc(yLoc), Utils.mkvc(zLoc)]
+#     #xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
+#     rxLoc = np.c_[Utils.mkvc(xLoc), Utils.mkvc(yLoc), Utils.mkvc(zLoc)]
 
-    f = plt.figure(figsize = (10, 5))
-    gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
+#     f = plt.figure(figsize = (10, 5))
+#     gs = gridspec.GridSpec(2, 1,height_ratios=[2,1])
 
-    ax0 = plt.subplot(gs[0])
-    ax1 = plt.subplot(gs[1])
+#     ax0 = plt.subplot(gs[0])
+#     ax1 = plt.subplot(gs[1])
 
-    ax1.plot(x0, depth, 'ko')
-    ax1.text(x0+0.5, depth, 'Rebar', color='k')
-    ax1.text(xlim[0]+1.,-1.2, 'Magnetometer height (1.9 m)', color='b')
-    ax1.plot(xlim, np.r_[-rx_h, -rx_h], 'b--')
+#     ax1.plot(x0, depth, 'ko')
+#     ax1.text(x0+0.5, depth, 'Rebar', color='k')
+#     ax1.text(xlim[0]+1.,-1.2, 'Magnetometer height (1.9 m)', color='b')
+#     ax1.plot(xlim, np.r_[-rx_h, -rx_h], 'b--')
 
-    magi,magr = getField(p, rxLoc, 'bz', 'total')
+#     magi,magr = getField(p, rxLoc, 'bz', 'total')
 
-    ax1.plot(xlim, np.r_[0., 0.], 'k--')
-    ax1.set_xlim(xlim)
-    ax1.set_ylim(-2.5, 2.5)
+#     ax1.plot(xlim, np.r_[0., 0.], 'k--')
+#     ax1.set_xlim(xlim)
+#     ax1.set_ylim(-2.5, 2.5)
 
-    ax0.scatter(loc,tfa,c=teams)
-    ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
-    ax0.set_xlim(xlim)
-    ax0.grid(which="both")
+#     ax0.scatter(loc,tfa,c=teams)
+#     ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
+#     ax0.set_xlim(xlim)
+#     ax0.grid(which="both")
 
-    ax0.plot(xLoc, magi, 'b', label='induced')
-    ax0.plot(xLoc, magr, 'r', label='remnant')
-    ax0.plot(xLoc, magi+magr, 'k', label='total')
-    ax0.legend(loc=2)
-    # ax[1].plot(loc-8, magnT[::-1], )
+#     ax0.plot(xLoc, magi, 'b', label='induced')
+#     ax0.plot(xLoc, magr, 'r', label='remnant')
+#     ax0.plot(xLoc, magi+magr, 'k', label='total')
+#     ax0.legend(loc=2)
+#     # ax[1].plot(loc-8, magnT[::-1], )
 
-    ax1.set_xlabel("Northing (m)")
-    ax1.set_ylabel("Depth (m)")
+#     ax1.set_xlabel("Northing (m)")
+#     ax1.set_ylabel("Depth (m)")
 
-    ax0.set_ylabel("Total field anomaly (nT)")
+#     ax0.set_ylabel("Total field anomaly (nT)")
 
-    ax0.grid(True)
-    ax0.set_xlabel("Northing (m)")
+#     ax0.grid(True)
+#     ax0.set_xlabel("Northing (m)")
 
-    ax1.grid(True)
-    ax1.set_xlabel("Northing (m)")
+#     ax1.grid(True)
+#     ax1.set_xlabel("Northing (m)")
 
-    ax1.invert_yaxis()
+#     ax1.invert_yaxis()
 
-    plt.tight_layout()
-    plt.show()
+#     plt.tight_layout()
+#     plt.show()
 
-    return True
+#     return True
 
 
 def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
-              profile=None, x0=15., y0=0.):
+              profile=None, x0=15., y0=0., fig=None, axs=None, plotSurvey=True):
 
     # define the survey area
     surveyArea = (-xylim, xylim, -xylim, xylim)
@@ -185,14 +185,17 @@ def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
     z1, z2 = p.zn[0], p.zn[1]
     pinc, pdec = p.pinc, p.pdec
 
-    fig = plt.figure(figsize=(7, 7))
-    ax = fig.add_subplot(111, projection='3d')
+    if fig is None:
+        fig = plt.figure(figsize=(7, 7))
+
+    if axs is None:
+        axs = fig.add_subplot(111, projection='3d')
     plt.rcParams.update({'font.size': 13})
 
-    ax.set_xlim3d(surveyArea[:2])
-    ax.set_ylim3d(surveyArea[2:])
-#     ax.set_zlim3d(depth+np.array(surveyArea[:2]))
-    ax.set_zlim3d(-surveyArea[-1]*1.5, 3)
+    axs.set_xlim3d(surveyArea[:2])
+    axs.set_ylim3d(surveyArea[2:])
+#     axs.set_zlim3d(depth+np.array(surveyArea[:2]))
+    axs.set_zlim3d(-surveyArea[-1]*1.5, 3)
 
     # Create a rectangular prism, rotate and plot
     block_xyz = np.asarray([[x1, x1, x2, x2, x1, x1, x2, x2],
@@ -201,56 +204,57 @@ def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
 
     rot = Utils.mkvc(Utils.dipazm_2_xyz(pinc, pdec))
 
-    xyz = Utils.rotatePointsFromNormals(block_xyz.T, rot, np.r_[0., 1., 0.],
+    xyz = Utils.rotatePointsFromNormals(block_xyz.T, np.r_[0., 1., 0.], rot,
                                         np.r_[p.xc, p.yc, p.zc])
 
     # Face 1
-    ax.add_collection3d(Poly3DCollection([zip(xyz[:4, 0],
-                                              xyz[:4, 1],
-                                              xyz[:4, 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[:4, 0],
+                                               xyz[:4, 1],
+                                               xyz[:4, 2])], facecolors='w'))
 
     # Face 2
-    ax.add_collection3d(Poly3DCollection([zip(xyz[4:, 0],
-                                              xyz[4:, 1],
-                                              xyz[4:, 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[4:, 0],
+                                               xyz[4:, 1],
+                                               xyz[4:, 2])], facecolors='w'))
 
     # Face 3
-    ax.add_collection3d(Poly3DCollection([zip(xyz[[0, 1, 5, 4], 0],
-                                              xyz[[0, 1, 5, 4], 1],
-                                              xyz[[0, 1, 5, 4], 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[[0, 1, 5, 4], 0],
+                                               xyz[[0, 1, 5, 4], 1],
+                                               xyz[[0, 1, 5, 4], 2])], facecolors='w'))
 
     # Face 4
-    ax.add_collection3d(Poly3DCollection([zip(xyz[[3, 2, 6, 7], 0],
-                                              xyz[[3, 2, 6, 7], 1],
-                                              xyz[[3, 2, 6, 7], 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[[3, 2, 6, 7], 0],
+                                               xyz[[3, 2, 6, 7], 1],
+                                               xyz[[3, 2, 6, 7], 2])], facecolors='w'))
 
     # Face 5
-    ax.add_collection3d(Poly3DCollection([zip(xyz[[0, 4, 7, 3], 0],
-                                              xyz[[0, 4, 7, 3], 1],
-                                              xyz[[0, 4, 7, 3], 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[[0, 4, 7, 3], 0],
+                                               xyz[[0, 4, 7, 3], 1],
+                                               xyz[[0, 4, 7, 3], 2])], facecolors='b'))
 
     # Face 6
-    ax.add_collection3d(Poly3DCollection([zip(xyz[[1, 5, 6, 2], 0],
-                                              xyz[[1, 5, 6, 2], 1],
-                                              xyz[[1, 5, 6, 2], 2])]))
+    axs.add_collection3d(Poly3DCollection([zip(xyz[[1, 5, 6, 2], 0],
+                                               xyz[[1, 5, 6, 2], 1],
+                                               xyz[[1, 5, 6, 2], 2])], facecolors='r'))
 
-    ax.set_xlabel('Easting (X; m)')
-    ax.set_ylabel('Northing (Y; m)')
-    ax.set_zlabel('Depth (Z; m)')
-    # ax.invert_zaxis()
-    ax.invert_yaxis()
+    axs.set_xlabel('Easting (X; m)')
+    axs.set_ylabel('Northing (Y; m)')
+    axs.set_zlabel('Depth (Z; m)')
+    # axs.invert_zaxis()
+    # axs.invert_yaxis()
 
-    ax.plot(rxLoc[:, 0], rxLoc[:, 1], rxLoc[:, 2], '.g', alpha=0.1)
+    if plotSurvey:
+        axs.plot(rxLoc[:, 0], rxLoc[:, 1], rxLoc[:, 2], '.g', alpha=0.1)
 
     if profile == "X":
-        ax.plot(np.r_[surveyArea[:2]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
+        axs.plot(np.r_[surveyArea[:2]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
     elif profile == "Y":
-        ax.plot(np.r_[0., 0.], np.r_[surveyArea[2:]], np.r_[rx_h, rx_h], 'r-')
+        axs.plot(np.r_[0., 0.], np.r_[surveyArea[2:]], np.r_[rx_h, rx_h], 'r-')
     elif profile == "XY":
-        ax.plot(np.r_[0., 0.], np.r_[surveyArea[:2]], np.r_[rx_h, rx_h], 'r-')
-        ax.plot(np.r_[surveyArea[2:]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
+        axs.plot(np.r_[0., 0.], np.r_[surveyArea[:2]], np.r_[rx_h, rx_h], 'r-')
+        axs.plot(np.r_[surveyArea[2:]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
 
-    ax.view_init(elev, azim)
+    axs.view_init(elev, azim)
     plt.show()
 
     return True
@@ -273,20 +277,27 @@ def linefun(x1, x2, y1, y2, nx, tol=1e-3):
     return x, y
 
 
-def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec):
+def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec, fig=None, axs1=None, axs2=None):
 
     import matplotlib.gridspec as gridspec
 
     # The MAG problem created is stored in result[1]
-    prob2D = Box.result[1]
+    # prob2D = Box.result[1]
 
-    fig = plt.figure(figsize=(18*1.5,3.4*1.5))
-    plt.rcParams.update({'font.size': 14})
-    gs1 = gridspec.GridSpec(2, 7)
-    gs1.update(left=0.05, right=0.48, wspace=0.05)
-    ax1 = plt.subplot(gs1[:2, :3])
-    ax2 = plt.subplot(gs1[0, 4:])
-    ax1.axis("equal")
+    if fig is None:
+        fig = plt.figure(figsize=(18*1.5,3.4*1.5))
+
+        plt.rcParams.update({'font.size': 14})
+        gs1 = gridspec.GridSpec(2, 7)
+        gs1.update(left=0.05, right=0.48, wspace=0.05)
+
+    if axs1 is None:
+        axs1 = plt.subplot(gs1[:2, :3])
+
+    if axs2 is None:
+        axs2 = plt.subplot(gs1[0, 4:])
+
+    axs1.axis("equal")
 
     prob2D.Bdec, prob2D.Binc, prob2D.Bigrf = Edec, Einc, Bigrf
     prob2D.Q, prob2D.rinc, prob2D.rdec = Q, rinc, rdec
@@ -307,8 +318,8 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
 
     X, Y = np.meshgrid(prob2D.survey.xr, prob2D.survey.yr)
 
-    dat = ax1.contourf(X,Y, np.reshape(out, (X.shape)).T, 25)
-    cb = plt.colorbar(dat, ax=ax1, ticks=np.linspace(out.min(), out.max(), 5))
+    dat = axs1.contourf(X,Y, np.reshape(out, (X.shape)).T, 25)
+    cb = plt.colorbar(dat, ax=axs1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
 
 
@@ -340,30 +351,30 @@ def plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q,
     distance = np.sqrt((x-x1)**2.+(y-y1)**2.)
 
 
-    ax1.plot(x,y, 'w.', ms=3)
+    axs1.plot(x,y, 'w.', ms=3)
 
-    ax1.text(x[0], y[0], 'A', fontsize=16, color='w')
-    ax1.text(x[-1], y[-1], 'B', fontsize=16,
+    axs1.text(x[0], y[0], 'A', fontsize=16, color='w')
+    axs1.text(x[-1], y[-1], 'B', fontsize=16,
              color='w', horizontalalignment='right')
 
-    ax1.set_xlabel('Easting (X; m)')
-    ax1.set_ylabel('Northing (Y; m)')
-    ax1.set_xlim(X.min(), X.max())
-    ax1.set_ylim(Y.min(), Y.max())
-    ax1.set_title(irt+' '+comp)
+    axs1.set_xlabel('Easting (X; m)')
+    axs1.set_ylabel('Northing (Y; m)')
+    axs1.set_xlim(X.min(), X.max())
+    axs1.set_ylim(Y.min(), Y.max())
+    axs1.set_title(irt+' '+comp)
 
-    ax2.plot(distance, out_linei, 'b.-')
-    ax2.plot(distance, out_liner, 'r.-')
-    ax2.plot(distance, out_linet, 'k.-')
-    ax2.set_xlim(distance.min(), distance.max())
+    axs2.plot(distance, out_linei, 'b.-')
+    axs2.plot(distance, out_liner, 'r.-')
+    axs2.plot(distance, out_linet, 'k.-')
+    axs2.set_xlim(distance.min(), distance.max())
 
-    ax2.set_xlabel("Distance (m)")
-    ax2.set_ylabel("Magnetic field (nT)")
+    axs2.set_xlabel("Distance (m)")
+    axs2.set_ylabel("Magnetic field (nT)")
 
-    ax2.text(distance.min(), out_linei.max()*0.8, 'A', fontsize = 16)
-    ax2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
-    ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
-    ax2.grid(True)
+    axs2.text(distance.min(), out_linei.max()*0.8, 'A', fontsize = 16)
+    axs2.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
+    axs2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
+    axs2.grid(True)
     plt.show()
 
     return True
@@ -391,7 +402,7 @@ def ViewMagSurvey2DInd(Box):
         prob = Box.result[1]
         x1, x2, y1, y2 = -prob.survey.xylim, prob.survey.xylim, 0., 0.
 
-        return plogMagSurvey2D(Box, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
+        return plogMagSurvey2D(prob, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
 
     out = widgets.interactive (MagSurvey2DInd 
                     ,susc=widgets.FloatSlider(min=0,max=200,step=0.1,value=0.1,continuous_update=False) \
@@ -438,7 +449,8 @@ def ViewPrism(dx, dy, dz, depth):
                             , xylim=widgets.FloatSlider(min=2, max=10, step=1, value=xylim, continuous_update=False) \
                             , rx_h=widgets.FloatSlider(min=0.1, max=2.5, step=0.1, value=rx_h, continuous_update=False) \
                             , View_elev=widgets.FloatSlider(min=-90, max=90, step=5, value=elev, continuous_update=False) \
-                            , View_azim=widgets.FloatSlider(min=0, max=360, step=5, value=azim, continuous_update=False))
+                            , View_azim=widgets.FloatSlider(min=0, max=360, step=5, value=azim, continuous_update=False)
+                            )
 
     return Q
 
