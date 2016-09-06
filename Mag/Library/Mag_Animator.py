@@ -57,12 +57,28 @@ clim = np.asarray([-50,50])
 def animate(ii):
     
     removePlt()
+
+    dec = 0
+    inc = 90
     
-    dec = 5*ii
-    inc = 0
+    if ii<10:
+        p.dx = dx - ii*1./10
+        p.dy = dy - ii*1./10
+        p.dz = dz + ii*2./10
+        
+        p.pdec = 0
+        p.pinc = 0
     
-    p.pdec = dec
-    p.pinc = inc
+    elif ii<20:
+        
+        p.pinc = (ii-10)*90./10
+        
+
+        
+    else:
+        p.dx += (ii-20)*1./10
+
+
     
     plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X", fig= fig, axs = ax1, plotSurvey=False)
     # Create problem
@@ -171,6 +187,6 @@ def removePlt():
     im5.remove()
     
 anim = animation.FuncAnimation(fig, animate,
-                               frames=72 , interval=100,repeat=False)
+                               frames=30 , interval=100,repeat=False)
                                #
 anim.save('animation.html', writer=HTMLWriter(embed_frames=True,fps=10,default_mode = 'loop'))

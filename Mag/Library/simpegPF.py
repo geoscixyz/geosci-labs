@@ -1,7 +1,7 @@
 from scipy.constants import mu_0
 import re
 import numpy as np
-from fromSimPEG import simpegCoordUtils as Utils
+import simpegCoordUtils as Utils
 
 
 class survey(object):
@@ -58,15 +58,22 @@ class problem(object):
     @property
     def Mind(self):
         # Define magnetization direction as sum of induced and remanence
-        Mind = self.susc*self.Higrf*Utils.dipazm_2_xyz(self.Binc - self.prism.pinc,
-                                                       self.Bdec - self.prism.pdec)
-
+        mind = Utils.dipazm_2_xyz(self.Binc, self.Bdec)
+        R = Utils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+        Mind = self.susc*self.Higrf*R.dot(mind)
+        # Mind = self.susc*self.Higrf*Utils.dipazm_2_xyz(self.Binc - self.prism.pinc,
+        #                                                self.Bdec - self.prism.pdec)
         return Mind
 
     @property
     def Mrem(self):
-        Mrem = self.Q*self.susc*self.Higrf * \
-               Utils.dipazm_2_xyz(self.rinc - self.prism.pinc, self.rdec - self.prism.pdec)
+
+        mrem = Utils.dipazm_2_xyz(self.rinc, self.rdec)
+        R = Utils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+        Mrem = self.Q*self.susc*self.Higrf * R.dot(mrem)
+
+        # Mrem = self.Q*self.susc*self.Higrf * \
+        #        Utils.dipazm_2_xyz(self.rinc - self.prism.pinc, self.rdec - self.prism.pdec)
 
         return Mrem
 
@@ -82,10 +89,21 @@ class problem(object):
         if getattr(self, '_G', None) is None:
             print "Computing G"
 
-            rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
+            # rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
 
-            rxLoc = Utils.rotatePointsFromNormals(self.survey.rxLoc, rot, np.r_[0., 1., 0.],
-                                                 np.r_[0, 0, 0])
+            # rxLoc = Utils.rotatePointsFromNormals(self.survey.rxLoc, rot, np.r_[0., 1., 0.],
+            #                                      np.r_[0, 0, 0])
+
+
+            xLoc = self.survey.rxLoc[:, 0] - self.prism.xc
+            yLoc = self.survey.rxLoc[:, 1] - self.prism.yc
+            zLoc = self.survey.rxLoc[:, 2] - self.prism.zc
+
+            R = Utils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+
+            rxLoc = R.dot(np.c_[xLoc, yLoc, zLoc].T).T
+
+            rxLoc = np.c_[rxLoc[:, 0] + self.prism.xc, rxLoc[:, 1] + self.prism.yc, rxLoc[:, 2] + self.prism.zc]
 
             # Create the linear forward system
             self._G = Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, rxLoc)
@@ -117,10 +135,13 @@ class problem(object):
         nD = bvec.shape[0]/3
         bvec = np.reshape(bvec, (3, nD))
 
-        rot = Utils.mkvc(Utils.dipazm_2_xyz(-self.prism.pinc, -self.prism.pdec))
+        # rot = Utils.mkvc(Utils.dipazm_2_xyz(-self.prism.pinc, -self.prism.pdec))
 
-        bvec = Utils.rotatePointsFromNormals(bvec.T, rot, np.r_[0., 1., 0.],
-                                             np.r_[0, 0, 0]).T
+        # bvec = Utils.rotatePointsFromNormals(bvec.T, rot, np.r_[0., 1., 0.],
+        #                                      np.r_[0, 0, 0]).T
+
+        R = Utils.rotationMatrix(self.prism.pinc, self.prism.pdec)
+        bvec = R.dot(bvec)
 
         if self.uType == 'bx':
             u = Utils.mkvc(bvec[0, :])

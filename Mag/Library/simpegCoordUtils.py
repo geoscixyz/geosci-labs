@@ -8,7 +8,7 @@ def crossProd(v0,v1):
         :param numpy.array v1: vector of length 3
         :rtype: numpy.array
         :return: cross product of v0,v1
-    """ 
+    """
     # ensure both n0, n1 are vectors of length 1
     assert len(v0) == 3, "Length of v0 should be 3"
     assert len(v1) == 3, "Length of v1 should be 3"
@@ -43,7 +43,7 @@ def rotationMatrixFromNormals(v0,v1,tol=1e-20):
     n0 = v0*1./np.linalg.norm(v0)
     n1 = v1*1./np.linalg.norm(v1)
 
-    n0dotn1 = n0.dot(n1) 
+    n0dotn1 = n0.dot(n1)
 
     # define the rotation axis, which is the cross product of the two vectors
     rotAx = crossProd(n0,n1)
@@ -67,7 +67,7 @@ def rotatePointsFromNormals(XYZ,n0,n1,x0=np.r_[0.,0.,0.]):
 
         :param numpy.array n0: vector of length 3, should have norm 1
         :param numpy.array n1: vector of length 3, should have norm 1
-        :param numpy.array x0: vector of length 3, point about which we perform the rotation 
+        :param numpy.array x0: vector of length 3, point about which we perform the rotation
         :rtype: numpy.array, 3x3
         :return: rotation matrix which rotates the frame so that n0 is aligned with n1
     """
@@ -77,7 +77,7 @@ def rotatePointsFromNormals(XYZ,n0,n1,x0=np.r_[0.,0.,0.]):
     assert XYZ.shape[1] == 3, "Grid XYZ should be 3 wide"
     assert len(x0) == 3, "x0 should have length 3"
 
-    return (XYZ - x0).dot(R.T) + x0 
+    return (XYZ - x0).dot(R.T) + x0
 
 def mkvc(x, numDims=1):
     """Creates a vector with the number of dimension specified
@@ -146,3 +146,28 @@ def dipazm_2_xyz(dip, azm_N):
     M[:, 2] = np.sin(I)
 
     return M.T
+
+
+def rotationMatrix(inc, dec, normal=True):
+    """
+        Take an inclination and declination angle and return a rotation matrix
+
+    """
+
+    phi = -np.deg2rad(np.asarray(inc))
+    theta = -np.deg2rad(np.asarray(dec))
+
+    Rx = np.asarray([[1, 0, 0],
+                    [0, np.cos(phi), -np.sin(phi)],
+                    [0, np.sin(phi), np.cos(phi)]])
+
+    Rz = np.asarray([[np.cos(theta), -np.sin(theta), 0],
+                    [np.sin(theta), np.cos(theta), 0],
+                    [0, 0, 1]])
+
+    if normal:
+        R = Rz.dot(Rx)
+    else:
+        R = Rx.dot(Rz)
+
+    return R

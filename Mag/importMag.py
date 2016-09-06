@@ -8,8 +8,7 @@ warnings.filterwarnings('ignore') # ignore warnings: only use this once you are 
 
 from IPython.html.widgets import *
 from IPython.display import display
-from fromSimPEG import *
+from Library import *
 from scipy.constants import mu_0
-from Mag import *
 
 # from importMag import *
