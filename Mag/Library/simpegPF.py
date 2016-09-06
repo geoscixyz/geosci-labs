@@ -87,7 +87,7 @@ class problem(object):
     def G(self):
 
         if getattr(self, '_G', None) is None:
-            print "Computing G"
+            #print "Computing G"
 
             # rot = Utils.mkvc(Utils.dipazm_2_xyz(self.prism.pinc, self.prism.pdec))
 
