@@ -3,4 +3,5 @@ scipy
 matplotlib
 ipywidgets
 pandas
+jupyter_dashboards
 git+git://github.com/simpeg/simpeg.git@dev
