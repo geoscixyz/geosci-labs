@@ -12,5 +12,6 @@ from IPython.display import display
 from Library import *
 from scipy.constants import mu_0
 
-subprocess.call("jupyter dashboards quick-setup --sys-prefix")
+subprocess.call("jupyter dashboards install --user --symlink --overwrite")
 # from importMag import *
+subprocess.call("jupyter dashboards activate")
