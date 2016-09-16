@@ -249,12 +249,12 @@ def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
     # Face 5
     axs.add_collection3d(Poly3DCollection([zip(xyz[[0, 4, 7, 3], 0]+p.xc,
                                                xyz[[0, 4, 7, 3], 1]+p.yc,
-                                               xyz[[0, 4, 7, 3], 2]+p.zc)], facecolors='b'))
+                                               xyz[[0, 4, 7, 3], 2]+p.zc)], facecolors='w'))
 
     # Face 6
     axs.add_collection3d(Poly3DCollection([zip(xyz[[1, 5, 6, 2], 0]+p.xc,
                                                xyz[[1, 5, 6, 2], 1]+p.yc,
-                                               xyz[[1, 5, 6, 2], 2]+p.zc)], facecolors='r'))
+                                               xyz[[1, 5, 6, 2], 2]+p.zc)], facecolors='w'))
 
     axs.set_xlabel('Easting (X; m)')
     axs.set_ylabel('Northing (Y; m)')
@@ -263,7 +263,7 @@ def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
     # axs.invert_yaxis()
 
     if plotSurvey:
-        axs.plot(rxLoc[:, 0], rxLoc[:, 1], rxLoc[:, 2], '.g', alpha=0.1)
+        axs.plot(rxLoc[:, 0], rxLoc[:, 1], rxLoc[:, 2], '.g', alpha=0.5)
 
     if profile == "X":
         axs.plot(np.r_[surveyArea[:2]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
@@ -341,6 +341,7 @@ def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt, 
     cb = plt.colorbar(dat, ax=axs1, ticks=np.linspace(out.min(), out.max(), 5))
     cb.set_label("nT")
 
+    axs1.plot(X, Y, '.k')
 
     # Compute fields on the line by creating a similar mag problem
     x, y = linefun(x1, x2, y1, y2, prob2D.survey.npts2D)
@@ -469,14 +470,14 @@ def ViewPrism(dx, dy, dz, depth):
     elev, azim = 20, 250
     npts2D, xylim = 20, 3.
     Q = widgets.interactive(Prism \
-                            , dx=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dx, continuous_update=False) \
-                            , dy=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dy, continuous_update=False) \
-                            , dz=widgets.FloatSlider(min=1e-4, max=2., step=0.05, value=dz, continuous_update=False) \
+                            , dx=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dx, continuous_update=False) \
+                            , dy=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dy, continuous_update=False) \
+                            , dz=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dz, continuous_update=False) \
                             , depth=widgets.FloatSlider(min=0., max=10., step=0.1, value=-depth, continuous_update=False)\
                             , pinc=(-90., 90., 5.) \
                             , pdec=(-90., 90., 5.) \
                             , npts2D=widgets.FloatSlider(min=5, max=100, step=5, value=npts2D, continuous_update=False) \
-                            , xylim=widgets.FloatSlider(min=2, max=10, step=1, value=xylim, continuous_update=False) \
+                            , xylim=widgets.FloatSlider(min=1, max=10, step=1, value=xylim, continuous_update=False) \
                             , rx_h=widgets.FloatSlider(min=0.1, max=2.5, step=0.1, value=rx_h, continuous_update=False) \
                             , View_elev=widgets.FloatSlider(min=-90, max=90, step=5, value=elev, continuous_update=False) \
                             , View_azim=widgets.FloatSlider(min=0, max=360, step=5, value=azim, continuous_update=False)

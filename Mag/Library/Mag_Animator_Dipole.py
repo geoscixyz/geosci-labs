@@ -7,18 +7,18 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib import animation
 from JSAnimation import HTMLWriter
-
+from scipy.constants import mu_0
 
 fig = plt.figure(figsize=(10,5))
 ax1 = plt.subplot(121, projection='3d')
 ax2 = plt.subplot(222)
 
 # Define the dimensions of the prism (m)
-dx, dy, dz = 1., 1, 1.
+dx, dy, dz = 0.1, 3, 0.1
 # Set the depth of burial (m)
 depth = 0.5
-pinc, pdec = 0., 0.
-npts2D, xylim = 20., 3.
+pinc, pdec = 0., 90.
+npts2D, xylim = 30., 3.
 rx_h, View_elev, View_azim = 1., 20, -115
 Einc, Edec, Bigrf = 45., 45., 50000.
 x1, x2, y1, y2 = x1, x2, y1, y2 = -xylim, xylim, 0., 0.
@@ -57,19 +57,23 @@ im2 = ax2.plot(x,y)
 im3 = ax2.plot(x,y)
 im4 = ax2.plot(x,y)
 im5 = ax1.text(0,0,0,'')
-clim = np.asarray([-125,125])
+
 def animate(ii):
 
     removePlt()
 
-    if ii<19:
-        dec = 0
-        inc = -90. + ii*10.
-        
-    else:
-
-        dec = 90.
-        inc = 90. - (ii-19)*10.
+    dec = 0.
+    inc = 90.
+    
+    p.z0 = -ii*0.25
+#    if ii<19:
+#        dec = 0
+#        inc = -90. + ii*10.
+#        
+#    else:
+#
+#        dec = 90.
+#        inc = 90. - (ii-19)*10.
         
     MAG.plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X", fig= fig, axs = ax1, plotSurvey=False)
 
@@ -133,6 +137,7 @@ def animate(ii):
     else:
         out = b_rem
 
+    clim = np.asarray([out.min()*1.2,1e-2])
 
 
     #out = plogMagSurvey2D(prob, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec, fig=fig, axs1=ax2, axs2=ax3)
@@ -174,17 +179,34 @@ def animate(ii):
     im2 =ax2.plot(distance, out_linei, 'b.-')
 
     global im3
-    im3 =ax2.plot(distance, out_liner, 'r.-')
+    
+    # Compute theoritical field of a dipole
+    
+    
+    r = (x**2. + y**2. + (rx_h-p.z0)**2.)**0.5
+    
+    ang = np.arccos(np.abs(rx_h-p.z0)/r)
+    
+    
+    dipole = -p.dx*p.dy*p.dz*susc*Bigrf/(4.*np.pi*r**3.)/1.02
+    rcomp = dipole*(2.*np.cos(ang))
+    theta = dipole*(np.sin(ang))
+    
+    zfield = np.cos(ang)*rcomp - np.sin(ang)*theta
+    
+    print zfield.min()/out_linei.min()
+    im3 =ax2.plot(distance, zfield, 'r.-')
 
-    global im4
-    im4 =ax2.plot(distance, out_linet, 'k.-')
+    clim = np.asarray([zfield.min()*1.2,zfield.max()/1.2])
+#    global im4
+#    im4 =ax2.plot(distance, out_linet, 'k.-')
 
     ax2.set_xlim(distance.min(), distance.max())
     ax2.set_xlabel("Distance (m)")
     ax2.set_ylabel("Magnetic field (nT)")
     ax2.set_ylim(clim)
 
-    ax2.legend(("induced", "remanent", "total"), bbox_to_anchor=(0.5, -0.3))
+    ax2.legend(( "dipole","prism"), bbox_to_anchor=(0.5, -0.3))
     ax2.grid(True)
     plt.show()
 
@@ -210,13 +232,13 @@ def removePlt():
     global im3
     im3.pop(0).remove()
 
-    global im4
-    im4.pop(0).remove()
+#    global im4
+#    im4.pop(0).remove()
 
     global im5
     im5.remove()
 
 anim = animation.FuncAnimation(fig, animate,
-                               frames=37 , interval=200,repeat=False)
+                               frames=20 , interval=200,repeat=False)
 
 anim.save('animation.html', writer=HTMLWriter(embed_frames=True,fps=10,default_mode = 'reflect'))
