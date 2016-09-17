@@ -36,6 +36,7 @@ setup(
     install_requires = ['future',
                         'numpy>=1.7',
                         'scipy>=0.13',
+                        'ipywidgets',
                        ],
     author = 'UBC GIF',
     author_email = 'lheagy@eos.ubc.ca',
