@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
+from FDEMDipolarfields import *
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
@@ -54,21 +55,21 @@ class DipoleWidget(object):
         self.dataview.set_xyz(self.x, self.y, self.z, normal=normal) # set plane and locations ...
 
         if self.functype == "E_from_ED":
-            self.func = EM.Analytics.E_from_ElectricDipoleWholeSpace
+            self.func = E_from_ElectricDipoleWholeSpace
         elif self.functype == "E_from_ED_galvanic":
-            self.func = EM.Analytics.E_galvanic_from_ElectricDipoleWholeSpace
+            self.func = E_galvanic_from_ElectricDipoleWholeSpace
         elif self.functype == "E_from_ED_inductive":
-            self.func = EM.Analytics.E_inductive_from_ElectricDipoleWholeSpace
+            self.func = E_inductive_from_ElectricDipoleWholeSpace
         elif self.functype == "H_from_ED":
-            self.func = EM.Analytics.H_from_ElectricDipoleWholeSpace
+            self.func = H_from_ElectricDipoleWholeSpace
         elif self.functype == "J_from_ED":
-            self.func = EM.Analytics.J_from_ElectricDipoleWholeSpace
+            self.func = J_from_ElectricDipoleWholeSpace
         elif self.functype == "E_from_MD":
-            self.func = EM.Analytics.E_from_MagneticDipoleWholeSpace
+            self.func = E_from_MagneticDipoleWholeSpace
         elif self.functype == "H_from_MD":
-            self.func = EM.Analytics.H_from_MagneticDipoleWholeSpace
+            self.func = H_from_MagneticDipoleWholeSpace
         elif self.functype == "J_from_MD":
-            self.func = EM.Analytics.J_from_MagneticDipoleWholeSpace
+            self.func = J_from_MagneticDipoleWholeSpace
         else:
             raise NotImplementedError()
 

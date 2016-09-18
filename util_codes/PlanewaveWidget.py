@@ -13,6 +13,7 @@ from ipywidgets import *
 from DipoleWidget import DipoleWidget, linefun, DisPosNegvalues
 from scipy.constants import mu_0, epsilon_0
 from VolumeWidget import polyplane
+from FDEMPlanewave import *
 
 def PlaneEHfield(z, t=0., f=1., sig=1., mu=mu_0,  epsilon=epsilon_0, E0=1.):
     """
@@ -118,11 +119,11 @@ class PlanewaveWidget(DipoleWidget):
         self.dataview.set_xyz(self.x, self.y, self.z, normal=normal) # set plane and locations ...
 
         if self.functype == "E_from_SheetCurrent":
-            self.func = EM.Analytics.E_field_from_SheetCurruent
+            self.func = E_field_from_SheetCurruent
         elif self.functype == "H_from_SheetCurrent":
-            self.func = EM.Analytics.H_field_from_SheetCurruent
+            self.func = H_field_from_SheetCurruent
         elif self.functype == "J_from_SheetCurrent":
-            self.func = EM.Analytics.J_field_from_SheetCurruent
+            self.func = J_field_from_SheetCurruent
         else:
             raise NotImplementedError()
 
