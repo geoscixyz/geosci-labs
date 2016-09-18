@@ -62,3 +62,5 @@ target/
 .ipynb_checkpoints
 em_examples.sublime-project
 em_examples.sublime-workspace
+*.html
+
