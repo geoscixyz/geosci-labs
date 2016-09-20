@@ -427,12 +427,11 @@ def fitline(Box):
 def ViewMagSurvey2DInd(Box):
 
 
-    def MagSurvey2DInd(susc, Einc, Edec, Bigrf, comp, irt, Q, rinc, rdec):
+    def MagSurvey2DInd(susc, Einc, Edec, Bigrf, comp, irt, Q, rinc, rdec, update):
 
         # Get the line extent from the 2D survey for now
         prob = Box.result[1]
         x1, x2, y1, y2 = -prob.survey.xylim, prob.survey.xylim, 0., 0.
-
         return plogMagSurvey2D(prob, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
 
     out = widgets.interactive (MagSurvey2DInd
@@ -446,6 +445,7 @@ def ViewMagSurvey2DInd(Box):
                     ,Q=widgets.FloatSlider(min=0.,max=10,step=1,value=0,continuous_update=False) \
                     ,rinc=widgets.FloatSlider(min=-90.,max=90,step=5,value=0,continuous_update=False) \
                     ,rdec=widgets.FloatSlider(min=-90.,max=90,step=5,value=0,continuous_update=False) \
+                    ,update=widgets.ToggleButton(description='Refresh', value=False) \
                     )
     return out
 
