@@ -25,7 +25,7 @@ rx_h = 1.9
 
 Bincd = 70.205
 Bdecd = 16.63
-Bigrfd = 54399
+Bigrfd = 54450
 
 # Depth of burial: Monday was 35cm. I believe that Wednesday was ~45cm
 
@@ -84,36 +84,47 @@ class definePrism(object):
         return zc
 
 
-def plotProfile(p, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
+def plotProfile(prob2D, x0, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
     if data is 'MonSt':
-        filename = "data/StudentData2015_Monday.csv"
+        filename = "data/Lab1_monday_TA.csv"
     elif data is 'WedSt':
-        filename = "data/StudentData2015_Wednesday.csv"
+        filename = "data/Lab1_Wednesday_student.csv"
     elif data is 'WedTA':
-        filename = "data/TAData2015_Wednesday.csv"
+        filename = "data/Lab1_Wednesday_TA.csv"
 
     dat = pd.DataFrame(pd.read_csv(filename, header = 0))
-    tf  = dat["Corrected Total Field Data (nT)"].values
-    std = dat["Standard Deviation (nT)"].values
-    loc = dat["Location (m)"].values
-    teams = dat["Team"].values
+    tf  = dat["MAG_MEAN"].values
+    std = dat["STDEV"].values
+    loc = dat["station"].values
+    #teams = dat["Team"].values
 
     tfa = tf - Bigrf
 
+    p = prob2D.prism
 
-    nx, ny = 100, 1
-    shape = (nx, ny)
-    xLoc = np.linspace(xlim[0], xlim[1], nx)
+    # nx, ny = 100, 1
+    # shape = (nx, ny)
 
-    zLoc = np.ones(np.shape(xLoc))*rx_h
-    yLoc = np.zeros(np.shape(xLoc))
+    dx = x0 - prob2D.survey.xylim
 
-    #xpl, ypl, zpl = fatiandoGridMesh.regular(surveyArea,shape, z=z)
-    rxLoc = np.c_[Utils.mkvc(xLoc), Utils.mkvc(yLoc), Utils.mkvc(zLoc)]
+    prob2D.survey.profile
+    if prob2D.survey.profile == "EW":
+        x1, x2, y1, y2 = prob2D.survey.xr[0]-dx, prob2D.survey.xr[-1]-dx, 0., 0.
+    elif prob2D.survey.profile == "NS":
+        x1, x2, y1, y2 = 0., 0., prob2D.survey.yr[0]-dx, prob2D.survey.yr[-1]-dx
+    elif prob2D.survey.profile == "45N":
+        x1, x2, y1, y2 = prob2D.survey.xr[0], prob2D.survey.xr[-1], prob2D.survey.yr[0], prob2D.survey.yr[-1]
 
+
+    x, y = linefun(x1, x2, y1, y2, 100)
+    xyz_line = np.c_[x, y, np.ones_like(x)*prob2D.survey.rx_h]
+
+    distance = np.sqrt((x-x1)**2.+(y-y1)**2.)
+
+    xlim = [0,distance[-1]]
     prob1D = MAG.problem()
     srvy1D = MAG.survey()
-    srvy1D._rxLoc = rxLoc
+    srvy1D._rxLoc = xyz_line
 
     prob1D.prism = p
     prob1D.survey = srvy1D
@@ -138,10 +149,10 @@ def plotProfile(p, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
     ax0 = plt.subplot(gs[0])
     ax1 = plt.subplot(gs[1])
 
-    ax1.plot(p.x0, p.z0, 'ko')
-    ax1.text(p.x0+0.5, p.z0, 'Rebar', color='k')
+    ax1.plot(x0, p.z0, 'ko')
+    ax1.text(x0+0.5, p.z0, 'Rebar', color='k')
     ax1.text(xlim[0]+1.,-1.2, 'Magnetometer height (1.9 m)', color='b')
-    ax1.plot(xlim, np.r_[-rx_h, -rx_h], 'b--')
+    ax1.plot(xlim, np.r_[rx_h, rx_h], 'b--')
 
     # magi,magr = getField(p, rxLoc, 'bz', 'total')
 
@@ -149,14 +160,14 @@ def plotProfile(p, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
     ax1.set_xlim(xlim)
     ax1.set_ylim(-2.5, 2.5)
 
-    ax0.scatter(loc,tfa,c=teams)
+    ax0.scatter(loc,tfa)
     ax0.errorbar(loc,tfa,yerr=std,linestyle = "None",color="k")
     ax0.set_xlim(xlim)
     ax0.grid(which="both")
 
-    ax0.plot(xLoc, magi, 'b', label='induced')
-    ax0.plot(xLoc, magr, 'r', label='remnant')
-    ax0.plot(xLoc, magi+magr, 'k', label='total')
+    ax0.plot(distance, magi, 'b', label='induced')
+    ax0.plot(distance, magr, 'r', label='remnant')
+    ax0.plot(distance, magi+magr, 'k', label='total')
     ax0.legend(loc=2)
     # ax[1].plot(loc-8, magnT[::-1], )
 
@@ -166,12 +177,21 @@ def plotProfile(p, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
     ax0.set_ylabel("Total field anomaly (nT)")
 
     ax0.grid(True)
-    ax0.set_xlabel("Northing (m)")
-
     ax1.grid(True)
-    ax1.set_xlabel("Northing (m)")
 
-    ax1.invert_yaxis()
+    if prob2D.survey.profile == "EW":
+        ax1.set_xlabel("Easting (m)")
+        ax0.set_xlabel("Easting (m)")
+
+    elif prob2D.survey.profile == "NS":
+        ax1.set_xlabel("Northing (m)")
+        ax0.set_xlabel("Northing (m)")
+
+    elif prob2D.survey.profile == "45N":
+        ax1.set_xlabel("Distance SW-NE (m)")
+        ax0.set_xlabel("Distance SW-NE (m)")
+
+            # ax1.invert_yaxis()
 
     plt.tight_layout()
     plt.show()
@@ -265,13 +285,13 @@ def plotObj3D(p, rx_h, elev, azim, npts2D, xylim,
     if plotSurvey:
         axs.plot(rxLoc[:, 0], rxLoc[:, 1], rxLoc[:, 2], '.g', alpha=0.5)
 
-    if profile == "X":
+    if profile == "EW":
         axs.plot(np.r_[surveyArea[:2]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
-    elif profile == "Y":
+    elif profile == "NS":
         axs.plot(np.r_[0., 0.], np.r_[surveyArea[2:]], np.r_[rx_h, rx_h], 'r-')
-    elif profile == "XY":
-        axs.plot(np.r_[0., 0.], np.r_[surveyArea[:2]], np.r_[rx_h, rx_h], 'r-')
-        axs.plot(np.r_[surveyArea[2:]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
+    elif profile == "45N":
+        axs.plot(np.r_[surveyArea[:2]], np.r_[surveyArea[2:]], np.r_[rx_h, rx_h], 'r-')
+        # axs.plot(np.r_[surveyArea[2:]], np.r_[0., 0.], np.r_[rx_h, rx_h], 'r-')
 
     axs.view_init(elev, azim)
     plt.show()
@@ -296,7 +316,7 @@ def linefun(x1, x2, y1, y2, nx, tol=1e-3):
     return x, y
 
 
-def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt,  Q, rinc, rdec, fig=None, axs1=None, axs2=None):
+def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, comp, irt,  Q, rinc, rdec, fig=None, axs1=None, axs2=None):
 
     import matplotlib.gridspec as gridspec
 
@@ -344,6 +364,14 @@ def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt, 
     axs1.plot(X, Y, '.k')
 
     # Compute fields on the line by creating a similar mag problem
+    prob2D.survey.profile
+    if prob2D.survey.profile == "EW":
+        x1, x2, y1, y2 = prob2D.survey.xr[0], prob2D.survey.xr[-1], 0., 0.
+    elif prob2D.survey.profile == "NS":
+        x1, x2, y1, y2 = 0., 0., prob2D.survey.yr[0], prob2D.survey.yr[-1]
+    elif prob2D.survey.profile == "45N":
+        x1, x2, y1, y2 = prob2D.survey.xr[0], prob2D.survey.xr[-1], prob2D.survey.yr[0], prob2D.survey.yr[-1]
+
     x, y = linefun(x1, x2, y1, y2, prob2D.survey.npts2D)
     xyz_line = np.c_[x, y, np.ones_like(x)*prob2D.survey.rx_h]
     # Create problem
@@ -402,13 +430,12 @@ def plogMagSurvey2D(prob2D, susc, Einc, Edec, Bigrf, x1, y1, x2, y2, comp, irt, 
 
 def fitline(Box):
 
-    def profiledata(data, Binc, Bdec, Bigrf, x0, depth, susc, Q, rinc, rdec):
+    def profiledata(data, Binc, Bdec, Bigrf, x0, depth, susc, Q, rinc, rdec, update):
 
         prob = Box.result[1]
-        prism = prob.prism
-        prism.x0, prism.z0 = x0-prism.dx/2, -depth
+        prob.prism.z0 = -depth
 
-        return plotProfile(prism, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec)
+        return plotProfile(prob, x0, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec)
 
     Q = widgets.interactive(profiledata, data=widgets.ToggleButtons(options=['MonSt','WedTA','WedSt']),\
              Binc=widgets.FloatSlider(min=-90.,max=90,step=5,value=90,continuous_update=False),\
@@ -420,6 +447,7 @@ def fitline(Box):
              Q=widgets.FloatSlider(min=0., max=10.,step=0.1, value=0.),\
              rinc=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),\
              rdec=widgets.FloatSlider(min=-180., max=180.,step=1., value=0.),
+             update=widgets.ToggleButton(description='Refresh', value=False) \
              )
     return Q
 
@@ -431,15 +459,14 @@ def ViewMagSurvey2DInd(Box):
 
         # Get the line extent from the 2D survey for now
         prob = Box.result[1]
-        x1, x2, y1, y2 = -prob.survey.xylim, prob.survey.xylim, 0., 0.
-        return plogMagSurvey2D(prob, susc, Einc, Edec, Bigrf, x1, y1, x2, y2 , comp, irt, Q, rinc, rdec)
+
+        return plogMagSurvey2D(prob, susc, Einc, Edec, Bigrf, comp, irt, Q, rinc, rdec)
 
     out = widgets.interactive (MagSurvey2DInd
                     ,susc=widgets.FloatSlider(min=0,max=200,step=0.1,value=0.1,continuous_update=False) \
-                    #,susc=widgets.FloatText(value=1.) \
                     ,Einc=widgets.FloatSlider(min=-90.,max=90,step=5,value=90,continuous_update=False) \
                     ,Edec=widgets.FloatSlider(min=-90.,max=90,step=5,value=0,continuous_update=False) \
-                    ,Bigrf=widgets.FloatSlider(min=54000.,max=55000,step=10,value=54500,continuous_update=False) \
+                    ,Bigrf=widgets.FloatSlider(min=53000.,max=55000,step=10,value=54500,continuous_update=False) \
                     ,comp=widgets.ToggleButtons(options=['tf','bx','by','bz'])
                     ,irt=widgets.ToggleButtons(options=['induced','remanent', 'total'])
                     ,Q=widgets.FloatSlider(min=0.,max=10,step=1,value=0,continuous_update=False) \
@@ -450,35 +477,36 @@ def ViewMagSurvey2DInd(Box):
     return out
 
 
-def Prism(dx, dy, dz, depth, pinc, pdec, npts2D, xylim, rx_h, View_elev, View_azim):
+def Prism(dx, dy, dz, depth, pinc, pdec, npts2D, xylim, rx_h, profile, View_elev, View_azim):
     #p = definePrism(dx, dy, dz, depth,pinc=pinc, pdec=pdec, susc = 1., Einc=90., Edec=0., Bigrf=1e-6)
     p = definePrism()
     p.dx, p.dy, p.dz, p.z0 = dx, dy, dz, -depth
     p.pinc, p.pdec = pinc, pdec
 
     srvy = MAG.survey()
-    srvy.rx_h, srvy.npts2D, srvy.xylim = rx_h, npts2D, xylim
+    srvy.rx_h, srvy.npts2D, srvy.xylim, srvy.profile = rx_h, npts2D, xylim, profile
 
     # Create problem
     prob = MAG.problem()
     prob.prism = p
     prob.survey = srvy
 
-    return plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X"), prob
+    return plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile=profile), prob
 
 def ViewPrism(dx, dy, dz, depth):
     elev, azim = 20, 250
     npts2D, xylim = 20, 3.
     Q = widgets.interactive(Prism \
-                            , dx=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dx, continuous_update=False) \
-                            , dy=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dy, continuous_update=False) \
-                            , dz=widgets.FloatSlider(min=1e-4, max=5., step=0.05, value=dz, continuous_update=False) \
+                            , dx=widgets.FloatSlider(min=1e-4, max=5., step=0.02, value=dx, continuous_update=False) \
+                            , dy=widgets.FloatSlider(min=1e-4, max=5., step=0.02, value=dy, continuous_update=False) \
+                            , dz=widgets.FloatSlider(min=1e-4, max=100., step=0.02, value=dz, continuous_update=False) \
                             , depth=widgets.FloatSlider(min=0., max=10., step=0.1, value=-depth, continuous_update=False)\
                             , pinc=(-90., 90., 5.) \
                             , pdec=(-90., 90., 5.) \
                             , npts2D=widgets.FloatSlider(min=5, max=100, step=5, value=npts2D, continuous_update=False) \
                             , xylim=widgets.FloatSlider(min=1, max=10, step=1, value=xylim, continuous_update=False) \
                             , rx_h=widgets.FloatSlider(min=0.1, max=2.5, step=0.1, value=rx_h, continuous_update=False) \
+                            , profile=widgets.ToggleButtons(options=['EW', 'NS', '45N'])
                             , View_elev=widgets.FloatSlider(min=-90, max=90, step=5, value=elev, continuous_update=False) \
                             , View_azim=widgets.FloatSlider(min=0, max=360, step=5, value=azim, continuous_update=False)
                             )

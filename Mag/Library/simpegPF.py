@@ -10,6 +10,7 @@ class survey(object):
     npts2D = 20
     xylim = 5.
     rxLoc = None
+    profile = 'EW'
 
     @property
     def rxLoc(self):
