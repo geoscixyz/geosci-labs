@@ -493,9 +493,9 @@ def Prism(dx, dy, dz, depth, pinc, pdec, npts2D, xylim, rx_h, profile, View_elev
 
     return plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile=profile), prob
 
-def ViewPrism(dx, dy, dz, depth):
+def ViewPrism(dx, dy, dz, depth, xylim=3.):
     elev, azim = 20, 250
-    npts2D, xylim = 20, 3.
+    npts2D = 20
     Q = widgets.interactive(Prism \
                             , dx=widgets.FloatSlider(min=1e-4, max=5., step=0.02, value=dx, continuous_update=False) \
                             , dy=widgets.FloatSlider(min=1e-4, max=5., step=0.02, value=dy, continuous_update=False) \
