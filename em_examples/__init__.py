@@ -6,3 +6,8 @@ import MT
 import sphereElectrostatic_example
 import View
 import VolumeWidget
+import VolumeWidgetPlane
+import DipoleWidgetFD
+import DipoleWidgetTD
+import PlanewaveWidget
+import EMcircuit

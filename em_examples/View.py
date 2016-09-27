@@ -63,33 +63,39 @@ class DataView(object):
                 self.xyz = np.c_[self.x, self.y, z*np.ones_like(self.x)]
 
 
-    def eval_loc(self, srcLoc,obsLoc, sigvec, fvec, orientation, func):
+    def eval_loc(self, srcLoc,obsLoc, log_sigvec, log_fvec, orientation,normal, func):
         self.srcLoc=srcLoc
         self.obsLoc = obsLoc
-        self.sigvec = sigvec
-        self.fvec = fvec
+        self.log_sigvec = log_sigvec
+        self.log_fvec = log_fvec
+        self.sigvec = 10.**log_sigvec
+        self.fvec = 10.**log_fvec
         self.orientation = orientation
+        self.normal = normal
         self.func1D = func
-        self.val_xfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
-        self.val_yfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
-        self.val_zfs=np.zeros((len(sigvec),len(fvec)),dtype=complex)
+        self.val_xfs=np.zeros((len(log_sigvec),len(log_fvec)),dtype=complex)
+        self.val_yfs=np.zeros((len(log_sigvec),len(log_fvec)),dtype=complex)
+        self.val_zfs=np.zeros((len(log_sigvec),len(log_fvec)),dtype=complex)
 
-        for n in range(len(sigvec)):
+        for n in range(len(log_sigvec)):
             #for k in range(len(fvec)):
-                self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, sigvec[n], fvec, orientation=self.orientation)
+                self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, 10.**log_sigvec[n], 10.**log_fvec, orientation=self.orientation)
 
-    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z"):
-        val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation)
+    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z", t=0.):
+        val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation, t=t)
         return val_x, val_y, val_z
 
+    def eval_TD(self, xyz, srcLoc, sig, t, orientation, func, normal="Z"):
+        val_x, val_y, val_z = func(xyz, srcLoc, sig, t, orientation=orientation)
+        return val_x, val_y, val_z
 
-    def eval_2D(self, srcLoc, sig, f, orientation, func):
+    def eval_2D(self, srcLoc, sig, f, orientation, func, t=0.):
         self.func2D = func
         self.srcLoc = srcLoc
         self.sig = sig
-        self.f = f
+        self.t = f
         self.orientation = orientation
-        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation)
+        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation, t=t)
         if self.normal =="X" or self.normal=="x":
             Freshape = lambda v: v.reshape(self.ncy, self.ncz)
         elif self.normal =="Y" or self.normal =="y":
@@ -103,19 +109,22 @@ class DataView(object):
         self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2+np.abs(self.VAL_Z)**2)
         self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2+phase(self.VAL_Z)**2)
 
-        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Z.real**2)
-        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Z.imag**2)
-        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Z)**2)
-        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Z)**2)
+    def eval_2D_TD(self, srcLoc, sig, t, orientation, func):
+        self.func2D = func
+        self.srcLoc = srcLoc
+        self.sig = sig
+        self.t = t
+        self.orientation = orientation
+        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, t, orientation=orientation)
+        if self.normal =="X" or self.normal=="x":
+            Freshape = lambda v: v.reshape(self.ncy, self.ncz)
+        elif self.normal =="Y" or self.normal =="y":
+            Freshape = lambda v: v.reshape(self.ncx, self.ncz)
+        elif self.normal =="Z" or self.normal =="z":
+            Freshape = lambda v: v.reshape(self.ncx, self.ncy)
 
-        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2)
-        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Y.imag**2)
-        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2)
-        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2)
-
-    # Modularize ax0, ax1
+        self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
+        self.VEC_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2+self.VAL_Z.real**2)
 
     def plot2D_FD(self, component="real", view="vec", ncontour=20, logamp=True, clim=None, showcontour=False, levels=None, ax=None, colorbar=True, cmap="viridis"):
         """
@@ -204,6 +213,71 @@ class DataView(object):
             elif component == "phase":
                 # ax.quiver(a, b, phase(vec_a)/VEC_amp,  phase(vec_b)/VEC_amp, color="w", linewidth=0.5)
                 ax.streamplot(a, b, phase(vec_a),  phase(vec_b), color="w", linewidth=0.5)
+
+        return ax, dat
+
+    def plot2D_TD(self, view="vec", ncontour=20, logamp=True, clim=None, showcontour=False, levels=None, ax=None, colorbar=True, cmap="viridis"):
+        """
+            2D visualization of dipole fields
+        """
+        if ax is None:
+            fig = plt.figure(figsize=(6.5,5))
+            ax = plt.subplot(111)
+
+        if view == "amp" or view == "vec":
+            val = self.VEC_amp
+
+        elif view =="X" or view=="x":
+            val = self.VAL_X
+        elif view =="Y" or view=="y":
+            val = self.VAL_Y
+        elif view =="Z" or view=="z":
+            val = self.VAL_Z
+
+        if logamp == True:
+            zeroind = val == 0
+            val = np.log10(abs(val))
+            val[zeroind] = val[~zeroind].min()
+        if self.normal =="X" or self.normal=="x":
+            a, b = self.y, self.z
+            vec_a, vec_b = self.VAL_Y, self.VAL_Z
+            xlabel = "Y (m)"
+            ylabel = "Z (m)"
+        elif self.normal =="Y" or self.normal =="y":
+            a, b = self.x, self.z
+            vec_a, vec_b = self.VAL_X, self.VAL_Z
+            xlabel = "X (m)"
+            ylabel = "Z (m)"
+        elif self.normal =="Z" or self.normal =="z":
+            a, b = self.x, self.y
+            vec_a, vec_b = self.VAL_X, self.VAL_Y
+            xlabel = "X (m)"
+            ylabel = "Y (m)"
+
+        if clim == None:
+            vmin, vmax = val.min(), val.max()
+        else:
+            vmin, vmax = clim[0], clim[1]
+
+        dat = ax.contourf(a, b, val, ncontour, clim=(vmin,vmax), vmin=vmin, vmax=vmax, cmap=cmap)
+
+        if showcontour:
+            ax.contour(a, b, val, levels, colors="k", linestyles="-")
+
+        if colorbar:
+            if logamp == True:
+                cb = plt.colorbar(dat,ax=ax, format="$10^{%.1f}$", ticks=np.linspace(vmin, vmax, 3))
+            else:
+                cb = plt.colorbar(dat,ax=ax, format="%.1e", ticks=np.linspace(vmin, vmax, 3))
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+
+        if view == "vec":
+            nx = self.x.size
+            nskip = int(nx/15)
+            # ax.quiver(a[::nskip], b[::nskip], (vec_a.real/VEC_amp)[::nskip,::nskip],  (vec_b.real/VEC_amp)[::nskip,::nskip], color="w", linewidth=0.5)
+            ax.streamplot(a, b, vec_a,  vec_b, color="w", linewidth=0.5)
 
         return ax, dat
 
@@ -344,20 +418,20 @@ class DataView(object):
 
         return ax0,ax1
 
-    def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slice=None, logamp=True, ax=None,legend=True, color = 'black'):
+    def plot1D_FD(self,component="real",view="x",abscisse="Conductivity",slic=None, logamp=True, ax=None,legend=True, color = 'black'):
 
         if ax is None:
             fig = plt.figure(figsize=(6.5,5))
             ax = plt.subplot(111)
 
         slice_ind=0
-        if slice is None:
+        if slic is None:
             slice_ind=np.minimum(len(self.sigvec),len(self.fvec))/2
             if abscisse.upper() == "CONDUCTIVITY":
-                slice = self.fvec[slice_ind]
+                slic = self.log_fvec[slice_ind]
 
             elif abscisse.upper() == "FREQUENCY":
-                slice = self.sigvec[slice_ind]
+                slic = self.log_sigvec[slice_ind]
 
         pltvalue =[]
 
@@ -386,26 +460,26 @@ class DataView(object):
 
         if component.upper() == "PHASOR":
             if abscisse.upper() == "CONDUCTIVITY":
-                slice_ind = np.where( slice == self.fvec)[0][0]
+                slice_ind = np.where( slic == self.log_fvec)[0][0]
                 ax.plot(pltvalue.real[:,slice_ind],pltvalue.imag[:,slice_ind],color = color)
                 ax.set_xlabel("E field, Real part (V/m)")
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[:,slice_ind].min(),pltvalue.imag[:,slice_ind].max()
-                if legend:    
+                if legend:
                     ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
                         xy=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=((pltvalue.real[:,slice_ind].min()+pltvalue.real[:,slice_ind].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
                         fontsize=14.)
 
             elif abscisse.upper() == "FREQUENCY":
-                slice_ind = np.where( slice == self.sigvec)[0][0]
+                slice_ind = np.where( slic == self.log_sigvec)[0][0]
                 ax.plot(pltvalue.real[slice_ind,:],pltvalue.imag[slice_ind,:],color = color)
                 ax.set_xlabel("E field, Real part (V/m)")
                 ax.set_ylabel("E field, Imag part(V/m)")
 
                 axymin, axymax = pltvalue.imag[slice_ind,:].min(),pltvalue.imag[slice_ind,:].max()
-                if legend:    
+                if legend:
                     ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                         xy=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=((pltvalue.real[slice_ind,:].min()+pltvalue.real[slice_ind,:].max())/2., axymin+(axymax-axymin)/4.), textcoords='data',
@@ -416,11 +490,11 @@ class DataView(object):
             if abscisse.upper() == "CONDUCTIVITY":
                 ax.set_xlabel("Conductivity (S/m)")
                 ax.set_xscale('log')
-                slice_ind = np.where( slice == self.fvec)[0][0]
+                slice_ind = np.where( slic == self.log_fvec)[0][0]
                 ax.plot(self.sigvec,pltvalue[:,slice_ind],color=color)
 
                 axymin, axymax = pltvalue[:,slice_ind].min(),pltvalue[:,slice_ind].max()
-                if legend:    
+                if legend:
                     ax.annotate(("f =%0.5f Hz")%(self.fvec[slice_ind]),
                         xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
@@ -429,11 +503,11 @@ class DataView(object):
             elif abscisse.upper() =="FREQUENCY":
                 ax.set_xlabel("Frequency (Hz)")
                 ax.set_xscale('log')
-                slice_ind = np.where( slice == self.sigvec)[0][0]
+                slice_ind = np.where( slic == self.log_sigvec)[0][0]
                 ax.plot(self.fvec,pltvalue[slice_ind,:],color=color)
 
                 axymin, axymax = pltvalue[slice_ind,:].min(),pltvalue[slice_ind,:].max()
-                if legend:    
+                if legend:
                     ax.annotate(("$\sigma$ =%0.5f S/m")%(self.sigvec[slice_ind]),
                         xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), xycoords='data',
                         xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), axymin+(axymax-axymin)/4.), textcoords='data',
