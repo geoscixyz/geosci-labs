@@ -81,16 +81,19 @@ class DataView(object):
             #for k in range(len(fvec)):
                 self.val_xfs[n],self.val_yfs[n],self.val_zfs[n]=func(self.obsLoc, srcLoc, 10.**log_sigvec[n], 10.**log_fvec, orientation=self.orientation)
 
-    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z",t=0.):
+    def eval(self, xyz, srcLoc, sig, f, orientation, func, normal="Z", t=0.):
         val_x, val_y, val_z = func(xyz, srcLoc, sig, f, orientation=orientation, t=t)
         return val_x, val_y, val_z
 
+    def eval_TD(self, xyz, srcLoc, sig, t, orientation, func, normal="Z"):
+        val_x, val_y, val_z = func(xyz, srcLoc, sig, t, orientation=orientation)
+        return val_x, val_y, val_z
 
-    def eval_2D(self, srcLoc, sig, f, orientation, func,t=0.):
+    def eval_2D(self, srcLoc, sig, f, orientation, func, t=0.):
         self.func2D = func
         self.srcLoc = srcLoc
         self.sig = sig
-        self.f = f
+        self.t = f
         self.orientation = orientation
         self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, f, orientation=orientation, t=t)
         if self.normal =="X" or self.normal=="x":
@@ -106,19 +109,22 @@ class DataView(object):
         self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2+np.abs(self.VAL_Z)**2)
         self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2+phase(self.VAL_Z)**2)
 
-        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Z.real**2)
-        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Z.imag**2)
-        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Z)**2)
-        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Z)**2)
+    def eval_2D_TD(self, srcLoc, sig, t, orientation, func):
+        self.func2D = func
+        self.srcLoc = srcLoc
+        self.sig = sig
+        self.t = t
+        self.orientation = orientation
+        self.val_x, self.val_y, self.val_z = func(self.xyz, srcLoc, sig, t, orientation=orientation)
+        if self.normal =="X" or self.normal=="x":
+            Freshape = lambda v: v.reshape(self.ncy, self.ncz)
+        elif self.normal =="Y" or self.normal =="y":
+            Freshape = lambda v: v.reshape(self.ncx, self.ncz)
+        elif self.normal =="Z" or self.normal =="z":
+            Freshape = lambda v: v.reshape(self.ncx, self.ncy)
 
-        #     self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
-        #     self.VEC_R_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2)
-        #     self.VEC_I_amp = np.sqrt(self.VAL_X.imag**2+self.VAL_Y.imag**2)
-        #     self.VEC_A_amp = np.sqrt(np.abs(self.VAL_X)**2+np.abs(self.VAL_Y)**2)
-        #     self.VEC_P_amp = np.sqrt(phase(self.VAL_X)**2+phase(self.VAL_Y)**2)
-
-    # Modularize ax0, ax1
+        self.VAL_X, self.VAL_Y, self.VAL_Z = Freshape(self.val_x), Freshape(self.val_y), Freshape(self.val_z)
+        self.VEC_amp = np.sqrt(self.VAL_X.real**2+self.VAL_Y.real**2+self.VAL_Z.real**2)
 
     def plot2D_FD(self, component="real", view="vec", ncontour=20, logamp=True, clim=None, showcontour=False, levels=None, ax=None, colorbar=True, cmap="viridis"):
         """
@@ -207,6 +213,71 @@ class DataView(object):
             elif component == "phase":
                 # ax.quiver(a, b, phase(vec_a)/VEC_amp,  phase(vec_b)/VEC_amp, color="w", linewidth=0.5)
                 ax.streamplot(a, b, phase(vec_a),  phase(vec_b), color="w", linewidth=0.5)
+
+        return ax, dat
+
+    def plot2D_TD(self, view="vec", ncontour=20, logamp=True, clim=None, showcontour=False, levels=None, ax=None, colorbar=True, cmap="viridis"):
+        """
+            2D visualization of dipole fields
+        """
+        if ax is None:
+            fig = plt.figure(figsize=(6.5,5))
+            ax = plt.subplot(111)
+
+        if view == "amp" or view == "vec":
+            val = self.VEC_amp
+
+        elif view =="X" or view=="x":
+            val = self.VAL_X
+        elif view =="Y" or view=="y":
+            val = self.VAL_Y
+        elif view =="Z" or view=="z":
+            val = self.VAL_Z
+
+        if logamp == True:
+            zeroind = val == 0
+            val = np.log10(abs(val))
+            val[zeroind] = val[~zeroind].min()
+        if self.normal =="X" or self.normal=="x":
+            a, b = self.y, self.z
+            vec_a, vec_b = self.VAL_Y, self.VAL_Z
+            xlabel = "Y (m)"
+            ylabel = "Z (m)"
+        elif self.normal =="Y" or self.normal =="y":
+            a, b = self.x, self.z
+            vec_a, vec_b = self.VAL_X, self.VAL_Z
+            xlabel = "X (m)"
+            ylabel = "Z (m)"
+        elif self.normal =="Z" or self.normal =="z":
+            a, b = self.x, self.y
+            vec_a, vec_b = self.VAL_X, self.VAL_Y
+            xlabel = "X (m)"
+            ylabel = "Y (m)"
+
+        if clim == None:
+            vmin, vmax = val.min(), val.max()
+        else:
+            vmin, vmax = clim[0], clim[1]
+
+        dat = ax.contourf(a, b, val, ncontour, clim=(vmin,vmax), vmin=vmin, vmax=vmax, cmap=cmap)
+
+        if showcontour:
+            ax.contour(a, b, val, levels, colors="k", linestyles="-")
+
+        if colorbar:
+            if logamp == True:
+                cb = plt.colorbar(dat,ax=ax, format="$10^{%.1f}$", ticks=np.linspace(vmin, vmax, 3))
+            else:
+                cb = plt.colorbar(dat,ax=ax, format="%.1e", ticks=np.linspace(vmin, vmax, 3))
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+
+        if view == "vec":
+            nx = self.x.size
+            nskip = int(nx/15)
+            # ax.quiver(a[::nskip], b[::nskip], (vec_a.real/VEC_amp)[::nskip,::nskip],  (vec_b.real/VEC_amp)[::nskip,::nskip], color="w", linewidth=0.5)
+            ax.streamplot(a, b, vec_a,  vec_b, color="w", linewidth=0.5)
 
         return ax, dat
 

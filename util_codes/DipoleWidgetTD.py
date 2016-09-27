@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-from FDEMDipolarfields import *
+from TDEMDipolarfields import *
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
@@ -28,7 +28,7 @@ def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     return x, y
 
 
-class DipoleWidget(object):
+class DipoleWidgetTD(object):
     """DipoleWidget"""
 
     x = None
@@ -44,11 +44,11 @@ class DipoleWidget(object):
     def __init__(self):
         self.dataview = DataView()
 
-    def SetDataview(self, srcLoc, sig, f, orientation, normal, functype, na=100, nb=100, loc=0.):
+    def SetDataview(self, srcLoc, sig, t, orientation, normal, functype, na=100, nb=100, loc=0.):
 
         self.srcLoc = srcLoc
         self.sig = sig
-        self.f = f
+        self.t = t
         self.normal = normal
         self.SetGrid(normal, loc, na, nb)
         self.functype = functype
@@ -56,24 +56,22 @@ class DipoleWidget(object):
 
         if self.functype == "E_from_ED":
             self.func = E_from_ElectricDipoleWholeSpace
-        elif self.functype == "E_from_ED_galvanic":
-            self.func = E_galvanic_from_ElectricDipoleWholeSpace
-        elif self.functype == "E_from_ED_inductive":
-            self.func = E_inductive_from_ElectricDipoleWholeSpace
         elif self.functype == "H_from_ED":
             self.func = H_from_ElectricDipoleWholeSpace
+        elif self.functype == "dHdt_from_ED":
+            self.func = dHdt_from_ElectricDipoleWholeSpace
         elif self.functype == "J_from_ED":
             self.func = J_from_ElectricDipoleWholeSpace
-        elif self.functype == "E_from_MD":
-            self.func = E_from_MagneticDipoleWholeSpace
-        elif self.functype == "H_from_MD":
-            self.func = H_from_MagneticDipoleWholeSpace
-        elif self.functype == "J_from_MD":
-            self.func = J_from_MagneticDipoleWholeSpace
+        # elif self.functype == "E_from_MD":
+        #     self.func = E_from_MagneticDipoleWholeSpace
+        # elif self.functype == "H_from_MD":
+        #     self.func = H_from_MagneticDipoleWholeSpace
+        # elif self.functype == "J_from_MD":
+        #     self.func = J_from_MagneticDipoleWholeSpace
         else:
             raise NotImplementedError()
 
-        self.dataview.eval_2D(srcLoc, sig, f, orientation, self.func) # evaluate
+        self.dataview.eval_2D_TD(srcLoc, sig, t, orientation, self.func) # evaluate
 
     def SetGrid(self, normal, loc, na, nb):
         # Assume we are seeing xy plane
@@ -90,7 +88,7 @@ class DipoleWidget(object):
             self.y = np.linspace(self.ymin, self.ymax, nb)
             self.z = np.r_[loc]
 
-    def Dipole2Dviz(self, x1, y1, x2, y2, npts2D, npts, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="x", component="real", view="x", normal="Z", functype="E_from_ED", loc=0., scale="log", dx=50.):
+    def Dipole2Dviz(self, x1, y1, x2, y2, npts2D, npts, sig, t, srcLoc=np.r_[0., 0., 0.], orientation="x", component="real", view="x", normal="Z", functype="E_from_ED", loc=0., scale="log", dx=50.):
         nx, ny = npts2D, npts2D
         x, y = linefun(x1, x2, y1, y2, npts)
         if scale == "log":
@@ -100,7 +98,7 @@ class DipoleWidget(object):
         else:
             raise NotImplementedError()
 
-        self.SetDataview(srcLoc, sig, f, orientation, normal, functype, na=nx, nb=ny, loc=loc)
+        self.SetDataview(srcLoc, sig, t, orientation, normal, functype, na=nx, nb=ny, loc=loc)
         plot1D = False
         plotTxProflie = False
         if normal =="X" or normal=="x":
@@ -124,7 +122,7 @@ class DipoleWidget(object):
         ax1 = plt.subplot(gs1[:2, :3])
         ax1.axis("equal")
 
-        ax1, dat1 = self.dataview.plot2D_FD(ax=ax1, component=component,view=view, colorbar=False, logamp=logamp)
+        ax1, dat1 = self.dataview.plot2D_TD(ax=ax1,view=view, colorbar=False, logamp=logamp)
         vmin, vmax = dat1.cvalues.min(), dat1.cvalues.max()
         if scale == "log":
             cb = plt.colorbar(dat1, ax=ax1, ticks=np.linspace(vmin, vmax, 5), format="$10^{%.1f}$")
@@ -141,16 +139,8 @@ class DipoleWidget(object):
             tname = "|"
             title = tname+tempstr[0]+"|-field from "+tempstr[2]
         else:
-            if component == "real":
-                tname = "Re("
-            elif component == "imag":
-                tname = "Im("
-            elif component == "amplitude":
-                tname = "Amp("
-            elif component == "phase":
-                tname = "Phase("
 
-            title = tname + tempstr[0]+view+")-field from "+tempstr[2]
+            title = tempstr[0]+view+"-field from "+tempstr[2]
 
         if tempstr[0] == "E":
             unit = " (V/m)"
@@ -158,13 +148,16 @@ class DipoleWidget(object):
         elif tempstr[0] == "H":
             unit = " (A/m)"
             fieldname = "Magnetic field"
+        elif tempstr[0] == "dHdt":
+            unit = " (A/m-s)"
+            fieldname = "dH/dt"
         elif tempstr[0] == "J":
             unit =  " (A/m$^2$) "
             fieldname = "Current density"
         else:
+            print tempstr
             raise NotImplementedError()
-        if component == "phase":
-            unit = " (rad)"
+
         label = fieldname + unit
         label_cb = tempstr[0]+view+"-field from "+tempstr[2]
         cb.set_label(label)
@@ -176,7 +169,7 @@ class DipoleWidget(object):
         if plot1D:
             ax1.plot(x,y, 'r.', ms=4)
             ax2 = plt.subplot(gs1[:, 4:6])
-            val_line_x, val_line_y, val_line_z = self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[f], orientation, self.func)
+            val_line_x, val_line_y, val_line_z = self.dataview.eval_TD(xyz_line, srcLoc, np.r_[sig], np.r_[t], orientation, self.func)
 
             if view =="X" or view =="x":
                 val_line = val_line_x
@@ -186,26 +179,9 @@ class DipoleWidget(object):
                 val_line = val_line_z
             elif view =="vec" or "amp":
                 vecamp = lambda a, b, c: np.sqrt((a)**2+(b)**2+(c)**2)
-                if component == "real":
-                    val_line = vecamp(val_line_x.real, val_line_y.real, val_line_z.real)
-                elif component == "imag":
-                    val_line = vecamp(val_line_x.imag, val_line_y.imag, val_line_z.imag)
-                elif component == "amplitude":
-                    val_line = vecamp(abs(val_line_x), abs(val_line_y), abs(val_line_z))
-                elif component == "phase":
-                    val_line = vecamp(np.angle(val_line_x), np.angle(val_line_y), np.angle(val_line_z))
+                val_line = vecamp(val_line_x, val_line_y, val_line_z)
 
             distance = np.sqrt((x-x1)**2+(y-y1)**2) - dx # specific purpose
-
-
-            if component == "real":
-                val_line = val_line.real
-            elif component == "imag":
-                val_line = val_line.imag
-            elif component == "amplitude":
-                val_line = abs(val_line)
-            elif component == "phase":
-                val_line = np.angle(val_line)
 
             if scale == "log":
                 temp = val_line.copy()*np.nan
@@ -233,22 +209,24 @@ class DipoleWidget(object):
                 if view == "vec" or view== "amp":
                     label = "|"+tempstr[0]+"|-field (V/m) "
                 else:
-                    label = tname+tempstr[0]+view+")-field (V/m) "
+                    label = tempstr[0]+view+"-field (V/m) "
             elif tempstr[0] == "H":
                 if view == "vec" or view== "amp":
                     label = "|"+tempstr[0]+"|-field field (A/m) "
                 else:
-                    label = tname+tempstr[0]+view+")-field (A/m) "
+                    label = tempstr[0]+view+"-field (A/m) "
+            elif tempstr[0] == "dHdt":
+                if view == "vec" or view== "amp":
+                    label = "|"+tempstr[0]+"|-field field (A/m-s) "
+                else:
+                    label = tempstr[0]+view+"-field (A/m-s) "
             elif tempstr[0] == "J":
                 if view == "vec" or view== "amp":
                     label = "|"+tempstr[0]+"|-field field (A/m$^2$) "
                 else:
-                    label = tname+tempstr[0]+view+")-field (A/m$^2$) "
+                    label = tempstr[0]+view+"-field (A/m$^2$) "
             else:
                 raise NotImplementedError()
-
-            if component == "phase":
-                label = tname+tempstr[0]+view+")-field (rad) "
 
             ax2.set_title("EM data at Rx hole")
             ax2.set_xlabel(label)
@@ -269,12 +247,12 @@ class DipoleWidget(object):
         self.ymin, self.ymax = Y1, Y2
         self.zmin, self.zmax = Z1, Z2
 
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma, Offset, Scale, Slider, FreqLog, SigLog, SrcType=SrcType):
+        def foo(Field, AmpDir, Component, Time, Sigma, Offset, Scale, Slider, TimeLog, SigLog, SrcType=SrcType):
             if Slider ==True:
-                f = np.r_[10**FreqLog]
+                t = np.r_[10**TimeLog]
                 sig = np.r_[10**SigLog]
             else:
-                f = np.r_[Frequency]
+                t = np.r_[Time]
                 sig = np.r_[Sigma]
 
             if plane == "XZ":
@@ -284,22 +262,12 @@ class DipoleWidget(object):
             elif plane == "YZ":
                 normal = "X"
                 self.offset_rx = 0.
+
             x1, x2, y1, y2 = self.offset_rx, self.offset_rx, Z1, Z2
 
-            if ComplexNumber == "Re":
-                ComplexNumber = "real"
-            elif ComplexNumber == "Im":
-                ComplexNumber = "imag"
-            elif ComplexNumber == "Amp":
-                ComplexNumber = "amplitude"
-            elif ComplexNumber == "Phase":
-                ComplexNumber = "phase"
-
             if AmpDir == "Direction":
-                ComplexNumber = "real"
                 Component = "vec"
             elif AmpDir == "Amp":
-                ComplexNumber = "real"
                 Component = "amp"
 
             if SrcType == "ED":
@@ -307,45 +275,20 @@ class DipoleWidget(object):
             elif SrcType == "MD":
                 Field = Field+"_from_MD"
 
-            return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="z", component=ComplexNumber, view=Component, normal=normal, functype=Field, loc=Offset, scale=Scale)
+            return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, t, srcLoc=np.r_[0., 0., 0.], orientation="z", view=Component, normal=normal, functype=Field, loc=Offset, scale=Scale)
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["E", "H", "J"], value=fieldvalue) \
+                        ,Field=widgets.ToggleButtons(options=["E", "H", "dHdt","J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
-                        ,Frequency=widgets.FloatText(value=0., continuous_update=False, description='f (Hz)') \
+                        ,Time=widgets.FloatText(value=1e-5, continuous_update=False, description='t (sec)') \
                         ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
                         ,Offset=widgets.FloatText(value = offset_plane, continuous_update=False) \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
                         ,Slider=widgets.widget_bool.Checkbox(value=False)\
-                        ,FreqLog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
+                        ,TimeLog=widgets.FloatSlider(min=-6, max=0, step=0.5, value=-3, continuous_update=False) \
                         ,SigLog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
                         ,SrcType = fixed(SrcType)
-                        )
-        return out
-
-    def InteractiveDipole(self):
-        def foo(orientation, normal, component, view, functype, flog, siglog, x1, y1, x2, y2, npts2D, npts, loc):
-            f = np.r_[10**flog]
-            sig = np.r_[10**siglog]
-            return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, npts, sig, f, srcLoc=np.r_[0., 0., 0.], orientation=orientation, component=component, view=view, normal=normal, functype=functype, loc=loc, dx=50.)
-
-        out = widgets.interactive (foo
-                        ,orientation=widgets.ToggleButtons(options=['x','y','z']) \
-                        ,normal=widgets.ToggleButtons(options=['X','Y','Z'], value="Z") \
-                        ,component=widgets.ToggleButtons(options=['real','imag','amplitude', 'phase']) \
-                        ,view=widgets.ToggleButtons(options=['x','y','z', 'vec']) \
-                        ,functype=widgets.ToggleButtons(options=["E_from_ED", "H_from_ED", "E_from_ED_galvanic", "E_from_ED_inductive"]) \
-                        ,flog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
-                        ,siglog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
-                        ,loc=widgets.FloatText(value=0.01) \
-                        ,x1=widgets.FloatText(value=-10) \
-                        ,y1=widgets.FloatText(value=0.01) \
-                        ,x2=widgets.FloatText(value=10) \
-                        ,y2=widgets.FloatText(value=0.01) \
-                        ,npts2D=widgets.IntSlider(min=4,max=200,step=2,value=40) \
-                        ,npts=widgets.IntSlider(min=4,max=200,step=2,value=40)
                         )
         return out
 
@@ -358,36 +301,30 @@ def DisPosNegvalues(val):
     return temp_p, temp_n
 
 
-def InteractiveDipoleProfile(self, sig, Field, Scale):
+def InteractiveDipoleProfileTD(self, sig, Field, compvalue, Scale):
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
-    nRx = 100.
+    nRx = 100
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
-    def foo(Component, ComplexNumber, Profile, F1, F2, F3, Scale, FixedScale=False):
+    def foo(Component, Profile, T1, T2, T3, Scale, irx):
     #     Scale = "log"
         orientation = "z"
         vals = []
+
         if Field =="E":
             unit = " (V/m)"
         elif Field =="H":
             unit = " (A/m)"
+        elif Field =="dHdt":
+            unit = " (A/m-s)"
         elif Field =="J":
             unit = " (A/m $^2$)"
 
-        if ComplexNumber == "ReIm":
-            headerr, headeri = "Re(", "Im("
-            textsep = ")"
-        elif ComplexNumber == "AmpPhase":
-            headerr, headeri = "|", "Phase("
-            textsep = "|"
 
-        labelr = headerr+Field+Component+textsep+"-field "+unit
-        if ComplexNumber == "AmpPhase":
-            unit = " (rad)"
-        labeli = headeri+Field+Component+")-field " + unit
+        labelr = Field+Component+"-field "+unit
 
-        F = [F1, F2, F3]
+        T = [T1, T2, T3]
         if Component == "x":
             icomp = 0
         elif Component == "y":
@@ -402,7 +339,6 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])
-            ax2 = ax1.twinx()
 
         else:
             if Profile == "Rxhole":
@@ -417,76 +353,49 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])
-            ax2 = ax1.twiny()
 
 
-        for ifreq, f in enumerate(F):
-            Frequency = f
-            vals.append(self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[f], orientation, self.dataview.func2D))
+        for ifreq, t in enumerate(T):
+            Time = t
+            vals.append(self.dataview.eval_TD(xyz_line, srcLoc, np.r_[sig], np.r_[t], orientation, self.dataview.func2D))
             # for ifreq, f in enumerate(F):
-            if ComplexNumber == "ReIm":
-                valr = vals[ifreq][icomp].real.flatten()
-                vali = vals[ifreq][icomp].imag.flatten()
-            elif ComplexNumber == "AmpPhase":
-                valr = abs(vals[ifreq][icomp]).flatten()
-                vali = np.angle(vals[ifreq][icomp]).flatten()
+            valr = vals[ifreq][icomp]
 
             if Scale == "log":
                 valr_p, valr_n = DisPosNegvalues(valr)
-                vali_p, vali_n = DisPosNegvalues(vali)
                 if Profile == "Rxhole" or Profile == "Txhole" :
                     ax1.plot(valr_p, r, 'k-')
                     ax1.plot(valr_n, r, 'k--')
-                    if Frequency > 0.:
-                        ax2.plot(vali_p, r, 'r-')
-                        ax2.plot(vali_n, r, 'r--')
+                    ax1.plot(abs(valr)[irx], r[irx], 'ro')
+                    ax1.plot(abs(valr), r, 'k.', ms=2)
+
                 elif Profile == "TxProfile":
                     ax1.plot(r, valr_p, 'k-')
                     ax1.plot(r, valr_n, 'k--')
-                    if Frequency > 0.:
-                        ax2.plot(r, vali_p, 'r-')
-                        ax2.plot(r, vali_n, 'r--')
+                    ax1.plot(r[irx], abs(valr)[irx], 'ro')
+                    ax1.plot(r, abs(valr), 'k.', ms=2)
+
 
             elif Scale == "linear":
                 if Profile == "Rxhole" or Profile == "Txhole" :
                     ax1.plot(valr, r, 'k-')
-                    if Frequency > 0.:
-                        ax1.plot(vali, r, 'r-')
+                    ax1.plot(abs(valr)[irx], r[irx], 'ro')
+                    ax1.plot(abs(valr), r, 'k.', ms=2)
 
                 elif Profile == "TxProfile":
                     ax1.plot(r, valr, 'k-')
-                    if Frequency > 0.:
-                        ax1.plot(r, vali, 'r-')
+                    ax1.plot(r[irx], abs(valr)[irx], 'ro')
+                    ax1.plot(r, abs(valr), 'k.', ms=2)
 
         if Profile == "Rxhole" or Profile == "Txhole" :
             ax1.set_xscale(Scale)
             ax1.set_ylim(-50, 50)
-            if Frequency > 0.:
-                ax2.set_xscale(Scale)
-                if FixedScale:
-                    vmin1, vmax1 = ax1.get_xlim()
-                    vmin2, vmax2 = ax2.get_xlim()
-                    vmin = min(vmin1, vmin2)
-                    vmax = max(vmax1, vmax2)
-                    ax1.set_xlim(vmin, vmax)
-                    ax2.set_xlim(vmin, vmax)
-                ax2.set_xlabel(labeli, color='r')
             ax1.set_xlabel(labelr, color='k')
             ax1.set_ylabel("Z (m)")
 
         elif Profile == "TxProfile":
             ax1.set_yscale(Scale)
             ax1.set_xlim(-20, 80)
-            if Frequency > 0.:
-                ax2.set_yscale(Scale)
-                if FixedScale:
-                    vmin1, vmax1 = ax1.get_ylim()
-                    vmin2, vmax2 = ax2.get_ylim()
-                    vmin = min(vmin1, vmin2)
-                    vmax = max(vmax1, vmax2)
-                    ax1.set_ylim(vmin, vmax)
-                    ax2.set_ylim(vmin, vmax)
-                ax2.set_ylabel(labeli, color='r')
             ax1.set_ylabel(labelr, color='k')
             ax1.set_xlabel("X (m)")
 
@@ -497,14 +406,6 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
                 xticksa = np.linspace(x.min(), x.max(), 3)
                 ax1.xaxis.set_ticks(xticksa)
                 ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter("%.0e"))
-                if Frequency > 0.:
-                    if FixedScale is not True:
-                        x = ax2.xaxis.get_majorticklocs()
-                    for tl in ax2.get_yticklabels():
-                        tl.set_color('r')
-                    xticksb = np.linspace(x.min(), x.max(), 3)
-                    ax2.xaxis.set_ticks(xticksb)
-                    ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter("%.0e"))
 
             elif Profile == "TxProfile":
                 # yticksa = np.linspace(valr.min(), valr.max(), 3)
@@ -512,32 +413,67 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
                 yticksa = np.linspace(y.min(), y.max(), 3)
                 ax1.yaxis.set_ticks(yticksa)
                 ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter("%.0e"))
-                if Frequency > 0.:
-                    if FixedScale is not True:
-                        y = ax2.yaxis.get_majorticklocs()
-                    yticksb = np.linspace(y.min(), y.max(), 3)
-                    ax2.yaxis.set_ticks(yticksb)
-                    ax2.yaxis.set_major_formatter(ticker.FormatStrFormatter("%.0e"))
 
-        if Frequency > 0.:
-            if Profile == "Rxhole" or Profile == "Txhole":
-                for tl in ax2.get_xticklabels():
-                    tl.set_color('r')
-            elif Profile == "TxProfile":
-                for tl in ax2.get_yticklabels():
-                    tl.set_color('r')
-            else:
-                raise NotImplementedError()
 
         ax1.grid(True)
     Q2 = widgets.interactive (foo
-                    ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole')
-                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
-                    ,ComplexNumber=widgets.ToggleButtons(options=['ReIm','AmpPhase']) \
+                    ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole') \
+                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                     ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear'], value=Scale) \
-                    ,FixedScale=widgets.widget_bool.Checkbox(value=False, description='Fixed')
-                    ,F1=widgets.FloatText(value=0.1, continuous_update=False, description='$f_1$ (Hz)')
-                    ,F2=widgets.FloatText(value=100, continuous_update=False, description='$f_2$ (Hz)')\
-                    ,F3=widgets.FloatText(value=1000, continuous_update=False, description='$f_3$ (Hz)'))
+                    ,T1=widgets.FloatText(value=1e-5, continuous_update=False, description='$t_1$ (sec)')
+                    ,T2=widgets.FloatText(value=1e-4, continuous_update=False, description='$t_2$ (sec)')\
+                    ,T3=widgets.FloatText(value=1e-3, continuous_update=False, description='$t_3$ (sec)')\
+                    ,irx = widgets.IntSlider(min=0, max=int(nRx), step=1, value=0, continuous_update=False, description='Rx#'))
     return Q2
+
+
+def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5, Tmax=1e-2, waveform="stepoff"):
+    ntime = 200
+    srcLoc = np.r_[0., 0., 0.]
+    orientation = "z"
+
+    def foo(Component, Sigma, Waveform, Scale):
+        orientation = "z"
+        vals = []
+
+        if Field =="E":
+            unit = " (V/m)"
+        elif Field =="H":
+            unit = " (A/m)"
+        elif Field =="dHdt":
+            unit = " (A/m-s)"
+        elif Field =="J":
+            unit = " (A/m $^2$)"
+
+        label = Field+Component+"-field "+unit
+        t = np.logspace(np.log10(Tmin), np.log10(Tmax), ntime)
+        valx, valy, valz = self.dataview.eval_TD(xyz_loc, srcLoc, np.r_[Sigma], t, orientation, self.dataview.func2D)
+        if Component == "x" or Component == "X":
+            val = valx.copy()
+        elif Component == "y" or Component == "Y":
+            val = valy.copy()
+        elif Component == "z" or Component == "Z":
+            val = valz.copy()
+
+        fig = plt.figure(figsize=(7, 5))
+        ax = plt.subplot(111)
+        if Scale == "log":
+            valp, valn = DisPosNegvalues(val)
+            ax.plot(t, valp, 'k-')
+            ax.plot(t, valn, 'k--')
+
+        elif Scale == "linear":
+            ax.plot(t, val, 'k-')
+        ax.set_xscale("log")
+        ax.set_yscale(Scale)
+        ax.set_ylabel(label)
+        ax.set_xlabel("Time (sec)")
+        ax.grid(True)
+
+    Q3 = widgets.interactive (foo
+                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
+                    ,Sigma=widgets.FloatText(value=sig, continuous_update=False, description='$\sigma$ (S/m)') \
+                    ,Scale=widgets.ToggleButtons(options=['log','linear']) \
+                    ,Waveform=widgets.ToggleButtons(options=['stepoff','stepon','rampoff'], value='stepoff'))
+    return Q3

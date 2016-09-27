@@ -10,7 +10,7 @@ matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
 from ipywidgets import *
-from DipoleWidget import DipoleWidget, linefun, DisPosNegvalues
+from DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from scipy.constants import mu_0, epsilon_0
 from VolumeWidget import polyplane
 from FDEMPlanewave import *
@@ -92,7 +92,7 @@ class PolarEllipse(object):
         return out
 
 
-class PlanewaveWidget(DipoleWidget):
+class PlanewaveWidget(DipoleWidgetFD):
     """PlanewaveWidget"""
 
     x = None
