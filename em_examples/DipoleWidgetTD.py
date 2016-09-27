@@ -62,12 +62,14 @@ class DipoleWidgetTD(object):
             self.func = dHdt_from_ElectricDipoleWholeSpace
         elif self.functype == "J_from_ED":
             self.func = J_from_ElectricDipoleWholeSpace
-        # elif self.functype == "E_from_MD":
-        #     self.func = E_from_MagneticDipoleWholeSpace
-        # elif self.functype == "H_from_MD":
-        #     self.func = H_from_MagneticDipoleWholeSpace
-        # elif self.functype == "J_from_MD":
-        #     self.func = J_from_MagneticDipoleWholeSpace
+        elif self.functype == "E_from_MD":
+            self.func = E_from_MagneticDipoleWholeSpace
+        elif self.functype == "H_from_MD":
+            self.func = H_from_MagneticDipoleWholeSpace
+        elif self.functype == "dHdt_from_MD":
+            self.func = dHdt_from_MagneticDipoleWholeSpace
+        elif self.functype == "J_from_MD":
+            self.func = J_from_MagneticDipoleWholeSpace
         else:
             raise NotImplementedError()
 
