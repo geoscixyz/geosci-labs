@@ -11,3 +11,4 @@ import DipoleWidgetFD
 import DipoleWidgetTD
 import PlanewaveWidget
 import EMcircuit
+import FreqtoTime
