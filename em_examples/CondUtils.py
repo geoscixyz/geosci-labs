@@ -1,7 +1,8 @@
+from __future__ import print_function
 import numpy as np
-from FreqtoTime import transFilt
 import matplotlib
 import matplotlib.pyplot as plt
+from FreqtoTime import transFilt
 
 def ColeColePelton(f, sigmaInf, eta, tau, c, option):
     """
