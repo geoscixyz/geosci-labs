@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
-try:
-    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
-    pass
-except Exception, e:
-    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
+#try:
+ #   from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+  #  pass
+#except Exception, e:    
+from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
 def getPlotLog(d,log,dmax=200):
     d = np.array(d, dtype=float)
@@ -229,7 +229,7 @@ def plotLogs(d, rho, v, usingT=True):
     xlimz   = (xlimrho[0]*xlimv[0], xlimrho[1]*xlimv[1])
 
     # Plot Density
-    plt.figure(1)
+    plt.figure(1,figsize= (10,5))
 
     plt.subplot(141)
     plotLogFormat(rholog*10**-3,dpth,xlimrho,'blue')
@@ -258,7 +258,7 @@ def plotLogs(d, rho, v, usingT=True):
         plt.gca().set_xlabel('Reflectivity', fontsize = 8.)
     else:
         plt.title('Reflection Coeff.', fontsize = 8.);
-        plt.gca().set_xlabel('Reflection Coeff.', fontsize = 8.)
+        plt.gca().set_xlabel('Reflection Coeff.', fontsize = 8.) 
     plt.grid()
     plt.gca().invert_yaxis()
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
@@ -276,7 +276,7 @@ def plotTimeDepth(d,rho,v):
     dpth,t = getTimeDepth(d,v)
     nd   = len(dpth)
 
-    plt.figure(num=0, figsize = (10, 4))
+    plt.figure(num=0, figsize = (10, 5))
     ax1 = plt.subplot(131)
     ax2 = plt.subplot(132)
     ax3 = plt.subplot(133)
@@ -331,7 +331,7 @@ def plotSeismogram(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='RI
 
     seis = seis + noise
 
-    plt.figure(num=0, figsize = (8, 5))
+    plt.figure(num=0, figsize = (10, 5))
 
     plt.subplot(131)
     plt.plot(wav, twav,linewidth=1,color='black')
@@ -401,7 +401,7 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
 
     seis = seis + noise
 
-    plt.figure(num=0, figsize = (8, 5))
+    plt.figure(num=0, figsize = (10, 5))
 
     plt.subplot(141)
     plt.plot(wav,twav,linewidth=1,color='black')
@@ -441,7 +441,7 @@ def plotSeismogramV2(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
     plt.setp(plt.xticks()[1],rotation='90',fontsize=9)
     plt.setp(plt.yticks()[1],fontsize=9)
     plt.gca().set_xlabel('Amplitude',fontsize=9)
-    plt.gca().set_ylabel('Depth (m)',fontsize=9)
+    plt.gca().set_ylabel('Time (s)',fontsize=9)
 
     plt.tight_layout()
     plt.show()
@@ -469,7 +469,7 @@ def plotSeismogramV3(d, rho, v, wavf, wavA=1., noise = 0., usingT=True, wavtyp='
 
     seis = seis + noise
 
-    plt.figure(num=0, figsize = (8, 5))
+    plt.figure(num=0, figsize = (10, 5))
 
     plt.subplot(141)
     plt.plot(wav,twav,linewidth=1,color='black')
@@ -530,22 +530,23 @@ def plotLogsInteract(d2, d3, rho1, rho2, rho3, v1, v2, v3, usingT=False):
     plotLogs(d, rho, v, usingT)
 
 
-def plotTimeDepthInteract(d2, d3, v1, v2, v3, rho):
+def plotTimeDepthInteract(d2, d3, rho1, rho2, rho3, v1, v2, v3):
     """
     interactive wrapper for plotTimeDepth
     """
+    rho=np.r_[rho1,rho2,rho3]
     d   = np.array((0., d2, d3), dtype=float)
     v   = np.array((v1, v2, v3), dtype=float)
     plotTimeDepth(d, rho, v)
 
-def plotSeismogramInteractFixMod(d, v, rho, wavf, wavA):
+def plotSeismogramInteractFixMod(wavf, wavA):
     """
     interactive wrapper for plot seismogram
     """
 
-    # d      = [0., 50., 100.]      # Position of top of each layer (m)
-    # v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
-    # rho    = [2000., 2300., 2500.] # Density of each layer (kg/m^3)
+    d      = [0., 50., 100.]      # Position of top of each layer (m)
+    v      = [500., 1000., 1500.]  # Velocity of each layer (m/s)
+    rho    = [2000., 2300., 2300.] # Density of each layer (kg/m^3)
     wavf   = np.array(wavf, dtype=float)
     usingT = True
     plotSeismogram(d, rho, v, wavf, wavA, 0., usingT)
@@ -616,66 +617,64 @@ def InteractDtoT(Model):
     v10 = Model.kwargs["v1"]
     v20 = Model.kwargs["v2"]
     v30 = Model.kwargs["v3"]
-    rho10 = Model.kwargs["rho1"]
-    rho20 = Model.kwargs["rho2"]
-    rho30 = Model.kwargs["rho3"]
-    rho = np.r_[rho10, rho20, rho30]
-    func = lambda d2, d3, v1, v2, v3: plotTimeDepthInteract(d2, d3, v1, v2, v3, rho)
+    rho1 = Model.kwargs["rho1"]
+    rho2 = Model.kwargs["rho2"]
+    rho3 = Model.kwargs["rho3"]
+    #rho = np.r_[rho1, rho2, rho3]
+    func = lambda d2, d3, rho1, rho2, rho3, v1, v2, v3: plotTimeDepthInteract(d2, d3, rho1, rho2, rho3, v1, v2, v3)
     DtoT = interactive(
         func,
-        d2=FloatSlider(min=0. , max=100. , step=5  , value=d20),
-        d3=FloatSlider(min=100., max=200. , step=5  , value=d30),
-        v1=FloatSlider(min=500., max=3000., step=50., value=v10),
-        v2=FloatSlider(min=500., max=3000., step=50., value=v20),
-        v3=FloatSlider(min=500., max=3000., step=50., value=v30)
+        d2=FloatSlider(min = 0.  ,max = 100. ,step=5  , value = d20) ,
+        d3=FloatSlider(min = 100.,max = 200. ,step=5  , value = d30) ,
+        rho1=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho1),
+        rho2=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho2),
+        rho3=FloatSlider(min = 2000.,max = 5000.,step = 50., value = rho3),
+        v1=FloatSlider(min = 500.,max = 3000.,step=50., value = v10),
+        v2=FloatSlider(min = 500.,max = 3000.,step=50., value = v20),
+        v3=FloatSlider(min = 500.,max = 3000.,step=50., value = v30)
         )
 
-    return Model, DtoT
+    return DtoT
 
-def InteractWconvR(Model, DtoT):
-    d20 = DtoT.kwargs["d2"]
-    d30 = DtoT.kwargs["d3"]
-    v10 = DtoT.kwargs["v1"]
-    v20 = DtoT.kwargs["v2"]
-    v30 = DtoT.kwargs["v3"]
-    rho10 = Model.kwargs["rho1"]
-    rho20 = Model.kwargs["rho2"]
-    rho30 = Model.kwargs["rho3"]
-    func = lambda wavf, wavA: plotSeismogramInteractFixMod(
-        d=np.r_[0., d20, d30], v=np.r_[v10, v20, v30],
-        rho=np.r_[rho10, rho20, rho30], wavf=wavf, wavA=wavA)
-    return interact(func,
-                    wavf=(5., 100., 5.),
-                    wavA=FloatSlider(min=-2., max=2., step=0.25, value=1.))
+def InteractWconvR():
+    return interact(plotSeismogramInteractFixMod,wavf=(5.,100.,5.),wavA=(-2.,2.,0.25))    
 
 def InteractSeismogram():
-    return interact(plotSeismogramInteract,d2=(0., 150., 1),
-                                           d3=(0.,200., 1),
-                                           rho1=(2000.,5000.,50.),
-                                           rho2=(2000.,5000.,50.),
-                                           rho3=(2000.,5000.,50.),
-                                           v1=(100.,4000.,5.),
-                                           v2=(100.,4000.,5.),
-                                           v3=(300.,4000.,50.),
-                                           wavf=(5., 100.,2.5),
-                                           wavA=FloatSlider(min = -0.5, max = 1., step = 0.25, value = 1.),
-                                           addNoise=False,
-                                           usingT=True)
+    return interact(
+        plotSeismogramInteract,
+        d2=FloatSlider(min= 0.  ,max= 150. ,step=1.  , value= 75.) ,
+        d3=FloatSlider(min= 0.,max= 200. ,step=1  , value= 125.) ,
+        rho1=FloatSlider(min= 2000.,max= 5000.,step= 50., value= 3500.),
+        rho2=FloatSlider(min= 2000.,max= 5000.,step= 50., value= 3500.),
+        rho3=FloatSlider(min= 2000.,max= 5000.,step= 50., value= 3500.),
+        v1=FloatSlider(min= 500.,max= 3000.,step=5., value= 2150.),
+        v2=FloatSlider(min= 500.,max= 3000.,step=5., value= 1000.),
+        v3=FloatSlider(min= 500.,max= 3000.,step=5., value= 2150.),
+        wavf=(5., 100., 2.5),
+        wavA=FloatSlider(min= -0.5, max= 1., step= 0.25, value= 1.),
+        addNoise=False,
+        usingT=True
+        ) 
 
 def InteractSeismogramTBL(v1=125, v2=125, v3=125):
-    return interact(plotSeismogramInteractTBL,d2=FloatSlider(min = 1. ,max = 100.,step = 0.1, value = 9.),
-                                           d3=FloatSlider(min=2. ,max = 100.,step = 0.1, value = 9.5),
-                                           rho1=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
-                                           rho2=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
-                                           rho3=FloatSlider(min = 2000.,max = 5000.,step = 50.,value = 2300.),
-                                           v1=FloatSlider(min = 100.,max = 1200.,step = 5., value = v1),
-                                           v2=FloatSlider(min = 100.,max = 1200.,step = 5., value = v2),
-                                           v3=FloatSlider(min = 100.,max = 1200.,step = 5., value = v3),
-                                           wavf=FloatSlider(min = 5.,max = 100.,step = 1, value = 67),
-                                           wavA=FloatSlider(min = -0.5, max = 1., step = 0.25, value = 1.),
-                                           addNoise=False,
-                                           usingT=True)
-if __name__ == '__main__':
+    return interact(
+        plotSeismogramInteractTBL,
+        d2=FloatSlider(min= 1., max= 100., step= 0.1, value= 9.),
+        d3=FloatSlider(min= 2., max= 100., step= 0.1, value= 9.5),
+        rho1=FloatSlider(min= 2000., max= 5000., step= 50.,value= 2300.),
+        rho2=FloatSlider(min= 2000., max= 5000., step= 50.,value= 2300.),
+        rho3=FloatSlider(min= 2000., max= 5000., step= 50.,value= 2300.),
+        v1=FloatSlider(min= 100., max= 1200., step= 5., value= v1),
+        v2=FloatSlider(min= 100., max= 1200., step= 5., value= v2),
+        v3=FloatSlider(min= 100., max= 1200., step= 5., value= v3),
+        wavf=FloatSlider(min= 5., max= 100., step= 1, value= 67),
+        wavA=FloatSlider(min= -0.5, max= 1., step= 0.25, value= 1.),
+        addNoise=False,
+        usingT=True
+        )
+
+
+if __name__== '__main__':
 
     d      = [0., 50., 100.]       # Position of top of each layer (m)
     v      = [500.,  1000., 1500.] # Velocity of each layer (m/s)
