@@ -16,4 +16,4 @@ These notebooks supplement material in the [gpg](http://gpg.geosci.xyz) and are 
 
 - All notebooks committed to this repository are tested on [TravisCI](https://travis-ci.org/ubcgif/gpgLabs). If dependencies need to be updated, they can be added to [requirements.txt](https://github.com/ubcgif/gpgLabs/blob/master/requirements.txt)
 
-- To update the notebooks hosted on [binders](http://mybinder.org:/repo/ubcgif/gpgLabs), go to [mybinder.org](http://mybinder.org:/repo/ubcgif/gpgLabs) and enter "https://github.com/ubcgif/gpgLabs" in the **Build a repository** field.
+- To update the notebooks hosted on [binders](http://mybinder.org:/repo/ubcgif/gpgLabs), go to [mybinder.org](http://mybinder.org) and enter "https://github.com/ubcgif/gpgLabs" in the **Build a repository** field.
