@@ -54,3 +54,5 @@ docs/_build/
 target/
 *.ipynb_checkpoints
 */.ipynb_checkpoints/*
+
+*.html
