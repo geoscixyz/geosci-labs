@@ -74,7 +74,7 @@ def refraction1(x, v1, v2, z1):
     ref1[act1] = 1./v2*x[act1] + ti1
     return ref1
 
-def refraction2(x, v1, v2, z1, z2):
+def refraction2(x, v1, v2, v3, z1, z2):
     theta1 = np.arcsin(v1/v2)
     theta2 = np.arcsin(v2/v3)
     ti1 = 2*z1*np.cos(theta1)/v1
@@ -93,26 +93,27 @@ def reflection1(x, v1, z1):
     return refl1
 
 
-def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2, ax=None):
+def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2, ax=None,legend=True):
     x = x0 + np.arange(12)*dx
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize = (7, 8))
-    ax.plot(x, direct(x, v1), '-ro')
-    ax.plot(x, refraction1(x, v1, v2, z1), '-bo')
-    ax.plot(x, refraction2(x, v1, v2, z1, z2), '-go')
-    ax.plot(x, reflection1(x, v1, z1), '-ko')
-    ax.legend(['direct', 'refraction1', 'refraction2', 'reflection1'], loc='best')
+    ax.plot(x, direct(x, v1), '-r',linewidth =2.)
+    ax.plot(x, refraction1(x, v1, v2, z1), '-b',linewidth =2.)
+    ax.plot(x, refraction2(x, v1, v2, v3, z1, z2), '-g',linewidth =2.)
+    ax.plot(x, reflection1(x, v1, z1), '-k',linewidth =2.)
+    if legend:
+        ax.legend(['direct', 'refraction1', 'refraction2', 'reflection1'], loc='best')
     ax.set_xlim(0., 130.)
     ax.set_ylim(0., 0.25)
     ax.invert_yaxis()
     ax.set_xlabel("Offset (m)")
     ax.set_ylabel("Time (s)")
-    ax.grid(which='both', linestyle='-', linewidth=0.5, color='k', alpha=0.3)
+    ax.grid(which='both',axis='both', linestyle='-', linewidth=0.5, color='k', alpha=0.3)
     return ax
 
 
 def plotWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None, noise=False):
-    x = x0 + np.arange(12)*dx
+    x = x0 + np.arange(20)*dx
     if noise is True:
         noiseFact = 2.5
     else:
@@ -120,15 +121,15 @@ def plotWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None
     # dum = funDR1R2(x, v1, v2, v3, z1, z2)
     wavs = np.c_[direct(x, v1),
                  refraction1(x, v1, v2, z1),
-                 refraction2(x, v1, v2, z1, z2),
+                 refraction2(x, v1, v2, v3, z1, z2),
                  reflection1(x, v1, z1)
                 ]
     dt = 1e-3
     ntime = 241
     time = np.arange(ntime)*dt
     wave = getRicker(wavf, time, t0)
-    data = np.zeros((ntime, 12))
-    for i in range(12):
+    data = np.zeros((ntime, 20))
+    for i in range(20):
         inds = []
         for j in range(4):
             temp = np.argmin(abs(time-wavs[i,j]))
@@ -139,7 +140,7 @@ def plotWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None
     if Fit is True:
         np.random.seed(seed=1)
 
-    for i in range(12):
+    for i in range(20):
         temp = np.convolve(wave, data[:, i])[:ntime]
         data_convolved[:, i] =  temp+noiseFact*np.random.randn(ntime)*time
 
@@ -153,8 +154,8 @@ def plotWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None
     ax.set_ylim(0, 0.25)
     ax.invert_yaxis()
     ax.set_xlim(-1., 130)
-    ax.set_xlabel("Offset (m)")
-    ax.set_ylabel("Time (s)")
+    ax.set_xlabel("Offset (m)",fontsize=16)
+    ax.set_ylabel("Time (s)",fontsize=16)
     return ax
 
 def showWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None, noise=False):
