@@ -4,7 +4,7 @@ from scipy.constants import mu_0, epsilon_0
 try:
     from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
     pass
-except Exception, e:    
+except Exception, e:
     from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
 def WaveVelSkind(frequency, epsr, sigma):
@@ -37,30 +37,36 @@ def WaveVelandSkindWidgetTBL(epsr, sigma):
     frequency = np.logspace(5, 10, 31)
     vel, skind = WaveVelSkind(frequency, epsr, 10**sigma)
     velsm, skindsm = WaveVelSkind(np.r_[25, 100, 1000]*1e6, epsr, 10**sigma)
+
+    skdpthmin = 1e-2
+    skdpthmax = 0.3e2
+
     figure, ax = plt.subplots(1,2, figsize = (10, 4))
+
     ax[0].loglog(frequency, vel, 'b-', lw=2)
     ax[1].loglog(frequency, skind, 'r-', lw=2)
-    ax[0].loglog(np.r_[25., 25.]*1e6,    np.r_[1e5, 1e8], 'k--', lw=1)
-    ax[0].loglog(np.r_[100., 100.]*1e6,  np.r_[1e5, 1e8], 'k--', lw=1)
-    ax[0].loglog(np.r_[1000., 1000.]*1e6,np.r_[1e5, 1e8], 'k--', lw=1 )
+    # ax[0].loglog(np.r_[25., 25.]*1e6,    np.r_[1e5, 1e8], 'k--', lw=1)
+    # ax[0].loglog(np.r_[100., 100.]*1e6,  np.r_[1e5, 1e8], 'k--', lw=1)
+    # ax[0].loglog(np.r_[1000., 1000.]*1e6,np.r_[1e5, 1e8], 'k--', lw=1 )
 
-    ax[1].loglog(np.r_[25., 25.]*1e6,np.r_[1e-1, 1e1], 'k--', lw=1)
-    ax[1].loglog(np.r_[100., 100.]*1e6,np.r_[1e-1, 1e1], 'k--', lw=1)
-    ax[1].loglog(np.r_[1000., 1000.]*1e6,np.r_[1e-1, 1e1], 'k--', lw=1 )
+    # ax[1].loglog(np.r_[25., 25.]*1e6,np.r_[skdpthmin, skdpthmax], 'k--', lw=1)
+    # ax[1].loglog(np.r_[100., 100.]*1e6,np.r_[skdpthmin, skdpthmax], 'k--', lw=1)
+    # ax[1].loglog(np.r_[1000., 1000.]*1e6,np.r_[skdpthmin, skdpthmax], 'k--', lw=1 )
 
     ax[0].loglog(np.r_[25, 100, 1000]*1e6, velsm, 'ko', ms = 5)
-    # ax[0].text(25*1e6,   11*1e8, ("%3.1f m/s")%(velsm[0])   ,fontsize = 10) 
-    # ax[0].text(100*1e6,  11*1e8, ("%3.1f m/s")%(velsm[1])  ,fontsize = 10) 
-    # ax[0].text(1000*1e6, 11*1e8, ("%3.1f m/s")%(velsm[2]) ,fontsize = 10) 
+    ax[0].text(1.1*25*1e6, 0.7*velsm[0], ("%3.1e m/s")%(velsm[0]), fontsize=10, rotation=-45)
+    ax[0].text(1.1*100*1e6, 0.7*velsm[1], ("%3.1e m/s")%(velsm[1]), fontsize=10, rotation=-45)
+    ax[0].text(1.1*1000*1e6, 0.7*velsm[2], ("%3.1e m/s")%(velsm[2]), fontsize=10, rotation=-45)
 
     ax[1].loglog(np.r_[25, 100, 1000]*1e6, skindsm, 'ko', ms = 5)
-    ax[1].text(25*1e6, 11, ("%3.1f m")%(skindsm[0])   ,fontsize = 10) 
-    ax[1].text(100*1e6, 11, ("%3.1f m")%(skindsm[1])  ,fontsize = 10) 
-    ax[1].text(1000*1e6, 11, ("%3.1f m")%(skindsm[2]) ,fontsize = 10) 
+    ax[1].text(1.1*25e6, 1.1*skindsm[0], ("%3.2f m")%(skindsm[0]), fontsize = 10)
+    ax[1].text(1.1*100*1e6, 1.1*skindsm[1], ("%3.2f m")%(skindsm[1]), fontsize = 10)
+    ax[1].text(1.1*1000*1e6, 1.1*skindsm[2], ("%3.2f m")%(skindsm[2]), fontsize = 10)
     ax[0].set_xlim(10**5, 10**10)
     ax[1].set_xlim(10**5, 10**10)
-    ax[0].set_ylim(1e5, 1e8)
-    ax[1].set_ylim(1e-1, 1e1)
+
+    ax[0].set_ylim(1e6, 3e8)
+    ax[1].set_ylim(skdpthmin, skdpthmax)
     ax[0].set_xlabel('Frequency (Hz)')
     ax[0].set_ylabel('Velocity (m/s)')
     ax[1].set_xlabel('Frequency (Hz)')
