@@ -94,7 +94,7 @@ def reflection1(x, v1, z1):
 
 
 def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2, ax=None,legend=True):
-    x = x0 + np.arange(12)*dx
+    x = x0 + np.arange(20)*dx
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize = (7, 8))
     ax.plot(x, direct(x, v1), '-r',linewidth =2.)
@@ -103,11 +103,19 @@ def viewTXdiagram(x0, dx, v1, v2, v3, z1, z2, ax=None,legend=True):
     ax.plot(x, reflection1(x, v1, z1), '-k',linewidth =2.)
     if legend:
         ax.legend(['direct', 'refraction1', 'refraction2', 'reflection1'], loc='best')
+    majorxtick = np.arange(0.,131.,20)
+    minorxtick = np.arange(0.,131,5.)
+    majorytick = np.arange(0.,0.26,0.05)
+    minorytick = np.arange(0.,0.26,0.01)
+    ax.set_xticks(majorxtick)
+    ax.set_xticks(minorxtick,minor=True)
+    ax.set_yticks(majorytick)
+    ax.set_yticks(minorytick,minor=True)
     ax.set_xlim(0., 130.)
     ax.set_ylim(0., 0.25)
     ax.invert_yaxis()
-    ax.set_xlabel("Offset (m)")
-    ax.set_ylabel("Time (s)")
+    ax.set_xlabel("Offset (m)",fontsize=16)
+    ax.set_ylabel("Time (s)",fontsize=16)
     ax.grid(which='both',axis='both', linestyle='-', linewidth=0.5, color='k', alpha=0.3)
     return ax
 
