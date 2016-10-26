@@ -412,7 +412,8 @@ def dHdt_from_MagneticDipoleWholeSpace(XYZ, srcLoc, sig, t, current=1., length=1
     theta = np.sqrt((mu*sig)/(4*t))
 
     front =  -4*(current*length)*theta**5 * np.exp(-(theta)**2 * (r)**2)
-    mid   = 1./(np.pi**1.5 * mu * sig)
+    front  *= 1./(np.pi**1.5 * mu * sig)
+    mid = (theta)**2 * (r)**2
     extra = (1-(theta)**2 * (r)**2)
 
     if orientation.upper() == 'X':
