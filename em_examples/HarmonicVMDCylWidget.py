@@ -1,6 +1,5 @@
 from ipywidgets import *
 from SimPEG import Mesh, Maps, EM, Utils
-from simpegem1d import EM1DAnal
 from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
