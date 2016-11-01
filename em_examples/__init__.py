@@ -12,4 +12,4 @@ import DipoleWidgetTD
 import PlanewaveWidget
 import EMcircuit
 import FreqtoTime
-from HarmonicVMDCylWidget import HarmonicVMDCylWidget
+import HarmonicVMDCylWidget
