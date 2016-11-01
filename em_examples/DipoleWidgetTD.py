@@ -27,7 +27,6 @@ def linefun(x1, x2, y1, y2, nx,tol=1e-3):
         y=slope*(x-x1)+y1
     return x, y
 
-
 class DipoleWidgetTD(object):
     """DipoleWidget"""
 
