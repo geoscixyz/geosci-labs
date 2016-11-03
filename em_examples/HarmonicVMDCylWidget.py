@@ -3,6 +3,7 @@ from SimPEG import Mesh, Maps, EM, Utils
 from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 from DipoleWidgetFD import DisPosNegvalues
 
 class HarmonicVMDCylWidget(object):
@@ -18,6 +19,7 @@ class HarmonicVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
+        self.im = Image.open("../../images/emgeosci.png")
 
     def genMesh(self, h=0., cs=3., ncx=15, ncz=30, npad=20):
         """
@@ -146,7 +148,10 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Bz)
             else:
-                raise Exception("XXX")
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... no By for VMD"
 
         elif Field == "E":
             label = "Electric field (V/m)"
@@ -160,7 +165,10 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Ey)
             else:
-                raise Exception("XXX")
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... only Ey for VMD"
 
         elif Field == "J":
             label = "Current density (A/m$^2$)"
@@ -179,7 +187,7 @@ class HarmonicVMDCylWidget(object):
         elif scale == "log":
             cb = plt.colorbar(out[0], ax=ax, ticks=np.linspace(out[0].vmin, out[0].vmax, 3), format="$10^{%.1f}$")
         else:
-            raise Exception("XXX")
+            raise Exception("We consdier only linear and log scale!")
         cb.set_label(label)
         xmax = self.gridCCactive[:,0].max()
         ax.plot(np.r_[0, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5)
@@ -246,6 +254,8 @@ class HarmonicVMDCylWidget(object):
         # m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3)
         dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
         def foo(Field, Component, Scale):
+            fig = plt.figure()
+            ax = plt.subplot(111)
             bType = "b"
             if (Field == "Bsec") or (Field == "B"):
                 if Field == "Bsec":
@@ -262,7 +272,11 @@ class HarmonicVMDCylWidget(object):
                     valr = self.Bz.real
                     vali = self.Bz.imag
                 else:
-                    raise Exception("XXX")
+                    ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no By for VMD"
+
             else:
                 self.getData(bType=bType)
                 label = "Electric field (V/m)"
@@ -271,10 +285,11 @@ class HarmonicVMDCylWidget(object):
                     valr = self.Ey.real
                     vali = self.Ey.imag
                 else:
-                    raise Exception("XXX")
+                    ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... only Ey for VMD"
 
-            fig = plt.figure()
-            ax = plt.subplot(111)
             if Scale == "log":
                 valr_p, valr_n = DisPosNegvalues(valr)
                 vali_p, vali_n = DisPosNegvalues(vali)
