@@ -1,6 +1,6 @@
 from ipywidgets import *
 from SimPEG import Mesh, Maps, EM, Utils
-from pymatsolver import PardisoSolver
+# from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
@@ -68,7 +68,8 @@ class HarmonicVMDCylWidget(object):
         )
         self.srcList = [EM.FDEM.Src.MagDipole([bzr, bzi], freq, srcLoc, orientation='Z')
                    for freq in freqs]
-        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, Solver=PardisoSolver)
+        # prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, Solver=PardisoSolver)
+        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping)
         survey = EM.FDEM.Survey(self.srcList)
         prb.pair(survey)
         self.f = prb.fields(self.m)

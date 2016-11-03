@@ -2,7 +2,5 @@ numpy
 scipy
 matplotlib
 ipywidgets
-pyMKL
-git+git://github.com/rowanc1/pymatsolver.git
 git+git://github.com/simpeg/simpeg.git@dcip/dev
 git+git://github.com/ubcgif/em_examples.git@VMDCyl
