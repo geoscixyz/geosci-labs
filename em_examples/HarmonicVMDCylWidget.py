@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from DipoleWidgetFD import DisPosNegvalues
+from BiotSavart import BiotSavartFun
 
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -33,6 +34,14 @@ class HarmonicVMDCylWidget(object):
     def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.):
         self.activeCC = (self.mesh.gridCC[:,0] <= xmax) & (np.logical_and(self.mesh.gridCC[:,2] >= zmin, self.mesh.gridCC[:,2] <= zmax))
         self.gridCCactive = self.mesh.gridCC[self.activeCC,:][:,[0, 2]]
+
+    def getBiotSavrt(self, rxLoc):
+        """
+            Compute Biot-Savart operator: Gz and Gx
+        """
+        self.Gz = BiotSavartFun(self.mesh, rxLoc, component='z')
+        self.Gx = BiotSavartFun(self.mesh, rxLoc, component='x')
+
 
     def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-1, sig2=1e-2, sig3=1e-2):
         self.h1 = h1      # 1st layer thickness
@@ -79,8 +88,8 @@ class HarmonicVMDCylWidget(object):
         self.rxLoc = rxLoc
         return dpred
 
-    def getFields(self, bType = "b"):
-        src = self.srcList[0]
+    def getFields(self, bType = "b", ifreq=0):
+        src = self.srcList[ifreq]
         Pfx = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fx")
         Pfz = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fz")
         Ey = self.mesh.aveE2CC*self.f[src, "e"]
