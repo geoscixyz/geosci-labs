@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 try:
     from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
     pass
-except Exception, e:    
+except Exception, e:
     from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
 
 
@@ -165,8 +165,8 @@ def HsHp(loop1loc,loop1angle,loop2loc,loop2angle,loop3loc,loop3angle, freq,L,R):
 
 def interact_femPipe():
     Q = interactive(fempipeWidget,
-        alpha = FloatSlider(min=0.1,max=5.,step=0.1,value=1.),
-        pipedepth = FloatSlider(min=0.5,max=4.0,step=0.1,value=1.0))
+        alpha = FloatSlider(min=0.1,max=5.,step=0.1,value=1., continuous_update=False),
+        pipedepth = FloatSlider(min=0.5,max=4.0,step=0.1,value=1.0, continuous_update=False))
     return Q
 
 if __name__ == '__main__':
