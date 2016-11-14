@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 try:
     from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
     pass
-except Exception, e:    
+except Exception, e:
     from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
 
 
@@ -121,7 +121,7 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
     # scaled to simulate a net volumetric effect
     if np.logical_and(dincl==0., ddecl==0.):
         real_response=np.real(c_response)*0.
-        imag_response=np.imag(c_response)*0.        
+        imag_response=np.imag(c_response)*0.
     else:
         real_response=np.real(c_response)*1000.
         imag_response=np.imag(c_response)*1000.
@@ -137,7 +137,7 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
     ax[0][0].set_title('Plot 1: EM responses of loop')
     ax[0][0].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
     ax[0][0].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
-    
+
     kx = np.ceil(xp.size/2.)
     ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
     ax[0][1].plot(y[kx,:],imag_response[kx,:],'.--g')
@@ -178,12 +178,12 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
 
     if showDataPts:
         ax[1][1].plot(XP,YP,'.',color=[0.2,0.2,0.2])
-    
+
     plt.tight_layout()
     plt.show()
 
 
-   
+
 def interactfem3loop():
 
     S = 4.
@@ -197,15 +197,15 @@ def interactfem3loop():
     fem3loopwrap = lambda L,R,yc,xc,zc,dincl,ddecl,f,dx,showDataPts: fem3loop(L,R,-yc,xc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts)
 
     Q = interactive(fem3loopwrap,
-        L = FloatSlider(min=0.00,max=0.20,step=0.01,value=0.10),
-        R = FloatSlider(min=0.0,max=20000.,step=1000.,value=2000.),
-        xc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
-        yc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0),
-        zc = FloatSlider(min=0.,max=zmax,step=0.5,value=1.),
-        dincl = FloatSlider(min=-90.,max=90.,step=1.,value=0.),
-        ddecl = FloatSlider(min=0.,max=180.,step=1.,value=90.),
-        f = FloatSlider(min=10.,max=19990.,step=10.,value=10000.),
-        dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25),
+        L = FloatSlider(min=0.00,max=0.20,step=0.01,value=0.10, continuous_update=False),
+        R = FloatSlider(min=0.0,max=20000.,step=1000.,value=2000., continuous_update=False),
+        xc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0, continuous_update=False),
+        yc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0, continuous_update=False),
+        zc = FloatSlider(min=0.,max=zmax,step=0.5,value=1., continuous_update=False),
+        dincl = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
+        ddecl = FloatSlider(min=0.,max=180.,step=1.,value=90., continuous_update=False),
+        f = FloatSlider(min=10.,max=19990.,step=10.,value=10000., continuous_update=False),
+        dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25, continuous_update=False),
         showDataPts = Checkbox(value=False)
         )
 
