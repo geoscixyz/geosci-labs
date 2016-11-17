@@ -267,15 +267,15 @@ class TransientVMDCylWidget(object):
 
             if Scale == "log":
                 val_p, val_n = DisPosNegvalues(val)
-                ax.plot(self.prb.times[10:], val_p[10:], 'k-')
-                ax.plot(self.prb.times[10:], val_n[10:], 'k--')
+                ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
+                ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
                 ax.legend(("(+)", "(-)"), loc=4, fontsize = 10)
             else:
-                ax.plot(self.prb.times[10:], val[10:], 'k.-')
+                ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
 
             ax.set_xscale("log")
             ax.set_yscale(Scale)
-            ax.set_xlabel("Time (ms")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
