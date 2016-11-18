@@ -478,13 +478,13 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 def plot_Layer_Potentials_app():
     plot_Layer_Potentials_interact = lambda rho1,rho2,h,A,B,M,N,Plot: plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,Plot)
     app = interact(plot_Layer_Potentials_interact,
-                rho1 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500.),
-                rho2 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500.),
-                h = FloatSlider(min=0.,max=40.,step=1.,value=5.),
-                A = FloatSlider(min=-40.,max=40.,step=1.,value=-30.),
-                B = FloatSlider(min=-40.,max=40.,step=1.,value=30.),
-                M = FloatSlider(min=-40.,max=40.,step=1.,value=-10.),
-                N = FloatSlider(min=-40.,max=40.,step=1.,value=10.),
+                rho1 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
+                rho2 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
+                h = FloatSlider(min=0.,max=40.,step=1.,value=5., continuous_update=False),
+                A = FloatSlider(min=-40.,max=40.,step=1.,value=-30., continuous_update=False),
+                B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
+                M = FloatSlider(min=-40.,max=40.,step=1.,value=-10., continuous_update=False),
+                N = FloatSlider(min=-40.,max=40.,step=1.,value=10., continuous_update=False),
                 Plot = ToggleButtons(options =['Model','Potential','E','J',],value='Model'),
                 )
     return app
