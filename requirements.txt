@@ -5,4 +5,4 @@ ipywidgets
 pandas
 jupyter_dashboards
 Pillow
-git+git://github.com/simpeg/simpeg.git@dev
+git+git://github.com/simpeg/simpeg.git
