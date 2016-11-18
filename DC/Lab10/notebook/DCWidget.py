@@ -143,8 +143,8 @@ def cylinder_fields(A,B,r,sigcyl,sighalf):
     survey = DC.Survey([src])
     survey_prim = DC.Survey([src])
     #problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem_prim = DC.Problem3D_CC(mesh, mapping = mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
@@ -254,8 +254,8 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
 
     fig = plt.figure(figsize=(15, 5))
     ax = fig.add_subplot(111,autoscale_on=False)
-    ax.plot(A,0.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
-    ax.plot(B,0,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
+    ax.plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
+    ax.plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax, grid=False,view=view, streamOpts=streamOpts) #gridOpts={'color':'k', 'alpha':0.5}
     ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
     ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
@@ -329,7 +329,7 @@ def DC2Dsurvey(flag="PoleDipole"):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, mapping = mapping)
     problem.pair(survey)    
 
     sigblk, sighalf = 2e-2, 2e-3
@@ -541,8 +541,8 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
     dpred  = survey.dpred(mtrue)
     xi, yi = np.meshgrid(np.linspace(xr.min(), xr.max(), 120), np.linspace(1., nmax, 100))
     #Cheat to compute a geometric factor define as G = dV_halfspace / rho_halfspace
-    appres = dpred*(sighalf/dini)
-    appresobs = dobs*(sighalf/dini)
+    appres = dpred/dini/sighalf
+    appresobs = dobs/dini/sighalf
     pred = pylab.griddata(xzlocs[:,0], xzlocs[:,1], appres, xi, yi, interp='linear')
     
     if plotFlag is not None:
@@ -550,18 +550,21 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
         ax1 = plt.subplot(211)
         ax2 = plt.subplot(212)
 
-        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(0, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
-        cb1 = plt.colorbar(dat1[0], ticks=np.linspace(1, 3, 5), ax=ax1, format="$10^{%4.1f}$")
+        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(1, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
+        cb1ticks = [1.,2.,3.]
+        cb1 = plt.colorbar(dat1[0], ax=ax1,ticks=cb1ticks)#,tickslabel =)  #, format="$10^{%4.1f}$")
+        cb1.ax.set_yticklabels(['{:.0f}'.format(10.**x) for x in cb1ticks])#, fontsize=16, weight='bold')
         cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(-30, 0.)
+        ax1.set_ylim(-20, 0.)
         ax1.set_xlim(-40, 40)
         ax1.set_xlabel("")
-        ax1.set_ylabel("Depth (m)")    
+        ax1.set_ylabel("Depth (m)")  
+        ax1.set_aspect('equal')  
 
         dat2 = ax2.contourf(xi, yi, pred, 10)
         ax2.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
         ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb2 = plt.colorbar(dat2, ax=ax2, ticks=np.linspace(1, 3, 5),format="$10^{%4.1f}$")
+        cb2 = plt.colorbar(dat2, ax=ax2)#, ticks=np.linspace(0, 3, 5))#format="$10^{%4.1f}$")
         cb2.set_label("Apparent Resistivity \n (ohm-m)")
         ax2.text(-38, 7, "Predicted")
 
@@ -571,20 +574,24 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
 
     else:
         obs = pylab.griddata(xzlocs[:,0], xzlocs[:,1], appresobs, xi, yi, interp='linear')
-        fig = plt.figure(figsize = (12, 8))
+        fig = plt.figure(figsize = (12, 9))
         ax1 = plt.subplot(311)
-        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(0, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
-        cb1 = plt.colorbar(dat1[0], ticks=np.linspace(0, 3, 5), ax=ax1, format="$10^{%4.1f}$")
+        dat1 = mesh.plotImage(np.log10(1./(mapping*mtrue)), ax=ax1, clim=(1, 3), grid=True, gridOpts={'color':'k', 'alpha':0.5})
+        cb1ticks = [1.,2.,3.]
+        cb1 = plt.colorbar(dat1[0], ax=ax1,ticks=cb1ticks)#,tickslabel =)  #, format="$10^{%4.1f}$")
+        cb1.ax.set_yticklabels(['{:.0f}'.format(10.**x) for x in cb1ticks])#, fontsize=16, weight='bold')
         cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(-30, 0.)
+        ax1.set_ylim(-20, 0.)
         ax1.set_xlim(-40, 40)
         ax1.set_xlabel("")
-        ax1.set_ylabel("Depth (m)")    
+        ax1.set_ylabel("Depth (m)")
+        ax1.set_aspect('equal')  
+   
         ax2 = plt.subplot(312)
         dat2 = ax2.contourf(xi, yi, obs, 10)
         ax2.contour(xi, yi, obs, 10, colors='k', alpha=0.5)
         ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb2 = plt.colorbar(dat2, ax=ax2, ticks=np.linspace(appresobs.min(), appresobs.max(), 5), format="%4.1f")
+        cb2 = plt.colorbar(dat2, ax=ax2)#, ticks=np.linspace(0, 3, 5),format="$10^{%4.1f}$")
        
         cb2.set_label("Apparent Resistivity \n (ohm-m)")
         ax2.set_ylim(nmax+1, 0.)
