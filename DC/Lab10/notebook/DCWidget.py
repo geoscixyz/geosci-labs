@@ -11,6 +11,8 @@ from SimPEG.EM.Static import DC
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
+from matplotlib.ticker import LogFormatter 
+
 
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
@@ -36,7 +38,6 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
 
     Warning: 1D and 2D has not been tested
     """
-    from SimPEG import Mesh
     if mesh.dim == 1:
         xyzlim = xyzlim.flatten()
         xmin, xmax = xyzlim[0], xyzlim[1]
@@ -170,7 +171,14 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
     sighalf = 1./rhohalf
 
     mtrue, mhalf,src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf)
-    
+
+    fig = plt.figure(figsize=(15, 5))
+    ax = fig.add_subplot(111,autoscale_on=False)
+    ax.plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
+    ax.plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
+    ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+
     if Field == 'Model':
        
         label = 'Resisitivity (ohm-m)'
@@ -178,6 +186,10 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         view = 'real'
         streamOpts = None
         ind = indCC
+
+        formatter = None
+        pcolorOpts = None
+
 
         if Type == 'Total':
             u = 1./(mapping*mtrue)
@@ -193,6 +205,10 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         view = 'real'
         streamOpts = None
         ind = indCC
+
+        formatter = None
+        pcolorOpts = None
+
 
         if Type == 'Total':
             u = total_field[src, 'phi']
@@ -210,6 +226,9 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         view = 'vec'
         streamOpts = {'color':'w'}
         ind = indF
+
+        formatter = LogFormatter(10, labelOnlyBase=False)
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-1, linscale=0.01)}
         
         if Type == 'Total':
             u = total_field[src, 'e']
@@ -228,6 +247,10 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
+        formatter = LogFormatter(10, labelOnlyBase=False)
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e0, linscale=0.01)}
+
+
         if Type == 'Total':
             u = total_field[src,'j']
         
@@ -244,6 +267,9 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         view = 'real'
         streamOpts = None
         ind = indCC
+
+        formatter = LogFormatter(10, labelOnlyBase=False) 
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-12, linscale=0.01)}
         
         if Type == 'Total':
             u = total_field[src,'charge']
@@ -252,14 +278,10 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         elif Type == 'Secondary':
             u = total_field[src,'charge']-primary_field[src,'charge']
 
-    fig = plt.figure(figsize=(15, 5))
-    ax = fig.add_subplot(111,autoscale_on=False)
-    ax.plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
-    ax.plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax, grid=False,view=view, streamOpts=streamOpts) #gridOpts={'color':'k', 'alpha':0.5}
-    ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    cb = plt.colorbar(dat[0], ax=ax)
+    
+    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax, grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
+    
+    cb = plt.colorbar(dat[0], ax=ax,format = formatter)
     cb.set_label(label)
     ax.set_xlim([-40.,40.])
     ax.set_ylim([-40.,5.])
@@ -277,6 +299,7 @@ def cylinder_app():
             B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
             Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
             Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+            #Scale = ToggleButtons(options = ['Scalar','Log'],value='Scalar')
             )
     return app
 
