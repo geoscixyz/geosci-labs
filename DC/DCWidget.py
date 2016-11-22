@@ -228,7 +228,7 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         ind = indF
 
         formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-1, linscale=0.01)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
         
         if Type == 'Total':
             u = total_field[src, 'e']
@@ -248,7 +248,7 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         ind = indF
 
         formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e0, linscale=0.01)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
 
 
         if Type == 'Total':
