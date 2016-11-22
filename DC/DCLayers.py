@@ -481,10 +481,10 @@ def plot_Layer_Potentials_app():
                 rho1 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
                 rho2 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
                 h = FloatSlider(min=0.,max=40.,step=1.,value=5., continuous_update=False),
-                A = FloatSlider(min=-40.,max=40.,step=1.,value=-30., continuous_update=False),
-                B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
-                M = FloatSlider(min=-40.,max=40.,step=1.,value=-10., continuous_update=False),
-                N = FloatSlider(min=-40.,max=40.,step=1.,value=10., continuous_update=False),
+                A = FloatSlider(min=-30.,max=30.,step=1.,value=-30., continuous_update=False),
+                B = FloatSlider(min=-30.,max=30.,step=1.,value=30., continuous_update=False),
+                M = FloatSlider(min=-30.,max=30.,step=1.,value=-10., continuous_update=False),
+                N = FloatSlider(min=-30.,max=30.,step=1.,value=10., continuous_update=False),
                 Plot = ToggleButtons(options =['Model','Potential','E','J',],value='Model'),
                 )
     return app
