@@ -118,6 +118,8 @@ class TransientVMDCylWidget(object):
         self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
         self.Bx = Utils.mkvc(self.mirrorArray(Pfx*self.f[src, "b", itime], direction="x"))
         self.Bz = Utils.mkvc(self.mirrorArray(Pfz*self.f[src, "b", itime], direction="z"))
+        self.dBxdt = Utils.mkvc(self.mirrorArray(-Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x"))
+        self.dBzdt = Utils.mkvc(self.mirrorArray(-Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z"))
 
     def getData(self):
         src = self.srcList[0]
@@ -128,6 +130,9 @@ class TransientVMDCylWidget(object):
         self.Ey = (Pey*self.f[src, "e", :]).flatten()
         self.Bx = (Pfx*self.f[src, "b", :]).flatten()
         self.Bz = (Pfz*self.f[src, "b", :]).flatten()
+        self.dBxdt = (-Pfx*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
+        self.dBzdt = (-Pfz*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
+
 
     def plotField(self, Field='B', view="vec", scale="linear", itime=0, Geometry=True):
         fig = plt.figure(figsize=(10, 6))
@@ -156,6 +161,21 @@ class TransientVMDCylWidget(object):
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... no By for VMD"
+
+        elif Field == "dBdt":
+            label = "Time derivative of magnetic field (T/s)"
+            if view == "vec":
+                vec = True
+                val = np.c_[self.dBxdt, self.dBzdt]
+            elif view == "x":
+                val = self.dBxdt
+            elif view == "z":
+                val = self.dBzdt
+            else:
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... no dBydt for VMD"
 
         elif Field == "E":
             label = "Electric field (V/m)"
@@ -214,7 +234,7 @@ class TransientVMDCylWidget(object):
 
         out = widgets.interactive (foo
                         ,Update=widgets.ToggleButtons(options=["True", "False"], value="True") \
-                        ,Field=widgets.ToggleButtons(options=["E", "B", "J"], value=fieldvalue) \
+                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,itime=widgets.IntSlider(min=10, max=70, value=10, continuous_update=False, description='Time index') \
@@ -240,7 +260,6 @@ class TransientVMDCylWidget(object):
             bType = "b"
             self.getData()
             if Field == "B":
-                Field = "B"
                 label = "Magnetic field (T)"
                 if Component == "x":
                     title = "Bx"
@@ -253,6 +272,20 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... no By for VMD"
+
+            elif Field == "dBdt":
+                label = "Time dervative of magnetic field (T/s)"
+                if Component == "x":
+                    title = "Bx"
+                    val = self.dBxdt
+                elif Component == "z":
+                    title = "Bz"
+                    val = self.dBzdt
+                else:
+                    ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no dBydt for VMD"
 
             else:
                 label = "Electric field (V/m)"
@@ -282,7 +315,7 @@ class TransientVMDCylWidget(object):
 
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["E", "B"], value=fieldvalue) \
+                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt"], value=fieldvalue) \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
                         )

@@ -226,6 +226,12 @@ class HarmonicVMDCylWidget(object):
                     val = abs(self.Jy)
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Jy)
+            else:
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... only Jy for VMD"
+
         out = Utils.plot2Ddata(self.mesh2D.gridCC, val, vec=vec, ax=ax, contourOpts={"cmap":"viridis"}, ncontour=50, scale=scale)
         if scale == "linear":
             cb = plt.colorbar(out[0], ax=ax, ticks=np.linspace(out[0].vmin, out[0].vmax, 3), format="%.1e")
@@ -248,7 +254,7 @@ class HarmonicVMDCylWidget(object):
 
     def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
 
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, Geometry=False):
+        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, Geometry=True):
 
             if ComplexNumber == "Re":
                 ComplexNumber = "real"
@@ -277,9 +283,9 @@ class HarmonicVMDCylWidget(object):
 
         out = widgets.interactive (foo
                         ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec", "J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
+                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
+                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase'], value="Re") \
                         ,Frequency=widgets.FloatText(value=100., continuous_update=False, description='f (Hz)') \
                         ,Sigma0=widgets.FloatText(value=1e-8, continuous_update=False, description='$\sigma_0$ (S/m)') \
                         ,Sigma1=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_1$ (S/m)') \
@@ -289,7 +295,7 @@ class HarmonicVMDCylWidget(object):
                         ,z=widgets.FloatSlider(min=0., max=48., step=3., value=0., continuous_update=False, description='$z$ (m)') \
                         ,h1=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_1$ (m)') \
                         ,h2=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_2$ (m)') \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
+                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
                         ,rxOffset=widgets.FloatText(value=10., continuous_update=False, description='x (m)') \
                         )
         return out
