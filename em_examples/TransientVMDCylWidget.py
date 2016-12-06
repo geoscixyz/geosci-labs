@@ -216,10 +216,11 @@ class TransientVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
-        ax.text(-90, 90, ("Time at %.2f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        ax.text(-90, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
 
-    def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
-        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, z, h1, h2, Scale, rxOffset, radius, Geometry=False):
+    def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
+                         radius=1., z0=0., x0=10.):
+        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, z, h1, h2, Scale, rxOffset, radius, Geometry=True):
 
             if AmpDir == "Direction":
                 Component = "vec"
@@ -237,18 +238,18 @@ class TransientVMDCylWidget(object):
                         ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,itime=widgets.IntSlider(min=10, max=70, value=10, continuous_update=False, description='Time index') \
-                        ,Sigma0=widgets.FloatText(value=1e-8, continuous_update=False, description='$\sigma_0$ (S/m)') \
-                        ,Sigma1=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_1$ (S/m)') \
-                        ,Sigma2=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_2$ (S/m)') \
-                        ,Sigma3=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_3$ (S/m)') \
+                        ,itime=widgets.IntSlider(min=1, max=70, step=1, value=1, continuous_update=False, description='Time index') \
+                        ,Sigma0=widgets.FloatText(value=sig0, continuous_update=False, description='$\sigma_0$ (S/m)') \
+                        ,Sigma1=widgets.FloatText(value=sig1, continuous_update=False, description='$\sigma_1$ (S/m)') \
+                        ,Sigma2=widgets.FloatText(value=sig2, continuous_update=False, description='$\sigma_2$ (S/m)') \
+                        ,Sigma3=widgets.FloatText(value=sig3, continuous_update=False, description='$\sigma_3$ (S/m)') \
                         ,Sus=widgets.FloatText(value=0., continuous_update=False, description='$\chi$') \
-                        ,z=widgets.FloatSlider(min=0., max=48., step=3., value=0., continuous_update=False, description='$z$ (m)') \
+                        ,z=widgets.FloatSlider(min=0., max=48., step=3., value=z0, continuous_update=False, description='$z$ (m)') \
                         ,h1=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_1$ (m)') \
                         ,h2=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_2$ (m)') \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
-                        ,rxOffset=widgets.FloatText(value=10., continuous_update=False, description='x (m)') \
-                        ,radius=widgets.FloatText(value=1., continuous_update=False, description='Tx radius (m)') \
+                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
+                        ,rxOffset=widgets.FloatText(value=x0, continuous_update=False, description='x (m)') \
+                        ,radius=widgets.FloatText(value=radius, continuous_update=False, description='Tx radius (m)') \
                         )
         return out
 
@@ -276,10 +277,10 @@ class TransientVMDCylWidget(object):
             elif Field == "dBdt":
                 label = "Time dervative of magnetic field (T/s)"
                 if Component == "x":
-                    title = "Bx"
+                    title = "dBx/dt"
                     val = self.dBxdt
                 elif Component == "z":
-                    title = "Bz"
+                    title = "dBz/dt"
                     val = self.dBzdt
                 else:
                     ax.imshow(self.im)
