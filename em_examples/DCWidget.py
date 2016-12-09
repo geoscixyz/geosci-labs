@@ -287,7 +287,7 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
     ax.set_ylim([-40.,5.])
     ax.set_aspect('equal')
     plt.show()
-    return 
+    return
 
 
 def cylinder_app():
@@ -295,6 +295,194 @@ def cylinder_app():
             rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
             rhocyl = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
             r = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            A = FloatSlider(min=-40.,max=40.,step=1.,value=-30., continuous_update=False),
+            B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
+            Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
+            Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+            #Scale = ToggleButtons(options = ['Scalar','Log'],value='Scalar')
+            )
+    return app
+
+
+def plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf):
+    mhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
+    mtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, yc, r]
+    
+    Mx = np.empty(shape=(0, 2))
+    Nx = np.empty(shape=(0, 2))
+    #rx = DC.Rx.Dipole_ky(Mx,Nx)
+    rx = DC.Rx.Dipole(Mx,Nx)
+    src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
+    #survey = DC.Survey_ky([src])
+    survey = DC.Survey([src])
+    survey_prim = DC.Survey([src])
+    #problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem_prim = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem.Solver = SolverLU
+    problem_prim.Solver = SolverLU
+    problem.pair(survey)
+    problem_prim.pair(survey_prim)
+
+    primary_field = problem_prim.fields(mhalf)
+    #phihalf = f[src, 'phi', 15]
+    #ehalf = f[src, 'e']
+    #jhalf = f[src, 'j']
+    #charge = f[src, 'charge']
+
+    total_field = problem.fields(mtrue)
+    #phi = f[src, 'phi', 15]
+    #e = f[src, 'e']
+    #j = f[src, 'j']
+    #charge = f[src, 'charge']
+
+    return mtrue,mhalf, src, total_field, primary_field
+
+
+def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
+    sigplate = 1./rhoplate
+    sighalf = 1./rhohalf
+
+    mtrue, mhalf,src, total_field, primary_field = cylinder_fields(A,B,dx,dz,xc,zc,inc,sigplate,sighalf)
+
+    fig = plt.figure(figsize=(15, 5))
+    ax = fig.add_subplot(111,autoscale_on=False)
+    ax.plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
+    ax.plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
+    # Form rotation matix
+    rotMat = np.array([[np.cos(inc*(np.pi/180.)), -np.sin(inc*(np.pi/180.))],[np.sin(inc*(np.pi/180.)), np.cos(inc*(np.pi/180.))]])
+    originCorners = np.array([[-0.5*dx, 0.5*dz], [0.5*dx, 0.5*dz], [-0.5*dx, -0.5*dz], [0.5*dx, -0.5*dz]])
+    rotPlateCorners = plateCorners*rotMat
+    plateCorners = np.
+    # plot top of plate outline
+    ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # plot bottom of plate outline
+    ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # plot west side of plate outline
+    ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # plot west side of plate outline
+    ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+
+    if Field == 'Model':
+       
+        label = 'Resisitivity (ohm-m)'
+        xtype = 'CC'
+        view = 'real'
+        streamOpts = None
+        ind = indCC
+
+        formatter = None
+        pcolorOpts = None
+
+
+        if Type == 'Total':
+            u = 1./(mapping*mtrue)
+        elif Type == 'Primary':
+            u = 1./(mapping*mhalf)
+        elif Type == 'Secondary':
+            u = 1./(mapping*mtrue) - 1./(mapping*mhalf)
+    
+    elif Field == 'Potential':
+        
+        label = 'Potential (V)'
+        xtype = 'CC'
+        view = 'real'
+        streamOpts = None
+        ind = indCC
+
+        formatter = None
+        pcolorOpts = None
+
+
+        if Type == 'Total':
+            u = total_field[src, 'phi']
+
+        elif Type == 'Primary':
+            u = primary_field[src,'phi']
+
+        elif Type == 'Secondary':
+            u = total_field[src, 'phi'] - primary_field[src, 'phi']
+
+    elif Field == 'E':
+        
+        label = 'Electric Field (V/m)'
+        xtype = 'F'
+        view = 'vec'
+        streamOpts = {'color':'w'}
+        ind = indF
+
+        formatter = LogFormatter(10, labelOnlyBase=False)
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
+        
+        if Type == 'Total':
+            u = total_field[src, 'e']
+
+        elif Type == 'Primary':
+            u = primary_field[src,'e']
+        
+        elif Type == 'Secondary':
+            u = total_field[src, 'e'] - primary_field[src, 'e']
+    
+    elif Field == 'J':
+
+        label = 'Current density ($A/m^2$)'
+        xtype = 'F'
+        view = 'vec'
+        streamOpts = {'color':'w'}
+        ind = indF
+
+        formatter = LogFormatter(10, labelOnlyBase=False)
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
+
+
+        if Type == 'Total':
+            u = total_field[src,'j']
+        
+        elif Type == 'Secondary':
+            u = total_field[src,'j'] - primary_field[src,'j']
+
+        elif Type == 'Primary':
+            u = primary_field[src,'j']
+
+    elif Field == 'Charge':
+        
+        label = 'Charge Density ($C/m^2$)'
+        xtype = 'CC'
+        view = 'real'
+        streamOpts = None
+        ind = indCC
+
+        formatter = LogFormatter(10, labelOnlyBase=False) 
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-12, linscale=0.01)}
+        
+        if Type == 'Total':
+            u = total_field[src,'charge']
+        elif Type == 'Primary':
+            u = primary_field[src,'charge']
+        elif Type == 'Secondary':
+            u = total_field[src,'charge']-primary_field[src,'charge']
+
+    
+    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax, grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
+    
+    cb = plt.colorbar(dat[0], ax=ax,format = formatter)
+    cb.set_label(label)
+    ax.set_xlim([-40.,40.])
+    ax.set_ylim([-40.,5.])
+    ax.set_aspect('equal')
+    plt.show()
+    return          
+
+
+def plate_app():
+    app = interact(plate_wrapper,
+            rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+            rhoplate = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+            dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+            zc = FloatSlider(min=-30.,max=0.,step=1.,value=0., continuous_update=False),
+            rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
             A = FloatSlider(min=-40.,max=40.,step=1.,value=-30., continuous_update=False),
             B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
             Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
