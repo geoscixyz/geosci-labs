@@ -1,0 +1,33 @@
+ PROGRAM "EM1DFM" (v1.0).
+ 
+ Run started at 10:27:03.929, 06/12/2016.
+ 
+ Reading inputs ...
+ Filename root:                 "em1dfm".
+ Number of soundings:           1.
+ Observations file:             "Obs1D.dat".
+ Model type:                    1  (conductivity).
+ Starting conductivity model:   "EM1D_constart.dat".
+ Ref. (small.) cond. model:     "EM1D_conref.dat".
+ Background susc. model:        "EM1D_susref.dat".
+ Ref. (flat.) cond. model:      NONE.
+ Additional model weights:      NONE.
+ alpha_s:                       0.100E-01.
+ alpha_z:                       1.00.
+ Inversion algorithm:           1  (fixed trade-off parameter).
+ Supplied trade-off parameter:  200.0.
+ Max. number of iterations:     1.
+ Convergence param. (default):  0.100E-01.
+ No. of lambdas (default):      50.
+ Level of output:               2.
+ Finished reading inputs.
+ 
+ Sounding 1 (150.0,150.0).
+ Initial phid= 0.66435, beta= 200.00, phim= 0.66761E-03, Phi= 0.79787.
+ Iteration 1: phid= 0.44127, beta= 200.00, phim= 0.13025E-02, Phi= 0.70178.
+ One iteration completed.
+ 
+ Conductivity model:           "em1dfm.con".
+ Predicted data:               "em1dfm.prd".
+ 
+ The End! [10:27:04.039, 06/12/2016]

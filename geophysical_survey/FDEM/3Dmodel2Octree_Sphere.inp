@@ -1,0 +1,6 @@
+LIN_MODEL
+octree_large.msh
+Mesh.msh
+Sphere_Tensor.con
+USE_INPUT_MESH
+Sphere_Octree.con

@@ -1,0 +1,15 @@
+Mesh_4m.msh		! Mesh file
+EM1DFM.obs	! Obsfile in EM1DFM format
+FILE Topo.topo ! Topography: NULL | FILE | NONE
+VALUE 1e-2	! Starting conductivity model FILE xxx.con | VALUE XX | HS (best-fitting half-space)
+VALUE 1e-2		! Reference conductivity model FILE xxx.con | VALUE XX
+VALUE 0.0		! Starting susceptibility model FILE xxx.con | VALUE XX
+VALUE 0.0		! Reference susceptibility model FILE xxx.con | VALUE XX
+1			! Target chi factor
+0.01 1 2 1		! alpha values as, ax, ay, az (ax and ay are used for the lateral interp) CONDUCTIVITY
+0.01 2 1 1		! alpha values as, ax, ay, az (ax and ay are used for the lateral interp) SUSCEPTIBILITY
+1000 0.2		! beta start, cooling schedule
+VALUE 1-5 10		! Lower and upper conductivity bound
+1			! mtype: 1 cond, 2 susc, 3 cond & susc(+), 4  cond & susc
+10 150 4			! Number of stations to interpolate with, maximum distance for interpolation
+
