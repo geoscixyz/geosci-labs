@@ -50,7 +50,7 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
 
         hx = mesh.hx[xind]
 
-        x0 = [xc[0]-hx[0]*0.5, yc[0]-hy[0]*0.5]
+        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5]
 
         meshCore = Mesh.TensorMesh([hx, hy], x0=x0)
 
@@ -64,12 +64,12 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
         yind = np.logical_and(mesh.vectorCCy>ymin, mesh.vectorCCy<ymax)
 
         xc = mesh.vectorCCx[xind]
-        yc = mesh.vectorCCy[yind]
+        zc = mesh.vectorCCy[yind]
 
         hx = mesh.hx[xind]
         hy = mesh.hy[yind]
 
-        x0 = [xc[0]-hx[0]*0.5, yc[0]-hy[0]*0.5]
+        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5]
 
         meshCore = Mesh.TensorMesh([hx, hy], x0=x0)
 
@@ -86,14 +86,14 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
         zind = np.logical_and(mesh.vectorCCz>zmin, mesh.vectorCCz<zmax)
 
         xc = mesh.vectorCCx[xind]
-        yc = mesh.vectorCCy[yind]
+        zc = mesh.vectorCCy[yind]
         zc = mesh.vectorCCz[zind]
 
         hx = mesh.hx[xind]
         hy = mesh.hy[yind]
         hz = mesh.hz[zind]
 
-        x0 = [xc[0]-hx[0]*0.5, yc[0]-hy[0]*0.5, zc[0]-hz[0]*0.5]
+        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5, zc[0]-hz[0]*0.5]
 
         meshCore = Mesh.TensorMesh([hx, hy, hz], x0=x0)
 
@@ -107,15 +107,16 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
 
     return actind, meshCore
 
+
 # Mesh, mapping can be globals global
 npad = 8
 cs = 0.5
 hx = [(cs,npad, -1.3),(cs,200),(cs,npad, 1.3)]
 hy = [(cs,npad, -1.3),(cs,100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-circmap = Maps.ParametricCircleMap(mesh)
-circmap.slope = 1e5
-mapping = circmap
+expmap = Maps.ExpMap(mesh)
+# actmap = Maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
+mapping = expmap
 dx = 5 
 xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
@@ -132,10 +133,12 @@ indy = (mesh.gridFy[:,0]>=xmin) & (mesh.gridFy[:,0]<=xmax) \
 indF = np.concatenate((indx,indy))
 
 
-def cylinder_fields(A,B,r,sigcyl,sighalf):
-    xc, yc = 0.,-20.
-    mhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
-    mtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, yc, r]
+def plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf):
+    # Create halfspace model
+    mhalf = sighalf*np.ones([mesh.nC,])
+
+    #Create true model with plate
+    mtrue = createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf)
     
     Mx = np.empty(shape=(0, 2))
     Nx = np.empty(shape=(0, 2))
@@ -146,8 +149,8 @@ def cylinder_fields(A,B,r,sigcyl,sighalf):
     survey = DC.Survey([src])
     survey_prim = DC.Survey([src])
     #problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem3D_CC(mesh, mapping = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
@@ -167,19 +170,28 @@ def cylinder_fields(A,B,r,sigcyl,sighalf):
 
     return mtrue,mhalf, src, total_field, primary_field
 
-def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
-    xc, yc = 0.,-20.
-    sigcyl = 1./rhocyl
+
+
+def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
+    sigplate = 1./rhoplate
     sighalf = 1./rhohalf
 
-    mtrue, mhalf,src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf)
+    mtrue, mhalf,src, total_field, primary_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
 
     fig = plt.figure(figsize=(15, 5))
     ax = fig.add_subplot(111,autoscale_on=False)
     ax.plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
     ax.plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    ax.plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    ax.plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # Get plate corners
+    plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
+    # plot top of plate outline
+    ax.plot(plateCorners[[0,1],0],plateCorners[[0,1],1],linestyle = 'dashed',color='k')
+    # plot east side of plate outline
+    ax.plot(plateCorners[[1,3],0],plateCorners[[1,3],1],linestyle = 'dashed',color='k')
+    # plot bottom of plate outline
+    ax.plot(plateCorners[[2,3],0],plateCorners[[2,3],1],linestyle = 'dashed',color='k')
+    # plot west side of plate outline
+    ax.plot(plateCorners[[0,2],0],plateCorners[[0,2],1],linestyle = 'dashed',color='k')
 
     if Field == 'Model':
        
@@ -289,14 +301,18 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
     ax.set_ylim([-40.,5.])
     ax.set_aspect('equal')
     plt.show()
-    return
+    return          
 
 
-def cylinder_app():
-    app = interact(cylinder_wrapper,
+def plate_app():
+    app = interact(plate_wrapper,
             rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
-            rhocyl = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
-            r = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            rhoplate = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+            dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+            xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+            zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
+            rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
             A = FloatSlider(min=-40.,max=40.,step=1.,value=-30., continuous_update=False),
             B = FloatSlider(min=-40.,max=40.,step=1.,value=30., continuous_update=False),
             Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
@@ -304,6 +320,57 @@ def cylinder_app():
             #Scale = ToggleButtons(options = ['Scalar','Log'],value='Scalar')
             )
     return app
+
+def getPlateCorners(xc,zc,dx,dz,rotAng):
+
+    # Form rotation matix
+    rotMat = np.array([[np.cos(rotAng*(np.pi/180.)), -np.sin(rotAng*(np.pi/180.))],[np.sin(rotAng*(np.pi/180.)), np.cos(rotAng*(np.pi/180.))]])
+    originCorners = np.array([[-0.5*dx, 0.5*dz], [0.5*dx, 0.5*dz], [-0.5*dx, -0.5*dz], [0.5*dx, -0.5*dz]])
+    
+    rotPlateCorners = np.dot(originCorners,rotMat)
+    plateCorners = rotPlateCorners + np.hstack([np.repeat(xc,4).reshape([4,1]),np.repeat(zc,4).reshape([4,1])])
+    return plateCorners
+
+
+def createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf):
+    # use matplotlib paths to find CC inside of polygon
+    plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
+
+    verts = [
+        (plateCorners[0,:]), # left, top
+        (plateCorners[1,:]), # right, top
+        (plateCorners[3,:]), # right, bottom
+        (plateCorners[2,:]), # left, bottom
+        (plateCorners[0,:]), # left, top (closes polygon)
+        ]
+
+    codes = [Path.MOVETO,
+             Path.LINETO,
+             Path.LINETO,
+             Path.LINETO,
+             Path.CLOSEPOLY,
+             ]
+
+    path = Path(verts, codes)
+    CCLocs = mesh.gridCC
+    insideInd = np.where(path.contains_points(CCLocs))
+
+    #Check selected cell centers by plotting
+    # print insideInd
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # patch = patches.PathPatch(path, facecolor='none', lw=2)
+    # ax.add_patch(patch)
+    # plt.scatter(CCLocs[insideInd,0],CCLocs[insideInd,1])
+    # ax.set_xlim(-10,10)
+    # ax.set_ylim(-20,0)
+    # plt.axes().set_aspect('equal')
+    # plt.show()
+    # mtrue = sighalf*np.ones_like([mesh.nC,1])
+
+    mtrue = sighalf*np.ones([mesh.nC,])
+    mtrue[insideInd] = sigplate
+    return mtrue    
 
 
 def DC2Dsurvey(flag="PoleDipole"):
@@ -354,12 +421,12 @@ def DC2Dsurvey(flag="PoleDipole"):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem.pair(survey)    
 
     sigblk, sighalf = 2e-2, 2e-3
-    xc, yc, r = -15, -8, 4
-    mtrue = np.r_[np.log(sigblk), np.log(sighalf), xc, yc, r]
+    xc, zc, r = -15, -8, 4
+    mtrue = np.r_[np.log(sigblk), np.log(sighalf), xc, zc, r]
     dtrue = survey.dpred(mtrue) 
     perc = 0.1
     floor = np.linalg.norm(dtrue)*1e-3
@@ -557,12 +624,12 @@ def MidpointPseudoSectionWidget():
     ntx = 18
     return interact(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
 
-def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, dobs, uncert, predmis, nmax=8, plotFlag=None):
+def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, zc, dx, dz, rotAng, dobs, uncert, predmis, nmax=8, plotFlag=None):
     matplotlib.rcParams['font.size'] = 14
     sighalf, sigblk = 1./rhohalf, 1./rhoblk
-    m0 = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
+    m0 = sighalf*np.ones([mesh.nC,])
     dini = survey.dpred(m0)
-    mtrue = np.r_[np.log(sigblk), np.log(sighalf), xc, yc, r]
+    mtrue = createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf)
     dpred  = survey.dpred(mtrue)
     xi, yi = np.meshgrid(np.linspace(xr.min(), xr.max(), 120), np.linspace(1., nmax, 100))
     #Cheat to compute a geometric factor define as G = dV_halfspace / rho_halfspace
@@ -647,9 +714,9 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, do
     plt.show()
     return 
 
-def DC2DPseudoWidgetWrapper(rhohalf,rhosph,xc,zc,r,surveyType):
+def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, dx, dz, rotAng, surveyType):
     dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
-    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, r, dobs, uncert, 'pred',plotFlag='PredOnly')
+    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, dx, dz, rotAng, dobs, uncert, 'pred',plotFlag='PredOnly')
     return None
 
 def DC2DPseudoWidget():
@@ -657,16 +724,18 @@ def DC2DPseudoWidget():
     Q = interact(DC2DPseudoWidgetWrapper,
          rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
          rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
-         xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
-         zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
-         r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
+         dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+         dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+         xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+         zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
+         rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
          surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])         
         )
     return Q
 
-def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
+def DC2DfwdWrapper(rhohalf, rhosph,xc, zc, dx, dz, rotAng, predmis, surveyType):
     dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
-    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, r, dobs, uncert, predmis)
+    DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhosph, xc, zc, dx, dz, rotAng, dobs, uncert, predmis)
     return None
 
 def DC2DfwdWidget():
@@ -674,9 +743,11 @@ def DC2DfwdWidget():
     Q = interact(DC2DfwdWrapper,
          rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
          rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
-         xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
-         zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
-         r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
+         dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+         dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+         xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+         zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
+         rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
          predmis = ToggleButtons(options=['pred','mis']),
          surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])         
         )
