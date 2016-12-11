@@ -3,6 +3,6 @@ scipy
 matplotlib
 Pillow
 ipywidgets
-properties
+properties[math]
 git+git://github.com/simpeg/simpeg.git@dcip/dev
-git+git://github.com/ubcgif/em_examples.git@VMDCyl
+git+git://github.com/ubcgif/em_examples.git
