@@ -41,10 +41,10 @@ home_dir = '.'
 dsep = '\\'
 
 # Specify survey type
-stype = 'gradient'
+stype = 'dipole-dipole'
 dtype = 'appConductivity'
 DOI = False
-INVERT = True
+INVERT = False
 # Survey parameters
 b = 20 # Tx-Rx seperation
 a = 20 # Dipole spacing
