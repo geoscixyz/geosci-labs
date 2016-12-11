@@ -28,8 +28,8 @@ before_install:
   # - conda update --yes conda
 
 install:
-  - source activate example-environment
-  - conda env export > environment.yml
+  # - source activate example-environment
+  # - conda env export > environment.yml
 
 
 # Run test
