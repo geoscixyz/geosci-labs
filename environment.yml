@@ -1,4 +1,4 @@
-name: environment
+name: em_examples
 
 dependencies:
   - python=2.7
