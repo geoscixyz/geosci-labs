@@ -1,0 +1,14 @@
+name: example-environment
+
+dependencies:
+  - python=2.7
+  - numpy
+  - matplotlib
+  - pandas
+  - scipy
+  - Pillow
+  - ipywidgets
+  - pip:
+    - properties[math]
+    - git+git://github.com/simpeg/simpeg.git@dcip/dev
+    - git+git://github.com/ubcgif/em_examples.git

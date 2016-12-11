@@ -1,8 +1,0 @@
-numpy
-scipy
-matplotlib
-Pillow
-ipywidgets
-properties
-git+git://github.com/simpeg/simpeg.git@dcip/dev
-git+git://github.com/ubcgif/em_examples.git@VMDCyl
