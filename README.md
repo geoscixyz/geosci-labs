@@ -6,6 +6,16 @@
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in [SimPEG](http://simpeg.xyz)
 
+## Notebook Structure
+
+Each notebook has the following structure
+
+- **Purpose** : Motivation and key concepts addressed by the notebook 
+- **Setup** : Overview of the relevant parameters in the problem 
+- **Questions** : Guiding questions related to the purpose
+- **App** : interactive visualizations 
+- **Explore** : further questions that can be explored with the app 
+
 ## For developers
 - when you generate a new notebook, please make sure that the filepath to its location follows the same structure as in [EM GeoSci](http://em.geosci.xyz)
 - add the notebook name and path to theindex (index.ipynb)

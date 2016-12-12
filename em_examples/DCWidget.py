@@ -84,7 +84,7 @@ def DC2Dsurvey(flag="PoleDipole"):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem.pair(survey)
 
     sigblk, sighalf = 2e-2, 2e-3
