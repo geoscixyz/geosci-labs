@@ -8,7 +8,7 @@ from DipoleWidgetFD import DisPosNegvalues
 from BiotSavart import BiotSavartFun
 from scipy.constants import mu_0
 
-class HarmonicVMDCylWidget(object):
+class TransientVMDCylWidget(object):
     """FDEMCylWidgete"""
 
     survey = None
@@ -19,11 +19,13 @@ class HarmonicVMDCylWidget(object):
     srcLoc = None
     mesh2D = None
     mu = None
+    counter = 0
 
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
         self.im = Image.open("../../images/emgeosci.png")
+        self.time = np.logspace(-5, -2, 41)
 
     def mirrorArray(self, x, direction="x"):
         X = x.reshape((self.nx_core, self.ny_core), order="F")
@@ -65,7 +67,7 @@ class HarmonicVMDCylWidget(object):
         self.Gx = BiotSavartFun(self.mesh, rxLoc, component='x')
 
 
-    def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-1, sig2=1e-2, sig3=1e-2, chi=0.):
+    def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-2, sig2=1e-2, sig3=1e-2, chi=0.):
         self.h1 = h1      # 1st layer thickness
         self.h2 = h2      # 2nd layer thickness
         self.z0 = 0.
@@ -88,58 +90,51 @@ class HarmonicVMDCylWidget(object):
         self.mu[self.mesh.gridCC[:, 2]<0.] = (1.+chi)*mu_0
         return self.m
 
-    def simulate(self, srcLoc, rxLoc, freqs):
-        bzr = EM.FDEM.Rx.Point_bSecondary(
-            rxLoc,
-            orientation='z',
-            component='real'
-        )
-        bzi = EM.FDEM.Rx.Point_bSecondary(
-            rxLoc,
-            orientation='z',
-            component='imag'
-        )
-        self.srcList = [EM.FDEM.Src.MagDipole([bzr, bzi], freq, srcLoc, orientation='Z')
-                   for freq in freqs]
-        # prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, Solver=PardisoSolver)
-        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, mu = self.mu)
-        survey = EM.FDEM.Survey(self.srcList)
+    def simulate(self, srcLoc, rxLoc, time, radius=1.):
+
+        bz = EM.TDEM.Rx(rxLoc,time,'bz')
+        dbzdt = EM.TDEM.Rx(rxLoc,time,'dbzdt')
+        src = EM.TDEM.Src.CircularLoop([bz],
+                                       waveform=EM.TDEM.Src.StepOffWaveform(),
+                                       loc=srcLoc, radius=radius)
+        self.srcList = [src]
+        prb = EM.TDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping)
+        prb.timeSteps = [(1e-06, 10), (5e-06, 10), (1e-05, 10), (5e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
+        survey = EM.TDEM.Survey(self.srcList)
         prb.pair(survey)
         self.f = prb.fields(self.m)
         self.prb = prb
         dpred = survey.dpred(self.m, f=self.f)
-        self.srcLoc = srcLoc
-        self.rxLoc = rxLoc
         return dpred
 
-    def getFields(self, bType = "b", ifreq=0):
-        src = self.srcList[ifreq]
+    def getFields(self, itime):
+        src = self.srcList[0]
         Pfx = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fx")
         Pfz = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fz")
-        Ey = self.mesh.aveE2CC*self.f[src, "e"]
+        Ey = self.mesh.aveE2CC*self.f[src, "e", itime]
         Jy = Utils.sdiag(self.prb.sigma) * Ey
 
         self.Ey = Utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
         self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
-        self.Bx = Utils.mkvc(self.mirrorArray(Pfx*self.f[src, bType], direction="x"))
-        self.Bz = Utils.mkvc(self.mirrorArray(Pfz*self.f[src, bType], direction="z"))
+        self.Bx = Utils.mkvc(self.mirrorArray(Pfx*self.f[src, "b", itime], direction="x"))
+        self.Bz = Utils.mkvc(self.mirrorArray(Pfz*self.f[src, "b", itime], direction="z"))
+        self.dBxdt = Utils.mkvc(self.mirrorArray(-Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x"))
+        self.dBzdt = Utils.mkvc(self.mirrorArray(-Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z"))
 
-        # self.Ey = Ey[self.activeCC]
-        # self.Jy = Jy[self.activeCC]
-        # self.Bx = Pfx*self.f[src, bType]
-        # self.Bz = Pfz*self.f[src, bType]
-
-    def getData(self, bType = "b"):
-
+    def getData(self):
+        src = self.srcList[0]
         Pfx = self.mesh.getInterpolationMat(self.rxLoc, locType="Fx")
         Pfz = self.mesh.getInterpolationMat(self.rxLoc, locType="Fz")
         Pey = self.mesh.getInterpolationMat(self.rxLoc, locType="Ey")
 
-        self.Ey = (Pey*self.f[:, "e"]).flatten()
-        self.Bx = (Pfx*self.f[:, bType]).flatten()
-        self.Bz = (Pfz*self.f[:, bType]).flatten()
+        self.Ey = (Pey*self.f[src, "e", :]).flatten()
+        self.Bx = (Pfx*self.f[src, "b", :]).flatten()
+        self.Bz = (Pfz*self.f[src, "b", :]).flatten()
+        self.dBxdt = (-Pfx*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
+        self.dBzdt = (-Pfz*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
 
-    def plotField(self, Field='B', ComplexNumber="real", view="vec", scale="linear", ifreq=0, Geometry=True):
+
+    def plotField(self, Field='B', view="vec", scale="linear", itime=0, Geometry=True):
         fig = plt.figure(figsize=(10, 6))
         ax = plt.subplot(111)
         vec = False
@@ -150,65 +145,42 @@ class HarmonicVMDCylWidget(object):
             tname = "|"
             title = tname+Field+"|-field"
         else:
-            if ComplexNumber == "real":
-                tname = "Re("
-            elif ComplexNumber == "imag":
-                tname = "Im("
-            elif ComplexNumber == "amplitude":
-                tname = "Amp("
-            elif ComplexNumber == "phase":
-                tname = "Phase("
-            title = tname + Field + view+")-field"
+            title = Field + view+"-field"
 
         if Field == "B":
             label = "Magnetic field (T)"
             if view == "vec":
                 vec = True
-                if ComplexNumber == "real":
-                    val = np.c_[self.Bx.real, self.Bz.real]
-                elif ComplexNumber == "imag":
-                    val = np.c_[self.Bx.imag, self.Bz.imag]
-                else:
-                    ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    return "Vector plot only supports real and imaginary type!"
-
-            elif view=="x":
-                if ComplexNumber == "real":
-                    val = self.Bx.real
-                elif ComplexNumber == "imag":
-                    val = self.Bx.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Bx)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Bx)
-            elif view=="z":
-                if ComplexNumber == "real":
-                    val = self.Bz.real
-                elif ComplexNumber == "imag":
-                    val = self.Bz.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Bz)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Bz)
+                val = np.c_[self.Bx, self.Bz]
+            elif view == "x":
+                val = self.Bx
+            elif view == "z":
+                val = self.Bz
             else:
                 ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... no By for VMD"
 
+        elif Field == "dBdt":
+            label = "Time derivative of magnetic field (T/s)"
+            if view == "vec":
+                vec = True
+                val = np.c_[self.dBxdt, self.dBzdt]
+            elif view == "x":
+                val = self.dBxdt
+            elif view == "z":
+                val = self.dBzdt
+            else:
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... no dBydt for VMD"
+
         elif Field == "E":
             label = "Electric field (V/m)"
-            if view=="y":
-                if ComplexNumber == "real":
-                    val = self.Ey.real
-                elif ComplexNumber == "imag":
-                    val = self.Ey.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Ey)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Ey)
+            if view == "y":
+                val = self.Ey
             else:
                 ax.imshow(self.im)
                 ax.set_xticks([])
@@ -218,14 +190,7 @@ class HarmonicVMDCylWidget(object):
         elif Field == "J":
             label = "Current density (A/m$^2$)"
             if view=="y":
-                if ComplexNumber == "real":
-                    val = self.Jy.real
-                elif ComplexNumber == "imag":
-                    val = self.Jy.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Jy)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Jy)
+                val = self.Jy
             else:
                 ax.imshow(self.im)
                 ax.set_xticks([])
@@ -240,7 +205,7 @@ class HarmonicVMDCylWidget(object):
         else:
             raise Exception("We consdier only linear and log scale!")
         cb.set_label(label)
-        xmax = self.mesh2D.gridCC[:,0].max()
+        xmax = self.mesh2D.gridCC[:, 0].max()
         if Geometry:
             ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5)
             ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
@@ -251,92 +216,83 @@ class HarmonicVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
+        ax.text(-90, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
 
-    def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
-
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, Geometry=True):
-
-            if ComplexNumber == "Re":
-                ComplexNumber = "real"
-            elif ComplexNumber == "Im":
-                ComplexNumber = "imag"
-            elif ComplexNumber == "Amp":
-                ComplexNumber = "amplitude"
-            elif ComplexNumber == "Phase":
-                ComplexNumber = "phase"
+    def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
+                         radius=1., z0=0., x0=10.):
+        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, z, h1, h2, Scale, rxOffset, radius, Geometry=True):
 
             if AmpDir == "Direction":
-                # ComplexNumber = "real"
                 Component = "vec"
-            if Field == "Bsec":
-                bType = "bSecondary"
-                Field = "B"
-            else:
-                bType = "b"
-
-            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3, chi=Sus)
-            srcLoc = np.array([0., 0., z])
-            rxLoc = np.array([[rxOffset, 0., z]])
-            dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
-            self.getFields(bType=bType)
-            return self.plotField(Field=Field, ComplexNumber=ComplexNumber, view=Component, scale=Scale, Geometry=Geometry)
+            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3)
+            self.srcLoc = np.array([0., 0., z])
+            self.rxLoc = np.array([[rxOffset, 0., z]])
+            self.radius = radius
+            if Update =="True":
+                dpred = self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
+            self.getFields(itime)
+            return self.plotField(Field=Field, view=Component, scale=Scale, Geometry=Geometry, itime=itime)
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec", "J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="Direction") \
+                        ,Update=widgets.ToggleButtons(options=["True", "False"], value="True") \
+                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt", "J"], value=fieldvalue) \
+                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase'], value="Re") \
-                        ,Frequency=widgets.FloatText(value=100., continuous_update=False, description='f (Hz)') \
-                        ,Sigma0=widgets.FloatText(value=1e-8, continuous_update=False, description='$\sigma_0$ (S/m)') \
-                        ,Sigma1=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_1$ (S/m)') \
-                        ,Sigma2=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_2$ (S/m)') \
-                        ,Sigma3=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_3$ (S/m)') \
+                        ,itime=widgets.IntSlider(min=1, max=70, step=1, value=1, continuous_update=False, description='Time index') \
+                        ,Sigma0=widgets.FloatText(value=sig0, continuous_update=False, description='$\sigma_0$ (S/m)') \
+                        ,Sigma1=widgets.FloatText(value=sig1, continuous_update=False, description='$\sigma_1$ (S/m)') \
+                        ,Sigma2=widgets.FloatText(value=sig2, continuous_update=False, description='$\sigma_2$ (S/m)') \
+                        ,Sigma3=widgets.FloatText(value=sig3, continuous_update=False, description='$\sigma_3$ (S/m)') \
                         ,Sus=widgets.FloatText(value=0., continuous_update=False, description='$\chi$') \
-                        ,z=widgets.FloatSlider(min=0., max=48., step=3., value=0., continuous_update=False, description='$z$ (m)') \
+                        ,z=widgets.FloatSlider(min=0., max=48., step=3., value=z0, continuous_update=False, description='$z$ (m)') \
                         ,h1=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_1$ (m)') \
                         ,h2=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_2$ (m)') \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
-                        ,rxOffset=widgets.FloatText(value=10., continuous_update=False, description='x (m)') \
+                        ,rxOffset=widgets.FloatText(value=x0, continuous_update=False, description='x (m)') \
+                        ,radius=widgets.FloatText(value=radius, continuous_update=False, description='Tx radius (m)') \
                         )
         return out
 
-    def InteractiveData(self, fieldvalue="B", compvalue="z", z=0.):
-        # srcLoc = np.array([0., 0., z])
-        # rxLoc = np.array([[rxOffset, 0., z]])
-        frequency = np.logspace(2, 5, 31)
-        # m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3)
-        dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
+    def InteractiveData(self, fieldvalue="B", compvalue="z"):
+        # dpred = self.simulate(self.srcLoc, self.rxLoc, frequency, radius=radius)
         def foo(Field, Component, Scale):
             fig = plt.figure()
             ax = plt.subplot(111)
             bType = "b"
-            if (Field == "Bsec") or (Field == "B"):
-                if Field == "Bsec":
-                    bType = "bSecondary"
-                Field = "B"
-                self.getData(bType=bType)
+            self.getData()
+            if Field == "B":
                 label = "Magnetic field (T)"
                 if Component == "x":
                     title = "Bx"
-                    valr = self.Bx.real
-                    vali = self.Bx.imag
+                    val = self.Bx
                 elif Component == "z":
                     title = "Bz"
-                    valr = self.Bz.real
-                    vali = self.Bz.imag
+                    val = self.Bz
                 else:
                     ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... no By for VMD"
 
+            elif Field == "dBdt":
+                label = "Time dervative of magnetic field (T/s)"
+                if Component == "x":
+                    title = "dBx/dt"
+                    val = self.dBxdt
+                elif Component == "z":
+                    title = "dBz/dt"
+                    val = self.dBzdt
+                else:
+                    ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no dBydt for VMD"
+
             else:
-                self.getData(bType=bType)
                 label = "Electric field (V/m)"
                 title = "Ey"
                 if Component == "y":
-                    valr = self.Ey.real
-                    vali = self.Ey.imag
+                    val = self.Ey
                 else:
                     ax.imshow(self.im)
                     ax.set_xticks([])
@@ -344,27 +300,23 @@ class HarmonicVMDCylWidget(object):
                     return "Dude, think twice ... only Ey for VMD"
 
             if Scale == "log":
-                valr_p, valr_n = DisPosNegvalues(valr)
-                vali_p, vali_n = DisPosNegvalues(vali)
-                ax.plot(frequency, valr_p, 'k-')
-                ax.plot(frequency, valr_n, 'k--')
-                ax.plot(frequency, vali_p, 'r-')
-                ax.plot(frequency, vali_n, 'r--')
-                ax.legend(("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4, fontsize = 10)
+                val_p, val_n = DisPosNegvalues(val)
+                ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
+                ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
+                ax.legend(("(+)", "(-)"), loc=4, fontsize = 10)
             else:
-                ax.plot(frequency, valr, 'k.-')
-                ax.plot(frequency, vali, 'r.-')
-                ax.legend(("Re", "Im"), loc=4, fontsize = 10)
+                ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+
             ax.set_xscale("log")
             ax.set_yscale(Scale)
-            ax.set_xlabel("Frequency (Hz)")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
 
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec"], value=fieldvalue) \
+                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt"], value=fieldvalue) \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
                         )

@@ -9,7 +9,8 @@ env:
 # Setup anaconda
 before_install:
   - pip install --upgrade pip;
-  - pip install -r requirements.txt
+  - pip install numpy scipy matplotlib Pillow ipywidgets properties[math]
+  - pip install git+git://github.com/simpeg/simpeg.git@dcip/dev
   - python setup.py install
   # - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then wget http://repo.continuum.io/miniconda/Miniconda-3.8.3-Linux-x86_64.sh -O miniconda.sh; else wget http://repo.continuum.io/miniconda/Miniconda3-3.8.3-Linux-x86_64.sh -O miniconda.sh; fi
   # - chmod +x miniconda.sh
@@ -19,9 +20,10 @@ before_install:
 
 install:
   # - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets
-  - git clone https://github.com/simpeg/simpeg.git
-  - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
-  - export PATH=$PWD/simpeg:$PATH
+  # - git clone https://github.com/simpeg/simpeg.git
+  # - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
+  - export PATH=$PWD/em_examples:$PATH
+  - export PYTHONPATH=$PWD/em_examples:$PYTHONPATH
 
 # Run test
 script:
