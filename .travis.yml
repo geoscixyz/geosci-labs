@@ -30,5 +30,4 @@ script:
   - nosetests $TEST_DIR
 
 notifications:
-  email:
-    - lindseyheagy@gmail.com
+  slack: ubcgif:1Z2lR3XYRSM3GHflG71ZHEN6
