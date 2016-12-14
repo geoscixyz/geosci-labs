@@ -146,8 +146,8 @@ def cylinder_fields(A,B,r,sigcyl,sighalf):
     survey = DC.Survey([src])
     survey_prim = DC.Survey([src])
     #problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem3D_CC(mesh, mapping = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, mapping = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)

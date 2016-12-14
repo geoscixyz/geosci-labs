@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
-import matplotlib.patches as patches 
+import matplotlib.patches as patches
+from scipy.constants import epsilon_0 
 
 
 import warnings
@@ -142,35 +143,43 @@ def plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf):
     #Create true model with plate
     mtrue = createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf)
     
-    Mx = np.empty(shape=(0, 2))
-    Nx = np.empty(shape=(0, 2))
-    #rx = DC.Rx.Dipole_ky(Mx,Nx)
-    rx = DC.Rx.Dipole(Mx,Nx)
+    Mx =  mesh.gridCC
+    # Nx = np.empty(shape=(mesh.nC, 2))
+    rx = DC.Rx.Pole_ky(Mx)
+    # rx = DC.Rx.Dipole(Mx,Nx)
     src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
-    #survey = DC.Survey_ky([src])
-    survey = DC.Survey([src])
-    survey_prim = DC.Survey([src])
-    #problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    # src = DC.Src.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
+    survey = DC.Survey_ky([src])
+    # survey = DC.Survey([src])
+    # survey_prim = DC.Survey([src])
+    survey_prim = DC.Survey_ky([src])
+    #problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
+    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem_prim = DC.Problem2D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
     problem_prim.pair(survey_prim)
 
-    primary_field = problem_prim.fields(mhalf)
-    #phihalf = f[src, 'phi', 15]
-    #ehalf = f[src, 'e']
-    #jhalf = f[src, 'j']
-    #charge = f[src, 'charge']
 
-    total_field = problem.fields(mtrue)
-    #phi = f[src, 'phi', 15]
-    #e = f[src, 'e']
-    #j = f[src, 'j']
-    #charge = f[src, 'charge']
+    mesh.setCellGradBC("neumann")
+    cellGrad = mesh.cellGrad
+    faceDiv = mesh.faceDiv
 
-    return mtrue,mhalf, src, total_field, primary_field
+    phi_primary = survey_prim.dpred(mhalf)
+    e_primary = -cellGrad*phi_primary
+    j_primary = problem_prim.MfRhoI*problem_prim.Grad*phi_primary
+    q_primary = epsilon_0*problem_prim.Vol*(faceDiv*e_primary)
+    primary_field = {'phi': phi_primary, 'e': e_primary, 'j': j_primary, 'q': q_primary}
+
+    phi_total = survey.dpred(mtrue)
+    e_total = -cellGrad*phi_total
+    j_total = problem.MfRhoI*problem.Grad*phi_total
+    q_total = epsilon_0*problem.Vol*(faceDiv*e_total)
+    total_field = {'phi': phi_total, 'e': e_total, 'j': j_total, 'q': q_total}
+
+    return mtrue,mhalf, src, primary_field, total_field
 
 
 
@@ -178,7 +187,7 @@ def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
     sigplate = 1./rhoplate
     sighalf = 1./rhohalf
 
-    mtrue, mhalf,src, total_field, primary_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
+    mtrue,mhalf, src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
 
     fig = plt.figure(figsize=(15, 5))
     ax = fig.add_subplot(111,autoscale_on=False)
@@ -222,18 +231,25 @@ def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
         streamOpts = None
         ind = indCC
 
-        formatter = None
-        pcolorOpts = None
-
-
         if Type == 'Total':
-            u = total_field[src, 'phi']
+            formatter = LogFormatter(10, labelOnlyBase=False)
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
+
+            u = total_field['phi']
 
         elif Type == 'Primary':
-            u = primary_field[src,'phi']
+            formatter = LogFormatter(10, labelOnlyBase=False)
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
+
+            u = primary_field['phi']
 
         elif Type == 'Secondary':
-            u = total_field[src, 'phi'] - primary_field[src, 'phi']
+            formatter = None
+            pcolorOpts = None
+
+            uTotal = total_field['phi']
+            uPrim = primary_field['phi']
+            u = uTotal - uPrim
 
     elif Field == 'E':
         
@@ -247,13 +263,15 @@ def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
         pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
         
         if Type == 'Total':
-            u = total_field[src, 'e']
+            u = total_field['e']
 
         elif Type == 'Primary':
-            u = primary_field[src,'e']
+            u = primary_field['e']
         
         elif Type == 'Secondary':
-            u = total_field[src, 'e'] - primary_field[src, 'e']
+            uTotal = total_field['e']
+            uPrim = primary_field['e']
+            u = uTotal - uPrim
     
     elif Field == 'J':
 
@@ -268,13 +286,15 @@ def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
 
 
         if Type == 'Total':
-            u = total_field[src,'j']
-        
-        elif Type == 'Secondary':
-            u = total_field[src,'j'] - primary_field[src,'j']
+            u = total_field['j']
 
         elif Type == 'Primary':
-            u = primary_field[src,'j']
+            u = primary_field['j']
+
+        elif Type == 'Secondary':
+            uTotal = total_field['j']
+            uPrim = primary_field['j']
+            u = uTotal - uPrim
 
     elif Field == 'Charge':
         
@@ -285,14 +305,18 @@ def plate_wrapper(A,B,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
         ind = indCC
 
         formatter = LogFormatter(10, labelOnlyBase=False) 
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-12, linscale=0.01)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-13, linscale=0.01)}
         
         if Type == 'Total':
-            u = total_field[src,'charge']
+            u = total_field['q']
+
         elif Type == 'Primary':
-            u = primary_field[src,'charge']
+            u = primary_field['q']
+
         elif Type == 'Secondary':
-            u = total_field[src,'charge']-primary_field[src,'charge']
+            uTotal = total_field['q']
+            uPrim = primary_field['q']
+            u = uTotal - uPrim
 
     
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax, grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
@@ -375,54 +399,44 @@ def createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf):
     return mtrue   
 
 
-def get_Surface_Potentials(total_field,src):
-    # sigplate = 1./rhoplate
-    # sighalf = 1./rhohalf
-
-    # mtrue, mhalf,src, total_field, primary_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
-    V = total_field[src, 'phi']
+def get_Surface_Potentials(total_field):
+    
+    phi = total_field['phi']
     CCLoc = mesh.gridCC
     zsurfaceLoc = np.max(CCLoc[:,1])
     surfaceInd = np.where(CCLoc[:,1] == zsurfaceLoc)
-    Vsurface = V[surfaceInd]
+    phiSurface = phi[surfaceInd]
     xSurface = CCLoc[surfaceInd,0].T
-    return xSurface,Vsurface     
+    return xSurface,phiSurface     
 
 
+# Inline functions for computing apparent resistivity
 eps = 1e-9 #to stabilize division
 G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
 rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
+
 
 def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type):
 
     sigplate = 1./rhoplate
     sighalf = 1./rhohalf
 
-    mtrue, mhalf,src, total_field, primary_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
+    mtrue, mhalf,src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
     
-    # rhomin = np.min([rhoplate,rhohalf])
-    # rhomax = np.max([rhoplate,rhohalf])
-
     fig, ax = plt.subplots(2,1,figsize=(18,14),sharex=True)
-
     fig.subplots_adjust(right=0.8)
-    # x = np.linspace(-40.,40.,200)
-    # z = np.linspace(x.min(),0,100)
-    
-    # pltgrid = Utils.ndgrid(x,z)
-    # xplt = pltgrid[:,0].reshape(x.size,z.size,order='F')
-    # zplt = pltgrid[:,1].reshape(x.size,z.size,order='F')
 
-    xSurface, Vsurface = get_Surface_Potentials(total_field,src)
-    ylim = np.r_[-1., 1.]*np.max(np.abs(Vsurface))
+    xSurface, phiSurface = get_Surface_Potentials(total_field)
+    ylim = np.r_[-1., 1.]*np.max(np.abs(phiSurface))
     xlim = np.array([-40,40])
 
     MInd = np.where(xSurface == M)
     NInd = np.where(xSurface == N)
-    VM = Vsurface[MInd]
-    VN = Vsurface[NInd]
 
-    ax[0].plot(xSurface,Vsurface,color=[0.1,0.5,0.1],linewidth=2)
+    VM = phiSurface[MInd[0]]
+    VN = phiSurface[NInd[0]]
+
+    ax[0].plot(xSurface,phiSurface,color=[0.1,0.5,0.1],linewidth=2)
     ax[0].grid(which='both',linestyle='-',linewidth=0.5,color=[0.2,0.2,0.2],alpha=0.5)
     ax[0].plot(A,0,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
     ax[0].plot(B,0,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
@@ -447,15 +461,13 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
     ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = 14)
     ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = 14)
 
-#     ax[0].plot(np.r_[M,N],np.ones(2)*VN,color='k')
-#     ax[0].plot(np.r_[M,M],np.r_[VM, VN],color='k')
-#     ax[0].annotate('%2.1e'%(VM-VN) , xy=(M,(VM+VN)/2), xytext=(M-9,(VM+VN)/2.),fontsize = 14)
+    # ax[0].plot(np.r_[M,N],np.ones(2)*VN,color='k')
+    # ax[0].plot(np.r_[M,M],np.r_[VM, VN],color='k')
+    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M,(VM+VN)/2), xytext=(M-9,(VM+VN)/2.),fontsize = 14)
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
     ax[0].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(rho_a(VM,VN,A,B,M,N)),
                 verticalalignment='bottom', bbox=props, fontsize = 14)
-
-
 
     if Field == 'Model':
        
@@ -484,18 +496,25 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
         streamOpts = None
         ind = indCC
 
-        formatter = None
-        pcolorOpts = None
-
-
         if Type == 'Total':
-            u = total_field[src, 'phi']
+            formatter = LogFormatter(10, labelOnlyBase=False)
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
+
+            u = total_field['phi']
 
         elif Type == 'Primary':
-            u = primary_field[src,'phi']
+            formatter = LogFormatter(10, labelOnlyBase=False)
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
+
+            u = primary_field['phi']
 
         elif Type == 'Secondary':
-            u = total_field[src, 'phi'] - primary_field[src, 'phi']
+            formatter = None
+            pcolorOpts = None
+
+            uTotal = total_field['phi']
+            uPrim = primary_field['phi']
+            u = uTotal - uPrim
 
     elif Field == 'E':
         
@@ -509,13 +528,15 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
         pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
         
         if Type == 'Total':
-            u = total_field[src, 'e']
+            u = total_field['e']
 
         elif Type == 'Primary':
-            u = primary_field[src,'e']
+            u = primary_field['e']
         
         elif Type == 'Secondary':
-            u = total_field[src, 'e'] - primary_field[src, 'e']
+            uTotal = total_field['e']
+            uPrim = primary_field['e']
+            u = uTotal - uPrim
     
     elif Field == 'J':
 
@@ -530,13 +551,15 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
 
 
         if Type == 'Total':
-            u = total_field[src,'j']
-        
-        elif Type == 'Secondary':
-            u = total_field[src,'j'] - primary_field[src,'j']
+            u = total_field['j']
 
         elif Type == 'Primary':
-            u = primary_field[src,'j']
+            u = primary_field['j']
+
+        elif Type == 'Secondary':
+            uTotal = total_field['j']
+            uPrim = primary_field['j']
+            u = uTotal - uPrim
 
     elif Field == 'Charge':
         
@@ -547,14 +570,18 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
         ind = indCC
 
         formatter = LogFormatter(10, labelOnlyBase=False) 
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-12, linscale=0.01)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-13, linscale=0.01)}
         
         if Type == 'Total':
-            u = total_field[src,'charge']
+            u = total_field['q']
+
         elif Type == 'Primary':
-            u = primary_field[src,'charge']
+            u = primary_field['q']
+
         elif Type == 'Secondary':
-            u = total_field[src,'charge']-primary_field[src,'charge']
+            uTotal = total_field['q']
+            uPrim = primary_field['q']
+            u = uTotal - uPrim
 
 
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
@@ -578,25 +605,11 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
     ax[1].set_ylim([-40.,5.])
     ax[1].set_aspect('equal')
 
-
-    # ax[1].set_xlim([x.min(),x.max()])
-    # ax[1].set_ylim([z.min(),0.])
-    # ax[1].set_ylabel('z (m)', fontsize=14)
-    
-    # plt.colorbar(cb,cax=cbar_ax,label=clabel)
-    # if 'clim' in locals():
-    #     cb.set_clim(clim)
-    # ax[1].set_xlabel('x(m)',fontsize=14)
-
-    # plt.tight_layout()
     plt.show()
-    print VM,VN
     return fig, ax
 
 
 def plot_Surface_Potentials_app():
-    # plot_Surface_Potentials_interact = lambda dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Plot: plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Plot)
-    # app = interact(plot_Surface_Potentials_interact,
     app = interact(plot_Surface_Potentials,
                 dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
                 dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
@@ -605,28 +618,28 @@ def plot_Surface_Potentials_app():
                 rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
                 rhoplate = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
                 rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
-                A = FloatSlider(min=-30.25,max=30.25,step=1.,value=-30.25, continuous_update=False),
-                B = FloatSlider(min=-30.25,max=30.25,step=1.,value=30.25, continuous_update=False),
-                M = FloatSlider(min=-30.25,max=30.25,step=1.,value=-10.25, continuous_update=False),
-                N = FloatSlider(min=-30.25,max=30.25,step=1.,value=10.25, continuous_update=False),
+                A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
+                B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
+                M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
+                N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
                 Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
                 Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
                 )
     return app
 
-if __name__ == '__main__':
-    rhohalf = 500.
-    rhoplate = 500.
-    dx = 10.
-    dz = 10.
-    xc = 0.
-    zc = -10.
-    rotAng = 0.
-    A,B = -30.25, 30.25 
-    M,N = -10.25, 10.25
-    Field =  'Model'
-    Type = 'Total'
-    plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type)
+# if __name__ == '__main__':
+#     rhohalf = 500.
+#     rhoplate = 500.
+#     dx = 10.
+#     dz = 10.
+#     xc = 0.
+#     zc = -10.
+#     rotAng = 0.
+#     A,B = -30.25, 30.25 
+#     M,N = -10.25, 10.25
+#     Field =  'Model'
+#     Type = 'Total'
+#     plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type)
 
 
 # def DC2Dsurvey(flag="PoleDipole"):
