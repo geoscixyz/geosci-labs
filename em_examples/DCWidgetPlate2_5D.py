@@ -410,7 +410,7 @@ def get_Surface_Potentials(total_field):
     xSurface = CCLoc[surfaceInd,0].T
     return xSurface,phiSurface
 
-def sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
+def sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary):
     # plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
     chargeRegionCorners = getPlateCorners(xc,zc,dx+1.,dz+1.,rotAng)
 
@@ -488,12 +488,15 @@ rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type):
 
+    labelsize = 18.
+    ticksize = 16.
+
     sigplate = 1./rhoplate
     sighalf = 1./rhohalf
 
     mtrue, mhalf,src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
     
-    fig, ax = plt.subplots(2,1,figsize=(18,14),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(18,18),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiSurface = get_Surface_Potentials(total_field)
@@ -510,8 +513,8 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
     ax[0].grid(which='both',linestyle='-',linewidth=0.5,color=[0.2,0.2,0.2],alpha=0.5)
     ax[0].plot(A,0,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
     ax[0].plot(B,0,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    ax[0].set_ylabel('Potential, (V)',fontsize = 14)
-    ax[0].set_xlabel('x (m)',fontsize = 14)
+    ax[0].set_ylabel('Potential, (V)',fontsize = labelsize)
+    ax[0].set_xlabel('x (m)',fontsize = labelsize)
     ax[0].set_xlim(xlim)
     ax[0].set_ylim(ylim)
 
@@ -528,16 +531,18 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
 
-    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = 14)
-    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = 14)
+    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
+    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
+
+    ax[0].tick_params(axis='both', which='major', labelsize=ticksize)
 
     # ax[0].plot(np.r_[M,N],np.ones(2)*VN,color='k')
     # ax[0].plot(np.r_[M,M],np.r_[VM, VN],color='k')
-    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M,(VM+VN)/2), xytext=(M-9,(VM+VN)/2.),fontsize = 14)
+    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M,(VM+VN)/2), xytext=(M-9,(VM+VN)/2.),fontsize = labelsize14)
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
     ax[0].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(rho_a(VM,VN,A,B,M,N)),
-                verticalalignment='bottom', bbox=props, fontsize = 14)
+                verticalalignment='bottom', bbox=props, fontsize = labelsize)
 
     if Field == 'Model':
        
@@ -672,19 +677,35 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
         qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
         ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
         ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
-    xytext_qPos = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
-    xytext_qNeg = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
-    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = 14)
-    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = 14)
+    
+    #xytext_qPos = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
+    #xytext_qNeg = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
+    #ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
+    #ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
 
 
-    ax[1].set_xlabel('x (m)', fontsize=14)
-    ax[1].set_ylabel('z (m)', fontsize=14)
+    ax[1].set_xlabel('x (m)', fontsize= labelsize)
+    ax[1].set_ylabel('z (m)', fontsize= labelsize)
+    ax[1].plot(A,0.,marker = 'v',color='red',markersize= labelsize)
+    ax[1].plot(B,0.,marker = 'v',color='blue',markersize= labelsize)
+    ax[1].plot(M,0.,marker = 'v',color='yellow',markersize= labelsize)
+    ax[1].plot(N,0.,marker = 'v',color='green',markersize= labelsize)
+
+    xytextA1 = (A-0.5,1.)
+    xytextB1 = (B-0.5,1.)
+    xytextM1 = (M-0.5,1.)
+    xytextN1 = (N-0.5,1.)
+    ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
+    ax[1].annotate('B', xy=xytextB1, xytext=xytextB1,fontsize = labelsize)
+    ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
+    ax[1].annotate('N', xy=xytextN1, xytext=xytextN1,fontsize = labelsize)
+    ax[1].tick_params(axis='both', which='major', labelsize=ticksize)
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter)
-    cb.set_label(label)
-    # ax[1].set_xlim([-40.,40.])
+    cb.ax.tick_params(labelsize=ticksize)
+    cb.set_label(label, fontsize=labelsize)
+    ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     ax[1].set_aspect('equal')
 
