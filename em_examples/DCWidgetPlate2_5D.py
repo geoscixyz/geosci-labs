@@ -15,6 +15,7 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0 
+from scipy.ndimage.measurements import center_of_mass
 
 
 import warnings
@@ -407,7 +408,76 @@ def get_Surface_Potentials(total_field):
     surfaceInd = np.where(CCLoc[:,1] == zsurfaceLoc)
     phiSurface = phi[surfaceInd]
     xSurface = CCLoc[surfaceInd,0].T
-    return xSurface,phiSurface     
+    return xSurface,phiSurface
+
+def sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
+    # plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
+    chargeRegionCorners = getPlateCorners(xc,zc,dx+1.,dz+1.,rotAng)
+
+    # plateVerts = [
+    #     (plateCorners[0,:]), # left, top
+    #     (plateCorners[1,:]), # right, top
+    #     (plateCorners[3,:]), # right, bottom
+    #     (plateCorners[2,:]), # left, bottom
+    #     (plateCorners[0,:]), # left, top (closes polygon)
+    #     ]
+
+    chargeRegionVerts = [
+        (chargeRegionCorners[0,:]), # left, top
+        (chargeRegionCorners[1,:]), # right, top
+        (chargeRegionCorners[3,:]), # right, bottom
+        (chargeRegionCorners[2,:]), # left, bottom
+        (chargeRegionCorners[0,:]), # left, top (closes polygon)
+        ]
+
+    codes = [Path.MOVETO,
+             Path.LINETO,
+             Path.LINETO,
+             Path.LINETO,
+             Path.CLOSEPOLY,
+             ]
+
+    # platePath = Path(plateVerts, codes)
+    chargeRegionPath = Path(chargeRegionVerts, codes)
+    CCLocs = mesh.gridCC
+    # plateInsideInd = np.where(platePath.contains_points(CCLocs))
+    chargeRegionInsideInd = np.where(chargeRegionPath.contains_points(CCLocs))
+    
+    plateChargeLocs = CCLocs[chargeRegionInsideInd]
+    plateCharge = qSecondary[chargeRegionInsideInd]
+    posInd = np.where(plateCharge >= 0)
+    negInd = np.where(plateCharge < 0)
+    qPos = Utils.mkvc(plateCharge[posInd])
+    qNeg = Utils.mkvc(plateCharge[negInd])
+
+    qPosLoc = plateChargeLocs[posInd,:][0]
+    qNegLoc = plateChargeLocs[negInd,:][0]
+
+    qPosData = np.vstack([qPosLoc[:,0], qPosLoc[:,1], qPos]).T
+    print qPosData.shape
+    qNegData = np.vstack([qNegLoc[:,0], qNegLoc[:,1], qNeg]).T
+
+    qNegAvgLoc = np.average(qNegLoc,axis=0, weights=qNeg)
+    qPosAvgLoc = np.average(qPosLoc,axis=0, weights=qPos)
+
+    qPosSum = np.sum(qPos)
+    qNegSum = np.sum(qNeg)
+
+    # # Check things by plotting
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # platePatch = patches.PathPatch(platePath, facecolor='none', lw=2)
+    # ax.add_patch(platePatch)
+    # chargeRegionPatch = patches.PathPatch(chargeRegionPath, facecolor='none', lw=2)
+    # ax.add_patch(chargeRegionPatch)
+    # plt.scatter(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
+    # plt.scatter(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
+    # ax.set_xlim(-15,5)
+    # ax.set_ylim(-25,-5)
+    # plt.axes().set_aspect('equal')
+    # plt.show()
+
+    return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
 
 # Inline functions for computing apparent resistivity
@@ -583,9 +653,8 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
             uPrim = primary_field['q']
             u = uTotal - uPrim
 
-
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
-        # Get plate corners
+    # Get plate corners
     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
     # plot top of plate outline
     ax[1].plot(plateCorners[[0,1],0],plateCorners[[0,1],1],linestyle = 'dashed',color='k')
@@ -595,6 +664,20 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
     ax[1].plot(plateCorners[[2,3],0],plateCorners[[2,3],1],linestyle = 'dashed',color='k')
     # plot west side of plate outline
     ax[1].plot(plateCorners[[0,2],0],plateCorners[[0,2],1],linestyle = 'dashed',color='k')
+
+    if (Field == 'Charge'):
+        qTotal = total_field['q']
+        qPrim = primary_field['q']
+        qSecondary = qTotal - qPrim
+        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
+    xytext_qPos = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
+    xytext_qNeg = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
+    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = 14)
+    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = 14)
+
+
     ax[1].set_xlabel('x (m)', fontsize=14)
     ax[1].set_ylabel('z (m)', fontsize=14)
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
