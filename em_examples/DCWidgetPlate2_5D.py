@@ -675,16 +675,16 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
         qPrim = primary_field['q']
         qSecondary = qTotal - qPrim
         qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
-        print(qPosAvgLoc)
-        print(qNegAvgLoc)
-        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], color='black', markersize= labelsize)
-        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], color='black', markersize= labelsize)
+        print(qPosAvgLoc[0])
+        print(qPosAvgLoc[1])
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
         if(qPosAvgLoc[0] > qNegAvgLoc[0]):
-            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1])
-            xytext_qNeg = (qNegAvgLoc[0] - 13., qNegAvgLoc[1])
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] - 13., qNegAvgLoc[1] - 0.5)
         else:
-            xytext_qPos = (qPosAvgLoc[0] - 13., qPosAvgLoc[1])
-            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1])
+            xytext_qPos = (qPosAvgLoc[0] - 13., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
         ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
         ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
 
