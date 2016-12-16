@@ -670,26 +670,31 @@ def plot_Surface_Potentials(dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Ty
     # plot west side of plate outline
     ax[1].plot(plateCorners[[0,2],0],plateCorners[[0,2],1],linestyle = 'dashed',color='k')
 
-    if (Field == 'Charge'):
+    if(Field == 'Charge'):
         qTotal = total_field['q']
         qPrim = primary_field['q']
         qSecondary = qTotal - qPrim
         qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary)
-        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
-        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
-    
-    #xytext_qPos = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
-    #xytext_qNeg = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
-    #ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
-    #ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
+        print(qPosAvgLoc)
+        print(qNegAvgLoc)
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], color='black', markersize= labelsize)
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], color='black', markersize= labelsize)
+        if(qPosAvgLoc[0] > qNegAvgLoc[0]):
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1])
+            xytext_qNeg = (qNegAvgLoc[0] - 13., qNegAvgLoc[1])
+        else:
+            xytext_qPos = (qPosAvgLoc[0] - 13., qPosAvgLoc[1])
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1])
+        ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
+        ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
 
 
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
     ax[1].plot(A,0.,marker = 'v',color='red',markersize= labelsize)
     ax[1].plot(B,0.,marker = 'v',color='blue',markersize= labelsize)
-    ax[1].plot(M,0.,marker = 'v',color='yellow',markersize= labelsize)
-    ax[1].plot(N,0.,marker = 'v',color='green',markersize= labelsize)
+    ax[1].plot(M,0.,marker = '^',color='yellow',markersize= labelsize)
+    ax[1].plot(N,0.,marker = '^',color='green',markersize= labelsize)
 
     xytextA1 = (A-0.5,1.)
     xytextB1 = (B-0.5,1.)
