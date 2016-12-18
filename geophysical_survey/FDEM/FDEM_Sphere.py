@@ -24,6 +24,8 @@ sig = [1e-2,1e-0]
 air = 1e-8
 mfile = 'Sphere_Tensor.con'
 
+vmin = np.log10(sig[0])
+vmax = np.log10(sig[1])
 # Location and radisu of the sphere
 loc = [0,0,-40.]
 radi = 30.
@@ -41,7 +43,7 @@ xlim = 150
 # This is our mesh
 dx = 2.
 nC = 30
-npad = 0
+npad = 12
 
 # Floor uncertainties for e3D inversion
 floor = 100
@@ -123,87 +125,87 @@ for ii in range(rxLoc.shape[0]):
 fid.close()
 
 #%% WRITE AEM CODE FILES
-fid = open('AEM_data.obs','w')
-count_tx = 0
-
-
-
-for ii in range(rxLoc.shape[0]):
-
-    count_tx += 1
-    count_fq = 0
-    for freq in freqs:
-        
-        count_fq += 1
-        
-        fid.write('%i %i %i ' % (count_tx, count_fq, 1))
-        np.savetxt(fid, np.ones((1,5))*-99, fmt='%f',delimiter=' ',newline='\n')
-        
-fid.close()
-
-def loop(cnter, r, nseg):
-    
-    theta = np.linspace(0,2*np.pi,nseg)
-    xx = cnter[0] + r*np.cos(theta)
-    yy = cnter[1] + r*np.sin(theta)
-    zz = cnter[2] * np.ones_like(xx)
-    
-    loc = np.c_[xx, yy, zz]
-    return loc
-    
-# Write tx file
-fid = open('AEM_tx.dat','w')
-count_tx = 0
-nseg = 9
-
-for ii in range(rxLoc.shape[0]):
-    
-    count_tx += 1
-    txLoc = rxLoc[ii,:].copy()
-    txLoc[0] -= rx_offset/2.
-
-    loc = loop(txLoc,1.,nseg)
-    
-    np.savetxt(fid, np.c_[count_tx, nseg, 1], fmt='%i',delimiter=' ',newline='\n')
-    
-    for jj in range(nseg)    :
-    
-         np.savetxt(fid, loc[jj,:].reshape((1,3)), fmt='%f',delimiter=' ',newline='\n')
-
-fid.close()
-
-# Write rx file
-fid = open('AEM_rx.dat','w')
-count_tx = 0
-
-
-for ii in range(rxLoc.shape[0]):
-    
-    count_tx += 1
-    txLoc = rxLoc[ii,:].copy()
-    txLoc[0] += rx_offset/2.
-
-    loc = loop(txLoc,1.,9)
-    
-    np.savetxt(fid, np.c_[count_tx, nseg, 1], fmt='%i',delimiter=' ',newline='\n')
-    
-    for jj in range(nseg):    
-    
-         np.savetxt(fid, loc[jj,:].reshape((1,3)), fmt='%f',delimiter=' ',newline='\n')
-
-fid.close()
-
-# Write rx file
-fid = open('AEM_freq.dat','w')
-count_fq = 0
-
-for freq in freqs:
-    
-    count_fq +=1
-
-    np.savetxt(fid, np.c_[count_fq, freq], fmt='%f',delimiter=' ',newline='\n')
-    
-fid.close()
+#fid = open('AEM_data.obs','w')
+#count_tx = 0
+#
+#
+#
+#for ii in range(rxLoc.shape[0]):
+#
+#    count_tx += 1
+#    count_fq = 0
+#    for freq in freqs:
+#        
+#        count_fq += 1
+#        
+#        fid.write('%i %i %i ' % (count_tx, count_fq, 1))
+#        np.savetxt(fid, np.ones((1,5))*-99, fmt='%f',delimiter=' ',newline='\n')
+#        
+#fid.close()
+#
+#def loop(cnter, r, nseg):
+#    
+#    theta = np.linspace(0,2*np.pi,nseg)
+#    xx = cnter[0] + r*np.cos(theta)
+#    yy = cnter[1] + r*np.sin(theta)
+#    zz = cnter[2] * np.ones_like(xx)
+#    
+#    loc = np.c_[xx, yy, zz]
+#    return loc
+#    
+## Write tx file
+#fid = open('AEM_tx.dat','w')
+#count_tx = 0
+#nseg = 9
+#
+#for ii in range(rxLoc.shape[0]):
+#    
+#    count_tx += 1
+#    txLoc = rxLoc[ii,:].copy()
+#    txLoc[0] -= rx_offset/2.
+#
+#    loc = loop(txLoc,1.,nseg)
+#    
+#    np.savetxt(fid, np.c_[count_tx, nseg, 1], fmt='%i',delimiter=' ',newline='\n')
+#    
+#    for jj in range(nseg)    :
+#    
+#         np.savetxt(fid, loc[jj,:].reshape((1,3)), fmt='%f',delimiter=' ',newline='\n')
+#
+#fid.close()
+#
+## Write rx file
+#fid = open('AEM_rx.dat','w')
+#count_tx = 0
+#
+#
+#for ii in range(rxLoc.shape[0]):
+#    
+#    count_tx += 1
+#    txLoc = rxLoc[ii,:].copy()
+#    txLoc[0] += rx_offset/2.
+#
+#    loc = loop(txLoc,1.,9)
+#    
+#    np.savetxt(fid, np.c_[count_tx, nseg, 1], fmt='%i',delimiter=' ',newline='\n')
+#    
+#    for jj in range(nseg):    
+#    
+#         np.savetxt(fid, loc[jj,:].reshape((1,3)), fmt='%f',delimiter=' ',newline='\n')
+#
+#fid.close()
+#
+## Write rx file
+#fid = open('AEM_freq.dat','w')
+#count_fq = 0
+#
+#for freq in freqs:
+#    
+#    count_fq +=1
+#
+#    np.savetxt(fid, np.c_[count_fq, freq], fmt='%f',delimiter=' ',newline='\n')
+#    
+#fid.close()
 #%% Read in e3d pred file
 def read_e3d_pred(predFile):
 
@@ -226,9 +228,56 @@ def read_e3d_pred(predFile):
 
     fid.close()
     return np.asarray(obs)
+    
+#%% Load 1D inverted model and plot
+m1D = Mesh.TensorMesh.readModelUBC(mesh,'EM1D_iter2.dat')
+fig3 = plt.figure(figsize=(8,8))
+
+X, Z = mesh.gridCC[:,0].reshape(mesh.vnC, order="F"), mesh.gridCC[:,2].reshape(mesh.vnC, order="F")    
+Y = mesh.gridCC[:,1].reshape(mesh.vnC, order="F")
+
+axs = plt.subplot(2,1,1)
+temp = np.log10(model)
+temp[temp==-8] = np.nan
+temp = temp.reshape(mesh.vnC, order='F')
+
+ptemp = temp[:,nC,:].T
+ps = plt.contourf(X[:,nC,:].T,Z[:,nC,:].T,ptemp,20,vmin=vmin, vmax=vmax, clim=[vmin,vmax], cmap='RdBu_r')
+plt.contour(X[:,nC,:].T,Z[:,nC,:].T,ptemp,1, colors='k', linestyles='solid')
+
+plt.scatter(mkvc(locx),mkvc(locz),c='r')
+axs.set_title('')
+axs.set_aspect('equal')
+axs.set_xlim([-xlim-10,xlim+10])
+axs.set_ylim([-100,30])
+axs.set_xticklabels([])
+axs = plt.subplot(2,1,2)
+temp = np.log10(m1D)
+temp[temp==-8] = np.nan
+temp = temp.reshape(mesh.vnC, order='F')
+
+ptemp = temp[:,nC,:].T
+plt.contourf(X[:,nC,:].T,Z[:,nC,:].T,ptemp,20,vmin=vmin, vmax=vmax, clim=[vmin,vmax], cmap='RdBu_r')
+plt.contour(X[:,nC,:].T,Z[:,nC,:].T,ptemp,5, linestyles='solid')
+
+plt.scatter(mkvc(locx),mkvc(locz),c='r')
+axs.set_title('Recovered 1D model')
+axs.set_aspect('equal')
+axs.set_xlim([-xlim-10,xlim+10])
+axs.set_ylim([-100,30])
+axs.set_xlabel('Easting (m)')
+axs.set_ylabel('Elevation (m)')
+pos =  axs.get_position()
+
+axs.set_position([pos.x0, pos.y0+.05,  pos.width, pos.height])
+cbs = fig3.add_axes([pos.x0 + .3, pos.y0-0.04,  pos.width*0.25, pos.height*0.05]) 
+plt.colorbar(ps,orientation="horizontal",ticks=np.linspace(vmin,vmax, 3), format="$10^{%.1f}$", cmap ='RdBu_r', cax = cbs, ax=axs, label=' S/m ') 
+plt.show()
+
+plt.savefig('FEM_1D_Model.png')
 #%%
-dpred = read_e3d_pred('Broadband\\Sphere2_dpred0.txt')
-dprim = read_e3d_pred('Broadband\\WholeSpace2_dpred0.txt')
+dpred = read_e3d_pred('E3D\\Sphere_dpred0.txt')
+dprim = read_e3d_pred('E3D\\WholeSpace_dpred0.txt')
 
 # Adjust primary field and convert to ppm
 H0true = 0.00017543534291434681*np.pi 
@@ -324,17 +373,23 @@ anim.save('Freq_slice.html', writer=HTMLWriter(embed_frames=True,fps=1))
 
 
 # Plot
-fig = plt.figure(figsize=(8,8))
+fig2 = plt.figure(figsize=(8,8))
 ax1 = plt.subplot(2,2,1)
 ax2 = plt.subplot(2,2,2)
 ax3 = plt.subplot(2,1,2)
 pos =  ax3.get_position()
-ax4 = fig.add_axes([pos.x0, pos.y0+0.1,  pos.width, pos.height*0.5])
-cb3 = fig.add_axes([pos.x0, pos.y0+0.1,  pos.width, pos.height])
+ax4 = fig2.add_axes([pos.x0, pos.y0+0.1,  pos.width, pos.height*0.5])
+#cb3 = fig.add_axes([pos.x0, pos.y0+0.1,  pos.width, pos.height])
 
+temp = np.log10(model)
+temp[temp==-8] = np.nan
+temp = temp.reshape(mesh.vnC, order='F')
+
+ptemp = temp[:,nC,:].T
+    
 def animate(ii):
     
-    global ax1, ax2, ax3, ax4, cb3, fig
+    global ax1, ax2, ax3, ax4, fig2
     removeFrame()
     
     indx = dpred[:,0] == freqs[ii]
@@ -345,19 +400,19 @@ def animate(ii):
     xx = locx[0,:]
     yy = locy[:,0]
     
-    X, Y = np.meshgrid(np.linspace(xx.min(),xx.max(),50),np.linspace(yy.min(),yy.max(),50))
+    x, y = np.meshgrid(np.linspace(xx.min(),xx.max(),50),np.linspace(yy.min(),yy.max(),50))
     
     R_grid = sp.interpolate.griddata(np.c_[mkvc(locx),mkvc(locy)], 
-                                     (sub_R), (X, Y), method='cubic')
+                                     (sub_R), (x, y), method='cubic')
                      
 
     I_grid = sp.interpolate.griddata(np.c_[mkvc(locx),mkvc(locy)], 
-                                     ((sub_I)), (X, Y), method='cubic')
+                                     ((sub_I)), (x, y), method='cubic')
                                              
     ax1 = plt.subplot(2,2,1)
     
-    vmin, vmax = np.floor(R_grid.min()-10), np.ceil(R_grid.max()+10)
-    im1 = plt.contourf(X[0,:],Y[:,0],R_grid,25, clim=(vmin,vmax), vmin=vmin, vmax=vmax)
+    vminD, vmaxD = np.floor(R_grid.min()-10), np.ceil(R_grid.max()+10)
+    im1 = plt.contourf(x[0,:],y[:,0],R_grid,25, clim=(vminD,vmaxD), vminD=vminD, vmaxD=vmaxD)
     plt.scatter(mkvc(locx),mkvc(locy),c='k')
     ax1.set_xticks([-xlim,0,xlim])
     ax1.set_yticks([-xlim,0,xlim])
@@ -366,13 +421,13 @@ def animate(ii):
     plt.title('Real{$H_z$} (ppm)')
     pos =  ax1.get_position()
     ax1.set_position([pos.x0+0.05, pos.y0+0.15,  pos.width*0.75, pos.height*0.75])
-    cb1 = fig.add_axes([pos.x0+0.1, pos.y0+0.1,  pos.width*0.5, pos.height*0.05]) 
+    cb1 = fig2.add_axes([pos.x0+0.1, pos.y0+0.1,  pos.width*0.5, pos.height*0.05]) 
     plt.colorbar(im1,orientation="horizontal",ticks=np.round(np.linspace(R_grid.min(),R_grid.max(), 3)), cax = cb1) 
 
     
     ax2 = plt.subplot(2,2,2)
-    vmin, vmax = np.floor(I_grid.min()-10), np.ceil(I_grid.max()+10)
-    im2 = plt.contourf(X[0,:],Y[:,0],I_grid,25, clim=(vmin,vmax), vmin=vmin, vmax=vmax)
+    vminD, vmaxD = np.floor(I_grid.min()-10), np.ceil(I_grid.max()+10)
+    im2 = plt.contourf(x[0,:],y[:,0],I_grid,25, clim=(vminD,vmaxD), vmin=vminD, vmax=vmaxD)
     plt.scatter(mkvc(locx),mkvc(locy),c='k')
     ax2.set_aspect('equal')
     ax2.set_xticks([-xlim,0,xlim])
@@ -381,20 +436,30 @@ def animate(ii):
     plt.title('Imag{$H_z$} (ppm)')
     pos =  ax2.get_position()
     ax2.set_position([pos.x0, pos.y0+0.15,  pos.width*0.75, pos.height*0.75])
-    cb2 = fig.add_axes([pos.x0+0.05, pos.y0+0.1,  pos.width*0.5, pos.height*0.05]) 
+    cb2 = fig2.add_axes([pos.x0+0.05, pos.y0+0.1,  pos.width*0.5, pos.height*0.05]) 
     plt.colorbar(im2,orientation="horizontal",ticks=np.round(np.linspace(I_grid.min(),I_grid.max(), 3)), cax = cb2) 
 
     ax3 = plt.subplot(2,1,2)
-    ps = mesh.plotSlice(np.log10(model),normal = 'Y', ind=nC, ax=ax3, pcolorOpts={'cmap':'RdBu_r'})
+#    ps = mesh.plotSlice(np.log10(model),normal = 'Y', ind=nC, ax=ax3, pcolorOpts={'cmap':'RdBu_r'})
+    
+    ax3.contourf(X[:,nC,:].T,Z[:,nC,:].T,ptemp,20,vmin=vmin, vmax=vmax, clim=(vmin,vmax), cmap='RdBu_r')
+    plt.contour(X[:,nC,:].T,Z[:,nC,:].T,ptemp,1, colors='k', linestyles='solid')
     plt.scatter(mkvc(locx),mkvc(locz),c='r')
     ax3.set_title('')
     ax3.set_aspect('equal')
     ax3.set_xlim([-xlim-10,xlim+10])
     ax3.set_ylim([-100,30])
-    pos =  ax3.get_position()
-    cb3 = fig.add_axes([pos.x0+0.5, pos.y0+0.05,  pos.width*0.25, pos.height*0.05]) 
-    plt.colorbar(ps[0],orientation="horizontal",ticks=np.linspace(np.log10(air),np.log10(sig[1]), 3), format="$10^{%.1f}$", cax = cb3, label=' S/m ') 
-    
+    plt.show()
+#    pos =  ax3.get_position()
+#    cb3 = fig.add_axes([pos.x0+0.5, pos.y0+0.05,  pos.width*0.25, pos.height*0.05]) 
+#    plt.colorbar(ps[0],orientation="horizontal",ticks=np.linspace(np.log10(air),np.log10(sig[1]), 3), format="$10^{%.1f}$", cax = cb3, label=' S/m ') 
+#    
+    ax3.text(loc[0],loc[2],"$10^{0}$" + ' S/m ',
+                 horizontalalignment='center', verticalalignment='center')
+                 
+    ax3.text(loc[0],loc[1],"$10^{-2}$" + ' S/m ',
+                 horizontalalignment='center', verticalalignment='top')
+                 
     #Create a line of data for profile
     xx = np.linspace(locx[0,:].min(),locx[0,:].max(),50) 
     yy = np.ones_like(xx) * np.mean(locy[:,0])  
@@ -410,7 +475,7 @@ def animate(ii):
     pos =  ax3.get_position()
     ax3.set_position([pos.x0, pos.y0-0.05,  pos.width, pos.height])
     ax3.set_xlabel('Easting (m)')
-    ax4 = fig.add_axes([pos.x0, pos.y0+0.3,  pos.width, pos.height*0.4])
+    ax4 = fig2.add_axes([pos.x0, pos.y0+0.3,  pos.width, pos.height*0.4])
     
     ax4.semilogy(xx,R_grid,c='r', lw=2)
     ax4.semilogy(xx,np.abs(I_grid),c='b',ls='--', lw=2)                           
@@ -424,16 +489,16 @@ def animate(ii):
     ax4.set_xticklabels([])
     
 def removeFrame():
-    global ax1, ax2, ax3, ax4, cb3, fig
-    fig.delaxes(ax1)
-    fig.delaxes(ax2)
-    fig.delaxes(ax3)
-    fig.delaxes(ax4)
-    fig.delaxes(cb3)
+    global ax1, ax2, ax3, ax4, fig2
+    fig2.delaxes(ax1)
+    fig2.delaxes(ax2)
+    fig2.delaxes(ax3)
+    fig2.delaxes(ax4)
+#    fig.delaxes(cb3)
 #    fig.delaxes(cb2)
     plt.draw()
 
-anim = animation.FuncAnimation(fig, animate,
+anim = animation.FuncAnimation(fig2, animate,
                                frames=len(freqs) , interval=1000, repeat = False)
 #/home/dominiquef/3796_AGIC_Research/DCIP3D/MtISa
 anim.save('Data_slice.html', writer=HTMLWriter(embed_frames=True,fps=1))
@@ -464,4 +529,6 @@ for ii in range(rxLoc.shape[0]):
         count+=1
         
 fid.close()
+
+#%% Load 1D data and plot obs vs pred
 

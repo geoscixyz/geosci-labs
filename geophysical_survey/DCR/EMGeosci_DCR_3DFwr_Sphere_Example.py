@@ -131,24 +131,24 @@ elif re.match(slvr,'LU'):
 # Display top section
 top = int(mesh.nCz)-1
 
-plt.figure()
-ax_prim = plt.subplot(1,1,1)
-dat1 = mesh.plotSlice(model, ind=top, normal='Z', grid=False, pcolorOpts={'alpha':0.5}, ax =ax_prim)
+#plt.figure()
+#ax_prim = plt.subplot(1,1,1)
+#dat1 = mesh.plotSlice(model, ind=top, normal='Z', grid=False, pcolorOpts={'alpha':0.5}, ax =ax_prim)
 #==============================================================================
 # plt.xlim([423200,423750])
 # plt.ylim([546350,546650])
 #==============================================================================
-plt.gca().set_aspect('equal', adjustable='box')
+#plt.gca().set_aspect('equal', adjustable='box')
 
-plt.show()
-cfm1=get_current_fig_manager().window
+#plt.show()
+#cfm1=get_current_fig_manager().window
 
 # Keep creating sections until returns an empty ginput (press enter on figure)
 #while bool(gin)==True:
 
 # Bring back the plan view figure and pick points
-cfm1.activateWindow()
-plt.sca(ax_prim)
+#cfm1.activateWindow()
+#plt.sca(ax_prim)
 
 # Takes two points from ginput and create survey
 
