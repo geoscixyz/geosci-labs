@@ -13,6 +13,6 @@ except Exception, e:
     from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
-def define_model(sig0,sig1,)
-def plot_model()
-def 2D_cylinder_field
+# def define_model(sig0,sig1,)
+# def plot_model()
+# def 2D_cylinder_field
