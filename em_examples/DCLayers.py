@@ -1,10 +1,12 @@
-import sys
+#import sys
+##sys.path.append("./simpeg/")
+#sys.path.append("./simpegdc/")
 
-import warnings
-warnings.filterwarnings('ignore')
+#import warnings
+#warnings.filterwarnings('ignore')
 
 from SimPEG import *
-# import SimPEG.EM.Static.DC as DC
+from SimPEG.EM.Static import DC
 from scipy.constants import epsilon_0
 
 import matplotlib.pyplot as plt
@@ -29,6 +31,13 @@ rhomax = 1e3
 eps = 1e-9 #to stabilize division
 
 def get_Layer_Potentials(rho1,rho2,h,A,B,xyz,infty=100):
+
+
+    """
+    Compute analytic solution of surface potential for 2-layered Earth (Ref: Telford 1990, section 8.3.4)
+    """
+
+
     k = (rho2-rho1) / (rho2+rho1)
 
     r = lambda src_loc: np.sqrt((xyz[:,0] - src_loc[0])**2 + (xyz[:,1] - src_loc[1])**2 + (xyz[:,2] - src_loc[2])**2)+eps
@@ -121,7 +130,7 @@ def solve_2D_J(rho1, rho2, h, A, B):
 
 def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 
-    ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)
+    ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)*1.5
 
     fig, ax = plt.subplots(2,1,figsize=(9,7))
 
@@ -469,13 +478,13 @@ def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 def plot_Layer_Potentials_app():
     plot_Layer_Potentials_interact = lambda rho1,rho2,h,A,B,M,N,Plot: plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,Plot)
     app = interact(plot_Layer_Potentials_interact,
-                rho1 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500.),
-                rho2 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500.),
-                h = FloatSlider(min=0.,max=40.,step=1.,value=5.),
-                A = FloatSlider(min=-40.,max=40.,step=1.,value=-30.),
-                B = FloatSlider(min=-40.,max=40.,step=1.,value=30.),
-                M = FloatSlider(min=-40.,max=40.,step=1.,value=-10.),
-                N = FloatSlider(min=-40.,max=40.,step=1.,value=10.),
+                rho1 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
+                rho2 = FloatSlider(min=rhomin,max=rhomax,step=10., value = 500., continuous_update=False),
+                h = FloatSlider(min=0.,max=40.,step=1.,value=5., continuous_update=False),
+                A = FloatSlider(min=-30.,max=30.,step=1.,value=-30., continuous_update=False),
+                B = FloatSlider(min=-30.,max=30.,step=1.,value=30., continuous_update=False),
+                M = FloatSlider(min=-30.,max=30.,step=1.,value=-10., continuous_update=False),
+                N = FloatSlider(min=-30.,max=30.,step=1.,value=10., continuous_update=False),
                 Plot = ToggleButtons(options =['Model','Potential','E','J',],value='Model'),
                 )
     return app
