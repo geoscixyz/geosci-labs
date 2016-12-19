@@ -127,34 +127,34 @@ elif re.match(slvr,'LU'):
     Ainv = sp.linalg.splu(A)
     print("LU DECOMP--- %s seconds ---" % (time.time() - start_time))
 
-# #%% Create survey
-# # Display top section
-# top = int(mesh.nCz)-1
+#%% Create survey
+# Display top section
+top = int(mesh.nCz)-1
 
-# plt.figure()
-# ax_prim = plt.subplot(1,1,1)
-# dat1 = mesh.plotSlice(model, ind=top, normal='Z', grid=False, pcolorOpts={'alpha':0.5}, ax =ax_prim)
-# #==============================================================================
-# # plt.xlim([423200,423750])
-# # plt.ylim([546350,546650])
-# #==============================================================================
-# plt.gca().set_aspect('equal', adjustable='box')
+#plt.figure()
+#ax_prim = plt.subplot(1,1,1)
+#dat1 = mesh.plotSlice(model, ind=top, normal='Z', grid=False, pcolorOpts={'alpha':0.5}, ax =ax_prim)
+#==============================================================================
+# plt.xlim([423200,423750])
+# plt.ylim([546350,546650])
+#==============================================================================
+#plt.gca().set_aspect('equal', adjustable='box')
 
-# plt.show()
-# # cfm1=get_current_fig_manager().window
+#plt.show()
+#cfm1=get_current_fig_manager().window
 
-# # Keep creating sections until returns an empty ginput (press enter on figure)
-# #while bool(gin)==True:
+# Keep creating sections until returns an empty ginput (press enter on figure)
+#while bool(gin)==True:
 
-# # Bring back the plan view figure and pick points
-# # cfm1.activateWindow()
-# # plt.sca(ax_prim)
+# Bring back the plan view figure and pick points
+#cfm1.activateWindow()
+#plt.sca(ax_prim)
 
-# # Takes two points from ginput and create survey
+# Takes two points from ginput and create survey
 
-# #gin = plt.ginput(2, timeout = 0)
+#gin = plt.ginput(2, timeout = 0)
 
-# # Add z coordinate to all survey... assume flat
+# Add z coordinate to all survey... assume flat
 nz = mesh.vectorNz
 var = np.c_[np.asarray(srvy_end),np.ones(2).T*nz[-1]]
 

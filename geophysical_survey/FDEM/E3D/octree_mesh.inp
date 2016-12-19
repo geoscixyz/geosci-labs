@@ -1,0 +1,11 @@
+2 2 2 ?? for global?
+500. 500. 500. 500. ??
+0. 0. 0.  !  20. 100. 200. ?? depth core
+4 1 1 cells around receivers, ncell2, ncell4
+605
+E3D_Obs.loc
+Topo.topo
+NOT_SHIFT_DATA
+USE_ELECTRODES
+10. 100. 200.
+CREATE_LARGE_MESH octree_large.msh
