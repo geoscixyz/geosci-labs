@@ -13,5 +13,6 @@ import PlanewaveWidget
 import EMcircuit
 import FreqtoTime
 import HarmonicVMDCylWidget
+import TransientVMDCylWidget
 import BiotSavart
 import Loop
