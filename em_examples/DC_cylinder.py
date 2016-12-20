@@ -106,8 +106,8 @@ def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
     return actind, meshCore
 
 # Mesh, sigmaMap can be globals global
-npad = 12
-growrate = 3.
+npad = 15
+growrate = 2.
 cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
@@ -120,7 +120,7 @@ xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
 xmin = -40.
 xmax = 40.
-ymin = -40.
+ymin = -50.
 ymax = 5.
 xylim = np.c_[[xmin,ymin],[xmax,ymax]]
 indCC, meshcore = ExtractCoreMesh(xylim,mesh)
@@ -194,7 +194,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc)
 
     #fig, ax = plt.subplots(3,1,figsize=(18,28),sharex=True)
-    fig, ax = plt.subplots(2,1,figsize=(15,16),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(15,19),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface = get_Surface_Potentials(src,total_field)
@@ -295,7 +295,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
+        formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         
         if Type == 'Total':
@@ -315,7 +315,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
+        formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
 
 
@@ -337,7 +337,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         ind = indCC
 
         formatter = LogFormatter(10, labelOnlyBase=False) 
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11,linscale=1e-01)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh = 1e-12,linscale=1e-01)}
         
         if Type == 'Total':
             u = total_field[src,'charge']
@@ -346,8 +346,8 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         elif Type == 'Secondary':
             u = total_field[src,'charge']-primary_field[src,'charge']
 
-    
-    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
+    eps = 1e-15
+    dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
     
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
@@ -368,10 +368,13 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter)
+    tick_locator = matplotlib.ticker.MaxNLocator(nbins=6)
+    cb.locator = tick_locator
+    cb.update_ticks()
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
-    ax[1].set_xlim([-40.,40.])
-    ax[1].set_ylim([-40.,5.])
+    ax[1].set_xlim([xmin,xmax])
+    ax[1].set_ylim([ymin,ymax])
     ax[1].set_aspect('equal')
 
     plt.show()
@@ -382,10 +385,10 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
 def cylinder_app():
     app = interact(plot_Surface_Potentials,
             rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
-            rhocyl = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+            rhocyl = FloatSlider(min=10.,max=1000.,step=10., value = 250., continuous_update=False),
             r = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
             xc = FloatSlider(min=-20.,max=20.,step=1.,value=0., continuous_update=False),
-            yc = FloatSlider(min=-30.,max=0.,step=1.,value=-20., continuous_update=False),
+            yc = FloatSlider(min=-30.,max=0.,step=1.,value=-30., continuous_update=False),
             A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
             B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
             M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
