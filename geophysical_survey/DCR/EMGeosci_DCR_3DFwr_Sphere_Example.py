@@ -8,7 +8,8 @@
         well as an animation for the current and charge density as a function
         of source location.
 
-        Dependencies:
+        Dependencies
+        :
         JSAnimation
         SimPEG
 
