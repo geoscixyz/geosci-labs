@@ -227,8 +227,8 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
+        formatter = LogFormatter(10, labelOnlyBase=True)
+        pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         
         if Type == 'Total':
             u = total_field[src, 'e']
@@ -247,8 +247,8 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
+        formatter = LogFormatter(10, labelOnlyBase=True)
+        pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
 
 
         if Type == 'Total':
@@ -268,8 +268,8 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
         streamOpts = None
         ind = indCC
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-12, linscale=0.01)}
+        formatter = LogFormatter(10, labelOnlyBase=True) 
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.1)}
         
         if Type == 'Total':
             u = total_field[src,'charge']
