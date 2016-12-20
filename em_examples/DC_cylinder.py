@@ -295,7 +295,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=True) 
+        formatter = LogFormatter(10, labelOnlyBase=False) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         
         if Type == 'Total':
@@ -315,7 +315,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=True) 
+        formatter = LogFormatter(10, labelOnlyBase=False) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
 
 
@@ -336,7 +336,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = None
         ind = indCC
 
-        formatter = LogFormatter(10, labelOnlyBase=True) 
+        formatter = LogFormatter(10, labelOnlyBase=False) 
         pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11,linscale=1e-01)}
         
         if Type == 'Total':
