@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 from DipoleWidgetFD import DisPosNegvalues
 from BiotSavart import BiotSavartFun
+from scipy.constants import mu_0
 
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -16,11 +17,21 @@ class HarmonicVMDCylWidget(object):
     f = None
     activeCC = None
     srcLoc = None
+    mesh2D = None
+    mu = None
 
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
         self.im = Image.open("../../images/emgeosci.png")
+
+    def mirrorArray(self, x, direction="x"):
+        X = x.reshape((self.nx_core, self.ny_core), order="F")
+        if direction == "x" or direction == "y" :
+            X2 = np.vstack((-np.flipud(X), X))
+        else:
+            X2 = np.vstack((np.flipud(X), X))
+        return X2
 
     def genMesh(self, h=0., cs=3., ncx=15, ncz=30, npad=20):
         """
@@ -32,8 +43,19 @@ class HarmonicVMDCylWidget(object):
         self.mesh = Mesh.CylMesh([hx, 1, hz], '00C')
 
     def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.):
+
         self.activeCC = (self.mesh.gridCC[:,0] <= xmax) & (np.logical_and(self.mesh.gridCC[:,2] >= zmin, self.mesh.gridCC[:,2] <= zmax))
         self.gridCCactive = self.mesh.gridCC[self.activeCC,:][:,[0, 2]]
+
+        xind = (self.mesh.vectorCCx <= xmax)
+        yind = np.logical_and(self.mesh.vectorCCz >= zmin, self.mesh.vectorCCz <= zmax)
+        self.nx_core = xind.sum()
+        self.ny_core = yind.sum()
+
+        if self.mesh2D is None:
+            hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
+            hz = self.mesh.hz[yind]
+            self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
 
     def getBiotSavrt(self, rxLoc):
         """
@@ -43,7 +65,7 @@ class HarmonicVMDCylWidget(object):
         self.Gx = BiotSavartFun(self.mesh, rxLoc, component='x')
 
 
-    def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-1, sig2=1e-2, sig3=1e-2):
+    def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-1, sig2=1e-2, sig3=1e-2, chi=0.):
         self.h1 = h1      # 1st layer thickness
         self.h2 = h2      # 2nd layer thickness
         self.z0 = 0.
@@ -62,6 +84,8 @@ class HarmonicVMDCylWidget(object):
         model[ind1] = sig1
         model[ind2] = sig2
         self.m = model[active]
+        self.mu = np.ones(self.mesh.nC)*mu_0
+        self.mu[self.mesh.gridCC[:, 2]<0.] = (1.+chi)*mu_0
         return self.m
 
     def simulate(self, srcLoc, rxLoc, freqs):
@@ -78,7 +102,7 @@ class HarmonicVMDCylWidget(object):
         self.srcList = [EM.FDEM.Src.MagDipole([bzr, bzi], freq, srcLoc, orientation='Z')
                    for freq in freqs]
         # prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, Solver=PardisoSolver)
-        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping)
+        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, mu = self.mu)
         survey = EM.FDEM.Survey(self.srcList)
         prb.pair(survey)
         self.f = prb.fields(self.m)
@@ -94,10 +118,16 @@ class HarmonicVMDCylWidget(object):
         Pfz = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fz")
         Ey = self.mesh.aveE2CC*self.f[src, "e"]
         Jy = Utils.sdiag(self.prb.sigma) * Ey
-        self.Ey = Ey[self.activeCC]
-        self.Jy = Jy[self.activeCC]
-        self.Bx = Pfx*self.f[src, bType]
-        self.Bz = Pfz*self.f[src, bType]
+
+        self.Ey = Utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
+        self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
+        self.Bx = Utils.mkvc(self.mirrorArray(Pfx*self.f[src, bType], direction="x"))
+        self.Bz = Utils.mkvc(self.mirrorArray(Pfz*self.f[src, bType], direction="z"))
+
+        # self.Ey = Ey[self.activeCC]
+        # self.Jy = Jy[self.activeCC]
+        # self.Bx = Pfx*self.f[src, bType]
+        # self.Bz = Pfz*self.f[src, bType]
 
     def getData(self, bType = "b"):
 
@@ -109,8 +139,8 @@ class HarmonicVMDCylWidget(object):
         self.Bx = (Pfx*self.f[:, bType]).flatten()
         self.Bz = (Pfz*self.f[:, bType]).flatten()
 
-    def plotField(self, Field='B', ComplexNumber="real", view="vec", scale="linear", ifreq=0):
-        fig = plt.figure(figsize=(5, 6))
+    def plotField(self, Field='B', ComplexNumber="real", view="vec", scale="linear", ifreq=0, Geometry=True):
+        fig = plt.figure(figsize=(10, 6))
         ax = plt.subplot(111)
         vec = False
         if view == "vec":
@@ -138,6 +168,11 @@ class HarmonicVMDCylWidget(object):
                     val = np.c_[self.Bx.real, self.Bz.real]
                 elif ComplexNumber == "imag":
                     val = np.c_[self.Bx.imag, self.Bz.imag]
+                else:
+                    ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Vector plot only supports real and imaginary type!"
 
             elif view=="x":
                 if ComplexNumber == "real":
@@ -191,7 +226,13 @@ class HarmonicVMDCylWidget(object):
                     val = abs(self.Jy)
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Jy)
-        out = Utils.plot2Ddata(self.gridCCactive, val, vec=vec, ax=ax, contourOpts={"cmap":"viridis"}, ncontour=50, scale=scale)
+            else:
+                ax.imshow(self.im)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                return "Dude, think twice ... only Jy for VMD"
+
+        out = Utils.plot2Ddata(self.mesh2D.gridCC, val, vec=vec, ax=ax, contourOpts={"cmap":"viridis"}, ncontour=50, scale=scale)
         if scale == "linear":
             cb = plt.colorbar(out[0], ax=ax, ticks=np.linspace(out[0].vmin, out[0].vmax, 3), format="%.1e")
         elif scale == "log":
@@ -199,20 +240,21 @@ class HarmonicVMDCylWidget(object):
         else:
             raise Exception("We consdier only linear and log scale!")
         cb.set_label(label)
-        xmax = self.gridCCactive[:,0].max()
-        ax.plot(np.r_[0, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5)
-        ax.plot(np.r_[0, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
-        ax.plot(np.r_[0, xmax], np.ones(2)*self.z1, 'k--', lw=0.5)
-        ax.plot(np.r_[0, xmax], np.ones(2)*self.z2, 'k--', lw=0.5)
-        ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-        ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+        xmax = self.mesh2D.gridCC[:,0].max()
+        if Geometry:
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'k--', lw=0.5)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'k--', lw=0.5)
+            ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+            ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
 
     def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
 
-        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1, Sigma2, Sigma3, z, h1, h2, Scale, rxOffset):
+        def foo(Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, Geometry=True):
 
             if ComplexNumber == "Re":
                 ComplexNumber = "real"
@@ -232,32 +274,33 @@ class HarmonicVMDCylWidget(object):
             else:
                 bType = "b"
 
-            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3)
+            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3, chi=Sus)
             srcLoc = np.array([0., 0., z])
             rxLoc = np.array([[rxOffset, 0., z]])
             dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
             self.getFields(bType=bType)
-            return self.plotField(Field=Field, ComplexNumber=ComplexNumber, view=Component, scale=Scale)
+            return self.plotField(Field=Field, ComplexNumber=ComplexNumber, view=Component, scale=Scale, Geometry=Geometry)
 
         out = widgets.interactive (foo
                         ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec", "J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
+                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
+                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase'], value="Re") \
                         ,Frequency=widgets.FloatText(value=100., continuous_update=False, description='f (Hz)') \
                         ,Sigma0=widgets.FloatText(value=1e-8, continuous_update=False, description='$\sigma_0$ (S/m)') \
                         ,Sigma1=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_1$ (S/m)') \
                         ,Sigma2=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_2$ (S/m)') \
                         ,Sigma3=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma_3$ (S/m)') \
+                        ,Sus=widgets.FloatText(value=0., continuous_update=False, description='$\chi$') \
                         ,z=widgets.FloatSlider(min=0., max=48., step=3., value=0., continuous_update=False, description='$z$ (m)') \
                         ,h1=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_1$ (m)') \
                         ,h2=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_2$ (m)') \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
+                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
                         ,rxOffset=widgets.FloatText(value=10., continuous_update=False, description='x (m)') \
                         )
         return out
 
-    def InteractiveData(self, fieldvalue="B", compvalue="x", z=0.):
+    def InteractiveData(self, fieldvalue="B", compvalue="z", z=0.):
         # srcLoc = np.array([0., 0., z])
         # rxLoc = np.array([[rxOffset, 0., z]])
         frequency = np.logspace(2, 5, 31)
