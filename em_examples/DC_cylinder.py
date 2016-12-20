@@ -191,7 +191,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     sigcyl = 1./rhocyl
     sighalf = 1./rhohalf
 
-    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf)
+    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc)
 
     #fig, ax = plt.subplots(3,1,figsize=(18,28),sharex=True)
     fig, ax = plt.subplots(2,1,figsize=(15,16),sharex=True)
@@ -244,8 +244,8 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
 
     #Subplot 2: Fields
-    ax[1].plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    ax[1].plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
 
     if Field == 'Model':
        
@@ -295,7 +295,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
+        formatter = LogFormatter(10, labelOnlyBase=True) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         
         if Type == 'Total':
@@ -315,7 +315,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
+        formatter = LogFormatter(10, labelOnlyBase=True) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
 
 
@@ -336,7 +336,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = None
         ind = indCC
 
-        formatter = LogFormatter(10, labelOnlyBase=False) 
+        formatter = LogFormatter(10, labelOnlyBase=True) 
         pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11,linscale=1e-01)}
         
         if Type == 'Total':
