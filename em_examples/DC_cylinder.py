@@ -208,7 +208,6 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     VM = phiTotalSurface[MInd[0]]
     VN = phiTotalSurface[NInd[0]]
 
-
     VMprim = phiPrimSurface[MInd[0]]
     VNprim = phiPrimSurface[NInd[0]]
 
@@ -242,7 +241,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     ax[0].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(G2D*rho_a(VM,VN,A,B,M,N)),
                 verticalalignment='bottom', bbox=props, fontsize = labelsize)
 
-    ax[0].legend(['Model Potential','Half-Space Potential'],loc=3)
+    ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
 
     # Subplot 2: Surface potentials with gaps around current electrodes
 
@@ -373,7 +372,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         ind = indCC
 
         formatter = LogFormatter(10, labelOnlyBase=False) 
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11,linscale=1e-4)}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11,linscale=1e-01)}
         
         if Type == 'Total':
             u = total_field[src,'charge']
