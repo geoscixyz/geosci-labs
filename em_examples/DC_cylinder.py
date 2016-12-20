@@ -368,9 +368,11 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter)
-    tick_locator = matplotlib.ticker.MaxNLocator(nbins=6)
-    cb.locator = tick_locator
-    cb.update_ticks()
+    #t_logloc = matplotlib.ticker.LogLocator(base=10.0, subs=[1.0,2.], numdecs=4, numticks=8)
+    #tick_locator = matplotlib.ticker.SymmetricalLogLocator(t_logloc)
+    #cb.locator = tick_locator
+    #cb.ax.yaxis.set_major_locator(matplotlib.ticker.AutoLocator())
+    #cb.update_ticks()
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([xmin,xmax])
@@ -393,8 +395,8 @@ def cylinder_app():
             B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
             M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
             N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
-            Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
-            Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+            Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='J'),
+            Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Secondary')
             #Scale = ToggleButtons(options = ['Scalar','Log'],value='Scalar')
             )
     return app
