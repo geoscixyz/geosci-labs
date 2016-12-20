@@ -191,7 +191,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
     sigcyl = 1./rhocyl
     sighalf = 1./rhohalf
 
-    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf)
+    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc)
 
     #fig, ax = plt.subplots(3,1,figsize=(18,28),sharex=True)
     fig, ax = plt.subplots(2,1,figsize=(15,16),sharex=True)
@@ -243,44 +243,9 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
 
     ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
 
-    # Subplot 2: Surface potentials with gaps around current electrodes
-
-    # Select points more than 5m from Tx electrodes of plotting
-    #xSurface_AInd = np.where(np.abs(xSurface - A) >= 5.)[0]
-    #xSurface_BInd = np.where(np.abs(xSurface - B) >= 5.)[0]
-    #xSurfaceTxGapInd = list(set(xSurface_AInd).intersection(xSurface_BInd))
-    #xSurface_TxGap = xSurface[xSurfaceTxGapInd]
-    #phiTotalSurface_TxGap = phiTotalSurface[xSurfaceTxGapInd]
-    #phiPrimSurface_TxGap = phiPrimSurface[xSurfaceTxGapInd]
-    #ylim = np.r_[-1., 1.]*(np.max(np.abs(phiTotalSurface_TxGap)) - 0.05*np.max(np.abs(phiTotalSurface_TxGap)))
-
-    #ax[1].plot(xSurface_TxGap,phiTotalSurface_TxGap ,color=[0.1,0.5,0.1],linewidth=2)
-    #ax[1].plot(xSurface_TxGap,phiPrimSurface_TxGap ,linestyle='dashed',linewidth=0.5,color='k')
-    #ax[1].grid(which='both',linestyle='-',linewidth=0.5,color=[0.2,0.2,0.2],alpha=0.5)
-    #ax[1].plot(A,0,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
-    #ax[1].plot(B,0,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    #ax[1].set_ylabel('Potential, (V)',fontsize = labelsize)
-    #ax[1].set_xlabel('x (m)',fontsize = labelsize)
-    #ax[1].set_xlim(xlim)
-    #ax[1].set_ylim(ylim)
-
-    #ax[1].plot(M,VM,'o',color='k')
-    #ax[1].plot(N,VN,'o',color='k')
-
-    #ax[1].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
-    #ax[1].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
-
-    #ax[1].tick_params(axis='both', which='major', labelsize=ticksize)
-
-    #props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
-    #ax[1].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(rho_a(VM,VN,A,B,M,N)),
-    #            verticalalignment='bottom', bbox=props, fontsize = labelsize)
-
-
-    #ax[1].plot(A,1.,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
-    #ax[1].plot(B,1.,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    ax[1].plot(np.arange(-r,r+r/10,r/10),np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    ax[1].plot(np.arange(-r,r+r/10,r/10),-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    #Subplot 2: Fields
+    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
 
     if Field == 'Model':
        
@@ -330,7 +295,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
+        formatter = LogFormatter(10, labelOnlyBase=False) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         
         if Type == 'Total':
@@ -350,7 +315,7 @@ def plot_Surface_Potentials(A,B,M,N,r,rhocyl,rhohalf,xc,yc,Field,Type):
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
+        formatter = LogFormatter(10, labelOnlyBase=False) 
         pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
 
 
