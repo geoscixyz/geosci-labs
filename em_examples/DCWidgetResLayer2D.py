@@ -310,12 +310,13 @@ G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(
 rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 
-def plot_Surface_Potentials(zcLayer,dzLayer,rhoLayer,xc,zc,r,rhoTarget,rhoHalf,A,B,M,N,Field,Type):
+def plot_Surface_Potentials(zcLayer,dzLayer,logRhoLayer,xc,zc,r,rhoTarget,rhoHalf,A,B,M,N,Field,Type):
 
     labelsize = 18.
     ticksize = 16.
 
     sigTarget = 1./rhoTarget
+    rhoLayer = np.exp(logRhoLayer)
     sigLayer = 1./rhoLayer
     sigHalf = 1./rhoHalf
 
@@ -525,14 +526,14 @@ def plot_Surface_Potentials(zcLayer,dzLayer,rhoLayer,xc,zc,r,rhoTarget,rhoHalf,A
 
 def ResLayer_app():
     app = interact(plot_Surface_Potentials,
-                zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False),
-                dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False),
-                rhoLayer = FloatSlider(min=100.,max=100000.,step=100., value = 1000., continuous_update=False),
+                zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$dz_{layer}$"),
+                dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dx_{layer}$"),
+                logRhoLayer = FloatSlider(min=-20.,max=20.,step=0.5, value = 10., continuous_update=False, description="$log\\left(\\rho_{layer}\\right)$"),
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
                 r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
-                rhoTarget = FloatSlider(min=10.,max=1000.,step=10., value = 100., continuous_update=False),
-                rhoHalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+                rhoTarget = FloatSlider(min=10.,max=1000.,step=10., value = 100., continuous_update=False, description="$\\rho_{target}$"),
+                rhoHalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False, description="$\\rho_{half}$"),
                 A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
                 B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
