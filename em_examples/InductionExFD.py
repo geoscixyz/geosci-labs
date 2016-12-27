@@ -569,7 +569,7 @@ class IndEx():
 #        
         Ax.text(1.4e-6,1.12*Imax,'$R$ = '+R_str+' $\Omega$',fontsize=FS)
         Ax.text(1.4e-6,1.04*Imax,'$L$ = '+L_str+' H',fontsize=FS)
-        Ax.text(4e-2,1.12*Imax,'$f$ = '+t_str+' Hz',fontsize=FS,color='r')
+        Ax.text(4e-2,1.12*Imax,'$t$ = '+t_str+' s',fontsize=FS,color='r')
         Ax.text(4e-2,1.04*Imax,'$V$ = '+V_str+' V',fontsize=FS,color='r')
         Ax.text(4e-2,0.96*Imax,'$I_s$ = '+I_str+' A',fontsize=FS,color='r')
         
