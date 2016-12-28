@@ -106,7 +106,7 @@ def fcn_TDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,t):
     Ax2 = Obj.plot_InducedCurrent_TD(Ax2,Is,t,EMFi,Isi)
     
     EMF_str = '{:.2e}'.format(EMFi)
-    Ax12.text(-2.9,-1.4,'EMF(t=0) = '+EMF_str+' *$\delta$(t) V',fontsize=FS)
+    Ax12.text(-2.9,-1.4,'EMF = '+EMF_str+' *$\delta$(t) V',fontsize=FS)
 
     plt.show(fig1)
     
@@ -359,11 +359,13 @@ class IndEx():
         Ax.plot(xTx,zTx,color=((0.6,0.6,0.6)),linewidth=4)
         Ax.plot(xRx,zRx,color='black',linewidth=6)
         Ax.plot(xRx,zRx,color=((0.4,0.4,0.4)),linewidth=4)
-        Cplot = Ax.contourf(X,Z,np.log10(Babs),40,cmap='ocean_r')
+        #Cplot = Ax.contourf(X,Z,np.log10(Babs),40,cmap='ocean_r')
+        Cplot = Ax.contourf(X,Z,np.log10(1e9*Babs),40,cmap='viridis')
         cbar = plt.colorbar(Cplot, ax=Ax)
-        cbar.set_label('log$_{10}(\mathbf{|B_p|})$', rotation=270, labelpad = 20, size=FS)
+        cbar.set_label('log$_{10}(\mathbf{|B_p|})$ [nT]', rotation=270, labelpad = 20, size=FS)
         cbar.ax.tick_params(labelsize=FS-2)
-        Ax.streamplot(X,Z,Bpx,Bpz,color=(0.2,0.2,0.2),linewidth=2)
+        #Ax.streamplot(X,Z,Bpx,Bpz,color=(0.2,0.2,0.2),linewidth=2)
+        Ax.streamplot(X,Z,Bpx,Bpz,color=(1,1,1),linewidth=2)
         
         Ax.set_xbound(np.min(X),np.max(X))
         Ax.set_ybound(np.min(Z),np.max(Z))
@@ -411,8 +413,8 @@ class IndEx():
         Ax.text(1.2*dxn,1.3*dzn,'$\mathbf{n}$',fontsize=FS+4,color='r')
         Ax.text(1.2*dxB,1.2*dzB,'$\mathbf{B_p}$',fontsize=FS+4,color='b')
         
-        Babs_str = '{:.3e}'.format(Babs)
-        Bn_str   = '{:.3e}'.format(Bnor)
+        Babs_str = '{:.3e}'.format(1e9*Babs)
+        Bn_str   = '{:.3e}'.format(1e9*Bnor)
         A_str    = '{:.3f}'.format(Area)
         #f_str    = '{:.3e}'.format(f)
         #EMF_str  = '{:.3e}j'.format(EMF)
