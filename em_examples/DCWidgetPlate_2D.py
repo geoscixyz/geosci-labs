@@ -364,8 +364,8 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
 def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type):
 
-    labelsize = 18.
-    ticksize = 16.
+    labelsize = 12.
+    ticksize = 10.
 
     sigplate = 1./rhoplate
     sighalf = 1./rhohalf
@@ -375,7 +375,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
 
     mtrue, mhalf,src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
 
-    fig, ax = plt.subplots(2,1,figsize=(15,16),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(9*1.5,6*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface, phiScaleTotal = get_Surface_Potentials(survey, src, total_field)
@@ -710,22 +710,22 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
-    ax[1].set_aspect('equal')
+    # ax[1].set_aspect('equal')
 
     plt.show()
-    return fig, ax
+    # return fig, ax
 
 
 def plate_app():
     app = interact(plot_Surface_Potentials,
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                dx = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
-                dz = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
+                dx = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
+                dz = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
                 rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
-                rhoplate = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
-                rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
+                rhoplate = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
+                rhohalf = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
                 A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
                 B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
