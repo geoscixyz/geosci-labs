@@ -131,13 +131,26 @@ indy = (mesh.gridFy[:,0]>=xmin) & (mesh.gridFy[:,0]<=xmax) \
 indF = np.concatenate((indx,indy))
 
 
-def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
+def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.,rx_nc=1.,profile = False):
+
+    #rx_nc: number of cell-size for the Rx dipole
 
     mhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
     mtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, yc, r]
     
-    Mx = np.empty(shape=(0, 2))
-    Nx = np.empty(shape=(0, 2))
+    if profile:
+        extend = np.abs(A-B)
+
+        M = np.arange(np.minimum(A,B)+rx_nc*cs,np.maximum(A,B)-rx_nc*cs,rx_nc*cs)
+        N = np.arange(np.minimum(A,B)+2*rx_nc*cs,np.maximum(A,B),rx_nc*cs)
+
+        Mx = np.c_[M,np.ones(M.shape)*(-cs/2.)]
+        Nx = np.c_[N,np.ones(N.shape)*(-cs/2.)]
+        dipole_center = (Mx+Nx)/2.
+    else:
+        Mx = np.empty(shape=(0, 2))
+        Nx = np.empty(shape=(0, 2))
+
     #rx = DC.Rx.Dipole_ky(Mx,Nx)
     rx = DC.Rx.Dipole(Mx,Nx)
     src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
@@ -153,18 +166,23 @@ def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
     problem_prim.pair(survey_prim)
 
     primary_field = problem_prim.fields(mhalf)
+    dprim = survey.dpred(mhalf)
     #phihalf = f[src, 'phi', 15]
     #ehalf = f[src, 'e']
     #jhalf = f[src, 'j']
     #charge = f[src, 'charge']
 
     total_field = problem.fields(mtrue)
+    dpred = survey.dpred(mtrue)
     #phi = f[src, 'phi', 15]
     #e = f[src, 'e']
     #j = f[src, 'j']
     #charge = f[src, 'charge']
 
-    return mtrue,mhalf, src, total_field, primary_field
+    if profile:
+        return dipole_center, M, N, dprim, dpred
+    else:
+        return mtrue,mhalf, src, total_field, primary_field
 
 
 def get_Surface_Potentials(src,field_dict):
@@ -177,6 +195,23 @@ def get_Surface_Potentials(src,field_dict):
     xSurface = CCLoc[surfaceInd,0].T
     return xSurface,phiSurface
 
+def plot_Profile(A,B,r,rhocyl,rhohalf,xc,yc,rx_nc,ax):
+
+    labelsize = 18.
+    ticksize = 16.
+
+    sigcyl = 1./rhocyl
+    sighalf = 1./rhohalf
+
+    dipole_center, M, N, dprim, dpred = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc,rx_nc = rx_nc,profile=True)
+
+    G2D = rhohalf/(2.*np.pi*G(-30.25,30.25,M,N)*dprim)
+    appres = dpred*2.*np.pi*G(-30.25,30.25,M,N)*G2D
+
+    ax.scatter(dipole_center[:,0],appres)
+    ax.set_ylabel('Apparent Resistivity (Ohm-m)')
+
+    return ax
 
 # Inline functions for computing apparent resistivity
 eps = 1e-9 #to stabilize division
