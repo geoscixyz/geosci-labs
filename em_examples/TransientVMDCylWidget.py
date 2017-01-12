@@ -216,7 +216,7 @@ class TransientVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
-        ax.text(-85, 85, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        ax.text(-85, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
 
     def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
                          radius=1., z0=0., x0=10.):
