@@ -52,10 +52,10 @@ class HarmonicVMDCylWidget(object):
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 
-        if self.mesh2D is None:
-            hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
-            hz = self.mesh.hz[yind]
-            self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
+        # if self.mesh2D is None:
+        hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
+        hz = self.mesh.hz[yind]
+        self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
 
     def getBiotSavrt(self, rxLoc):
         """
@@ -63,7 +63,6 @@ class HarmonicVMDCylWidget(object):
         """
         self.Gz = BiotSavartFun(self.mesh, rxLoc, component='z')
         self.Gx = BiotSavartFun(self.mesh, rxLoc, component='x')
-
 
     def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-1, sig2=1e-2, sig3=1e-2, chi=0.):
         self.h1 = h1      # 1st layer thickness

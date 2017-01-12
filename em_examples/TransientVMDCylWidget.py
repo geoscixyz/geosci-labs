@@ -44,7 +44,7 @@ class TransientVMDCylWidget(object):
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
         self.mesh = Mesh.CylMesh([hx, 1, hz], '00C')
 
-    def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.):
+    def getCoreDomain(self, mirror=False, xmax=95, zmin=-95, zmax=95.):
 
         self.activeCC = (self.mesh.gridCC[:,0] <= xmax) & (np.logical_and(self.mesh.gridCC[:,2] >= zmin, self.mesh.gridCC[:,2] <= zmax))
         self.gridCCactive = self.mesh.gridCC[self.activeCC,:][:,[0, 2]]
@@ -54,10 +54,10 @@ class TransientVMDCylWidget(object):
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 
-        if self.mesh2D is None:
-            hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
-            hz = self.mesh.hz[yind]
-            self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
+        # if self.mesh2D is None:
+        hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
+        hz = self.mesh.hz[yind]
+        self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
 
     def getBiotSavrt(self, rxLoc):
         """
@@ -216,7 +216,7 @@ class TransientVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
-        ax.text(-90, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        ax.text(-85, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
 
     def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
                          radius=1., z0=0., x0=10.):
