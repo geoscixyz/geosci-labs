@@ -130,7 +130,7 @@ def solve_2D_J(rho1, rho2, h, A, B):
 
 def plot_Layer_Potentials(rho1,rho2,h,A,B,M,N,imgplt='Model'):
 
-    ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)
+    ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)*1.5
 
     fig, ax = plt.subplots(2,1,figsize=(9,7))
 

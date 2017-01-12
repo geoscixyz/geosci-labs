@@ -1,0 +1,36 @@
+ PROGRAM "EM1DTM" (v1.0).
+ 
+ Run started at 12:28:54.216, 19/12/2016.
+ 
+ Reading inputs ...
+ Root for file names:           "em1dtm".
+ Number of soundings:           1.
+ Observations file:             "em1dtm.obs".
+ No. of discretized waveforms:  1.
+ Starting conductivity model:   "inimodel.con".
+ Ref. (small.) cond. model:     "refmodel.con".
+ Ref. (flat.) cond. model:      NONE.
+ Additional model weights:      NONE.
+ Huber c:                       0.100E+04.
+ Ekblom p (small.):             2.00.
+ Ekblom epsilon (small.):       0.100E-03.
+ Ekblom p (flat.):              2.00.
+ Ekblom epsilon (flat.):        0.100E-03.
+ alpha_s:                       0.100E-01.
+ alpha_z:                       1.00.
+ Inversion algorithm:           1  (fixed trade-off parameter).
+ Supplied trade-off parameter:  100.0.
+ Max. number of iterations:     1.
+ Convergence param. (default):  0.100E-01.
+ No. of lambdas (default):      70.
+ No. of frequencies (default):  50.
+ Level of output:               2.
+ 
+ Sounding 1 (-150.0,75.0).
+ Initial phid= 1.6798, beta= 100.00, phim= 0.52530E-06, Phi= 1.6799.
+ Iteration 1: phid= 1.6727, beta= 100.00, phim= 0.35677E-04, Phi= 1.6763.
+ One iteration completed.
+ 
+ Conductivity model:           "em1dtm.con".
+ 
+ The End! [12:28:54.511, 19/12/2016]

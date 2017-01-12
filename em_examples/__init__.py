@@ -15,4 +15,5 @@ import FreqtoTime
 import HarmonicVMDCylWidget
 import TransientVMDCylWidget
 import BiotSavart
+import Loop
 import Attenuation

@@ -90,7 +90,7 @@ class DipoleWidgetFD(object):
             self.y = np.linspace(self.ymin, self.ymax, nb)
             self.z = np.r_[loc]
 
-    def Dipole2Dviz(self, x1, y1, x2, y2, npts2D, npts, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="x", component="real", view="x", normal="Z", functype="E_from_ED", loc=0., scale="log", dx=50.):
+    def Dipole2Dviz(self, x1, y1, x2, y2, npts2D, npts, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="x", component="real", view="x", normal="Z", functype="E_from_ED", loc=0., scale="log", dx=50., plot1D=False, plotTxProfile=False):
         nx, ny = npts2D, npts2D
         x, y = linefun(x1, x2, y1, y2, npts)
         if scale == "log":
@@ -101,8 +101,8 @@ class DipoleWidgetFD(object):
             raise NotImplementedError()
 
         self.SetDataview(srcLoc, sig, f, orientation, normal, functype, na=nx, nb=ny, loc=loc)
-        plot1D = False
-        plotTxProflie = False
+        # plot1D = False
+        # plotTxProfile = False
         if normal =="X" or normal=="x":
             if abs(loc - 50) < 1e-5:
                 plot1D = True
@@ -111,7 +111,7 @@ class DipoleWidgetFD(object):
         if normal =="Y" or normal=="y":
             if abs(loc - 0.) < 1e-5:
                 plot1D = True
-                plotTxProflie = True
+                plotTxProfile = True
             xyz_line = np.c_[x, np.ones_like(x)*self.y, y]
             self.dataview.xyz_line =  xyz_line
         if normal =="Z" or normal=="z":
@@ -171,7 +171,7 @@ class DipoleWidgetFD(object):
         ax1.set_title(title)
 
 
-        if plotTxProflie:
+        if plotTxProfile:
             ax1.plot(np.r_[-20., 80.],np.zeros(2), 'b-', lw=1)
         if plot1D:
             ax1.plot(x,y, 'r.', ms=4)
