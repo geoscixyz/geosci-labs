@@ -289,8 +289,12 @@ def sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary):
     qPosData = np.vstack([qPosLoc[:,0], qPosLoc[:,1], qPos]).T
     qNegData = np.vstack([qNegLoc[:,0], qNegLoc[:,1], qNeg]).T
 
-    qNegAvgLoc = np.average(qNegLoc,axis=0, weights=qNeg)
-    qPosAvgLoc = np.average(qPosLoc,axis=0, weights=qPos)
+    if qNeg.shape == (0,) or qPos.shape == (0,):
+        qNegAvgLoc = np.r_[-10, -10]
+        qPosAvgLoc = np.r_[+10, -10]
+    else:
+        qNegAvgLoc = np.average(qNegLoc, axis=0, weights=qNeg)
+        qPosAvgLoc = np.average(qPosLoc, axis=0, weights=qPos)
 
     qPosSum = np.sum(qPos)
     qNegSum = np.sum(qNeg)
@@ -362,7 +366,7 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
     return rho_a
 
 
-def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,Field,Type):
+def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
 
     labelsize = 12.
     ticksize = 10.
@@ -375,7 +379,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
 
     mtrue, mhalf,src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
 
-    fig, ax = plt.subplots(2,1,figsize=(9*1.5,6*1.5),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(9*1.5,7*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface, phiScaleTotal = get_Surface_Potentials(survey, src, total_field)
@@ -440,7 +444,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
     ax[0].tick_params(axis='both', which='major', labelsize=ticksize)
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
-    ax[0].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(G2D*calculateRhoA(survey,VMprim,VNprim,A,B,M,N)),
+    ax[0].text(xlim.max()+1,ylim.max()-0.1*ylim.max(),'$\\rho_a$ = %2.2f'%(G2D*calculateRhoA(survey,VM,VN,A,B,M,N)),
                 verticalalignment='bottom', bbox=props, fontsize = labelsize)
 
     ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
@@ -489,16 +493,21 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         streamOpts = None
         ind = indCC
 
-        formatter = None
-        pcolorOpts = None
+        formatter = "$10^{%.1f}$"
+        pcolorOpts = {"cmap":"jet_r"}
 
 
         if Type == 'Total':
             u = 1./(mapping*mtrue)
+            u = np.log10(u)
         elif Type == 'Primary':
             u = 1./(mapping*mhalf)
+            u = np.log10(u)
         elif Type == 'Secondary':
             u = 1./(mapping*mtrue) - 1./(mapping*mhalf)
+            formatter = "%.1e"
+            pcolorOpts = {"cmap":"jet_r"}
+
 
     elif Field == 'Potential':
 
@@ -508,8 +517,8 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         streamOpts = None
         ind = indCC
 
-        formatter = None
-        pcolorOpts = None
+        formatter = "%.1e"
+        pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
             # formatter = LogFormatter(10, labelOnlyBase=False)
@@ -525,7 +534,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
 
         elif Type == 'Secondary':
             # formatter = None
-            # pcolorOpts = None
+            # pcolorOpts = {"cmap":"viridis"}
 
             uTotal = total_field[src,'phi'] - phiScaleTotal
             uPrim = primary_field[src,'phi'] - phiScalePrim
@@ -539,8 +548,10 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
+        # formatter = LogFormatter(10, labelOnlyBase=False)
+        # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
+        formatter = "%.1e"
+        pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
             u = total_field[src,'e']
@@ -561,9 +572,10 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         streamOpts = {'color':'w'}
         ind = indF
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
-
+        # formatter = LogFormatter(10, labelOnlyBase=False)
+        # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
+        formatter = "%.1e"
+        pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
             u = total_field[src,'j']
@@ -584,8 +596,10 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         streamOpts = None
         ind = indCC
 
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.01)}
+        # formatter = LogFormatter(10, labelOnlyBase=False)
+        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.01)}
+        formatter = "%.1e"
+        pcolorOpts = {"cmap":"RdBu"}
 
         if Type == 'Total':
             u = total_field[src,'charge']
@@ -600,16 +614,18 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
 
     elif Field == 'Sensitivity':
 
-        label = 'Sensitivity'
+        label = '|Sensitivity|'
         xtype = 'CC'
         view = 'real'
         streamOpts = None
         ind = indCC
 
         # formatter = None
-        # pcolorOpts = None
-        formatter = LogFormatter(10, labelOnlyBase=False)
-        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-2, linscale=0.01)}
+        # pcolorOpts = {"cmap":"viridis"}
+        # formatter = LogFormatter(10, labelOnlyBase=False)
+        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-2, linscale=0.01)}
+        formatter = formatter = "$10^{%.1f}$"
+        pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
             u = getSensitivity(survey,A,B,M,N,mtrue)
@@ -621,7 +637,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
             uTotal = getSensitivity(survey,A,B,M,N,mtrue)
             uPrim = getSensitivity(survey,A,B,M,N,mhalf)
             u = uTotal - uPrim
-
+        u = np.log10(abs(u))
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
     # Get plate corners
     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
@@ -636,7 +652,7 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
         # plot west side of plate outline
         ax[1].plot(plateCorners[[0,2],0],plateCorners[[0,2],1],linestyle = 'dashed',color='k')
 
-    if (Field == 'Charge') and (Type != 'Primary'):
+    if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
         qTotal = total_field[src,'charge']
         qPrim = primary_field[src,'charge']
         qSecondary = qTotal - qPrim
@@ -705,27 +721,28 @@ def plot_Surface_Potentials(survey,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,A,B,M,N,F
     ax[1].tick_params(axis='both', which='major', labelsize=ticksize)
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
-    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter)
+    vmin, vmax = dat[0].get_clim()
+    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     # ax[1].set_aspect('equal')
 
-    plt.show()
+    # plt.show()
     # return fig, ax
 
 
 def plate_app():
     app = interact(plot_Surface_Potentials,
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                dx = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
-                dz = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
-                xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
-                zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
-                rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
-                rhoplate = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
-                rhohalf = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
+                dx = FloatText(min=1.,max=1e5, value=10., continuous_update=False),
+                dz = FloatText(min=1.,max=1e5, value=10., continuous_update=False),
+                xc = FloatText(min=-30,max=30, value=0., continuous_update=False),
+                zc = FloatText(min=-30,max=0., value=-10., continuous_update=False),
+                rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False,description='$\\theta$'),
+                rhoplate = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
+                rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
                 A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
                 B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
@@ -734,3 +751,20 @@ def plate_app():
                 Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
                 )
     return app
+
+    # app = interact(plot_Surface_Potentials,
+    #             survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
+    #             dx = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
+    #             dz = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
+    #             xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+    #             zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
+    #             rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
+    #             rhoplate = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
+    #             rhohalf = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
+    #             A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
+    #             B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
+    #             M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
+    #             N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
+    #             Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
+    #             Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+    #             )
