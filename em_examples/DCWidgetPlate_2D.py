@@ -341,7 +341,7 @@ def getSensitivity(survey,A,B,M,N,model):
     problem.pair(survey)
     fieldObj = problem.fields(model)
 
-    J = problem.Jtvec(model, np.array(1.), f=fieldObj)
+    J = problem.Jtvec(model, np.array([1.]), f=fieldObj)
 
     return J
 
@@ -614,7 +614,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
 
     elif Field == 'Sensitivity':
 
-        label = '|Sensitivity|'
+        label = 'Sensitivity'
         xtype = 'CC'
         view = 'real'
         streamOpts = None
@@ -624,7 +624,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
         # pcolorOpts = {"cmap":"viridis"}
         # formatter = LogFormatter(10, labelOnlyBase=False)
         # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-2, linscale=0.01)}
-        formatter = formatter = "$10^{%.1f}$"
+        # formatter = formatter = "$10^{%.1f}$"
+        formatter = "%.1e"
         pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
@@ -637,7 +638,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
             uTotal = getSensitivity(survey,A,B,M,N,mtrue)
             uPrim = getSensitivity(survey,A,B,M,N,mhalf)
             u = uTotal - uPrim
-        u = np.log10(abs(u))
+        # u = np.log10(abs(u))
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
     # Get plate corners
     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
