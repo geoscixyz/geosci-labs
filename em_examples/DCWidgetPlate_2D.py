@@ -1,11 +1,5 @@
-#import sys
-#sys.path.append("./simpeg")
-#sys.path.append("./simpegdc/")
-
-#import warnings
-#warnings.filterwarnings('ignore')
-
 from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
 from SimPEG.EM.Static import DC
 import matplotlib
@@ -729,7 +723,6 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     # ax[1].set_aspect('equal')
-
     # plt.show()
     # return fig, ax
 
@@ -737,10 +730,10 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
 def plate_app():
     app = interact(plot_Surface_Potentials,
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                dx = FloatText(min=1.,max=1e5, value=10., continuous_update=False),
-                dz = FloatText(min=1.,max=1e5, value=10., continuous_update=False),
-                xc = FloatText(min=-30,max=30, value=0., continuous_update=False),
-                zc = FloatText(min=-30,max=0., value=-10., continuous_update=False),
+                dx = FloatSlider(min=1.,max=1000.,step=1.,value=10., continuous_update=False),
+                dz = FloatSlider(min=1.,max=200.,step=1.,value=10., continuous_update=False),
+                xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+                zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
                 rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False,description='$\\theta$'),
                 rhoplate = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
                 rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
