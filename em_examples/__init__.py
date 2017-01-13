@@ -17,3 +17,4 @@ import TransientVMDCylWidget
 import BiotSavart
 import Loop
 import Attenuation
+import Reflection
