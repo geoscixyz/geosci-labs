@@ -1,6 +1,0 @@
-Mesh.msh
-FILE Sphere_Tensor.con
-0 
-H3DTD_Sphere.loc
-wave.dat ! wave file
-times.dat
