@@ -1,0 +1,13 @@
+2 2 2 ?? for global?
+1 1 32
+1000. 1000. 1000. 1000. ??
+20. 20. 20.  !  20. 100. 200. ?? depth core inv
+20. 20. 20.  !  20. 100. 200. ?? depth core fwr
+5 1 1 cells around receivers, ncell2, ncell4
+AEM_data.obs
+AEM_tx.dat
+AEM_rx.dat
+AEM_freq.dat
+Topo.topo
+MAKE_POLYGON 20
+CREATE_LARGE_MESH octree_large.msh

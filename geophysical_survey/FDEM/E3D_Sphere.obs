@@ -1,0 +1,3892 @@
+! Export from FDEM_Sphere.py
+IGNORE nan
+N_TRX 648
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959502e-04 5.511464e-08 -4.902943e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959641e-04 5.511464e-08 -1.003041e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960019e-04 5.511464e-08 -2.034139e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.961011e-04 5.511464e-08 -3.963526e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963365e-04 5.511464e-08 -7.117350e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967419e-04 5.511464e-08 -1.082727e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974625e-04 5.511464e-08 -1.502211e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984745e-04 5.511464e-08 -1.804123e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008183e-04 5.511464e-08 -4.915121e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008324e-04 5.511464e-08 -1.004451e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008704e-04 5.511464e-08 -2.034133e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009695e-04 5.511464e-08 -3.957722e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012045e-04 5.511464e-08 -7.109786e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016097e-04 5.511464e-08 -1.081472e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023295e-04 5.511464e-08 -1.499801e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033396e-04 5.511464e-08 -1.800649e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.139974e-04 5.511464e-08 -4.939223e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140115e-04 5.511464e-08 -1.008791e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140501e-04 5.511464e-08 -2.039546e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.141493e-04 5.511464e-08 -3.958737e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.143837e-04 5.511464e-08 -7.116391e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.147890e-04 5.511464e-08 -1.083660e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.155102e-04 5.511464e-08 -1.504439e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.165232e-04 5.511464e-08 -1.808377e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008252e-04 5.511464e-08 -4.953387e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008395e-04 5.511464e-08 -1.011751e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008785e-04 5.511464e-08 -2.042728e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009780e-04 5.511464e-08 -3.953198e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012114e-04 5.511464e-08 -7.104323e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016163e-04 5.511464e-08 -1.082519e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023372e-04 5.511464e-08 -1.502836e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033499e-04 5.511464e-08 -1.805096e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959357e-04 5.511464e-08 -4.964891e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959501e-04 5.511464e-08 -1.013958e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959894e-04 5.511464e-08 -2.044917e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960892e-04 5.511464e-08 -3.949498e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963222e-04 5.511464e-08 -7.091565e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967263e-04 5.511464e-08 -1.080552e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974458e-04 5.511464e-08 -1.499780e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984556e-04 5.511464e-08 -1.801711e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008273e-04 5.511464e-08 -4.953380e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008416e-04 5.511464e-08 -1.011756e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008806e-04 5.511464e-08 -2.042757e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009801e-04 5.511464e-08 -3.953330e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012135e-04 5.511464e-08 -7.104839e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016183e-04 5.511464e-08 -1.082681e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023391e-04 5.511464e-08 -1.503363e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033516e-04 5.511464e-08 -1.806755e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.139955e-04 5.511464e-08 -4.939242e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140097e-04 5.511464e-08 -1.008789e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140482e-04 5.511464e-08 -2.039523e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.141475e-04 5.511464e-08 -3.958623e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.143819e-04 5.511464e-08 -7.115917e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.147873e-04 5.511464e-08 -1.083508e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.155086e-04 5.511464e-08 -1.503930e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.165218e-04 5.511464e-08 -1.806761e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008199e-04 5.511464e-08 -4.915097e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008339e-04 5.511464e-08 -1.004451e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008720e-04 5.511464e-08 -2.034151e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009711e-04 5.511464e-08 -3.957825e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012061e-04 5.511464e-08 -7.110229e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016112e-04 5.511464e-08 -1.081618e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023309e-04 5.511464e-08 -1.500294e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033407e-04 5.511464e-08 -1.802220e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959471e-04 5.511464e-08 -4.892837e-08 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959610e-04 5.511464e-08 -1.000871e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959987e-04 5.511464e-08 -2.029991e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960977e-04 5.511464e-08 -3.956460e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963328e-04 5.511464e-08 -7.106357e-07 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967377e-04 5.511464e-08 -1.080987e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974572e-04 5.511464e-08 -1.499254e-06 5.511464e-08
+
+TRX_LOOP
+-158.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984668e-04 5.511464e-08 -1.800107e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807791e-04 5.511464e-08 -4.915460e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807931e-04 5.511464e-08 -1.004389e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.808312e-04 5.511464e-08 -2.033905e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.809303e-04 5.511464e-08 -3.957246e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.811653e-04 5.511464e-08 -7.108932e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.815705e-04 5.511464e-08 -1.081300e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.822903e-04 5.511464e-08 -1.499288e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.833001e-04 5.511464e-08 -1.799366e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851242e-04 5.511464e-08 -4.943326e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851384e-04 5.511464e-08 -1.008692e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851771e-04 5.511464e-08 -2.036722e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.852762e-04 5.511464e-08 -3.948649e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.855101e-04 5.511464e-08 -7.096614e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.859151e-04 5.511464e-08 -1.079905e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.866341e-04 5.511464e-08 -1.496776e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.876419e-04 5.511464e-08 -1.795828e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970217e-04 5.511464e-08 -4.992106e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970363e-04 5.511464e-08 -1.018146e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970760e-04 5.511464e-08 -2.049876e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.971761e-04 5.511464e-08 -3.950225e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974084e-04 5.511464e-08 -7.091642e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.978127e-04 5.511464e-08 -1.081702e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.985333e-04 5.511464e-08 -1.501479e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.995442e-04 5.511464e-08 -1.803755e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851342e-04 5.511464e-08 -5.037669e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851489e-04 5.511464e-08 -1.027977e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851898e-04 5.511464e-08 -2.065821e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.852919e-04 5.511464e-08 -3.954895e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.855232e-04 5.511464e-08 -7.063586e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.859245e-04 5.511464e-08 -1.078873e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.866446e-04 5.511464e-08 -1.499537e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.876555e-04 5.511464e-08 -1.800224e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807605e-04 5.511464e-08 -5.072909e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807755e-04 5.511464e-08 -1.035132e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.808172e-04 5.511464e-08 -2.076671e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.809206e-04 5.511464e-08 -3.959316e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.811519e-04 5.511464e-08 -7.041925e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.815506e-04 5.511464e-08 -1.075466e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.822688e-04 5.511464e-08 -1.496136e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.832768e-04 5.511464e-08 -1.796790e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851364e-04 5.511464e-08 -5.037661e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851512e-04 5.511464e-08 -1.027982e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851921e-04 5.511464e-08 -2.065854e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.852941e-04 5.511464e-08 -3.955044e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.855254e-04 5.511464e-08 -7.064160e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.859266e-04 5.511464e-08 -1.079051e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.866466e-04 5.511464e-08 -1.500114e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.876572e-04 5.511464e-08 -1.802035e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970198e-04 5.511464e-08 -4.992125e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970343e-04 5.511464e-08 -1.018144e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970741e-04 5.511464e-08 -2.049849e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.971742e-04 5.511464e-08 -3.950094e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974065e-04 5.511464e-08 -7.091114e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.978108e-04 5.511464e-08 -1.081533e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.985316e-04 5.511464e-08 -1.500921e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.995427e-04 5.511464e-08 -1.801991e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851259e-04 5.511464e-08 -4.943304e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851401e-04 5.511464e-08 -1.008694e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851788e-04 5.511464e-08 -2.036745e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.852779e-04 5.511464e-08 -3.948767e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.855118e-04 5.511464e-08 -7.097109e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.859166e-04 5.511464e-08 -1.080066e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.866355e-04 5.511464e-08 -1.497315e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.876431e-04 5.511464e-08 -1.797543e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807760e-04 5.511464e-08 -4.905172e-08 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807900e-04 5.511464e-08 -1.002181e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.808279e-04 5.511464e-08 -2.029685e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.809268e-04 5.511464e-08 -3.950039e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.811614e-04 5.511464e-08 -7.097617e-07 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.815662e-04 5.511464e-08 -1.079497e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.822848e-04 5.511464e-08 -1.496236e-06 5.511464e-08
+
+TRX_LOOP
+-120.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.832922e-04 5.511464e-08 -1.795262e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563113e-04 5.511464e-08 -4.942869e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563255e-04 5.511464e-08 -1.009230e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563641e-04 5.511464e-08 -2.039797e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.564633e-04 5.511464e-08 -3.958178e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.566976e-04 5.511464e-08 -7.115831e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.571030e-04 5.511464e-08 -1.083621e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.578242e-04 5.511464e-08 -1.504238e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.588372e-04 5.511464e-08 -1.807617e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600345e-04 5.511464e-08 -4.993950e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600490e-04 5.511464e-08 -1.018416e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600888e-04 5.511464e-08 -2.050143e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.601889e-04 5.511464e-08 -3.950525e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604212e-04 5.511464e-08 -7.091818e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.608254e-04 5.511464e-08 -1.081809e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.615460e-04 5.511464e-08 -1.501798e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.625572e-04 5.511464e-08 -1.804300e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.703425e-04 5.511464e-08 -5.113657e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.703577e-04 5.511464e-08 -1.042095e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.704000e-04 5.511464e-08 -2.085479e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705037e-04 5.511464e-08 -3.963631e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.707338e-04 5.511464e-08 -7.057878e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.711332e-04 5.511464e-08 -1.080613e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.718550e-04 5.511464e-08 -1.506040e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.728697e-04 5.511464e-08 -1.811902e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600451e-04 5.511464e-08 -5.276468e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600612e-04 5.511464e-08 -1.075252e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.601063e-04 5.511464e-08 -2.141589e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602164e-04 5.511464e-08 -4.021717e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604514e-04 5.511464e-08 -7.029559e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.608429e-04 5.511464e-08 -1.068965e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.615544e-04 5.511464e-08 -1.498896e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.625699e-04 5.511464e-08 -1.808038e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.562928e-04 5.511464e-08 -5.426791e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563098e-04 5.511464e-08 -1.104605e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563572e-04 5.511464e-08 -2.187528e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.564716e-04 5.511464e-08 -4.074579e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.567122e-04 5.511464e-08 -7.039679e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.571022e-04 5.511464e-08 -1.060416e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.578015e-04 5.511464e-08 -1.486953e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.588106e-04 5.511464e-08 -1.802441e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600472e-04 5.511464e-08 -5.276444e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600634e-04 5.511464e-08 -1.075253e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.601085e-04 5.511464e-08 -2.141614e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602185e-04 5.511464e-08 -4.021852e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604535e-04 5.511464e-08 -7.030097e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.608449e-04 5.511464e-08 -1.069130e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.615563e-04 5.511464e-08 -1.499428e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.625715e-04 5.511464e-08 -1.809707e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.703406e-04 5.511464e-08 -5.113680e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.703559e-04 5.511464e-08 -1.042094e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.703982e-04 5.511464e-08 -2.085457e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705019e-04 5.511464e-08 -3.963511e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.707321e-04 5.511464e-08 -7.057388e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.711315e-04 5.511464e-08 -1.080458e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.718534e-04 5.511464e-08 -1.505526e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.728683e-04 5.511464e-08 -1.810276e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600360e-04 5.511464e-08 -4.993929e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600506e-04 5.511464e-08 -1.018417e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.600904e-04 5.511464e-08 -2.050164e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.601905e-04 5.511464e-08 -3.950635e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604227e-04 5.511464e-08 -7.092275e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.608268e-04 5.511464e-08 -1.081957e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.615474e-04 5.511464e-08 -1.502295e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.625583e-04 5.511464e-08 -1.805881e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563083e-04 5.511464e-08 -4.932606e-08 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563224e-04 5.511464e-08 -1.007026e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.563609e-04 5.511464e-08 -2.035601e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.564598e-04 5.511464e-08 -3.951062e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.566937e-04 5.511464e-08 -7.104749e-07 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.570987e-04 5.511464e-08 -1.081864e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.578188e-04 5.511464e-08 -1.501254e-06 5.511464e-08
+
+TRX_LOOP
+-83.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.588295e-04 5.511464e-08 -1.803571e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925453e-04 5.511464e-08 -4.959199e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925596e-04 5.511464e-08 -1.012563e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925987e-04 5.511464e-08 -2.043446e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926982e-04 5.511464e-08 -3.952391e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.929314e-04 5.511464e-08 -7.102789e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.933363e-04 5.511464e-08 -1.082399e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.940572e-04 5.511464e-08 -1.502655e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.950698e-04 5.511464e-08 -1.804743e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974858e-04 5.511464e-08 -5.045047e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975006e-04 5.511464e-08 -1.029223e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975416e-04 5.511464e-08 -2.067217e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.976438e-04 5.511464e-08 -3.955337e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.978751e-04 5.511464e-08 -7.061924e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.982760e-04 5.511464e-08 -1.078721e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.989960e-04 5.511464e-08 -1.499804e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.000071e-04 5.511464e-08 -1.801150e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.107937e-04 5.511464e-08 -5.281484e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108098e-04 5.511464e-08 -1.076274e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108550e-04 5.511464e-08 -2.143095e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.109652e-04 5.511464e-08 -4.021960e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.112000e-04 5.511464e-08 -7.028651e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.115915e-04 5.511464e-08 -1.069086e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.123033e-04 5.511464e-08 -1.498947e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.133186e-04 5.511464e-08 -1.808158e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974966e-04 5.511464e-08 -6.125722e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975184e-04 5.511464e-08 -1.232875e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975761e-04 5.511464e-08 -2.361902e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.977043e-04 5.511464e-08 -4.256476e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979615e-04 5.511464e-08 -7.126308e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.983550e-04 5.511464e-08 -1.044349e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.990237e-04 5.511464e-08 -1.449162e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.000045e-04 5.511464e-08 -1.786060e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925341e-04 5.511464e-08 -7.428014e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925656e-04 5.511464e-08 -1.465956e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926435e-04 5.511464e-08 -2.642435e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.927911e-04 5.511464e-08 -4.468197e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.930603e-04 5.511464e-08 -7.201681e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.934585e-04 5.511464e-08 -1.033542e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.941125e-04 5.511464e-08 -1.406495e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.950405e-04 5.511464e-08 -1.733278e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974989e-04 5.511464e-08 -6.125641e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975206e-04 5.511464e-08 -1.232866e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975783e-04 5.511464e-08 -2.361915e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.977065e-04 5.511464e-08 -4.256610e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979636e-04 5.511464e-08 -7.126899e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.983571e-04 5.511464e-08 -1.044532e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.990257e-04 5.511464e-08 -1.449740e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.000062e-04 5.511464e-08 -1.787852e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.107918e-04 5.511464e-08 -5.281515e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108079e-04 5.511464e-08 -1.076274e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108531e-04 5.511464e-08 -2.143075e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.109633e-04 5.511464e-08 -4.021836e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.111982e-04 5.511464e-08 -7.028124e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.115897e-04 5.511464e-08 -1.068919e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.123016e-04 5.511464e-08 -1.498395e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.133171e-04 5.511464e-08 -1.806408e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974874e-04 5.511464e-08 -5.045023e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975022e-04 5.511464e-08 -1.029223e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975432e-04 5.511464e-08 -2.067239e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.976454e-04 5.511464e-08 -3.955457e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.978767e-04 5.511464e-08 -7.062419e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.982776e-04 5.511464e-08 -1.078881e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.989974e-04 5.511464e-08 -1.500339e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.000082e-04 5.511464e-08 -1.802852e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925422e-04 5.511464e-08 -4.948797e-08 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925565e-04 5.511464e-08 -1.010336e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.925955e-04 5.511464e-08 -2.039247e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926948e-04 5.511464e-08 -3.945348e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.929276e-04 5.511464e-08 -7.091878e-07 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.933321e-04 5.511464e-08 -1.080663e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.940518e-04 5.511464e-08 -1.499696e-06 5.511464e-08
+
+TRX_LOOP
+-45.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+-3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.950622e-04 5.511464e-08 -1.800721e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.955692e-04 5.511464e-08 -4.974518e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.955836e-04 5.511464e-08 -1.015514e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.956231e-04 5.511464e-08 -2.046872e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.957231e-04 5.511464e-08 -3.949653e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959559e-04 5.511464e-08 -7.090212e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963599e-04 5.511464e-08 -1.080508e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970795e-04 5.511464e-08 -1.499680e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.980893e-04 5.511464e-08 -1.801236e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004322e-04 5.511464e-08 -5.087161e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004473e-04 5.511464e-08 -1.037689e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004892e-04 5.511464e-08 -2.079996e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.005929e-04 5.511464e-08 -3.961371e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008242e-04 5.511464e-08 -7.040667e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012226e-04 5.511464e-08 -1.075149e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.019404e-04 5.511464e-08 -1.496402e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.029487e-04 5.511464e-08 -1.797709e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136091e-04 5.511464e-08 -5.440901e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136262e-04 5.511464e-08 -1.107367e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136740e-04 5.511464e-08 -2.191194e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.137886e-04 5.511464e-08 -4.075256e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140289e-04 5.511464e-08 -7.038662e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.144190e-04 5.511464e-08 -1.060595e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.151184e-04 5.511464e-08 -1.486926e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.161275e-04 5.511464e-08 -1.802838e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004478e-04 5.511464e-08 -7.437342e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004792e-04 5.511464e-08 -1.468674e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.005572e-04 5.511464e-08 -2.650915e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.007056e-04 5.511464e-08 -4.485596e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009764e-04 5.511464e-08 -7.223172e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.013763e-04 5.511464e-08 -1.035174e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.020317e-04 5.511464e-08 -1.405308e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.029561e-04 5.511464e-08 -1.729392e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.955692e-04 5.511464e-08 -1.249892e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.956395e-04 5.511464e-08 -2.372860e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.958004e-04 5.511464e-08 -3.704514e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960271e-04 5.511464e-08 -5.070134e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963165e-04 5.511464e-08 -6.923545e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.966663e-04 5.511464e-08 -9.315826e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972184e-04 5.511464e-08 -1.273461e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.980494e-04 5.511464e-08 -1.638841e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004499e-04 5.511464e-08 -7.437234e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004813e-04 5.511464e-08 -1.468659e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.005593e-04 5.511464e-08 -2.650923e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.007076e-04 5.511464e-08 -4.485723e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009785e-04 5.511464e-08 -7.223741e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.013782e-04 5.511464e-08 -1.035348e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.020335e-04 5.511464e-08 -1.405847e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.029577e-04 5.511464e-08 -1.731031e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136073e-04 5.511464e-08 -5.440927e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136244e-04 5.511464e-08 -1.107368e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.136722e-04 5.511464e-08 -2.191176e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.137868e-04 5.511464e-08 -4.075143e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140272e-04 5.511464e-08 -7.038174e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.144173e-04 5.511464e-08 -1.060440e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.151168e-04 5.511464e-08 -1.486420e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.161261e-04 5.511464e-08 -1.801232e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004337e-04 5.511464e-08 -5.087140e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004488e-04 5.511464e-08 -1.037690e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.004907e-04 5.511464e-08 -2.080018e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.005944e-04 5.511464e-08 -3.961483e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008257e-04 5.511464e-08 -7.041125e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012240e-04 5.511464e-08 -1.075296e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.019417e-04 5.511464e-08 -1.496894e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.029498e-04 5.511464e-08 -1.799272e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.955661e-04 5.511464e-08 -4.964035e-08 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.955805e-04 5.511464e-08 -1.013262e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.956199e-04 5.511464e-08 -2.042588e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.957196e-04 5.511464e-08 -3.942437e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959519e-04 5.511464e-08 -7.078967e-07 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963556e-04 5.511464e-08 -1.078712e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970740e-04 5.511464e-08 -1.496630e-06 5.511464e-08
+
+TRX_LOOP
+-8.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+0.000000e+00 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.980814e-04 5.511464e-08 -1.797132e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806228e-04 5.511464e-08 -4.962178e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806371e-04 5.511464e-08 -1.013177e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806763e-04 5.511464e-08 -2.044586e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807759e-04 5.511464e-08 -3.953368e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.810091e-04 5.511464e-08 -7.103331e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.814138e-04 5.511464e-08 -1.082607e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.821347e-04 5.511464e-08 -1.503245e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.831473e-04 5.511464e-08 -1.806204e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849670e-04 5.511464e-08 -5.052627e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849819e-04 5.511464e-08 -1.030665e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850230e-04 5.511464e-08 -2.069251e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851254e-04 5.511464e-08 -3.956181e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.853566e-04 5.511464e-08 -7.061485e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.857573e-04 5.511464e-08 -1.078848e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.864772e-04 5.511464e-08 -1.500445e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.874882e-04 5.511464e-08 -1.802819e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.968636e-04 5.511464e-08 -5.293898e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.968798e-04 5.511464e-08 -1.078600e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.969253e-04 5.511464e-08 -2.146074e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970356e-04 5.511464e-08 -4.023124e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972704e-04 5.511464e-08 -7.028154e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.976617e-04 5.511464e-08 -1.069049e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.983730e-04 5.511464e-08 -1.499282e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.993882e-04 5.511464e-08 -1.809824e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849796e-04 5.511464e-08 -6.134397e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850013e-04 5.511464e-08 -1.234840e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850591e-04 5.511464e-08 -2.366434e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851876e-04 5.511464e-08 -4.265410e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.854455e-04 5.511464e-08 -7.140532e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.858405e-04 5.511464e-08 -1.045650e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.865096e-04 5.511464e-08 -1.448649e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.874877e-04 5.511464e-08 -1.785679e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806091e-04 5.511464e-08 -7.463411e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806406e-04 5.511464e-08 -1.474114e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807189e-04 5.511464e-08 -2.661264e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.808679e-04 5.511464e-08 -4.504336e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.811405e-04 5.511464e-08 -7.253637e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.815434e-04 5.511464e-08 -1.037506e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.821994e-04 5.511464e-08 -1.403708e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.831195e-04 5.511464e-08 -1.726025e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849817e-04 5.511464e-08 -6.134327e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850034e-04 5.511464e-08 -1.234832e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850612e-04 5.511464e-08 -2.366447e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851897e-04 5.511464e-08 -4.265537e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.854476e-04 5.511464e-08 -7.141085e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.858425e-04 5.511464e-08 -1.045821e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.865115e-04 5.511464e-08 -1.449186e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.874894e-04 5.511464e-08 -1.787347e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.968617e-04 5.511464e-08 -5.293928e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.968780e-04 5.511464e-08 -1.078601e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.969234e-04 5.511464e-08 -2.146056e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.970338e-04 5.511464e-08 -4.023009e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972686e-04 5.511464e-08 -7.027663e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.976600e-04 5.511464e-08 -1.068893e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.983714e-04 5.511464e-08 -1.498767e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.993868e-04 5.511464e-08 -1.808195e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849686e-04 5.511464e-08 -5.052603e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.849835e-04 5.511464e-08 -1.030666e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.850246e-04 5.511464e-08 -2.069272e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.851270e-04 5.511464e-08 -3.956292e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.853581e-04 5.511464e-08 -7.061944e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.857588e-04 5.511464e-08 -1.078996e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.864786e-04 5.511464e-08 -1.500943e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.874893e-04 5.511464e-08 -1.804404e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806197e-04 5.511464e-08 -4.951723e-08 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806340e-04 5.511464e-08 -1.010938e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.806730e-04 5.511464e-08 -2.040362e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.807725e-04 5.511464e-08 -3.946272e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.810052e-04 5.511464e-08 -7.092320e-07 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.814096e-04 5.511464e-08 -1.080856e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.821293e-04 5.511464e-08 -1.500262e-06 5.511464e-08
+
+TRX_LOOP
+29.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+3.750000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.831396e-04 5.511464e-08 -1.802159e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565183e-04 5.511464e-08 -4.944255e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565325e-04 5.511464e-08 -1.009495e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565711e-04 5.511464e-08 -2.040344e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.566704e-04 5.511464e-08 -3.958129e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.569047e-04 5.511464e-08 -7.114667e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.573101e-04 5.511464e-08 -1.083349e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.580314e-04 5.511464e-08 -1.503560e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.590445e-04 5.511464e-08 -1.805893e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602430e-04 5.511464e-08 -5.000323e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602576e-04 5.511464e-08 -1.019509e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602975e-04 5.511464e-08 -2.051347e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.603977e-04 5.511464e-08 -3.950029e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.606299e-04 5.511464e-08 -7.089875e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.610341e-04 5.511464e-08 -1.081441e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.617548e-04 5.511464e-08 -1.501022e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.627660e-04 5.511464e-08 -1.802367e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705527e-04 5.511464e-08 -5.126230e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705680e-04 5.511464e-08 -1.044449e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.706105e-04 5.511464e-08 -2.088634e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.707145e-04 5.511464e-08 -3.964805e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.709446e-04 5.511464e-08 -7.055177e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.713439e-04 5.511464e-08 -1.079996e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.720653e-04 5.511464e-08 -1.505052e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.730800e-04 5.511464e-08 -1.810043e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602529e-04 5.511464e-08 -5.287549e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602691e-04 5.511464e-08 -1.077661e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.603144e-04 5.511464e-08 -2.146215e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604249e-04 5.511464e-08 -4.027017e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.606603e-04 5.511464e-08 -7.032229e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.610521e-04 5.511464e-08 -1.068484e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.617631e-04 5.511464e-08 -1.497427e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.627781e-04 5.511464e-08 -1.805649e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565009e-04 5.511464e-08 -5.442856e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565179e-04 5.511464e-08 -1.108131e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565657e-04 5.511464e-08 -2.194085e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.566806e-04 5.511464e-08 -4.082053e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.569219e-04 5.511464e-08 -7.046308e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.573126e-04 5.511464e-08 -1.060310e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.580115e-04 5.511464e-08 -1.485376e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.590197e-04 5.511464e-08 -1.799672e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602551e-04 5.511464e-08 -5.287527e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602713e-04 5.511464e-08 -1.077663e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.603166e-04 5.511464e-08 -2.146243e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.604271e-04 5.511464e-08 -4.027163e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.606625e-04 5.511464e-08 -7.032809e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.610542e-04 5.511464e-08 -1.068663e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.617650e-04 5.511464e-08 -1.498003e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.627799e-04 5.511464e-08 -1.807457e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705507e-04 5.511464e-08 -5.126255e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.705661e-04 5.511464e-08 -1.044449e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.706086e-04 5.511464e-08 -2.088610e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.707126e-04 5.511464e-08 -3.964675e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.709427e-04 5.511464e-08 -7.054647e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.713421e-04 5.511464e-08 -1.079828e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.720636e-04 5.511464e-08 -1.504495e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.730786e-04 5.511464e-08 -1.808282e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602447e-04 5.511464e-08 -5.000301e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602593e-04 5.511464e-08 -1.019510e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.602992e-04 5.511464e-08 -2.051370e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.603994e-04 5.511464e-08 -3.950149e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.606316e-04 5.511464e-08 -7.090371e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.610357e-04 5.511464e-08 -1.081601e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.617562e-04 5.511464e-08 -1.501560e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.627672e-04 5.511464e-08 -1.804079e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565153e-04 5.511464e-08 -4.934030e-08 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565294e-04 5.511464e-08 -1.007299e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.565679e-04 5.511464e-08 -2.036167e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.566670e-04 5.511464e-08 -3.951060e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.569009e-04 5.511464e-08 -7.103670e-07 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.573059e-04 5.511464e-08 -1.081604e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.580260e-04 5.511464e-08 -1.500591e-06 5.511464e-08
+
+TRX_LOOP
+67.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+7.500000e+01 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.590368e-04 5.511464e-08 -1.801861e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922581e-04 5.511464e-08 -4.918262e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922721e-04 5.511464e-08 -1.004836e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.923102e-04 5.511464e-08 -2.034720e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.924093e-04 5.511464e-08 -3.957835e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926443e-04 5.511464e-08 -7.110367e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.930495e-04 5.511464e-08 -1.081643e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.937693e-04 5.511464e-08 -1.500148e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.947790e-04 5.511464e-08 -1.801515e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.971955e-04 5.511464e-08 -4.948205e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972098e-04 5.511464e-08 -1.009514e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972486e-04 5.511464e-08 -2.037857e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.973477e-04 5.511464e-08 -3.949127e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975816e-04 5.511464e-08 -7.097749e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979864e-04 5.511464e-08 -1.080219e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.987054e-04 5.511464e-08 -1.497673e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.997132e-04 5.511464e-08 -1.798144e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.105010e-04 5.511464e-08 -5.000606e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.105156e-04 5.511464e-08 -1.019635e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.105555e-04 5.511464e-08 -2.051860e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.106557e-04 5.511464e-08 -3.951294e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108879e-04 5.511464e-08 -7.091535e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.112920e-04 5.511464e-08 -1.081863e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.120124e-04 5.511464e-08 -1.502296e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.130233e-04 5.511464e-08 -1.805927e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972059e-04 5.511464e-08 -5.051907e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972207e-04 5.511464e-08 -1.030747e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972618e-04 5.511464e-08 -2.070422e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.973644e-04 5.511464e-08 -3.959141e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975959e-04 5.511464e-08 -7.062094e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979965e-04 5.511464e-08 -1.078549e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.987161e-04 5.511464e-08 -1.500177e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.997270e-04 5.511464e-08 -1.802517e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922390e-04 5.511464e-08 -5.090585e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922541e-04 5.511464e-08 -1.038637e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922961e-04 5.511464e-08 -2.082723e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.924001e-04 5.511464e-08 -3.965972e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926319e-04 5.511464e-08 -7.041566e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.930299e-04 5.511464e-08 -1.074725e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.937470e-04 5.511464e-08 -1.496430e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.947550e-04 5.511464e-08 -1.798936e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972080e-04 5.511464e-08 -5.051904e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972228e-04 5.511464e-08 -1.030752e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972639e-04 5.511464e-08 -2.070454e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.973665e-04 5.511464e-08 -3.959280e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975980e-04 5.511464e-08 -7.062623e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979985e-04 5.511464e-08 -1.078712e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.987180e-04 5.511464e-08 -1.500706e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.997286e-04 5.511464e-08 -1.804176e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.104992e-04 5.511464e-08 -5.000620e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.105138e-04 5.511464e-08 -1.019632e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.105537e-04 5.511464e-08 -2.051835e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.106539e-04 5.511464e-08 -3.951173e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.108862e-04 5.511464e-08 -7.091050e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.112902e-04 5.511464e-08 -1.081709e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.120109e-04 5.511464e-08 -1.501785e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.130220e-04 5.511464e-08 -1.804311e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.971971e-04 5.511464e-08 -4.948188e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972114e-04 5.511464e-08 -1.009516e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.972501e-04 5.511464e-08 -2.037879e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.973493e-04 5.511464e-08 -3.949236e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.975831e-04 5.511464e-08 -7.098204e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.979879e-04 5.511464e-08 -1.080367e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.987068e-04 5.511464e-08 -1.498168e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.997143e-04 5.511464e-08 -1.799716e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922549e-04 5.511464e-08 -4.907968e-08 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.922689e-04 5.511464e-08 -1.002626e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.923069e-04 5.511464e-08 -2.030495e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.924058e-04 5.511464e-08 -3.950619e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.926403e-04 5.511464e-08 -7.099038e-07 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.930451e-04 5.511464e-08 -1.079838e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.937638e-04 5.511464e-08 -1.497090e-06 5.511464e-08
+
+TRX_LOOP
+104.500000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.125000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.947711e-04 5.511464e-08 -1.797405e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959449e-04 5.511464e-08 -4.893352e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959588e-04 5.511464e-08 -1.000692e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959964e-04 5.511464e-08 -2.029638e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960954e-04 5.511464e-08 -3.955357e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963304e-04 5.511464e-08 -7.104446e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967353e-04 5.511464e-08 -1.080683e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974546e-04 5.511464e-08 -1.498689e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 -1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984639e-04 5.511464e-08 -1.799020e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008130e-04 5.511464e-08 -4.906513e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008269e-04 5.511464e-08 -1.002292e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008649e-04 5.511464e-08 -2.029907e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009638e-04 5.511464e-08 -3.949310e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.011983e-04 5.511464e-08 -7.096259e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016030e-04 5.511464e-08 -1.079346e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023215e-04 5.511464e-08 -1.496182e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 -1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033288e-04 5.511464e-08 -1.795465e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.139921e-04 5.511464e-08 -4.934168e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140062e-04 5.511464e-08 -1.007284e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140448e-04 5.511464e-08 -2.036258e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.141438e-04 5.511464e-08 -3.950484e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.143776e-04 5.511464e-08 -7.102119e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.147824e-04 5.511464e-08 -1.081510e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.155023e-04 5.511464e-08 -1.500864e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 -7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.165127e-04 5.511464e-08 -1.803255e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008199e-04 5.511464e-08 -4.952700e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008342e-04 5.511464e-08 -1.011153e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008733e-04 5.511464e-08 -2.041139e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009729e-04 5.511464e-08 -3.946126e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012056e-04 5.511464e-08 -7.088475e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016097e-04 5.511464e-08 -1.080209e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023293e-04 5.511464e-08 -1.499175e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 -37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 -3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033394e-04 5.511464e-08 -1.799948e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959304e-04 5.511464e-08 -4.967221e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959447e-04 5.511464e-08 -1.013968e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959842e-04 5.511464e-08 -2.044383e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960843e-04 5.511464e-08 -3.943159e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963165e-04 5.511464e-08 -7.074355e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967197e-04 5.511464e-08 -1.078062e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974377e-04 5.511464e-08 -1.495962e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 0.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 0.000000e+00 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984448e-04 5.511464e-08 -1.796465e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008221e-04 5.511464e-08 -4.952673e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008363e-04 5.511464e-08 -1.011153e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008754e-04 5.511464e-08 -2.041159e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009750e-04 5.511464e-08 -3.946236e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.012077e-04 5.511464e-08 -7.088949e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016118e-04 5.511464e-08 -1.080366e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023312e-04 5.511464e-08 -1.499701e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 37.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 3.750000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033410e-04 5.511464e-08 -1.801609e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.139903e-04 5.511464e-08 -4.934207e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140044e-04 5.511464e-08 -1.007287e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.140429e-04 5.511464e-08 -2.036246e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.141420e-04 5.511464e-08 -3.950392e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.143758e-04 5.511464e-08 -7.101688e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.147807e-04 5.511464e-08 -1.081362e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.155007e-04 5.511464e-08 -1.500356e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 75.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 7.500000e+01 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.165113e-04 5.511464e-08 -1.801636e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008146e-04 5.511464e-08 -4.906489e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008285e-04 5.511464e-08 -1.002292e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.008665e-04 5.511464e-08 -2.029926e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.009654e-04 5.511464e-08 -3.949413e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.011998e-04 5.511464e-08 -7.096704e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.016045e-04 5.511464e-08 -1.079492e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.023228e-04 5.511464e-08 -1.496675e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 112.500000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 1.125000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 5.033299e-04 5.511464e-08 -1.797036e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 400
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959418e-04 5.511464e-08 -4.882935e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 900
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959556e-04 5.511464e-08 -9.984632e-08 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 2100
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.959932e-04 5.511464e-08 -2.025396e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 5000
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.960919e-04 5.511464e-08 -3.948131e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 12000
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.963265e-04 5.511464e-08 -7.093147e-07 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 26000
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.967309e-04 5.511464e-08 -1.078887e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 60000
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.974491e-04 5.511464e-08 -1.495651e-06 5.511464e-08
+
+TRX_LOOP
+142.000000 150.000000 20.000000 1.000000 0.000000 0.000000
+FREQUENCY 140000
+N_RECV 1
+1.500000e+02 1.500000e+02 2.000000e+01 nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan 4.984561e-04 5.511464e-08 -1.794937e-06 5.511464e-08
+
