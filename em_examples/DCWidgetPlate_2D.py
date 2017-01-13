@@ -22,8 +22,8 @@ except Exception, e:
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 # Mesh, mapping can be globals global
-npad = 12
-growrate = 3.
+npad = 15
+growrate = 2.
 cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
