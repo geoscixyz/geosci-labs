@@ -21,90 +21,6 @@ try:
 except Exception, e:
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
-
-def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
-    """
-    Extracts Core Mesh from Global mesh
-
-    :param numpy.ndarray xyzlim: 2D array [ndim x 2]
-    :param BaseMesh mesh: The mesh
-
-    This function ouputs::
-
-        - actind: corresponding boolean index from global to core
-        - meshcore: core SimPEG mesh
-
-    Warning: 1D and 2D has not been tested
-    """
-    if mesh.dim == 1:
-        xyzlim = xyzlim.flatten()
-        xmin, xmax = xyzlim[0], xyzlim[1]
-
-        xind = np.logical_and(mesh.vectorCCx>xmin, mesh.vectorCCx<xmax)
-
-        xc = mesh.vectorCCx[xind]
-
-        hx = mesh.hx[xind]
-
-        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5]
-
-        meshCore = Mesh.TensorMesh([hx, hy], x0=x0)
-
-        actind = (mesh.gridCC[:,0]>xmin) & (mesh.gridCC[:,0]<xmax)
-
-    elif mesh.dim == 2:
-        xmin, xmax = xyzlim[0,0], xyzlim[0,1]
-        ymin, ymax = xyzlim[1,0], xyzlim[1,1]
-
-        xind = np.logical_and(mesh.vectorCCx>xmin, mesh.vectorCCx<xmax)
-        yind = np.logical_and(mesh.vectorCCy>ymin, mesh.vectorCCy<ymax)
-
-        xc = mesh.vectorCCx[xind]
-        zc = mesh.vectorCCy[yind]
-
-        hx = mesh.hx[xind]
-        hy = mesh.hy[yind]
-
-        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5]
-
-        meshCore = Mesh.TensorMesh([hx, hy], x0=x0)
-
-        actind = (mesh.gridCC[:,0]>xmin) & (mesh.gridCC[:,0]<xmax) \
-               & (mesh.gridCC[:,1]>ymin) & (mesh.gridCC[:,1]<ymax) \
-
-    elif mesh.dim == 3:
-        xmin, xmax = xyzlim[0,0], xyzlim[0,1]
-        ymin, ymax = xyzlim[1,0], xyzlim[1,1]
-        zmin, zmax = xyzlim[2,0], xyzlim[2,1]
-
-        xind = np.logical_and(mesh.vectorCCx>xmin, mesh.vectorCCx<xmax)
-        yind = np.logical_and(mesh.vectorCCy>ymin, mesh.vectorCCy<ymax)
-        zind = np.logical_and(mesh.vectorCCz>zmin, mesh.vectorCCz<zmax)
-
-        xc = mesh.vectorCCx[xind]
-        zc = mesh.vectorCCy[yind]
-        zc = mesh.vectorCCz[zind]
-
-        hx = mesh.hx[xind]
-        hy = mesh.hy[yind]
-        hz = mesh.hz[zind]
-
-        x0 = [xc[0]-hx[0]*0.5, zc[0]-hy[0]*0.5, zc[0]-hz[0]*0.5]
-
-        meshCore = Mesh.TensorMesh([hx, hy, hz], x0=x0)
-
-        actind = (mesh.gridCC[:,0]>xmin) & (mesh.gridCC[:,0]<xmax) \
-               & (mesh.gridCC[:,1]>ymin) & (mesh.gridCC[:,1]<ymax) \
-               & (mesh.gridCC[:,2]>zmin) & (mesh.gridCC[:,2]<zmax)
-
-    else:
-        raise(Exception("Not implemented!"))
-
-
-    return actind, meshCore
-
-
-
 # Mesh, mapping can be globals global
 npad = 12
 growrate = 3.
@@ -414,7 +330,6 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
     else:
         ax[0].plot(A,0,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
         ax[0].plot(B,0,'_',markersize = 12, markeredgewidth = 3, color=[0.,0.,1.])
-    # ax[0].set_yscale('log')
     ax[0].set_ylabel('Potential, (V)',fontsize = labelsize)
     ax[0].set_xlabel('x (m)',fontsize = labelsize)
     ax[0].set_xlim(xlim)
@@ -745,20 +660,3 @@ def plate_app():
                 Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
                 )
     return app
-
-    # app = interact(plot_Surface_Potentials,
-    #             survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-    #             dx = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
-    #             dz = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
-    #             xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
-    #             zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
-    #             rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
-    #             rhoplate = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
-    #             rhohalf = FloatSlider(min=0.,max=1e8,step=10., value = 500., continuous_update=False),
-    #             A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
-    #             B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
-    #             M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
-    #             N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
-    #             Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
-    #             Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
-    #             )
