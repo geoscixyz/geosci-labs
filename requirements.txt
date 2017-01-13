@@ -4,5 +4,5 @@ matplotlib
 Pillow
 ipywidgets
 properties[math]
-git+git://github.com/simpeg/simpeg.git@dcip/dev
-git+git://github.com/ubcgif/em_examples.git@VMDCyl
+git+git://github.com/simpeg/simpeg.git@dev
+git+git://github.com/ubcgif/em_examples.git
