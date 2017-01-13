@@ -46,7 +46,7 @@ indy = (mesh.gridFy[:,0]>=xmin) & (mesh.gridFy[:,0]<=xmax) \
 indF = np.concatenate((indx,indy))
 
 
-def plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf):
+def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
     # Create halfspace model
     mhalf = np.log(sighalf*np.ones([mesh.nC,]))
 
@@ -80,7 +80,7 @@ def plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf):
 
 
 
-def getPlateCorners(xc,zc,dx,dz,rotAng):
+def getPlateCorners(xc, zc, dx, dz, rotAng):
 
     # Form rotation matix
     rotMat = np.array([[np.cos(rotAng*(np.pi/180.)), -np.sin(rotAng*(np.pi/180.))],[np.sin(rotAng*(np.pi/180.)), np.cos(rotAng*(np.pi/180.))]])
@@ -91,7 +91,7 @@ def getPlateCorners(xc,zc,dx,dz,rotAng):
     return plateCorners
 
 
-def createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf):
+def createPlateMod(xc, zc, dx, dz, rotAng, sigplate, sighalf):
     # use matplotlib paths to find CC inside of polygon
     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
 
@@ -132,7 +132,7 @@ def createPlateMod(xc,zc,dx,dz,rotAng,sigplate,sighalf):
     return mtrue
 
 
-def get_Surface_Potentials(survey, src,field_obj):
+def get_Surface_Potentials(survey, src, field_obj):
 
     phi = field_obj[src, 'phi']
     CCLoc = mesh.gridCC
@@ -153,7 +153,7 @@ def get_Surface_Potentials(survey, src,field_obj):
     return xSurface,phiSurface,phiScale
 
 
-def sumPlateCharges(xc,zc,dx,dz,rotAng,qSecondary):
+def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
     # plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
     chargeRegionCorners = getPlateCorners(xc,zc,dx+1.,dz+1.,rotAng)
 
