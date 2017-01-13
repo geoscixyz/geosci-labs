@@ -25,6 +25,12 @@ For colormaps (http://matplotlib.org/examples/color/colormaps_reference.html)
 - **physical properties** are plotted with `jet`
 - **charges** are plotted with `RdBu` 
 
+Order of widgets:
+- geometry of survey
+- geomerty target
+- physical properties of target
+- view options
+
 ## For developers
 - when you generate a new notebook, please make sure that the filepath to its location follows the same structure as in [EM GeoSci](http://em.geosci.xyz)
 - add the notebook name and path to theindex (index.ipynb)
