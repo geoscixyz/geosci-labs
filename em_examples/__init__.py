@@ -2,6 +2,10 @@ import CondUtils
 import DCLayers
 import DCsphere
 import DCWidget
+import DC_cylinder
+import DCWidgetPlate_2D
+import DCWidgetPlate2_5D
+import DCWidgetResLayer2_5D
 import MT
 import sphereElectrostatic_example
 import View
