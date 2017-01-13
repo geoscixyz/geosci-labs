@@ -16,6 +16,21 @@ Each notebook has the following structure
 - **App** : interactive visualizations 
 - **Explore** : further questions that can be explored with the app 
 
+## Conventions
+
+For colormaps (http://matplotlib.org/examples/color/colormaps_reference.html)
+- **fields** are plotted with the `viridis`
+- **potentials** are plotted with `viridis` 
+- **sensitivities** are plotted with `viridis` 
+- **physical properties** are plotted with `jet`
+- **charges** are plotted with `RdBu` 
+
+Order of widgets:
+- geometry of survey
+- geomerty target
+- physical properties of target
+- view options
+
 ## For developers
 - when you generate a new notebook, please make sure that the filepath to its location follows the same structure as in [EM GeoSci](http://em.geosci.xyz)
 - add the notebook name and path to theindex (index.ipynb)
