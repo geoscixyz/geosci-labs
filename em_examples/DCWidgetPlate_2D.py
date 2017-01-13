@@ -276,7 +276,7 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
     return rho_a
 
 
-def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,Field,Type):
+def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type):
 
     labelsize = 12.
     ticksize = 10.
@@ -402,7 +402,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
         streamOpts = None
         ind = indCC
 
-        formatter = "$10^{%.1f}$"
+        formatter = "1e%.1f"
         pcolorOpts = {"cmap":"jet_r"}
 
 
@@ -508,7 +508,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhoplate,rhohalf,F
         # formatter = LogFormatter(10, labelOnlyBase=False)
         # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.01)}
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"RdBu"}
+        pcolorOpts = {"cmap":"RdBu_r"}
 
         if Type == 'Total':
             u = total_field[src,'charge']
