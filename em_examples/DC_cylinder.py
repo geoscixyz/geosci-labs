@@ -13,7 +13,9 @@ from SimPEG.EM.Static import DC
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
-from matplotlib.ticker import LogFormatter 
+from matplotlib.ticker import LogFormatter
+from matplotlib.path import Path
+import matplotlib.patches as patches
 
 
 import warnings
@@ -22,7 +24,7 @@ warnings.filterwarnings('ignore') # ignore warnings: only use this once you are 
 try:
     from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
     pass
-except Exception, e:    
+except Exception, e:
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 # Mesh, sigmaMap can be globals global
@@ -36,7 +38,7 @@ circmap = Maps.CircleMap(mesh)
 idmap = Maps.IdentityMap(mesh)
 circmap.slope = 1e16
 sigmaMap = idmap
-dx = 5 
+dx = 5
 xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
 xmin = -40.
@@ -56,10 +58,10 @@ def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
 
     circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
     circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, yc, r]
-    
+
     mhalf = circmap*circhalf
     mtrue = circmap*circtrue
-    
+
     Mx = np.empty(shape=(0, 2))
     Nx = np.empty(shape=(0, 2))
     #rx = DC.Rx.Dipole_ky(Mx,Nx)
@@ -94,6 +96,27 @@ def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
     return mtrue,mhalf, src, total_field, primary_field
 
 
+def getCylinderPoints(xc,zc,r):
+    xLocOrig1 = np.arange(-r,r+r/10.,r/10.)
+    xLocOrig2 = np.arange(r,-r-r/10.,-r/10.)
+    # Top half of cylinder
+    zLoc1 = np.sqrt(-xLocOrig1**2.+r**2.)+zc
+    # Bottom half of cylinder
+    zLoc2 = -np.sqrt(-xLocOrig2**2.+r**2.)+zc
+    # Shift from x = 0 to xc
+    xLoc1 = xLocOrig1 + xc*np.ones_like(xLocOrig1)
+    xLoc2 = xLocOrig2 + xc*np.ones_like(xLocOrig2)
+
+    topHalf = np.vstack([xLoc1,zLoc1]).T
+    topHalf = topHalf[0:-1,:]
+    bottomHalf = np.vstack([xLoc2,zLoc2]).T
+    bottomHalf = bottomHalf[0:-1,:]
+
+    cylinderPoints = np.vstack([topHalf,bottomHalf])
+    cylinderPoints = np.vstack([cylinderPoints,topHalf[0,:]])
+    return cylinderPoints
+
+
 def get_Surface_Potentials(survey, src,field_obj):
 
     phi = field_obj[src, 'phi']
@@ -115,10 +138,61 @@ def get_Surface_Potentials(survey, src,field_obj):
     return xSurface,phiSurface,phiScale
 
 
+def sumCylinderCharges(xc, zc, r, qSecondary):
+    chargeRegionVerts = getCylinderPoints(xc, zc, r+0.5)
+
+    codes = chargeRegionVerts.shape[0]*[Path.LINETO]
+    codes[0] = Path.MOVETO
+    codes[-1] = Path.CLOSEPOLY
+
+    chargeRegionPath = Path(chargeRegionVerts, codes)
+    CCLocs = mesh.gridCC
+    chargeRegionInsideInd = np.where(chargeRegionPath.contains_points(CCLocs))
+
+    plateChargeLocs = CCLocs[chargeRegionInsideInd]
+    plateCharge = qSecondary[chargeRegionInsideInd]
+    posInd = np.where(plateCharge >= 0)
+    negInd = np.where(plateCharge < 0)
+    qPos = Utils.mkvc(plateCharge[posInd])
+    qNeg = Utils.mkvc(plateCharge[negInd])
+
+    qPosLoc = plateChargeLocs[posInd,:][0]
+    qNegLoc = plateChargeLocs[negInd,:][0]
+
+    qPosData = np.vstack([qPosLoc[:,0], qPosLoc[:,1], qPos]).T
+    qNegData = np.vstack([qNegLoc[:,0], qNegLoc[:,1], qNeg]).T
+
+    if qNeg.shape == (0,) or qPos.shape == (0,):
+        qNegAvgLoc = np.r_[-10, -10]
+        qPosAvgLoc = np.r_[+10, -10]
+    else:
+        qNegAvgLoc = np.average(qNegLoc, axis=0, weights=qNeg)
+        qPosAvgLoc = np.average(qPosLoc, axis=0, weights=qPos)
+
+    qPosSum = np.sum(qPos)
+    qNegSum = np.sum(qNeg)
+
+    # # Check things by plotting
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # platePatch = patches.PathPatch(platePath, facecolor='none', lw=2)
+    # ax.add_patch(platePatch)
+    # chargeRegionPatch = patches.PathPatch(chargeRegionPath, facecolor='none', lw=2)
+    # ax.add_patch(chargeRegionPatch)
+    # plt.scatter(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
+    # plt.scatter(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
+    # ax.set_xlim(-15,5)
+    # ax.set_ylim(-25,-5)
+    # plt.axes().set_aspect('equal')
+    # plt.show()
+
+    return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
+
+
 # Inline functions for computing apparent resistivity
-eps = 1e-9 #to stabilize division
-G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
-rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
+# eps = 1e-9 #to stabilize division
+# G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
+# rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 def getSensitivity(survey,A,B,M,N,model):
 
@@ -212,7 +286,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type):
     ax[0].plot(xSurface,phiTotalSurface,color=[0.1,0.5,0.1],linewidth=2)
     ax[0].plot(xSurface,phiPrimSurface ,linestyle='dashed',linewidth=0.5,color='k')
     ax[0].grid(which='both',linestyle='-',linewidth=0.5,color=[0.2,0.2,0.2],alpha=0.5)
-    
+
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         ax[0].plot(A,0,'+',markersize = 12, markeredgewidth = 3, color=[1.,0.,0])
     else:
@@ -247,8 +321,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type):
     ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
 
     #Subplot 2: Fields
-    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
 
     if Field == 'Model':
 
@@ -407,9 +481,31 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type):
 
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
 
+    # Get cylinder outline
+    cylinderPoints = getCylinderPoints(xc,yc,r)
+
+    if(rhocyl != rhohalf):
+        ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
+
+    if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
+        qTotal = total_field[src,'charge']
+        qPrim = primary_field[src,'charge']
+        qSecondary = qTotal - qPrim
+        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,yc,r,qSecondary)
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
+        if(qPosAvgLoc[0] > qNegAvgLoc[0]):
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 0.5)
+        else:
+            xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
+        ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
+        ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
+
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
-    
+
     if(survey == "Dipole-Dipole"):
         ax[1].plot(A,1.,marker = 'v',color='red',markersize= labelsize)
         ax[1].plot(B,1.,marker = 'v',color='blue',markersize= labelsize)
