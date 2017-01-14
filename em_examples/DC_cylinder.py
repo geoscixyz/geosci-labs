@@ -240,8 +240,8 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
 def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type):
 
-    labelsize = 18.
-    ticksize = 16.
+    labelsize = 12.
+    ticksize = 10.
 
     sigcyl = 1./rhocyl
     sighalf = 1./rhohalf
@@ -251,7 +251,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type):
 
     mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc)
 
-    fig, ax = plt.subplots(2,1,figsize=(8*1.5,8.5*1.5),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface, phiScaleTotal = get_Surface_Potentials(survey, src, total_field)
