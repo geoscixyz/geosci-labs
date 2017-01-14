@@ -433,8 +433,9 @@ def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5,
     ntime = 200
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
+    waveform = waveform
 
-    def foo(Component, Sigma, Waveform, Scale):
+    def foo(Component, Sigma, Scale):
         orientation = "z"
         vals = []
 
