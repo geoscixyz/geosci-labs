@@ -22,8 +22,8 @@ except Exception, e:
 
 
 # Mesh, mapping can be globals global
-npad = 12
-growrate = 3.
+npad = 15
+growrate = 2.
 cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
@@ -103,6 +103,8 @@ def addLayer2Mod(zcLayer,dzLayer,mod,sigLayer):
 
     mod[layerInds] = sigLayer
     return mod
+
+
 def getCylinderPoints(xc,zc,r):
     xLocOrig1 = np.arange(-r,r+r/10.,r/10.)
     xLocOrig2 = np.arange(r,-r-r/10.,-r/10.)
@@ -114,7 +116,13 @@ def getCylinderPoints(xc,zc,r):
     xLoc1 = xLocOrig1 + xc*np.ones_like(xLocOrig1)
     xLoc2 = xLocOrig2 + xc*np.ones_like(xLocOrig2)
 
-    cylinderPoints = np.vstack([np.vstack([xLoc1,zLoc1]).T,np.vstack([xLoc2,zLoc2]).T])
+    topHalf = np.vstack([xLoc1,zLoc1]).T
+    topHalf = topHalf[0:-1,:]
+    bottomHalf = np.vstack([xLoc2,zLoc2]).T
+    bottomHalf = bottomHalf[0:-1,:]
+
+    cylinderPoints = np.vstack([topHalf,bottomHalf])
+    cylinderPoints = np.vstack([cylinderPoints,topHalf[0,:]])
     return cylinderPoints
 
 
@@ -155,54 +163,54 @@ def addCylinder2Mod(xc,zc,r,mod,sigCylinder):
     return mod
 
 
-def getPlateCorners(xc, zc, dx, dz, rotAng):
+# def getPlateCorners(xc, zc, dx, dz, rotAng):
 
-    # Form rotation matix
-    rotMat = np.array([[np.cos(rotAng*(np.pi/180.)), -np.sin(rotAng*(np.pi/180.))],[np.sin(rotAng*(np.pi/180.)), np.cos(rotAng*(np.pi/180.))]])
-    originCorners = np.array([[-0.5*dx, 0.5*dz], [0.5*dx, 0.5*dz], [-0.5*dx, -0.5*dz], [0.5*dx, -0.5*dz]])
+#     # Form rotation matix
+#     rotMat = np.array([[np.cos(rotAng*(np.pi/180.)), -np.sin(rotAng*(np.pi/180.))],[np.sin(rotAng*(np.pi/180.)), np.cos(rotAng*(np.pi/180.))]])
+#     originCorners = np.array([[-0.5*dx, 0.5*dz], [0.5*dx, 0.5*dz], [-0.5*dx, -0.5*dz], [0.5*dx, -0.5*dz]])
 
-    rotPlateCorners = np.dot(originCorners,rotMat)
-    plateCorners = rotPlateCorners + np.hstack([np.repeat(xc,4).reshape([4,1]),np.repeat(zc,4).reshape([4,1])])
-    return plateCorners
+#     rotPlateCorners = np.dot(originCorners,rotMat)
+#     plateCorners = rotPlateCorners + np.hstack([np.repeat(xc,4).reshape([4,1]),np.repeat(zc,4).reshape([4,1])])
+#     return plateCorners
 
 
-def addPlate2Mod(xc, zc, dx, dz, rotAng, mod, sigPlate):
-    # use matplotlib paths to find CC inside of polygon
-    plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
+# def addPlate2Mod(xc, zc, dx, dz, rotAng, mod, sigPlate):
+#     # use matplotlib paths to find CC inside of polygon
+#     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
 
-    verts = [
-        (plateCorners[0,:]), # left, top
-        (plateCorners[1,:]), # right, top
-        (plateCorners[3,:]), # right, bottom
-        (plateCorners[2,:]), # left, bottom
-        (plateCorners[0,:]), # left, top (closes polygon)
-        ]
+#     verts = [
+#         (plateCorners[0,:]), # left, top
+#         (plateCorners[1,:]), # right, top
+#         (plateCorners[3,:]), # right, bottom
+#         (plateCorners[2,:]), # left, bottom
+#         (plateCorners[0,:]), # left, top (closes polygon)
+#         ]
 
-    codes = [Path.MOVETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.CLOSEPOLY,
-             ]
+#     codes = [Path.MOVETO,
+#              Path.LINETO,
+#              Path.LINETO,
+#              Path.LINETO,
+#              Path.CLOSEPOLY,
+#              ]
 
-    path = Path(verts, codes)
-    CCLocs = mesh.gridCC
-    insideInd = np.where(path.contains_points(CCLocs))
+#     path = Path(verts, codes)
+#     CCLocs = mesh.gridCC
+#     insideInd = np.where(path.contains_points(CCLocs))
 
-    #Check selected cell centers by plotting
-    # print insideInd
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # patch = patches.PathPatch(path, facecolor='none', lw=2)
-    # ax.add_patch(patch)
-    # plt.scatter(CCLocs[insideInd,0],CCLocs[insideInd,1])
-    # ax.set_xlim(-10,10)
-    # ax.set_ylim(-20,0)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
+#     #Check selected cell centers by plotting
+#     # print insideInd
+#     # fig = plt.figure()
+#     # ax = fig.add_subplot(111)
+#     # patch = patches.PathPatch(path, facecolor='none', lw=2)
+#     # ax.add_patch(patch)
+#     # plt.scatter(CCLocs[insideInd,0],CCLocs[insideInd,1])
+#     # ax.set_xlim(-10,10)
+#     # ax.set_ylim(-20,0)
+#     # plt.axes().set_aspect('equal')
+#     # plt.show()
 
-    mod[insideInd] = sigPlate
-    return mod
+#     mod[insideInd] = sigPlate
+#     return mod
 
 
 def get_Surface_Potentials(survey, src, field_obj):
@@ -226,37 +234,15 @@ def get_Surface_Potentials(survey, src, field_obj):
     return xSurface,phiSurface,phiScale
 
 
-def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
-    # plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
-    chargeRegionCorners = getPlateCorners(xc,zc,dx+1.,dz+1.,rotAng)
+def sumCylinderCharges(xc, zc, r, qSecondary):
+    chargeRegionVerts = getCylinderPoints(xc, zc, r+0.5)
 
-    # plateVerts = [
-    #     (plateCorners[0,:]), # left, top
-    #     (plateCorners[1,:]), # right, top
-    #     (plateCorners[3,:]), # right, bottom
-    #     (plateCorners[2,:]), # left, bottom
-    #     (plateCorners[0,:]), # left, top (closes polygon)
-    #     ]
+    codes = chargeRegionVerts.shape[0]*[Path.LINETO]
+    codes[0] = Path.MOVETO
+    codes[-1] = Path.CLOSEPOLY
 
-    chargeRegionVerts = [
-        (chargeRegionCorners[0,:]), # left, top
-        (chargeRegionCorners[1,:]), # right, top
-        (chargeRegionCorners[3,:]), # right, bottom
-        (chargeRegionCorners[2,:]), # left, bottom
-        (chargeRegionCorners[0,:]), # left, top (closes polygon)
-        ]
-
-    codes = [Path.MOVETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.CLOSEPOLY,
-             ]
-
-    # platePath = Path(plateVerts, codes)
     chargeRegionPath = Path(chargeRegionVerts, codes)
     CCLocs = mesh.gridCC
-    # plateInsideInd = np.where(platePath.contains_points(CCLocs))
     chargeRegionInsideInd = np.where(chargeRegionPath.contains_points(CCLocs))
 
     plateChargeLocs = CCLocs[chargeRegionInsideInd]
@@ -362,6 +348,9 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     # rhoLayer = np.exp(logRhoLayer)
     sigLayer = 1./rhoLayer
     sigHalf = 1./rhoHalf
+
+    if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
+        B = []
 
     mFull, mHalf,src, primary_field, total_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
 
@@ -590,6 +579,22 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     if(rhoTarget != rhoHalf):
         ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
 
+    if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
+        qTotal = total_field[src,'charge']
+        qPrim = primary_field[src,'charge']
+        qSecondary = qTotal - qPrim
+        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,zc,r,qSecondary)
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
+        if(qPosAvgLoc[0] > qNegAvgLoc[0]):
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 0.5)
+        else:
+            xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
+        ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
+        ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
+
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
 
@@ -646,7 +651,9 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
-    ax[1].set_aspect('equal')
+    ax[1].set_xlim([-40.,40.])
+    ax[1].set_ylim([-40.,5.])
+    # ax[1].set_aspect('equal')
 
     # plt.show()
     # return fig, ax
