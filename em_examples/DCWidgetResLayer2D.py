@@ -354,7 +354,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
 
     mFull, mHalf,src, primary_field, total_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
 
-    fig, ax = plt.subplots(2,1,figsize=(9*1.5,7*1.5),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface, phiScaleTotal = get_Surface_Potentials(survey, src, total_field)
@@ -573,7 +573,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
             u = uTotal - uPrim
 
     dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
-        # Get plate corners
+
+    # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc,zc,r)
 
     if(rhoTarget != rhoHalf):
@@ -653,7 +654,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
-    # ax[1].set_aspect('equal')
+    ax[1].set_aspect('equal')
 
     # plt.show()
     # return fig, ax
