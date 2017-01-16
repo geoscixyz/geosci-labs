@@ -236,7 +236,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     txtsp = 1
 
     xytextM = (M+0.5, np.max([np.min([VM, ylim.max()]), ylim.min()])+0.5)
-    xytextN = (N+0.5, np.max([np.min([VN, ylim.max()]), -ylim.min()])+0.5)
+    xytextN = (N+0.5, np.max([np.min([VN, ylim.max()]), ylim.min()])+0.5)
 
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
@@ -244,9 +244,9 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM, fontsize = 14)
     ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN, fontsize = 14)
 
-#     ax[0].plot(np.r_[M, N], np.ones(2)*VN, color='k')
-#     ax[0].plot(np.r_[M, M], np.r_[VM, VN], color='k')
-#     ax[0].annotate('%2.1e'%(VM-VN) , xy=(M, (VM+VN)/2), xytext=(M-9, (VM+VN)/2.), fontsize = 14)
+    # ax[0].plot(np.r_[M, N], np.ones(2)*VN, color='k')
+    # ax[0].plot(np.r_[M, M], np.r_[VM, VN], color='k')
+    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M, (VM+VN)/2), xytext=(M-9, (VM+VN)/2.), fontsize = 14)
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
     ax[0].text(x.max()+1, ylim.max()-0.1*ylim.max(), '$\\rho_a$ = %2.2f'%(rho_a(VM, VN, A, B, M, N)),
