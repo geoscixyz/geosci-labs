@@ -289,7 +289,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
 
     mtrue, mhalf,src, primary_field, total_field = plate_fields(A,B,dx,dz,xc,zc,rotAng,sigplate,sighalf)
 
-    fig, ax = plt.subplots(2,1,figsize=(9*1.5,7*1.5),sharex=True)
+    fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
 
     xSurface, phiTotalSurface, phiScaleTotal = get_Surface_Potentials(survey, src, total_field)
@@ -578,10 +578,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
         ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
         ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
 
-
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
-
 
     if(survey == "Dipole-Dipole"):
         ax[1].plot(A,1.,marker = 'v',color='red',markersize= labelsize)
@@ -637,7 +635,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
-    # ax[1].set_aspect('equal')
+    ax[1].set_aspect('equal')
     # plt.show()
     # return fig, ax
 

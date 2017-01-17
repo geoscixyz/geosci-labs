@@ -580,6 +580,13 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     if(rhoTarget != rhoHalf):
         ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
 
+    if(rhoLayer != rhoHalf):
+        layerX = np.arange(xmin,xmax+1)
+        layerTopY = (zcLayer + dzLayer/2.)*np.ones_like(layerX)
+        layerBottomY = (zcLayer - dzLayer/2.)*np.ones_like(layerX)
+        ax[1].plot(layerX,layerTopY, linestyle = 'dashed', color='k')
+        ax[1].plot(layerX,layerBottomY, linestyle = 'dashed', color='k')
+
     if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
         qTotal = total_field[src,'charge']
         qPrim = primary_field[src,'charge']
@@ -663,8 +670,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
 def ResLayer_app():
     app = interact(plot_Surface_Potentials,
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$dz_{layer}$"),
-                dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dx_{layer}$"),
+                zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$zc_{layer}$"),
+                dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dz_{layer}$"),
                 rhoLayer = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
