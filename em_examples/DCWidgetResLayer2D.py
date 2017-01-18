@@ -9,6 +9,7 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
+import copy
 
 
 import warnings
@@ -21,15 +22,15 @@ except Exception, e:
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
-# Mesh, mapping can be globals global
+# Mesh, sigmaMap can be globals global
 npad = 15
 growrate = 2.
 cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-expmap = Maps.ExpMap(mesh)
-mapping = expmap
+idmap = Maps.IdentityMap(mesh)
+sigmaMap = idmap
 dx = 5
 xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
@@ -48,16 +49,12 @@ indF = np.concatenate((indx,indy))
 
 def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     # Create halfspace model
-    halfspaceMod = sigHalf*np.ones([mesh.nC,])
-    mHalf = np.log(halfspaceMod)
+    mhalf = sigHalf*np.ones([mesh.nC,])
     # Add layer to model
-    LayerMod = addLayer2Mod(zcLayer,dzLayer,halfspaceMod,sigLayer)
-    mLayer = np.log(LayerMod)
-
+    mLayer = addLayer2Mod(zcLayer,dzLayer,mhalf,sigLayer)
     # Add plate or cylinder
     # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
-    fullMod = addCylinder2Mod(xc,zc,r,LayerMod,sigTarget)
-    mFull = np.log(fullMod)
+    mtrue = addCylinder2Mod(xc,zc,r,mLayer,sigTarget)
 
     Mx = np.empty(shape=(0, 2))
     Nx = np.empty(shape=(0, 2))
@@ -67,23 +64,25 @@ def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     survey = DC.Survey([src])
     survey_prim = DC.Survey([src])
 
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
+    problem_prim = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
     problem_prim.pair(survey_prim)
 
-    primary_field = problem_prim.fields(mHalf)
+    primary_field = problem_prim.fields(mhalf)
 
-    total_field = problem.fields(mFull)
+    total_field = problem.fields(mtrue)
 
-    return mFull,mHalf, src, primary_field, total_field
+    return mtrue,mhalf, src, primary_field, total_field
 
 
-def addLayer2Mod(zcLayer,dzLayer,mod,sigLayer):
+def addLayer2Mod(zcLayer,dzLayer,modd,sigLayer):
 
     CCLocs = mesh.gridCC
+    mod = copy.copy(modd)
+
 
     zmax = zcLayer + dzLayer/2.
     zmin = zcLayer - dzLayer/2.
@@ -118,18 +117,19 @@ def getCylinderPoints(xc,zc,r):
 
     topHalf = np.vstack([xLoc1,zLoc1]).T
     topHalf = topHalf[0:-1,:]
-    bottomHalf = np.vstack([xLoc2,zLoc2]).T
-    bottomHalf = bottomHalf[0:-1,:]
+    bottomhalf = np.vstack([xLoc2,zLoc2]).T
+    bottomhalf = bottomhalf[0:-1,:]
 
-    cylinderPoints = np.vstack([topHalf,bottomHalf])
+    cylinderPoints = np.vstack([topHalf,bottomhalf])
     cylinderPoints = np.vstack([cylinderPoints,topHalf[0,:]])
     return cylinderPoints
 
 
-def addCylinder2Mod(xc,zc,r,mod,sigCylinder):
+def addCylinder2Mod(xc,zc,r,modd,sigCylinder):
 
     # Get points for cylinder outline
     cylinderPoints = getCylinderPoints(xc,zc,r)
+    mod = copy.copy(modd)
 
     verts = []
     codes = []
@@ -300,12 +300,8 @@ def getSensitivity(survey, A, B, M, N, model):
         rx = DC.Rx.Pole(np.r_[M,0.])
         src = DC.Src.Pole([rx], np.r_[A,0.])
 
-    # Model mappings
-    expmap = Maps.ExpMap(mesh)
-    mapping = expmap
-
     survey = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
     problem.Solver = SolverLU
     problem.pair(survey)
     fieldObj = problem.fields(model)
@@ -352,7 +348,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
 
-    mFull, mHalf,src, primary_field, total_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
+    mtrue, mhalf,src, primary_field, total_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
 
     fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
@@ -435,13 +431,13 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
 
 
         if Type == 'Total':
-            u = 1./(mapping*mFull)
+            u = 1./(sigmaMap*mtrue)
             u = np.log10(u)
         elif Type == 'Primary':
-            u = 1./(mapping*mHalf)
+            u = 1./(sigmaMap*mhalf)
             u = np.log10(u)
         elif Type == 'Secondary':
-            u = 1./(mapping*mFull) - 1./(mapping*mHalf)
+            u = 1./(sigmaMap*mtrue) - 1./(sigmaMap*mhalf)
             formatter = "%.1e"
             pcolorOpts = {"cmap":"jet_r"}
 
@@ -672,17 +668,17 @@ def ResLayer_app():
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
                 zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$zc_{layer}$"),
                 dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dz_{layer}$"),
-                rhoLayer = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
+                rhoLayer = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Layer}$'),
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
                 r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
-                rhoHalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
-                rhoTarget = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_3$'),
+                rhoHalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Half}$'),
+                rhoTarget = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Cyl}$'),
                 A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
                 B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
                 N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
-                Field = ToggleButtons(options =['Model','Potential','E','J','Charge'],value='Model'),
+                Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
                 Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
                 )
     return app
