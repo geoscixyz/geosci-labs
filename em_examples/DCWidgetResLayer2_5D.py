@@ -6,7 +6,6 @@
 #warnings.filterwarnings('ignore')
 
 from SimPEG import Mesh, Maps, SolverLU, Utils
-import SimPEG.Utils as Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
 from SimPEG.EM.Static import DC
