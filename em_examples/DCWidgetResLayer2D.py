@@ -336,7 +336,7 @@ def calculateRhoA(survey, VM, VN, A, B, M, N):
 # rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 
-def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLayer,rhoTarget,Field,Type):
+def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLayer,rhoTarget,Field,Type,Scale):
     labelsize = 12.
     ticksize = 10.
 
@@ -426,20 +426,20 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
         streamOpts = None
         ind = indCC
 
-        formatter = "1e%.1f"
+        formatter = "%.1e"
         pcolorOpts = {"cmap":"jet_r"}
-
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"jet_r"}
 
         if Type == 'Total':
             u = 1./(sigmaMap*mtrue)
-            u = np.log10(u)
         elif Type == 'Primary':
             u = 1./(sigmaMap*mhalf)
-            u = np.log10(u)
         elif Type == 'Secondary':
             u = 1./(sigmaMap*mtrue) - 1./(sigmaMap*mhalf)
-            formatter = "%.1e"
-            pcolorOpts = {"cmap":"jet_r"}
+            if Scale == 'Log':
+                linthresh = 10.
+                pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"jet_r"}
 
     elif Field == 'Potential':
 
@@ -451,6 +451,9 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
 
         formatter = "%.1e"
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            linthresh = 10.
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"viridis"}
 
         if Type == 'Total':
             # formatter = LogFormatter(10, labelOnlyBase=False)
@@ -480,10 +483,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
         streamOpts = {'color':'w'}
         ind = indF
 
-        # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
-        formatter = "%.1e"
+         #formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"viridis"}
+        formatter = "%.1e"
 
         if Type == 'Total':
             u = total_field[src,'e']
@@ -504,10 +508,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
         streamOpts = {'color':'w'}
         ind = indF
 
-        # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-4, linscale=0.01)}
-        formatter = "%.1e"
+         #formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"viridis"}
+        formatter = "%.1e"
 
 
         if Type == 'Total':
@@ -530,9 +535,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
         ind = indCC
 
         # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-13, linscale=0.01)}
-        formatter = "%.1e"
         pcolorOpts = {"cmap":"RdBu_r"}
+        if Scale == 'Log':
+            linthresh = 1e-12
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"RdBu_r"}
+        formatter = "%.1e"
 
 
         if Type == 'Total':
@@ -554,8 +561,15 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
         streamOpts = None
         ind = indCC
 
-        formatter = "%.1e"
+        # formatter = None
+        # pcolorOpts = {"cmap":"viridis"}
+        # formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            linthresh =1.
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"viridis"}
+        # formatter = formatter = "$10^{%.1f}$"
+        formatter = "%.1e"
 
         if Type == 'Total':
             u = getSensitivity(survey,A,B,M,N,mtrue)
@@ -568,7 +582,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
             uPrim = getSensitivity(survey,A,B,M,N,mhalf)
             u = uTotal - uPrim
 
-    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
+    if Scale == 'Log':
+        eps = 1e-16
+    else:
+        eps = 0.
+    dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc,zc,r)
@@ -652,7 +670,26 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
-    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
+    if Scale == 'Log':
+        
+        if (Field=='E') or (Field == 'J'):
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
+        
+        elif (Field == 'Model'):
+            
+            if (Type == 'Secondary'):
+                cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
+            else:
+                cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
+
+        else:
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[-1.*np.logspace(np.log10(-vmin-eps), np.log10(linthresh), 3)[:-1],0.,np.logspace(np.log10(linthresh), np.log10(vmax), 3)[1:]])
+    else:
+        if (Field == 'Model') and (Type == 'Secondary'):
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
+        else:
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
+    
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
@@ -679,7 +716,8 @@ def ResLayer_app():
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
                 N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
                 Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
-                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
+                Scale = ToggleButtons(options =['Linear','Log'],value='Linear')
                 )
     return app
 
