@@ -347,8 +347,6 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
                 linthresh = 10.
                 pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"jet_r"}
 
-
-
     elif Field == 'Potential':
 
         label = 'Potential (V)'
