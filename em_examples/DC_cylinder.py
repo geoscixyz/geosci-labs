@@ -209,10 +209,10 @@ def getSensitivity(survey,A,B,M,N,model):
         rx = DC.Rx.Pole(np.r_[M,0.])
         src = DC.Src.Pole([rx], np.r_[A,0.])
 
-    survey = DC.Survey([src])
+    Srv = DC.Survey([src])
     problem = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
     problem.Solver = SolverLU
-    problem.pair(survey)
+    problem.pair(Srv)
     fieldObj = problem.fields(model)
 
     J = problem.Jtvec(model, np.array([1.]), f=fieldObj)
@@ -581,8 +581,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
                 cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
 
         else:
-            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[-1.*np.logspace(np.log10(-vmin+eps), np.log10(linthresh), 3)[:-1],0.,np.logspace(np.log10(linthresh), np.log10(vmax), 3)[1:]])
-    
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[-1.*np.logspace(np.log10(-vmin-eps), np.log10(linthresh), 3)[:-1],0.,np.logspace(np.log10(linthresh), np.log10(vmax), 3)[1:]])
     else:
         if (Field == 'Model') and (Type == 'Secondary'):
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])

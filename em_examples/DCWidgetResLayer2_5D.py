@@ -35,10 +35,10 @@ cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-idmap = Maps.IdentityMap(mesh)
+expmap = Maps.ExpMap(mesh)
 # actmap = Maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
-sigmaMap = idmap
-# sigmaMap = Maps.IdentityMap(mesh)
+mapping = expmap
+# mapping = Maps.IdentityMap(mesh)
 dx = 5 
 xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
@@ -57,12 +57,16 @@ indF = np.concatenate((indx,indy))
 
 def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     # Create halfspace model
-    mHalf = sigHalf*np.ones([mesh.nC,])
+    halfspaceMod = sigHalf*np.ones([mesh.nC,])
+    mhalf = np.log(halfspaceMod)
     # Add layer to model
-    mLayer = addLayer2Mod(zcLayer,dzLayer,mHalf,sigLayer)
+    LayerMod = addLayer2Mod(zcLayer,dzLayer,halfspaceMod,sigLayer)
+    mLayer = np.log(LayerMod)
+
     # Add plate or cylinder
     # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
-    mFull = addCylinder2Mod(xc,zc,r,mLayer,sigTarget)
+    fullMod = addCylinder2Mod(xc,zc,r,LayerMod,sigTarget)
+    mtrue = np.log(fullMod)
     
     Mx =  mesh.gridCC
     # Nx = np.empty(shape=(mesh.nC, 2))
@@ -74,10 +78,10 @@ def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     # survey = DC.Survey([src])
     # survey_prim = DC.Survey([src])
     survey_prim = DC.Survey_ky([src])
-    #problem = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
-    problem = DC.Problem2D_CC(mesh, sigmaMap = sigmaMap)
-    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
-    problem_prim = DC.Problem2D_CC(mesh, sigmaMap = sigmaMap)
+    #problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
+    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem_prim = DC.Problem2D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
@@ -88,25 +92,24 @@ def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     cellGrad = mesh.cellGrad
     faceDiv = mesh.faceDiv
 
-    phi_primary = survey_prim.dpred(mHalf)
+    phi_primary = survey_prim.dpred(mhalf)
     e_primary = -cellGrad*phi_primary
     j_primary = problem_prim.MfRhoI*problem_prim.Grad*phi_primary
     q_primary = epsilon_0*problem_prim.Vol*(faceDiv*e_primary)
     primary_field = {'phi': phi_primary, 'e': e_primary, 'j': j_primary, 'q': q_primary}
 
-    phi_total = survey.dpred(mFull)
+    phi_total = survey.dpred(mtrue)
     e_total = -cellGrad*phi_total
     j_total = problem.MfRhoI*problem.Grad*phi_total
     q_total = epsilon_0*problem.Vol*(faceDiv*e_total)
     total_field = {'phi': phi_total, 'e': e_total, 'j': j_total, 'q': q_total}
 
-    return mFull,mHalf, src, primary_field, total_field
+    return mtrue,mhalf, src, primary_field, total_field
 
 
-def addLayer2Mod(zcLayer,dzLayer,modd,sigLayer):
+def addLayer2Mod(zcLayer,dzLayer,mod,sigLayer):
 
     CCLocs = mesh.gridCC
-    mod = copy.copy(modd)
 
     zmax = zcLayer + dzLayer/2.
     zmin = zcLayer - dzLayer/2.
@@ -322,7 +325,7 @@ def getSensitivity(survey,A,B,M,N,model):
         src = DC.Src.Pole([rx], np.r_[A,0.])
 
     survey = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap = sigmaMap)
+    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem.pair(survey)
     fieldObj = problem.fields(model)
@@ -350,19 +353,19 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
     return rho_a
 
-def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhocyl,Field,Type):
+def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field,Type,Scale):
 
     labelsize = 12.
     ticksize = 10.
 
-    sigTarget = 1./rhocyl
-    sigLayer = 1./rholayer
-    sigHalf = 1./rhohalf
-
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
 
-    mtrue, mhalf, src, total_field, primary_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
+    sigTarget = 1./rhoTarget
+    sigLayer = 1./rholayer
+    sigHalf = 1./rhohalf
+
+    mtrue, mhalf,src, primary_field, total_field = model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf)
 
     fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
@@ -442,20 +445,20 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
         streamOpts = None
         ind = indCC
 
-        formatter = "1e%.1f"
+        formatter = "%.1e"
         pcolorOpts = {"cmap":"jet_r"}
-
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"jet_r"}
 
         if Type == 'Total':
-            u = 1./(mtrue)
-            u = np.log10(u)
+            u = 1./(mapping*mtrue)
         elif Type == 'Primary':
-            u = 1./(mhalf)
-            u = np.log10(u)
+            u = 1./(mapping*mhalf)
         elif Type == 'Secondary':
-            u = 1./(mtrue) - 1./(mhalf)
-            formatter = "%.1e"
-            pcolorOpts = {"cmap":"jet_r"}
+            u = 1./(mapping*mtrue) - 1./(mapping*mhalf)
+            if Scale == 'Log':
+                linthresh = 10.
+                pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"jet_r"}
 
 
     elif Field == 'Potential':
@@ -468,6 +471,9 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
 
         formatter = "%.1e"
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            linthresh = 10.
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"viridis"}
 
         if Type == 'Total':
             # formatter = LogFormatter(10, labelOnlyBase=False)
@@ -497,10 +503,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
         streamOpts = {'color':'w'}
         ind = indF
 
-        # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
-        formatter = "%.1e"
+        #formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"viridis"}
+        formatter = "%.1e"
 
         if Type == 'Total':
             u = total_field['e']
@@ -521,10 +528,12 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
         streamOpts = {'color':'w'}
         ind = indF
 
-        # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
-        formatter = "%.1e"
+        #formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            pcolorOpts = {'norm':matplotlib.colors.LogNorm(),"cmap":"viridis"}
+        formatter = "%.1e"
+
 
         if Type == 'Total':
             u = total_field['j']
@@ -546,9 +555,11 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
         ind = indCC
 
         # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.01)}
-        formatter = "%.1e"
         pcolorOpts = {"cmap":"RdBu_r"}
+        if Scale == 'Log':
+            linthresh = 1e-12
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"RdBu_r"}
+        formatter = "%.1e"
 
         if Type == 'Total':
             u = total_field['q']
@@ -572,10 +583,12 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
         # formatter = None
         # pcolorOpts = {"cmap":"viridis"}
         # formatter = LogFormatter(10, labelOnlyBase=False)
-        # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-2, linscale=0.01)}
+        pcolorOpts = {"cmap":"viridis"}
+        if Scale == 'Log':
+            linthresh =1e-4
+            pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2),"cmap":"viridis"}
         # formatter = formatter = "$10^{%.1f}$"
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"viridis"}
 
         if Type == 'Total':
             u = getSensitivity(survey,A,B,M,N,mtrue)
@@ -589,29 +602,33 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
             u = uTotal - uPrim
         # u = np.log10(abs(u))
 
-    dat = meshcore.plotImage(u[ind], vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
+    if Scale == 'Log':
+        eps = 1e-16
+    else:
+        eps = 0.
+    dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
     
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc,zc,r)
 
-    if(rhocyl != rhohalf):
+    if(rhoTarget != rhohalf):
         ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
 
-    # if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
-    #     qTotal = total_field['q']
-    #     qPrim = primary_field['q']
-    #     qSecondary = qTotal - qPrim
-    #     qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,zc,r,qSecondary)
-    #     ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
-    #     ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
-    #     if(qPosAvgLoc[0] > qNegAvgLoc[0]):
-    #         xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
-    #         xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 0.5)
-    #     else:
-    #         xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 0.5)
-    #         xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
-    #     ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
-    #     ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
+    if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
+        qTotal = total_field['q']
+        qPrim = primary_field['q']
+        qSecondary = qTotal - qPrim
+        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,zc,r,qSecondary)
+        ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
+        ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
+        if(qPosAvgLoc[0] > qNegAvgLoc[0]):
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 0.5)
+        else:
+            xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 0.5)
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
+        ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
+        ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
 
     ax[1].set_xlabel('x (m)', fontsize= labelsize)
     ax[1].set_ylabel('z (m)', fontsize= labelsize)
@@ -665,7 +682,25 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
-    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
+    if Scale == 'Log':
+        
+        if (Field=='E') or (Field == 'J'):
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
+        
+        elif (Field == 'Model'):
+            
+            if (Type == 'Secondary'):
+                cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
+            else:
+                cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
+
+        else:
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[-1.*np.logspace(np.log10(-vmin-eps), np.log10(linthresh), 3)[:-1],0.,np.logspace(np.log10(linthresh), np.log10(vmax), 3)[1:]])
+    else:
+        if (Field == 'Model') and (Type == 'Secondary'):
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
+        else:
+            cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
     #t_logloc = matplotlib.ticker.LogLocator(base=10.0, subs=[1.0,2.], numdecs=4, numticks=8)
     #tick_locator = matplotlib.ticker.SymmetricalLogLocator(t_logloc)
     #cb.locator = tick_locator
@@ -687,14 +722,15 @@ def ResLayer_app():
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
                 r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
-                rhocyl = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Cyl}$'),
+                rhoTarget = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Cyl}$'),
                 rhohalf = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Half}$'),
                 A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
                 B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
                 M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
                 N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
                 Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
-                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
+                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
+                Scale = ToggleButtons(options =['Linear','Log'],value='Linear')
                 )
     return app
 

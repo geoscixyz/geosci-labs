@@ -427,7 +427,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
         ind = indCC
 
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"viridis"}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1),"cmap":"viridis"}
 
         if Type == 'Total':
             # formatter = LogFormatter(10, labelOnlyBase=False)
@@ -460,7 +460,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
         # formatter = LogFormatter(10, labelOnlyBase=False)
         # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"viridis"}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1),"cmap":"viridis"}
 
         if Type == 'Total':
             u = total_field[src,'e']
@@ -484,7 +484,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
         # formatter = LogFormatter(10, labelOnlyBase=False)
         # pcolorOpts = {'norm':matplotlib.colors.LogNorm()}
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"viridis"}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1),"cmap":"viridis"}
 
         if Type == 'Total':
             u = total_field[src,'j']
@@ -508,7 +508,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
         # formatter = LogFormatter(10, labelOnlyBase=False)
         # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=1e-11, linscale=0.01)}
         formatter = "%.1e"
-        pcolorOpts = {"cmap":"RdBu_r"}
+        pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1),"cmap":"RdBu_r"}
 
         if Type == 'Total':
             u = total_field[src,'charge']
@@ -630,7 +630,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
     cbar_ax = fig.add_axes([0.8, 0.05, 0.08, 0.5])
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
-    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
+    cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 2))
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])
