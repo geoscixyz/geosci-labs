@@ -58,7 +58,10 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
     # Nx = np.empty(shape=(mesh.nC, 2))
     rx = DC.Rx.Pole_ky(Mx)
     # rx = DC.Rx.Dipole(Mx,Nx)
-    src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
+    if(B == []):
+        src = DC.Src.Pole([rx], np.r_[A,0.])
+    else:
+        src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
     # src = DC.Src.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
     survey = DC.Survey_ky([src])
     # survey = DC.Survey([src])
