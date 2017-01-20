@@ -357,7 +357,7 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
     return rho_a
 
-def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field,Type,Scale):
+def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field,Type,Scale):
 
     labelsize = 12.
     ticksize = 10.
@@ -725,7 +725,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
 
 
 def ResLayer_app():
-    app = interact(plot_Surface_Potentials,
+    app = interact(PLOT,
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
                 zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False,description='$zc_{layer}$'),
                 dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False,description='$dz_{layer}$'),
@@ -741,7 +741,8 @@ def ResLayer_app():
                 N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
                 Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
                 Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
-                Scale = ToggleButtons(options =['Linear','Log'],value='Linear')
+                Scale = ToggleButtons(options =['Linear','Log'],value='Linear'),
+                __manual = True
                 )
     return app
 
