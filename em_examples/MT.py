@@ -400,9 +400,9 @@ def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenvelope,PlotEnvelope):
     #plt.show()
 
 #Interactive MT for Notebook
-def PlotAppRes3Layers_wrapper(h1,h2,rhol1,rhol2,rhol3,mul1,mul2,mul3,epsl1,epsl2,epsl3,PlotEnvelope,F_Envelope):
+def PlotAppRes3Layers_wrapper(fmin,fmax,nbdata,h1,h2,rhol1,rhol2,rhol3,mul1,mul2,mul3,epsl1,epsl2,epsl3,PlotEnvelope,F_Envelope):
 
-    frangn=frange(-5,5,100.)
+    frangn=frange(np.log10(fmin),np.log10(fmax),nbdata)
     sig3= np.array([0.,0.001,0.1, 0.001])
     thick3 = np.array([120000.,50.,50.])
     eps3=np.array([1.,1.,1.,1])
@@ -428,6 +428,9 @@ def PlotAppRes3Layers_wrapper(h1,h2,rhol1,rhol2,rhol3,mul1,mul2,mul3,epsl1,epsl2
 
 def MT1D_app():
     app = interact(PlotAppRes3Layers_wrapper,
+        fmin = FloatText(min=1e-5,max=1e5, value = 1e-5, continuous_update=False),
+        fmax = FloatText(min=1e-5,max=1e5, value = 1e5, continuous_update=False),
+        nbdata = IntSlider(min =10,max=100,value = 100, step =10, continuous_update=False),
         h1=FloatSlider(min=0.,max=10000.,step=50.,value=500., continuous_update=False),
         h2=FloatSlider(min=0.,max=10000.,step=50.,value=1000., continuous_update=False),
         rhol1=FloatText(min=1e-8,max=1e8, value = 100., continuous_update=False,description='$\\rho_1$'),
@@ -440,7 +443,8 @@ def MT1D_app():
         epsl2=FloatSlider(min=1.,max=80.,step=1,value=1., continuous_update=False,description='$\\varepsilon_2$'),
         epsl3=FloatSlider(min=1.,max=80.,step=1.,value=1., continuous_update=False,description='$\\varepsilon_3$'),
         PlotEnvelope=ToggleButton(options =True, description='Plot Envelope fields'),
-        F_Envelope=FloatText(min = 1e-5,max=1e5,value=1e4, continuous_update=False, description='F')
+        F_Envelope=FloatText(min = 1e-5,max=1e5,value=1e4, continuous_update=False, description='F'),
+        #__manual = True
         )
     return app
 
