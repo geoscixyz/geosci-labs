@@ -238,7 +238,7 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
 
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
-
+# The only thing we need to make it work is a 2.5D field object in SimPEG
 def getSensitivity(survey,A,B,M,N,model):
 
     if(survey == "Dipole-Dipole"):
@@ -254,16 +254,15 @@ def getSensitivity(survey,A,B,M,N,model):
         rx = DC.Rx.Pole_ky(np.r_[M,0.])
         src = DC.Src.Pole([rx], np.r_[A,0.])
 
-    Srv = DC.Survey_ky([src])
+    survey = DC.Survey_ky([src])
     problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
-    problem.pair(Srv)
+    problem.pair(survey)
     fieldObj = problem.fields(model)
 
     J = problem.Jtvec(model, np.array([1.]), f=fieldObj)
 
     return J
-
 
 def calculateRhoA(survey,VM,VN,A,B,M,N):
 

@@ -309,23 +309,24 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
+# The only thing we need to make it work is a 2.5D field object in SimPEG
 def getSensitivity(survey,A,B,M,N,model):
 
     if(survey == "Dipole-Dipole"):
-        rx = DC.Rx.Dipole(np.r_[M,0.], np.r_[N,0.])
+        rx = DC.Rx.Dipole_ky(np.r_[M,0.], np.r_[N,0.])
         src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
     elif(survey == "Pole-Dipole"):
-        rx = DC.Rx.Dipole(np.r_[M,0.], np.r_[N,0.])
+        rx = DC.Rx.Dipole_ky(np.r_[M,0.], np.r_[N,0.])
         src = DC.Src.Pole([rx], np.r_[A,0.])
     elif(survey == "Dipole-Pole"):
-        rx = DC.Rx.Pole(np.r_[M,0.])
+        rx = DC.Rx.Pole_ky(np.r_[M,0.])
         src = DC.Src.Dipole([rx], np.r_[A,0.], np.r_[B,0.])
     elif(survey == "Pole-Pole"):
-        rx = DC.Rx.Pole(np.r_[M,0.])
+        rx = DC.Rx.Pole_ky(np.r_[M,0.])
         src = DC.Src.Pole([rx], np.r_[A,0.])
 
-    survey = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    survey = DC.Survey_ky([src])
+    problem = DC.Problem2D_CC(mesh, sigmaMap = mapping)
     problem.Solver = SolverLU
     problem.pair(survey)
     fieldObj = problem.fields(model)
