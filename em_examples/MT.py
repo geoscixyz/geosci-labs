@@ -344,7 +344,7 @@ def PlotAppRes(F,H,sig,chg,taux,c,mu,eps,n,fenvelope,PlotEnvelope):
     ax[0].scatter(F,Res,color='black')
     ax[0].set_xscale('Log')
     ax[0].set_yscale('Log')
-    ax[0].set_ylim([10.**(np.floor(np.log10(Res.min()))-1.),10.**(np.floor(np.log10(Res.max()))+1.)])
+    ax[0].set_ylim([10.**(np.round(np.log10(Res.min()))-1.),10.**(np.round(np.log10(Res.max()))+1.)])
     ax[0].set_xlim([F.max(),F.min()])
     ax[0].set_ylabel('Apparent Resistivity (Ohm-m)',fontsize=16.,color="black")
     ax[0].set_xlabel('Frequency (Hz)',fontsize=16.)
