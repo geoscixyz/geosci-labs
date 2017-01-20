@@ -614,6 +614,13 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rhola
     if(rhoTarget != rhohalf):
         ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
 
+    if(rholayer != rhohalf):
+        layerX = np.arange(xmin,xmax+1)
+        layerTopY = (zcLayer + dzLayer/2.)*np.ones_like(layerX)
+        layerBottomY = (zcLayer - dzLayer/2.)*np.ones_like(layerX)
+        ax[1].plot(layerX,layerTopY, linestyle = 'dashed', color='k')
+        ax[1].plot(layerX,layerBottomY, linestyle = 'dashed', color='k')
+    
     if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
         qTotal = total_field['q']
         qPrim = primary_field['q']

@@ -705,7 +705,7 @@ def ResLayer_app():
                 survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
                 zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$zc_{layer}$"),
                 dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dz_{layer}$"),
-                rhoLayer = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{Layer}$'),
+                rhoLayer = FloatText(min=1e-8,max=1e8, value = 5000., continuous_update=False,description='$\\rho_{Layer}$'),
                 xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
                 zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
                 r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
