@@ -1,8 +1,8 @@
 # em_apps
 
-[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/ubcgif/em_examples)
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/geoscixyz/em_apps)
 
-[![Build Status](https://travis-ci.org/ubcgif/em_examples.svg?branch=master)](https://travis-ci.org/geoscixyz/em_apps)
+[![Build Status](https://travis-ci.org/geoscixyz/em_apps.svg?branch=master)](https://travis-ci.org/geoscixyz/em_apps)
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in
 [em_examples](http://github.com/geoscixyz/em_examples). Numerical simulations are based on [SimPEG](http://simpeg.xyz)
@@ -46,11 +46,11 @@ Order of widgets:
 To add the binder badge to an rst file, include:
 
 ```
-.. image:: http://mybinder.org/badge.svg :target: http://mybinder.org/repo/ubcgif/em_examples
+.. image:: http://mybinder.org/badge.svg :target: http://mybinder.org/repo/geoscixyz/em_apps
 ```
 
 and if you would like to point directly to a specific example, append the path to the url, ie.
 
 ```
-.. image:: http://mybinder.org/badge.svg :target: http://mybinder.org/repo/ubcgif/em_examples/notebooks/geophysical_surveys/DCR_Pseudo-section_Simulation.ipynb
+.. image:: http://mybinder.org/badge.svg :target: http://mybinder.org/repo/geoscixyz/em_apps/notebooks/geophysical_surveys/DCR_Pseudo-section_Simulation.ipynb
 ```
