@@ -1,7 +1,6 @@
 # em_apps
 
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/geoscixyz/em_apps)
-
 [![Build Status](https://travis-ci.org/geoscixyz/em_apps.svg?branch=master)](https://travis-ci.org/geoscixyz/em_apps)
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in
