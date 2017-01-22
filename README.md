@@ -1,8 +1,8 @@
-# em_examples
+# em_apps
 
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/ubcgif/em_examples)
 
-[![Build Status](https://travis-ci.org/ubcgif/em_examples.svg?branch=master)](https://travis-ci.org/ubcgif/em_examples)
+[![Build Status](https://travis-ci.org/ubcgif/em_examples.svg?branch=master)](https://travis-ci.org/geoscixyz/em_apps)
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in [SimPEG](http://simpeg.xyz)
 
@@ -10,20 +10,20 @@ This is a repo of notebooks and interactive examples for http://em.geosci.xyz. T
 
 Each notebook has the following structure
 
-- **Purpose** : Motivation and key concepts addressed by the notebook 
-- **Setup** : Overview of the relevant parameters in the problem 
+- **Purpose** : Motivation and key concepts addressed by the notebook
+- **Setup** : Overview of the relevant parameters in the problem
 - **Questions** : Guiding questions related to the purpose
-- **App** : interactive visualizations 
-- **Explore** : further questions that can be explored with the app 
+- **App** : interactive visualizations
+- **Explore** : further questions that can be explored with the app
 
 ## Conventions
 
 For colormaps (http://matplotlib.org/examples/color/colormaps_reference.html)
 - **fields** are plotted with the `viridis`
-- **potentials** are plotted with `viridis` 
-- **sensitivities** are plotted with `viridis` 
+- **potentials** are plotted with `viridis`
+- **sensitivities** are plotted with `viridis`
 - **physical properties** are plotted with `jet`
-- **charges** are plotted with `RdBu` 
+- **charges** are plotted with `RdBu`
 
 Order of widgets:
 - geometry of survey
