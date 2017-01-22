@@ -24,9 +24,9 @@ install:
   # - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
   # - export PATH=$PWD:$PATH
   # - export PYTHONPATH=$PWD:$PYTHONPATH
-  - cd em_examples/tests
+  - cd tests
   - git clone https://github.com/geoscixyz/em_apps.git
-  - cd ../../
+  - cd ../
 
 # Run test
 script:
