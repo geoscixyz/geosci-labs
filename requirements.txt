@@ -5,4 +5,4 @@ Pillow
 ipywidgets
 properties[math]
 SimPEG
-git+git://github.com/geosci/em_examples.git
+em_examples
