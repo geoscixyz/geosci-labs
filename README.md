@@ -33,6 +33,7 @@ Order of widgets:
 - view options
 
 ## For developers
+- to develop code for these notebooks, please see http://github.com/geoscixyz/em_examples
 - when you generate a new notebook, please make sure that the filepath to its location follows the same structure as in [EM GeoSci](http://em.geosci.xyz)
 - add the notebook name and path to theindex (index.ipynb)
 - and update the [binder](http://mybinder.org) so it can be shared with the world!
