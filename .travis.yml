@@ -10,7 +10,7 @@ env:
 before_install:
   - pip install --upgrade pip;
   - pip install numpy scipy matplotlib Pillow ipywidgets properties[math]
-  - pip install git+git://github.com/simpeg/simpeg.git@dev
+  - pip install SimPEG
   - python setup.py install
   # - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then wget http://repo.continuum.io/miniconda/Miniconda-3.8.3-Linux-x86_64.sh -O miniconda.sh; else wget http://repo.continuum.io/miniconda/Miniconda3-3.8.3-Linux-x86_64.sh -O miniconda.sh; fi
   # - chmod +x miniconda.sh
@@ -22,8 +22,13 @@ install:
   # - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets
   # - git clone https://github.com/simpeg/simpeg.git
   # - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
-  - export PATH=$PWD:$PATH
-  - export PYTHONPATH=$PWD:$PYTHONPATH
+  # - export PATH=$PWD:$PATH
+  # - export PYTHONPATH=$PWD:$PYTHONPATH
+  - echo $PWD
+  - cd ../
+  - git clone https://github.com/geoscixyz/em_apps.git
+  - cd em_examples
+  - echo $PWD
 
 # Run test
 script:

@@ -8,7 +8,7 @@ import subprocess
 
 
 TESTDIR = os.path.abspath(__file__)
-NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + ['notebooks/']) # where are the notebooks?
+NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-3] + ['em_apps/']) # where are the notebooks?
 
 def setUp():
     nbpaths = []  # list of notebooks, with file paths

@@ -567,12 +567,12 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
     if Scale == 'Log':
-        
+
         if (Field=='E') or (Field == 'J'):
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
-        
+
         elif (Field == 'Model'):
-            
+
             if (Type == 'Secondary'):
                 cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
             else:
