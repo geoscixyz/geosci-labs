@@ -32,8 +32,5 @@ install:
 script:
   - nosetests $TEST_DIR
 
-deploy:
-
-
 notifications:
   slack: ubcgif:1Z2lR3XYRSM3GHflG71ZHEN6
