@@ -7,8 +7,6 @@ import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
 matplotlib.rcParams['font.size'] = 12
-import warnings
-warnings.filterwarnings("ignore")
 from ipywidgets import *
 from DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from scipy.constants import mu_0, epsilon_0

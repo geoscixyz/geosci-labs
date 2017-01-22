@@ -20,10 +20,10 @@ import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 
 try:
-    from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
     pass
 except Exception, e:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
 def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
