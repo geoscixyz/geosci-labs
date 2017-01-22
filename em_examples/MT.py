@@ -4,14 +4,11 @@ import numpy as np
 from ipywidgets import *
 #from SimPEG.EM.Utils import k, omega
 
-import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
 try:
-    from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
     pass
 except Exception, e:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
 """

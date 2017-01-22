@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import copy
-import warnings
-warnings.filterwarnings("ignore")
+
 matplotlib.rcParams["font.size"] = 13
 
 def phase(z):

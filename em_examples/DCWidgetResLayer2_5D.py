@@ -18,15 +18,11 @@ import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
 
-
-import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
 try:
-    from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:    
     from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    pass
+except Exception, e:
+    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -39,7 +35,7 @@ expmap = Maps.ExpMap(mesh)
 # actmap = Maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
 mapping = expmap
 # mapping = Maps.IdentityMap(mesh)
-dx = 5 
+dx = 5
 xr = np.arange(-40,41,dx)
 dxr = np.diff(xr)
 xmin = -40.
@@ -67,7 +63,7 @@ def model_fields(A,B,zcLayer,dzLayer,xc,zc,r,sigLayer,sigTarget,sigHalf):
     # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
     fullMod = addCylinder2Mod(xc,zc,r,LayerMod,sigTarget)
     mtrue = np.log(fullMod)
-    
+
     Mx =  mesh.gridCC
     # Nx = np.empty(shape=(mesh.nC, 2))
     rx = DC.Rx.Pole_ky(Mx)
@@ -157,13 +153,13 @@ def addCylinder2Mod(xc,zc,r,modd,sigCylinder):
     codes = []
     for ii in range(0,cylinderPoints.shape[0]):
         verts.append(cylinderPoints[ii,:])
-        
+
         if(ii == 0):
             codes.append(Path.MOVETO)
         elif(ii == cylinderPoints.shape[0]-1):
             codes.append(Path.CLOSEPOLY)
         else:
-            codes.append(Path.LINETO)        
+            codes.append(Path.LINETO)
 
     path = Path(verts, codes)
     CCLocs = mesh.gridCC
@@ -182,7 +178,7 @@ def addCylinder2Mod(xc,zc,r,modd,sigCylinder):
     # plt.show()
 
     mod[insideInd] = sigCylinder
-    return mod 
+    return mod
 
 
 def getPlateCorners(xc,zc,dx,dz,rotAng):
@@ -190,7 +186,7 @@ def getPlateCorners(xc,zc,dx,dz,rotAng):
     # Form rotation matix
     rotMat = np.array([[np.cos(rotAng*(np.pi/180.)), -np.sin(rotAng*(np.pi/180.))],[np.sin(rotAng*(np.pi/180.)), np.cos(rotAng*(np.pi/180.))]])
     originCorners = np.array([[-0.5*dx, 0.5*dz], [0.5*dx, 0.5*dz], [-0.5*dx, -0.5*dz], [0.5*dx, -0.5*dz]])
-    
+
     rotPlateCorners = np.dot(originCorners,rotMat)
     plateCorners = rotPlateCorners + np.hstack([np.repeat(xc,4).reshape([4,1]),np.repeat(zc,4).reshape([4,1])])
     return plateCorners
@@ -233,7 +229,7 @@ def addPlate2Mod(xc,zc,dx,dz,rotAng,modd,sigPlate):
     # plt.show()
 
     mod[insideInd] = sigPlate
-    return mod   
+    return mod
 
 
 def get_Surface_Potentials(survey, src,field_obj):
@@ -254,7 +250,7 @@ def get_Surface_Potentials(survey, src,field_obj):
         phiScale = phi[refInd]
         phiSurface = phiSurface - phiScale
 
-    return xSurface,phiSurface,phiScale  
+    return xSurface,phiSurface,phiScale
 
 
 # Inline functions for computing apparent resistivity
@@ -432,7 +428,7 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
         ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
 
-    
+
     ax[0].tick_params(axis='both', which='major', labelsize=ticksize)
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
@@ -611,7 +607,7 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
     else:
         eps = 0.
     dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
-    
+
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc,zc,r)
 
@@ -624,7 +620,7 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         layerBottomY = (zcLayer - dzLayer/2.)*np.ones_like(layerX)
         ax[1].plot(layerX,layerTopY, linestyle = 'dashed', color='k')
         ax[1].plot(layerX,layerBottomY, linestyle = 'dashed', color='k')
-    
+
     if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
         qTotal = total_field['q']
         qPrim = primary_field['q']
@@ -694,12 +690,12 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
     if Scale == 'Log':
-        
+
         if (Field=='E') or (Field == 'J'):
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
-        
+
         elif (Field == 'Model'):
-            
+
             if (Type == 'Secondary'):
                 cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
             else:

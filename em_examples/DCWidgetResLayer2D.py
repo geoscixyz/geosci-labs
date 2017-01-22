@@ -11,15 +11,11 @@ import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
 
-
-import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
 try:
-    from IPython.html.widgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from ipywidgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
     pass
 except Exception, e:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 
 # Mesh, sigmaMap can be globals global
@@ -674,12 +670,12 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     cbar_ax.axis('off')
     vmin, vmax = dat[0].get_clim()
     if Scale == 'Log':
-        
+
         if (Field=='E') or (Field == 'J'):
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.logspace(np.log10(vmin), np.log10(vmax), 5))
-        
+
         elif (Field == 'Model'):
-            
+
             if (Type == 'Secondary'):
                 cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
             else:
@@ -692,7 +688,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.r_[np.minimum(0.,vmin),np.maximum(0.,vmax)])
         else:
             cb = plt.colorbar(dat[0], ax=cbar_ax,format = formatter, ticks = np.linspace(vmin, vmax, 5))
-    
+
     cb.ax.tick_params(labelsize=ticksize)
     cb.set_label(label, fontsize=labelsize)
     ax[1].set_xlim([-40.,40.])

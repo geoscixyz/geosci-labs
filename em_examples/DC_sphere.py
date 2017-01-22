@@ -1,4 +1,3 @@
-
 from SimPEG import *
 from SimPEG.EM.Static import DC
 from scipy.constants import epsilon_0

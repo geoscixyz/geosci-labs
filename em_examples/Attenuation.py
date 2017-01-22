@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.constants import mu_0, epsilon_0
 try:
-    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    from ipywidgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
     pass
 except Exception, e:
-    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    from IPython.html.widgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
 def WaveVelSkind(frequency, epsr, sigma):
     omega = np.pi*np.complex128(frequency)
