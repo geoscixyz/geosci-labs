@@ -4,5 +4,6 @@ matplotlib
 Pillow
 ipywidgets
 properties[math]
+request
 SimPEG
 em_examples
