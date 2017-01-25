@@ -9,7 +9,7 @@ env:
 # Setup anaconda
 before_install:
   - pip install --upgrade pip;
-  - pip install numpy scipy matplotlib Pillow ipywidgets properties[math]
+  - pip install numpy scipy matplotlib Pillow ipywidgets properties[math] request
   - pip install SimPEG
   - pip install em_examples
 
