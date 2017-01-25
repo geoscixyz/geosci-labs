@@ -98,7 +98,7 @@ def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=3
     return ax
 
 
-def InteractivePlanes(planevalue="YZ", offsetvalue=50.):
+def InteractivePlanes(planevalue="XZ", offsetvalue=0.):
     def foo(Plane, Offset, nRx):
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.

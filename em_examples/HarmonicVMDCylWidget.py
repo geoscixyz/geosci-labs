@@ -23,7 +23,7 @@ class HarmonicVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
-        self.im = Image.open("../../images/emgeosci.png")
+        self.im = Image.open("emgeosci.png")
 
     def mirrorArray(self, x, direction="x"):
         X = x.reshape((self.nx_core, self.ny_core), order="F")

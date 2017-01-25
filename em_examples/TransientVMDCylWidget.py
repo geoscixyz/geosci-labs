@@ -24,7 +24,7 @@ class TransientVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
-        self.im = Image.open("../../images/emgeosci.png")
+        self.im = Image.open("emgeosci.png")
         self.time = np.logspace(-5, -2, 41)
 
     def mirrorArray(self, x, direction="x"):

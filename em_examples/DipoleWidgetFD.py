@@ -194,7 +194,6 @@ class DipoleWidgetFD(object):
                     val_line = vecamp(abs(val_line_x), abs(val_line_y), abs(val_line_z))
                 elif component == "phase":
                     val_line = vecamp(np.angle(val_line_x), np.angle(val_line_y), np.angle(val_line_z))
-
             distance = np.sqrt((x-x1)**2+(y-y1)**2) - dx # specific purpose
 
 
@@ -296,10 +295,10 @@ class DipoleWidgetFD(object):
                 ComplexNumber = "phase"
 
             if AmpDir == "Direction":
-                ComplexNumber = "real"
+                # ComplexNumber = "real"
                 Component = "vec"
             elif AmpDir == "Amp":
-                ComplexNumber = "real"
+                # ComplexNumber = "real"
                 Component = "amp"
 
             if SrcType == "ED":
@@ -311,7 +310,7 @@ class DipoleWidgetFD(object):
 
         out = widgets.interactive (foo
                         ,Field=widgets.ToggleButtons(options=["E", "H", "J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
+                        ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
                         ,Frequency=widgets.FloatText(value=0., continuous_update=False, description='f (Hz)') \
