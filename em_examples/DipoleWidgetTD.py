@@ -280,15 +280,15 @@ class DipoleWidgetTD(object):
 
         out = widgets.interactive (foo
                         ,Field=widgets.ToggleButtons(options=["E", "H", "dHdt","J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
+                        ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,Time=widgets.FloatText(value=1e-5, continuous_update=False, description='t (sec)') \
+                        ,Time=widgets.FloatText(value=1e-7, continuous_update=False, description='t (sec)') \
                         ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
                         ,Offset=widgets.FloatText(value = offset_plane, continuous_update=False) \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
                         ,Slider=widgets.widget_bool.Checkbox(value=False)\
-                        ,TimeLog=widgets.FloatSlider(min=-6, max=0, step=0.5, value=-3, continuous_update=False) \
-                        ,SigLog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
+                        ,TimeLog=widgets.FloatSlider(min=-7, max=0, step=0.2, value=-7, continuous_update=False) \
+                        ,SigLog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-2, continuous_update=False) \
                         ,SrcType = fixed(SrcType)
                         )
         return out

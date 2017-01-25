@@ -2,6 +2,7 @@ numpy
 scipy
 matplotlib
 Pillow
+requests
 ipywidgets
 properties[math]
 git+git://github.com/simpeg/simpeg.git@dev
