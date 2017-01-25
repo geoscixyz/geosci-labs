@@ -7,6 +7,8 @@ from PIL import Image
 from DipoleWidgetFD import DisPosNegvalues
 from BiotSavart import BiotSavartFun
 from scipy.constants import mu_0
+import requests
+from StringIO import StringIO
 
 class TransientVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -24,7 +26,9 @@ class TransientVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
-        self.im = Image.open("emgeosci.png")
+        url = "http://em.geosci.xyz/_images/disc_dipole.png"
+        response = requests.get(url)
+        self.im = Image.open(StringIO(response.content))
         self.time = np.logspace(-5, -2, 41)
 
     def mirrorArray(self, x, direction="x"):
