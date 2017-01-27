@@ -38,7 +38,7 @@ setup(
         'numpy>=1.7',
         'scipy>=0.13',
         'ipywidgets',
-        'properties[math]'
+        'properties[math]',
         'SimPEG',
         'Pillow',
         'requests',
