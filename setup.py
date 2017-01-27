@@ -38,7 +38,11 @@ setup(
         'numpy>=1.7',
         'scipy>=0.13',
         'ipywidgets',
+        'properties[math]'
         'SimPEG',
+        'Pillow',
+        'requests',
+        'matplotlib'
                        ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
