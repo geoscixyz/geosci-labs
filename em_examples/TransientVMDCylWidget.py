@@ -96,8 +96,8 @@ class TransientVMDCylWidget(object):
 
     def simulate(self, srcLoc, rxLoc, time, radius=1.):
 
-        bz = EM.TDEM.Rx(rxLoc,time,'bz')
-        dbzdt = EM.TDEM.Rx(rxLoc,time,'dbzdt')
+        bz = EM.TDEM.Rx.Point_b(rxLoc,time,'z')
+        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc,time,'z')
         src = EM.TDEM.Src.CircularLoop([bz],
                                        waveform=EM.TDEM.Src.StepOffWaveform(),
                                        loc=srcLoc, radius=radius)
