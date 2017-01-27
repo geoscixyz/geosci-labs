@@ -26,9 +26,9 @@ class TransientVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
-        url = "http://em.geosci.xyz/_images/disc_dipole.png"
-        response = requests.get(url)
-        self.im = Image.open(StringIO(response.content))
+        # url = "http://em.geosci.xyz/_images/disc_dipole.png"
+        # response = requests.get(url)
+        # self.im = Image.open(StringIO(response.content))
         self.time = np.logspace(-5, -2, 41)
 
     def mirrorArray(self, x, direction="x"):
@@ -161,7 +161,7 @@ class TransientVMDCylWidget(object):
             elif view == "z":
                 val = self.Bz
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... no By for VMD"
@@ -176,7 +176,7 @@ class TransientVMDCylWidget(object):
             elif view == "z":
                 val = self.dBzdt
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... no dBydt for VMD"
@@ -186,7 +186,7 @@ class TransientVMDCylWidget(object):
             if view == "y":
                 val = self.Ey
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... only Ey for VMD"
@@ -196,7 +196,7 @@ class TransientVMDCylWidget(object):
             if view=="y":
                 val = self.Jy
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... only Jy for VMD"
@@ -273,7 +273,7 @@ class TransientVMDCylWidget(object):
                     title = "Bz"
                     val = self.Bz
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... no By for VMD"
@@ -287,7 +287,7 @@ class TransientVMDCylWidget(object):
                     title = "dBz/dt"
                     val = self.dBzdt
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... no dBydt for VMD"
@@ -298,7 +298,7 @@ class TransientVMDCylWidget(object):
                 if Component == "y":
                     val = self.Ey
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... only Ey for VMD"
