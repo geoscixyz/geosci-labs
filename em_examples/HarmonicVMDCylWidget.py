@@ -25,9 +25,9 @@ class HarmonicVMDCylWidget(object):
     def __init__(self):
         self.genMesh()
         self.getCoreDomain()
-        url = "http://em.geosci.xyz/_images/disc_dipole.png"
-        response = requests.get(url)
-        self.im = Image.open(StringIO(response.content))
+        # url = "http://em.geosci.xyz/_images/disc_dipole.png"
+        # response = requests.get(url)
+        # self.im = Image.open(StringIO(response.content))
 
     def mirrorArray(self, x, direction="x"):
         X = x.reshape((self.nx_core, self.ny_core), order="F")
@@ -172,7 +172,7 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "imag":
                     val = np.c_[self.Bx.imag, self.Bz.imag]
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Vector plot only supports real and imaginary type!"
@@ -196,7 +196,7 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Bz)
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... no By for VMD"
@@ -213,7 +213,7 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Ey)
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... only Ey for VMD"
@@ -230,7 +230,7 @@ class HarmonicVMDCylWidget(object):
                 elif ComplexNumber == "phase":
                     val = np.angle(self.Jy)
             else:
-                ax.imshow(self.im)
+                # ax.imshow(self.im)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 return "Dude, think twice ... only Jy for VMD"
@@ -328,7 +328,7 @@ class HarmonicVMDCylWidget(object):
                     valr = self.Bz.real
                     vali = self.Bz.imag
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... no By for VMD"
@@ -341,7 +341,7 @@ class HarmonicVMDCylWidget(object):
                     valr = self.Ey.real
                     vali = self.Ey.imag
                 else:
-                    ax.imshow(self.im)
+                    # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     return "Dude, think twice ... only Ey for VMD"
