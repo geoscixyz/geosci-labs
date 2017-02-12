@@ -15,15 +15,13 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
+from .Base import widgetify
 
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
-try:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import (
+    interactive, IntSlider, FloatSlider, FloatText, ToggleButtons, VBox
+)
 
 
 def ExtractCoreMesh(xyzlim, mesh, meshType='tensor'):
@@ -293,7 +291,8 @@ def cylinder_wrapper(A,B,r,rhocyl,rhohalf,Field,Type):
 
 
 def cylinder_app():
-    app = interact(cylinder_wrapper,
+    f = cylinder_wrapper
+    app = interactive(f,
             rhohalf = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
             rhocyl = FloatSlider(min=10.,max=1000.,step=10., value = 500., continuous_update=False),
             r = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
@@ -303,7 +302,11 @@ def cylinder_app():
             Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total')
             #Scale = ToggleButtons(options = ['Scalar','Log'],value='Scalar')
             )
-    return app
+    w = VBox(app.children)
+    f.widget = w
+    defaults=dict([(child.description, child.value) for child in app.children])
+    iplot.on_displayed(f(**defaults))
+    return w
 
 
 def DC2Dsurvey(flag="PoleDipole"):
@@ -551,11 +554,11 @@ def PseudoSectionWidget(survey,flag):
         dxr = np.diff(xr)
     xzlocs = getPseudoLocs(dxr, ntx, nmax,flag)
     PseudoSectionPlot = lambda i,j: PseudoSectionPlotfnc(i,j,survey,flag)
-    return interact(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
+    return widgetify(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
 
 def MidpointPseudoSectionWidget():
     ntx = 18
-    return interact(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
+    return widgetify(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
 
 def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r, dobs, uncert, predmis, nmax=8, plotFlag=None):
     matplotlib.rcParams['font.size'] = 14
@@ -653,16 +656,15 @@ def DC2DPseudoWidgetWrapper(rhohalf,rhosph,xc,zc,r,surveyType):
     return None
 
 def DC2DPseudoWidget():
-    # print xzlocs
-    Q = interact(DC2DPseudoWidgetWrapper,
-         rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
-         rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
-         xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
-         zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
-         r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
-         surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
-        )
-    return Q
+    return widgetify(
+        DC2DPseudoWidgetWrapper,
+        rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
+        rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
+        xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
+        zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
+        r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
+        surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
+    )
 
 def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
     dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
@@ -670,14 +672,14 @@ def DC2DfwdWrapper(rhohalf,rhosph,xc,zc,r,predmis,surveyType):
     return None
 
 def DC2DfwdWidget():
-    # print xzlocs
-    Q = interact(DC2DfwdWrapper,
-         rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
-         rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
-         xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
-         zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
-         r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
-         predmis = ToggleButtons(options=['pred','mis']),
-         surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
-        )
-    return Q
+    return widgetify(
+        DC2DfwdWrapper,
+        rhohalf = FloatSlider(min=10, max=1000, step=1, value = 1000, continuous_update=False),
+        rhosph = FloatSlider(min=10, max=1000, step=1, value = 50, continuous_update=False),
+        xc = FloatSlider(min=-40, max=40, step=1, value =  0, continuous_update=False),
+        zc = FloatSlider(min= -20, max=0, step=1, value =  -10, continuous_update=False),
+        r = FloatSlider(min= 0, max=15, step=0.5, value = 5, continuous_update=False),
+        predmis = ToggleButtons(options=['pred','mis']),
+        surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
+
+    )

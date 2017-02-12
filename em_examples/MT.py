@@ -4,12 +4,9 @@ import numpy as np
 from ipywidgets import *
 #from SimPEG.EM.Utils import k, omega
 
-try:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
 
+from .Base import widgetify
 
 """
 MT1D: n layered earth problem
@@ -424,7 +421,7 @@ def PlotAppRes3Layers_wrapper(fmin,fmax,nbdata,h1,h2,rhol1,rhol2,rhol3,mul1,mul2
     PlotAppRes(frangn,thick3,sig3,chg3_0,taux3,c3,mu3,eps3,3,F_Envelope,PlotEnvelope)
 
 def MT1D_app():
-    app = interact(PlotAppRes3Layers_wrapper,
+    app = widgetify(PlotAppRes3Layers_wrapper,
         fmin = FloatText(min=1e-5,max=1e5, value = 1e-5, continuous_update=False),
         fmax = FloatText(min=1e-5,max=1e5, value = 1e5, continuous_update=False),
         nbdata = IntSlider(min =10,max=100,value = 100, step =10, continuous_update=False),

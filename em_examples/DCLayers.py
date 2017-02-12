@@ -7,15 +7,11 @@ from scipy.constants import epsilon_0
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-try:
-    from ipywidgets import (
-        interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    )
-    pass
-except Exception, e:
-    from IPython.html.widgets import (
-        interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    )
+from ipywidgets import (
+    IntSlider, FloatSlider, FloatText, ToggleButtons
+)
+
+from .Base import widgetify
 
 # Mesh parameters
 npad = 20
@@ -380,7 +376,7 @@ def plot_layer_potentials_app():
         lambda A, B, M, N, rho1, rho2, h, Plot:
         plot_layer_potentials(rho1, rho2, h, A, B, M, N, Plot)
     )
-    app = interact(
+    app = widgetify(
         plot_layer_potentials_interact,
         A = FloatSlider(
             min=-30., max=30., step=1., value=-30., continuous_update=False

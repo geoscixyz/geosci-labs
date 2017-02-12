@@ -11,15 +11,11 @@ import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 from scipy.ndimage.measurements import center_of_mass
 
+from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
 
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
-try:
-    from ipywidgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from .Base import widgetify
 
 # Mesh, mapping can be globals global
 npad = 15
@@ -690,21 +686,21 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
 
 
 def plate_app():
-    app = interact(PLOT,
-                survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                dx = FloatSlider(min=1.,max=1000.,step=1.,value=10., continuous_update=False),
-                dz = FloatSlider(min=1.,max=200.,step=1.,value=10., continuous_update=False),
-                xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
-                zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
-                rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False,description='$\\theta$'),
-                rhoplate = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
-                rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
-                A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
-                B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
-                M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
-                N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
-                Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
-                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
-                Scale = ToggleButtons(options =['Linear','Log'],value='Linear'),
-                __manual = True)
+    app = widgetify(PLOT,
+        survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
+        dx = FloatSlider(min=1.,max=1000.,step=1.,value=10., continuous_update=False),
+        dz = FloatSlider(min=1.,max=200.,step=1.,value=10., continuous_update=False),
+        xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+        zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
+        rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False,description='$\\theta$'),
+        rhoplate = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
+        rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
+        A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
+        B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
+        M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
+        N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
+        Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
+        Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
+        Scale = ToggleButtons(options =['Linear','Log'],value='Linear'),
+        __manual = True)
     return app
