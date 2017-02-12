@@ -2,7 +2,6 @@ import Attenuation
 import BiotSavart
 import CondUtils
 import DC_cylinder
-import DC_sphere
 import DCLayers
 import DCsphere
 import DCWidget
