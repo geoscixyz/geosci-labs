@@ -13,6 +13,8 @@ from scipy.constants import mu_0, epsilon_0
 from VolumeWidget import polyplane
 from FDEMPlanewave import *
 
+from .Base import widgetify
+
 def PlaneEHfield(z, t=0., f=1., sig=1., mu=mu_0,  epsilon=epsilon_0, E0=1.):
     """
         Plane wave propagating downward (negative z (depth))

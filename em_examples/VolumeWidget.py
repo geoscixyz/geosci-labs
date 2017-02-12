@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
+from .Base import widgetify
+
 class Arrow3D(FancyArrowPatch):
     def __init__(self, xs, ys, zs, *args, **kwargs):
         FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
@@ -103,7 +105,7 @@ def InteractivePlanes(planevalue="XZ", offsetvalue=0.):
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.
         return plotObj3D(offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=Plane)
-    out = widgets.interactive (foo
+    out = widgetify(foo
                     ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=offsetvalue, continuous_update=False) \
                     # ,X0=widgets.FloatText(value=-20) \
                     # ,Y0=widgets.FloatText(value=-50.) \

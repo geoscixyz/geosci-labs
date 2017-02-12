@@ -17,15 +17,11 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
+from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-
-try:
-    from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from .Base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -34,7 +30,7 @@ cs = 0.5
 hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
 hy = [(cs,npad, -growrate),(cs,100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-circmap = Maps.CircleMap(mesh)
+circmap = Maps.ParametricCircleMap(mesh)
 idmap = Maps.IdentityMap(mesh)
 circmap.slope = 1e16
 sigmaMap = idmap
@@ -600,12 +596,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     # plt.show()
     # return fig, ax
 
-
-
-
-
 def cylinder_app():
-    app = interact(plot_Surface_Potentials,
+    app = widgetify(plot_Surface_Potentials,
             survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
             rhocyl = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_2$'),
             rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),

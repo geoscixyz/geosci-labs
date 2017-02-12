@@ -10,6 +10,8 @@ from scipy.constants import mu_0
 import requests
 from StringIO import StringIO
 
+from .Base import widgetify
+
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
 
@@ -284,7 +286,7 @@ class HarmonicVMDCylWidget(object):
             self.getFields(bType=bType)
             return self.plotField(Field=Field, ComplexNumber=ComplexNumber, view=Component, scale=Scale, Geometry=Geometry)
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
@@ -366,7 +368,7 @@ class HarmonicVMDCylWidget(object):
             ax.grid(True)
 
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["E", "B", "Bsec"], value=fieldvalue) \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
