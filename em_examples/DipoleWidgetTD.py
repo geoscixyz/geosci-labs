@@ -479,5 +479,6 @@ def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5,
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                     ,Sigma=widgets.FloatText(value=sig, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear']) \
-                    ,Waveform=widgets.ToggleButtons(options=['stepoff','stepon','rampoff'], value='stepoff'))
+                    # ,Waveform=widgets.ToggleButtons(options=['stepoff','stepon','rampoff'], value='stepoff')
+                )
     return Q3
