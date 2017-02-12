@@ -336,7 +336,7 @@ class PlanewaveWidget(DipoleWidgetFD):
 
             return self.Planewave2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, f, srcLoc=0., orientation="X", component=ComplexNumber, view=Component, normal=normal, functype=Field, scale=Scale, t=Time)
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["Ex", "Hy"]) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
                         ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
@@ -434,7 +434,7 @@ def InteractivePlaneProfile():
             tl.set_color('r')
         ax1.grid(True)
 
-    Q2 = widgets.interactive (foo
+    Q2 = widgetify(foo
                     ,Field=widgets.ToggleButtons(options=['Ex','Hy','Impedance'], value='Ex')
                     ,Sigma=widgets.FloatText(value=1, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \

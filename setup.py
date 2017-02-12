@@ -31,7 +31,7 @@ with open('README.rst') as f:
 
 setup(
     name = 'em_examples',
-    version = '0.0.5',
+    version = '0.0.6',
     packages = find_packages(),
     install_requires = [
         'future',
