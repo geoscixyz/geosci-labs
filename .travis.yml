@@ -27,7 +27,6 @@ install:
   - cd ../
   - git clone https://github.com/geoscixyz/em_apps.git
   - cd em_examples
-  - git checkout dev
   - echo $PWD
 
 # Run test
