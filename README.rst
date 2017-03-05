@@ -9,7 +9,7 @@ em_examples
       :target: https://travis-ci.org/geoscixyz/em_examples
       :alt: build_status
 
-This is a repository of code used to power the notebooks and interactive examples for http://em.geosci.xyz. The associated notebooks are in the repository `em_apps <http://github.com/geoscixyz/em_apps>`_ The examples are based on code available in `SimPEG <http://simpeg.xyz>`_
+This is a repository of code used to power the notebooks and interactive examples for http://em.geosci.xyz. The associated notebooks are in the repository `em_apps <http://github.com/geoscixyz/em_apps>`_ and are hosted on `Azure Notebooks <https://notebooks.azure.com/library/em_apps>`_, where they can be run on the cloud. The examples are based on code available in `SimPEG <http://simpeg.xyz>`_
 
 Why
 ---
