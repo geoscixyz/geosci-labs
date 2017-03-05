@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/geoscixyz/em_apps.svg?branch=master)](https://travis-ci.org/geoscixyz/em_apps)
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in
-[em_examples](http://github.com/geoscixyz/em_examples). Numerical simulations are based on [SimPEG](http://simpeg.xyz)
+[em_examples](http://github.com/geoscixyz/em_examples) and are hosted on [Azure Notebooks](https://notebooks.azure.com/library/em_apps), where they can be run on the cloud. Numerical simulations are based on [SimPEG](http://simpeg.xyz)
 
 ## Notebook Structure
 
