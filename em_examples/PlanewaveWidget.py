@@ -162,23 +162,20 @@ class PlanewaveWidget(DipoleWidgetFD):
             cb = plt.colorbar(dat1, ax=ax1, ticks=np.linspace(vmin, vmax, 5), format="%.1e")
 
         tempstr = functype.split("_")
-        if view == "vec":
-            tname = "Vector "
-            title = tname+tempstr[0]+"-field from "+tempstr[2]
-        elif  view== "amp":
-            tname = "|"
-            title = tname+tempstr[0]+"|-field from "+tempstr[2]
-        else:
-            if component == "real":
-                tname = "Re("
-            elif component == "imag":
-                tname = "Im("
-            elif component == "amplitude":
-                tname = "Amp("
-            elif component == "phase":
-                tname = "Phase("
 
-            title = tname + tempstr[0]+view+")-field from "+tempstr[2]
+        tname_end = ")"
+
+        if component == "real":
+            tname = "Re("
+        elif component == "imag":
+            tname = "Im("
+        elif component == "amplitude":
+            tname = "|"
+            tname_end = "|"
+        elif component == "phase":
+            tname = "Phase("
+
+        title = tname + tempstr[0]+view+tname_end
 
         if tempstr[0] == "E":
             unit = " (V/m)"
@@ -194,13 +191,12 @@ class PlanewaveWidget(DipoleWidgetFD):
         if component == "phase":
             unit = " (rad)"
         label = fieldname + unit
-        label_cb = tempstr[0]+view+"-field from "+tempstr[2]
         cb.set_label(label)
         ax1.set_title(title)
 
 
         if plot1D:
-            ax1.plot(x,y, 'r.', ms=4)
+            ax1.plot(x, y, 'r.', ms=4)
             ax2 = plt.subplot(gs1[:, 4:6])
             val_line_x, val_line_y, val_line_z = self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[f], orientation, self.func, t=t)
 
@@ -221,8 +217,7 @@ class PlanewaveWidget(DipoleWidgetFD):
                 elif component == "phase":
                     val_line = vecamp(np.angle(val_line_x), np.angle(val_line_y), np.angle(val_line_z))
 
-            distance = np.sqrt((x-x1)**2+(y-y1)**2) - dx # specific purpose
-
+            distance = xyz_line[:, 2]
 
             if component == "real":
                 val_line = val_line.real
@@ -277,7 +272,7 @@ class PlanewaveWidget(DipoleWidgetFD):
             if component == "phase":
                 label = tname+tempstr[0]+view+")-field (rad) "
 
-            ax2.set_title("EM data at Rx hole")
+            ax2.set_title("EM data")
             ax2.set_xlabel(label)
 
             # ax2.text(distance.min(), val_line.max(), 'A', fontsize = 16)
@@ -296,7 +291,7 @@ class PlanewaveWidget(DipoleWidgetFD):
         self.ymin, self.ymax = Y1, Y2
         self.zmin, self.zmax = Z1, Z2
 
-        def foo(Field, AmpDir, ComplexNumber, Frequency, Sigma, Scale, Time):
+        def foo(Field, ComplexNumber, Frequency, Sigma, Scale, Time):
             f = np.r_[Frequency]
             sig = np.r_[Sigma]
 
@@ -323,24 +318,14 @@ class PlanewaveWidget(DipoleWidgetFD):
             elif ComplexNumber == "Phase":
                 ComplexNumber = "phase"
 
-            if AmpDir == "Direction":
-                ComplexNumber = "real"
-                Component = "vec"
-            elif AmpDir == "Amp":
-                ComplexNumber = "real"
-                Component = "amp"
-
-
-
             return self.Planewave2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, f, srcLoc=0., orientation="X", component=ComplexNumber, view=Component, normal=normal, functype=Field, scale=Scale, t=Time)
 
         out = widgets.interactive (foo
-                        ,Field=widgets.ToggleButtons(options=["Ex", "Hy"]) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="None") \
-                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase']) \
-                        ,Frequency=widgets.FloatText(value=10., continuous_update=False) \
-                        ,Sigma=widgets.FloatText(value=1, continuous_update=False) \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
+                        ,Field=widgets.ToggleButtons(options=["Ex", "Hy"])
+                        ,ComplexNumber=widgets.ToggleButtons(options=['Re','Im','Amp', 'Phase'])
+                        ,Frequency=widgets.FloatText(value=10., continuous_update=False)
+                        ,Sigma=widgets.FloatText(value=1, continuous_update=False)
+                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear")
                         ,Time=widgets.FloatSlider(min=0, max=0.2, step=0.01, value=0.))
         return out
 
@@ -369,7 +354,15 @@ def InteractivePlaneProfile():
             vali = val_hy.imag.flatten()
             labelr = "Re (Hy)-field (V/m)"
             labeli = "Im (Hy)-field (V/m)"
+
         elif Field == "Impedance":
+            imp = - val_ex / val_hy
+            valr = imp.real.flatten()
+            vali = imp.imag.flatten()
+            labelr = "Re (Z) (Ohm)"
+            labeli = "Im (Z) (Ohm)"
+
+        elif Field == "rhophi":
             imp = - val_ex / val_hy
             valr = abs(imp)**2 / (2*np.pi*Frequency*mu_0)
             vali = np.angle(imp, deg=True)
@@ -379,7 +372,7 @@ def InteractivePlaneProfile():
         if Scale == "log":
             valr_p, valr_n = DisPosNegvalues(valr)
             vali_p, vali_n = DisPosNegvalues(vali)
-            if Field == "Impedance":
+            if Field == "rhophi":
                 ax1.plot(r, valr, 'k.')
             else:
                 ax1.plot(r, valr_p, 'k-', lw=2)
@@ -398,7 +391,7 @@ def InteractivePlaneProfile():
 
 
         elif Scale == "linear":
-            if Field == "Impedance":
+            if Field == "rhophi":
                 ax1.plot(r, valr, 'k.')
             else:
                 ax1.plot(r, valr, 'k-', lw=2)
@@ -431,15 +424,15 @@ def InteractivePlaneProfile():
         for tl in ax2.get_yticklabels():
             tl.set_color('r')
         ax1.grid(True)
+        plt.show()
 
     Q2 = widgets.interactive (foo
-                    ,Field=widgets.ToggleButtons(options=['Ex','Hy','Impedance'], value='Ex')
+                    ,Field=widgets.ToggleButtons(options=['Ex','Hy','Impedance','rhophi'], value='Ex')
                     ,Sigma=widgets.FloatText(value=1, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
                     ,Fixed=widgets.widget_bool.Checkbox(value=False)
                     ,Frequency=widgets.FloatText(value=10., continuous_update=False, description='$f$ (Hz)') \
                     ,Time=widgets.FloatSlider(min=0, max=0.2, step=0.005, continuous_update=False, description='t (s)'))
-    return Q2
     return Q2
 
 if __name__ == '__main__':
