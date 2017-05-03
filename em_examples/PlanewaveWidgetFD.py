@@ -77,12 +77,10 @@ class PolarEllipse(object):
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Ex (V/m)")
         ax.set_zlabel("Hy (A/m)")
-        elev=45
-        azim=290
-        # elev=-90
-        # azim=-90
-        ax.view_init(elev,azim)
-
+        elev = 45
+        azim = 290
+        ax.view_init(elev, azim)
+        plt.show()
         pass
 
     def Interactive(self):
@@ -352,8 +350,8 @@ def InteractivePlaneProfile():
         elif Field == "Hy":
             valr = val_hy.real.flatten()
             vali = val_hy.imag.flatten()
-            labelr = "Re (Hy)-field (V/m)"
-            labeli = "Im (Hy)-field (V/m)"
+            labelr = "Re (Hy)-field (A/m)"
+            labeli = "Im (Hy)-field (A/m)"
 
         elif Field == "Impedance":
             imp = - val_ex / val_hy
@@ -434,13 +432,3 @@ def InteractivePlaneProfile():
                     ,Frequency=widgets.FloatText(value=10., continuous_update=False, description='$f$ (Hz)') \
                     ,Time=widgets.FloatSlider(min=0, max=0.2, step=0.005, continuous_update=False, description='t (s)'))
     return Q2
-
-if __name__ == '__main__':
-    planewidget = PlanewaveWidget()
-    x1, x2 = -500, 500
-    y1, y2 = -500, 500
-    npts2D = 100
-    npts = 100
-    sig = 1.
-    f = 10.
-    planewidget.Planewave2Dviz(x1, y1, x2, y2, npts2D, npts, sig, np.r_[f], functype="E_from_SheetCurrent", orientation="X", normal="Y")

@@ -4,7 +4,6 @@ from scipy.constants import mu_0, pi, epsilon_0
 import numpy as np
 from SimPEG import Utils
 
-
 omega = lambda f: 2.*np.pi*f
 
 def E_field_from_SheetCurruent(XYZ, srcLoc, sig, f, E0=1., orientation='X', kappa=0., epsr=1., t=0.):
