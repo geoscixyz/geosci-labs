@@ -20,7 +20,7 @@ import HarmonicVMDCylWidget
 import InductionLoop
 import Loop
 import MT
-import PlanewaveWidget
+import PlanewaveWidgetFD
 import Reflection
 import sphereElectrostatic_example
 import TransientVMDCylWidget
