@@ -31,15 +31,19 @@ with open('README.rst') as f:
 
 setup(
     name = 'em_examples',
-    version = '0.0.2',
+    version = '0.0.6',
     packages = find_packages(),
     install_requires = [
         'future',
         'numpy>=1.7',
         'scipy>=0.13',
+        'matplotlib',
+        'Pillow',
+        'requests',
         'ipywidgets',
-        'SimPEG',
-                       ],
+        'properties[math]',
+        'SimPEG>=0.4.1',
+    ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
     description = 'em_examples',

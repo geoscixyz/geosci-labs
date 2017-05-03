@@ -9,6 +9,8 @@ from FDEMDipolarfields import *
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
+
+from .Base import widgetify
 from ipywidgets import *
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
@@ -308,7 +310,7 @@ class DipoleWidgetFD(object):
 
             return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, f, srcLoc=np.r_[0., 0., 0.], orientation="z", component=ComplexNumber, view=Component, normal=normal, functype=Field, loc=Offset, scale=Scale)
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["E", "H", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
@@ -330,22 +332,22 @@ class DipoleWidgetFD(object):
             sig = np.r_[10**siglog]
             return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, npts, sig, f, srcLoc=np.r_[0., 0., 0.], orientation=orientation, component=component, view=view, normal=normal, functype=functype, loc=loc, dx=50.)
 
-        out = widgets.interactive (foo
-                        ,orientation=widgets.ToggleButtons(options=['x','y','z']) \
-                        ,normal=widgets.ToggleButtons(options=['X','Y','Z'], value="Z") \
-                        ,component=widgets.ToggleButtons(options=['real','imag','amplitude', 'phase']) \
-                        ,view=widgets.ToggleButtons(options=['x','y','z', 'vec']) \
-                        ,functype=widgets.ToggleButtons(options=["E_from_ED", "H_from_ED", "E_from_ED_galvanic", "E_from_ED_inductive"]) \
-                        ,flog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
-                        ,siglog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
-                        ,loc=widgets.FloatText(value=0.01) \
-                        ,x1=widgets.FloatText(value=-10) \
-                        ,y1=widgets.FloatText(value=0.01) \
-                        ,x2=widgets.FloatText(value=10) \
-                        ,y2=widgets.FloatText(value=0.01) \
-                        ,npts2D=widgets.IntSlider(min=4,max=200,step=2,value=40) \
-                        ,npts=widgets.IntSlider(min=4,max=200,step=2,value=40)
-                        )
+        out = widgetify(foo
+            ,orientation=widgets.ToggleButtons(options=['x','y','z']) \
+            ,normal=widgets.ToggleButtons(options=['X','Y','Z'], value="Z") \
+            ,component=widgets.ToggleButtons(options=['real','imag','amplitude', 'phase']) \
+            ,view=widgets.ToggleButtons(options=['x','y','z', 'vec']) \
+            ,functype=widgets.ToggleButtons(options=["E_from_ED", "H_from_ED", "E_from_ED_galvanic", "E_from_ED_inductive"]) \
+            ,flog=widgets.FloatSlider(min=-3, max=6, step=0.5, value=-3, continuous_update=False) \
+            ,siglog=widgets.FloatSlider(min=-3, max=3, step=0.5, value=-3, continuous_update=False) \
+            ,loc=widgets.FloatText(value=0.01) \
+            ,x1=widgets.FloatText(value=-10) \
+            ,y1=widgets.FloatText(value=0.01) \
+            ,x2=widgets.FloatText(value=10) \
+            ,y2=widgets.FloatText(value=0.01) \
+            ,npts2D=widgets.IntSlider(min=4,max=200,step=2,value=40) \
+            ,npts=widgets.IntSlider(min=4,max=200,step=2,value=40)
+            )
         return out
 
 
@@ -363,7 +365,7 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
     nRx = 100.
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
-    def foo(Component, ComplexNumber, Profile, F1, F2, F3, Scale, FixedScale=False):
+    def foo(Component, ComplexNumber, Sigma, Profile, F1, F2, F3, Scale, FixedScale=False):
     #     Scale = "log"
         orientation = "z"
         vals = []
@@ -421,7 +423,7 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
 
         for ifreq, f in enumerate(F):
             Frequency = f
-            vals.append(self.dataview.eval(xyz_line, srcLoc, np.r_[sig], np.r_[f], orientation, self.dataview.func2D))
+            vals.append(self.dataview.eval(xyz_line, srcLoc, np.r_[Sigma], np.r_[f], orientation, self.dataview.func2D))
             # for ifreq, f in enumerate(F):
             if ComplexNumber == "ReIm":
                 valr = vals[ifreq][icomp].real.flatten()
@@ -529,14 +531,14 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
                 raise NotImplementedError()
 
         ax1.grid(True)
-    Q2 = widgets.interactive (foo
-                    ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole')
-                    ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
-                    ,ComplexNumber=widgets.ToggleButtons(options=['ReIm','AmpPhase']) \
-                    ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
-                    ,Scale=widgets.ToggleButtons(options=['log','linear'], value=Scale) \
-                    ,FixedScale=widgets.widget_bool.Checkbox(value=False, description='Fixed')
-                    ,F1=widgets.FloatText(value=0.1, continuous_update=False, description='$f_1$ (Hz)')
-                    ,F2=widgets.FloatText(value=100, continuous_update=False, description='$f_2$ (Hz)')\
-                    ,F3=widgets.FloatText(value=1000, continuous_update=False, description='$f_3$ (Hz)'))
+    Q2 = widgetify(foo
+        ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole')
+        ,Component=widgets.ToggleButtons(options=['x','y','z'], value='z', description='Comp.') \
+        ,ComplexNumber=widgets.ToggleButtons(options=['ReIm','AmpPhase']) \
+        ,Sigma=widgets.FloatText(value=sig, continuous_update=False, description='$\sigma$ (S/m)') \
+        ,Scale=widgets.ToggleButtons(options=['log','linear'], value=Scale) \
+        ,FixedScale=widgets.widget_bool.Checkbox(value=False, description='Fixed')
+        ,F1=widgets.FloatText(value=0.1, continuous_update=False, description='$f_1$ (Hz)')
+        ,F2=widgets.FloatText(value=100, continuous_update=False, description='$f_2$ (Hz)')\
+        ,F3=widgets.FloatText(value=1000, continuous_update=False, description='$f_3$ (Hz)'))
     return Q2

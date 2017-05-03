@@ -7,6 +7,8 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from VolumeWidget import Arrow3D, polyplane
 
+from .Base import widgetify
+
 def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300, X1=-500., X2=500, Y1=-500, Y2=500, Z1=-1000, Z2=0, nRx=10, plane="XZ", **kwargs):
     plt.rcParams.update({'font.size': 13})
     # define the survey area
@@ -95,7 +97,7 @@ def InteractivePlanes():
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.
         return plotObj3D(offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=Plane)
-    out = widgets.interactive (foo
+    out = widgetify(foo
                     ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=50., continuous_update=False) \
                     # ,X0=widgets.FloatText(value=-20) \
                     # ,Y0=widgets.FloatText(value=-50.) \

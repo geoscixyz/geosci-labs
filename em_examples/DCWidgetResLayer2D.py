@@ -11,12 +11,9 @@ import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
 
-try:
-    from ipywidgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
+from .Base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -695,28 +692,25 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     ax[1].set_ylim([-40.,5.])
     ax[1].set_aspect('equal')
 
-    # plt.show()
-    # return fig, ax
-
 
 def ResLayer_app():
-    app = interact(plot_Surface_Potentials,
-                survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-                zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$zc_{layer}$"),
-                dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dz_{layer}$"),
-                rhoLayer = FloatText(min=1e-8,max=1e8, value = 5000., continuous_update=False,description='$\\rho_{2}$'),
-                xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
-                zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
-                r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
-                rhoHalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{1}$'),
-                rhoTarget = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{3}$'),
-                A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
-                B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
-                M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
-                N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
-                Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
-                Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
-                Scale = ToggleButtons(options =['Linear','Log'],value='Linear')
-                )
+    app = widgetify(plot_Surface_Potentials,
+        survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
+        zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False, description="$zc_{layer}$"),
+        dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False, description="$dz_{layer}$"),
+        rhoLayer = FloatText(min=1e-8,max=1e8, value = 5000., continuous_update=False,description='$\\rho_{2}$'),
+        xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
+        zc = FloatSlider(min=-30.,max=-15.,step=0.5,value=-25., continuous_update=False),
+        r = FloatSlider(min=1.,max=10.,step=0.5,value=5., continuous_update=False),
+        rhoHalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{1}$'),
+        rhoTarget = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_{3}$'),
+        A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
+        B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
+        M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),
+        N = FloatSlider(min=-30.25,max=30.25,step=0.5,value=10.25, continuous_update=False),
+        Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
+        Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
+        Scale = ToggleButtons(options =['Linear','Log'],value='Linear')
+    )
     return app
 

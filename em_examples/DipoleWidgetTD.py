@@ -9,7 +9,10 @@ from TDEMDipolarfields import *
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
+
 from ipywidgets import *
+
+from .Base import widgetify
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     dx = x2-x1
@@ -278,7 +281,7 @@ class DipoleWidgetTD(object):
 
             return self.Dipole2Dviz(x1, y1, x2, y2, npts2D, nRx, sig, t, srcLoc=np.r_[0., 0., 0.], orientation="z", view=Component, normal=normal, functype=Field, loc=Offset, scale=Scale)
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["E", "H", "dHdt","J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Amp','Direction'], value="Direction") \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
@@ -302,13 +305,13 @@ def DisPosNegvalues(val):
     return temp_p, temp_n
 
 
-def InteractiveDipoleProfileTD(self, sig, Field, compvalue, Scale):
+def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
     nRx = 100
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
-    def foo(Component, Profile, T1, T2, T3, Scale, irx):
+    def foo(Component, Profile, Sigma, T1, T2, T3, Scale, irx):
     #     Scale = "log"
         orientation = "z"
         vals = []
@@ -358,7 +361,7 @@ def InteractiveDipoleProfileTD(self, sig, Field, compvalue, Scale):
 
         for ifreq, t in enumerate(T):
             Time = t
-            vals.append(self.dataview.eval_TD(xyz_line, srcLoc, np.r_[sig], np.r_[t], orientation, self.dataview.func2D))
+            vals.append(self.dataview.eval_TD(xyz_line, srcLoc, np.r_[Sigma], np.r_[t], orientation, self.dataview.func2D))
             # for ifreq, f in enumerate(F):
             valr = vals[ifreq][icomp]
 
@@ -417,10 +420,10 @@ def InteractiveDipoleProfileTD(self, sig, Field, compvalue, Scale):
 
 
         ax1.grid(True)
-    Q2 = widgets.interactive (foo
+    Q2 = widgetify(foo
                     ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole') \
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                    ,Sigma=widgets.FloatText(value=0.01, continuous_update=False, description='$\sigma$ (S/m)') \
+                    ,Sigma=widgets.FloatText(value=Sigma, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear'], value=Scale) \
                     ,T1=widgets.FloatText(value=1e-5, continuous_update=False, description='$t_1$ (sec)')
                     ,T2=widgets.FloatText(value=1e-4, continuous_update=False, description='$t_2$ (sec)')\
@@ -429,13 +432,12 @@ def InteractiveDipoleProfileTD(self, sig, Field, compvalue, Scale):
     return Q2
 
 
-def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5, Tmax=1e-2, waveform="stepoff"):
+def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5, Tmax=1e-2, Waveform="stepoff"):
     ntime = 200
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
-    waveform = waveform
 
-    def foo(Component, Sigma, Scale):
+    def foo(Component, Sigma, Scale): #, Waveform="stepoff"):
         orientation = "z"
         vals = []
 
@@ -473,9 +475,10 @@ def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5,
         ax.set_xlabel("Time (sec)")
         ax.grid(True)
 
-    Q3 = widgets.interactive (foo
+    Q3 = widgetify(foo
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                     ,Sigma=widgets.FloatText(value=sig, continuous_update=False, description='$\sigma$ (S/m)') \
                     ,Scale=widgets.ToggleButtons(options=['log','linear']) \
-                    ,Waveform=widgets.ToggleButtons(options=['stepoff','stepon','rampoff'], value='stepoff'))
+                    # ,Waveform=widgets.ToggleButtons(options=['stepoff','stepon','rampoff'], value='stepoff')
+                )
     return Q3

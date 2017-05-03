@@ -10,6 +10,8 @@ from scipy.constants import mu_0
 import requests
 from StringIO import StringIO
 
+from .Base import widgetify
+
 class TransientVMDCylWidget(object):
     """FDEMCylWidgete"""
 
@@ -224,11 +226,11 @@ class TransientVMDCylWidget(object):
 
     def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
                          radius=1., z0=0., x0=10.):
-        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, z, h1, h2, Scale, rxOffset, radius, Geometry=True):
+        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, radius, Geometry=True):
 
             if AmpDir == "Direction":
                 Component = "vec"
-            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3)
+            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3, chi=Sus)
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
@@ -237,7 +239,7 @@ class TransientVMDCylWidget(object):
             self.getFields(itime)
             return self.plotField(Field=Field, view=Component, scale=Scale, Geometry=Geometry, itime=itime)
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Update=widgets.ToggleButtons(options=["True", "False"], value="True") \
                         ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt", "J"], value=fieldvalue) \
                         ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
@@ -319,7 +321,7 @@ class TransientVMDCylWidget(object):
             ax.grid(True)
 
 
-        out = widgets.interactive (foo
+        out = widgetify(foo
                         ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt"], value=fieldvalue) \
                         ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
                         ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
