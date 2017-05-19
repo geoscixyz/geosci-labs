@@ -29,14 +29,13 @@ def fcn_Cosine_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
     t_range = (4/f)*np.linspace(0,1,num=100)
     
     
-    Obj.calc_PrimaryLoop()
+    Obj.calc_PrimaryLoop()                                      # Primary Field at Loop Center
     Bpx,Bpz,Babs = Obj.calc_PrimaryRegion(X,Z)
-    #calc_IndCurrent_Cos_i(self,f,t)
     Ire,Iim,Is,phi = Obj.calc_IndCurrent_cos_range(f,t_range)    
     
     fig1 = plt.figure(figsize=(13,18))
     Ax11 = fig1.add_axes([0,0.7,0.52,0.29])
-    Ax12 = fig1.add_axes([0.57,0.7,0.43,0.29])
+    Ax12 = fig1.add_axes([0.55,0.7,0.46,0.29])
     Ax21 = fig1.add_axes([0.1,0.35,0.8,0.3])
     Ax22 = fig1.add_axes([0.1,0,0.8,0.3])
     
@@ -57,25 +56,38 @@ def fcn_FDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
     Z = np.transpose(Z)  
 
     Obj = IndEx(I,a1,a2,xRx,zRx,azm,R,L)
+    t_range = (4/f)*np.linspace(0,1,num=100)
 
-    Obj.calc_PrimaryLoop()
-    Bpx,Bpz,Babs = Obj.calc_PrimaryRegion(X,Z)
-    EMF,Is = Obj.calc_IndCurrent_FD_spectrum()
-    EMFi,Isi = Obj.calc_IndCurrent_FD_i(f)
+    Obj.calc_PrimaryLoop()  # Calculate primary field at loop center
+    Bpx,Bpz,Babs = Obj.calc_PrimaryRegion(X,Z)  # Calculates regional primary field
+    EMF,Isf = Obj.calc_IndCurrent_FD_spectrum()
+    Ire,Iim,Is,phi = Obj.calc_IndCurrent_cos_range(f,t_range) 
 
-    fig1 = plt.figure(figsize=(13,12))
-    Ax11 = fig1.add_axes([0,0.55,0.52,0.43])
-    Ax12 = fig1.add_axes([0.57,0.54,0.43,0.43])
-    Ax2  = fig1.add_axes([0,0,1,0.45])
+    fig1 = plt.figure(figsize=(13,18))
+    Ax11 = fig1.add_axes([0,0.7,0.48,0.29])
+    Ax12 = fig1.add_axes([0.61,0.7,0.40,0.29])
+    Ax21 = fig1.add_axes([0.1,0.35,0.8,0.3])
+    Ax22 = fig1.add_axes([0.1,0,0.8,0.3])
 
-    Ax11,Cplot = Obj.plot_PrimaryRegion(X,Z,Bpx,Bpz,Babs,Ax11);
-    Ax12 = Obj.plot_PrimaryLoop(Ax12)
-    Ax2 = Obj.plot_InducedCurrent_FD(Ax2,Is,f,EMFi,Isi)
+    Ax11,Cplot = Obj.plot_PrimaryRegion(X,Z,Bpx,Bpz,Babs,Ax11)
+    polyArray = np.array([[-20,10],[4,10],[4,20],[-20,20]])
+    polyObj = plt.Polygon(polyArray,facecolor=((1,1,1)),edgecolor='k')
+    Ax11.add_patch(polyObj)
+    Ax12 = Obj.plot_InducedCurrent_FD(Ax12,Isf,f)
+    Ax21,Ax21b,Ax22 = Obj.plot_InducedCurrent_cos(Ax21,Ax22,Ire,Iim,Is,phi,f,t_range)
     
-    f_str    = '{:.2e}'.format(f)
-    EMF_str  = '{:.2e}j'.format(EMFi.imag)
-    Ax12.text(-2.9,-1.0,'f = '+f_str+' Hz',fontsize=FS)
-    Ax12.text(-2.9,-1.4,'EMF = '+EMF_str+' V',fontsize=FS)
+    Babs_str = '{:.2e}'.format(1e9*Obj.Bpabs)
+    Bn_str   = '{:.2e}'.format(1e9*Obj.Bpn)
+    A_str    = '{:.2f}'.format(Obj.Area)
+
+    Ax11.text(-19,17,'$\mathbf{|B_p|}$ = '+Babs_str+' nT',fontsize=FS,color='k')
+    Ax11.text(-19,14,'$\mathbf{|B_n|}$ = '+Bn_str+' nT',fontsize=FS,color='k')
+    Ax11.text(-19,11,'Area = '+A_str+' m$^2$',fontsize=FS,color='k')
+
+    #f_str    = '{:.2e}'.format(f)
+    #EMF_str  = '{:.2e}j'.format(EMFi.imag)
+    #Ax12.text(-2.9,-1.0,'f = '+f_str+' Hz',fontsize=FS)
+    #Ax12.text(-2.9,-1.4,'EMF = '+EMF_str+' V',fontsize=FS)
 
     plt.show(fig1)
 
@@ -96,17 +108,23 @@ def fcn_TDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,t):
     V,Is = Obj.calc_IndCurrent_TD_offtime()
     EMFi,Isi = Obj.calc_IndCurrent_TD_i(t)
 
-    fig1 = plt.figure(figsize=(13,12))
-    Ax11 = fig1.add_axes([0,0.55,0.52,0.43])
-    Ax12 = fig1.add_axes([0.57,0.54,0.43,0.43])
-    Ax2  = fig1.add_axes([0,0,1,0.45])
+    fig1 = plt.figure(figsize=(13,6))
+    Ax11 = fig1.add_axes([0,0,0.48,0.89])
+    Ax12 = fig1.add_axes([0.61,0,0.40,0.89])
 
-    Ax11,Cplot = Obj.plot_PrimaryRegion(X,Z,Bpx,Bpz,Babs,Ax11);
-    Ax12 = Obj.plot_PrimaryLoop(Ax12)
-    Ax2 = Obj.plot_InducedCurrent_TD(Ax2,Is,t,EMFi,Isi)
+    Ax11,Cplot = Obj.plot_PrimaryRegion(X,Z,Bpx,Bpz,Babs,Ax11)
+    polyArray = np.array([[-20,10],[4,10],[4,20],[-20,20]])
+    polyObj = plt.Polygon(polyArray,facecolor=((1,1,1)),edgecolor='k')
+    Ax11.add_patch(polyObj)
+    Ax12 = Obj.plot_InducedCurrent_TD(Ax12,Is,t,EMFi,Isi)
     
-    EMF_str = '{:.2e}'.format(EMFi)
-    Ax12.text(-2.9,-1.4,'EMF = '+EMF_str+' *$\delta$(t) V',fontsize=FS)
+    Babs_str = '{:.2e}'.format(1e9*Obj.Bpabs)
+    Bn_str   = '{:.2e}'.format(1e9*Obj.Bpn)
+    A_str    = '{:.2f}'.format(Obj.Area)
+
+    Ax11.text(-19,17,'$\mathbf{|B_p|}$ = '+Babs_str+' nT',fontsize=FS,color='k')
+    Ax11.text(-19,14,'$\mathbf{|B_n|}$ = '+Bn_str+' nT',fontsize=FS,color='k')
+    Ax11.text(-19,11,'Area = '+A_str+' m$^2$',fontsize=FS,color='k')
 
     plt.show(fig1)
     
@@ -180,8 +198,10 @@ class IndEx():
         
         I   = self.I
         a1  = self.a1
+        a2  = self.a2
         x   = self.x
         z   = self.z
+        azm = self.azm
         eps = 1e-7
         mu0 = 4*np.pi*1e-7   # 1e9*mu0
         
@@ -191,9 +211,15 @@ class IndEx():
         
         Bpx = mu0*np.sign(x)*(z*I/(2*np.pi*s + eps))*(1/np.sqrt(z**2 + (a1+s)**2))*(-sp.ellipk(k) + ((a1**2 + z**2 + s**2)/(z**2 + (s-a1)**2))*sp.ellipe(k))
         Bpz = mu0*           (  I/(2*np.pi           ))*(1/np.sqrt(z**2 + (a1+s)**2))*( sp.ellipk(k) + ((a1**2 - z**2 - s**2)/(z**2 + (s-a1)**2))*sp.ellipe(k))
+        Bpabs = np.sqrt(Bpx**2 + Bpz**2)
+        Bpn = np.sin(azm)*Bpx + np.cos(azm)*Bpz
+        Area = np.pi*a2**2
 
         self.Bpx = Bpx
         self.Bpz = Bpz
+        self.Bpabs = Bpabs
+        self.Bpn = Bpn
+        self.Area = Area
     
     def calc_IndCurrent_Cos_i(self,f,t):
         """Induced current at particular time and frequency"""
@@ -361,8 +387,8 @@ class IndEx():
         Ax.plot(xRx,zRx,color=((0.4,0.4,0.4)),linewidth=4)
         #Cplot = Ax.contourf(X,Z,np.log10(Babs),40,cmap='ocean_r')
         Cplot = Ax.contourf(X,Z,np.log10(1e9*Babs),40,cmap='viridis')
-        cbar = plt.colorbar(Cplot, ax=Ax)
-        cbar.set_label('log$_{10}(\mathbf{|B_p|})$ [nT]', rotation=270, labelpad = 20, size=FS)
+        cbar = plt.colorbar(Cplot, ax=Ax, pad=0.02)
+        cbar.set_label('log$_{10}(\mathbf{|B_p|})$ [nT]', rotation=270, labelpad = 25, size=FS)
         cbar.ax.tick_params(labelsize=FS-2)
         #Ax.streamplot(X,Z,Bpx,Bpz,color=(0.2,0.2,0.2),linewidth=2)
         Ax.streamplot(X,Z,Bpx,Bpz,color=(1,1,1),linewidth=2)
@@ -370,7 +396,7 @@ class IndEx():
         Ax.set_xbound(np.min(X),np.max(X))
         Ax.set_ybound(np.min(Z),np.max(Z))
         Ax.set_xlabel('X [m]',fontsize=FS+2)
-        Ax.set_ylabel('Z [m]',fontsize=FS+2)
+        Ax.set_ylabel('Z [m]',fontsize=FS+2,labelpad=-10)
         Ax.tick_params(labelsize=FS-2)
         
         
@@ -507,7 +533,7 @@ class IndEx():
         
         
         
-    def plot_InducedCurrent_FD(self,Ax,Is,fi,EMFi,Isi):
+    def plot_InducedCurrent_FD(self,Ax,Is,fi):
         
         FS = 20
         
@@ -520,26 +546,30 @@ class IndEx():
         
 
         
-        Ax.semilogx(f,-np.real(Is),color='k',linewidth=4)
-        Ax.semilogx(f,-np.imag(Is),color='k',ls='--',linewidth=4)
+        Ax.semilogx(f,-np.real(Is),color='k',linewidth=4,label="$I_{Re}$")
+        Ax.semilogx(f,-np.imag(Is),color='k',ls='--',linewidth=4,label="$I_{Im}$")
         Ax.semilogx(fi*np.array([1.,1.]),np.array([0,1.1*Imax]),color='r',ls='-',linewidth=3)
+        handles, labels = Ax.get_legend_handles_labels()
+        Ax.legend(handles, labels, loc='upper left', fontsize=FS)
         
         Ax.set_xlabel('Frequency [Hz]',fontsize=FS+2)
-        Ax.set_ylabel('-Current [A]',fontsize=FS+2)
+        Ax.set_ylabel('$\mathbf{- \, I_s (\omega)}$ [A]',fontsize=FS+2,labelpad=-10)
+        Ax.set_title('Frequency Response',fontsize=FS)
         Ax.set_ybound(0,1.1*Imax)
         Ax.tick_params(labelsize=FS-2)
+        Ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
         
-        R_str    = '{:.3e}'.format(R)
-        L_str    = '{:.3e}'.format(L)
-        f_str    = '{:.3e}'.format(fi)
-        EMF_str  = '{:.2e}j'.format(EMFi.imag)
-        I_str    = '{:.2e} - {:.2e}j'.format(float(np.real(Isi)),np.abs(float(np.imag(Isi))))
+        #R_str    = '{:.3e}'.format(R)
+        #L_str    = '{:.3e}'.format(L)
+        #f_str    = '{:.3e}'.format(fi)
+        #EMF_str  = '{:.2e}j'.format(EMFi.imag)
+        #I_str    = '{:.2e} - {:.2e}j'.format(float(np.real(Isi)),np.abs(float(np.imag(Isi))))
         
-        Ax.text(1.4,1.01*Imax,'$R$ = '+R_str+' $\Omega$',fontsize=FS)
-        Ax.text(1.4,0.94*Imax,'$L$ = '+L_str+' H',fontsize=FS)
-        Ax.text(1.4,0.87*Imax,'$f$ = '+f_str+' Hz',fontsize=FS,color='r')
-        Ax.text(1.4,0.8*Imax,'$V$ = '+EMF_str+' V',fontsize=FS,color='r')
-        Ax.text(1.4,0.73*Imax,'$I_s$ = '+I_str+' A',fontsize=FS,color='r')
+        #Ax.text(1.4,1.01*Imax,'$R$ = '+R_str+' $\Omega$',fontsize=FS)
+        #Ax.text(1.4,0.94*Imax,'$L$ = '+L_str+' H',fontsize=FS)
+        #Ax.text(1.4,0.87*Imax,'$f$ = '+f_str+' Hz',fontsize=FS,color='r')
+        #Ax.text(1.4,0.8*Imax,'$V$ = '+EMF_str+' V',fontsize=FS,color='r')
+        #Ax.text(1.4,0.73*Imax,'$I_s$ = '+I_str+' A',fontsize=FS,color='r')
         
         return Ax
     
@@ -558,22 +588,23 @@ class IndEx():
         Ax.semilogx(ti*np.array([1.,1.]),np.array([0,1.3*Imax]),color='r',ls='-',linewidth=3)
         
         Ax.set_xlabel('Time [s]',fontsize=FS+2)
-        Ax.set_ylabel('Induced Current [A]',fontsize=FS+2)
+        Ax.set_ylabel('$\mathbf{I_s (\omega)}$ [A]',fontsize=FS+2,labelpad=-10)
+        Ax.set_title('Transient Induced Current',fontsize=FS)
         Ax.set_ybound(0,1.2*Imax)
         Ax.tick_params(labelsize=FS-2)
         Ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
         
-        R_str    = '{:.3e}'.format(R)
-        L_str    = '{:.3e}'.format(L)
-        t_str    = '{:.3e}'.format(ti)
-        V_str    = '{:.3e}'.format(Vi)
-        I_str    = '{:.3e}'.format(Isi)
-#        
-        Ax.text(1.4e-6,1.12*Imax,'$R$ = '+R_str+' $\Omega$',fontsize=FS)
-        Ax.text(1.4e-6,1.04*Imax,'$L$ = '+L_str+' H',fontsize=FS)
-        Ax.text(4e-2,1.12*Imax,'$t$ = '+t_str+' s',fontsize=FS,color='r')
-        Ax.text(4e-2,1.04*Imax,'$V$ = '+V_str+' V',fontsize=FS,color='r')
-        Ax.text(4e-2,0.96*Imax,'$I_s$ = '+I_str+' A',fontsize=FS,color='r')
+        #R_str    = '{:.3e}'.format(R)
+        #L_str    = '{:.3e}'.format(L)
+        #t_str    = '{:.3e}'.format(ti)
+        #V_str    = '{:.3e}'.format(Vi)
+        #I_str    = '{:.3e}'.format(Isi)
+        
+        #Ax.text(1.4e-6,1.12*Imax,'$R$ = '+R_str+' $\Omega$',fontsize=FS)
+        #Ax.text(1.4e-6,1.04*Imax,'$L$ = '+L_str+' H',fontsize=FS)
+        #Ax.text(4e-2,1.12*Imax,'$t$ = '+t_str+' s',fontsize=FS,color='r')
+        #Ax.text(4e-2,1.04*Imax,'$V$ = '+V_str+' V',fontsize=FS,color='r')
+        #Ax.text(4e-2,0.96*Imax,'$I_s$ = '+I_str+' A',fontsize=FS,color='r')
         
         return Ax
         
