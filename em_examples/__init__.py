@@ -28,7 +28,7 @@ import View
 import VolumeWidget
 import VolumeWidgetPlane
 
-__version__   = '0.0.6'
+__version__   = '0.0.7'
 __author__    = 'GeoScixyz developers'
 __license__   = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
