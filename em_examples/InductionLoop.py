@@ -457,10 +457,10 @@ class IndEx():
         xTicks  = (np.max(t)/8)*np.linspace(0,8,9)
         xLabels = ['0','T/2','T','3T/2','2T','5T/2','3T','7T/2','4T']
         
+        Ax1.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax1.plot(t,zero_line,color='k',linewidth=2)
         Ax1.plot(t,I0,color='k',linewidth=4)
         Ax1.plot(tL_phase,IL_phase,color='k',ls=':',linewidth=8)
-        Ax1.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax1.set_xbound(0,np.max(t))
         Ax1.set_ybound(1.55*np.min(I0),1.55*np.max(I0))
         Ax1.set_xlabel('Time',fontsize=FS+2)
@@ -491,11 +491,10 @@ class IndEx():
         Ax1.text(1.7*T,1.3*Ipmax,'Phase Lag ($\phi$) = '+phi_str+'$^o$',fontsize=FS,color='k')
                 
         
-        
+        Ax2.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax2.plot(t,zero_line,color='k',linewidth=2)
         Ax2.plot(t,Ire,color='b',linewidth=4)
         Ax2.plot(t,Iim,color='r',linewidth=4)
-        Ax2.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax2.set_xbound(0,np.max(t))
         Ax2.set_ybound(1.61*np.min(Is),1.61*np.max(Is))
         Ax2.set_xlabel('Time',fontsize=FS+2)
@@ -529,11 +528,10 @@ class IndEx():
         f = np.logspace(0,8,101)
         
 
-        
+        Ax.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax.semilogx(f,-np.real(Is),color='k',linewidth=4,label="$I_{Re}$")
         Ax.semilogx(f,-np.imag(Is),color='k',ls='--',linewidth=4,label="$I_{Im}$")
         Ax.semilogx(fi*np.array([1.,1.]),np.array([0,1.1*Imax]),color='r',ls='-',linewidth=3)
-        Ax.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         handles, labels = Ax.get_legend_handles_labels()
         Ax.legend(handles, labels, loc='upper left', fontsize=FS)
         
@@ -569,9 +567,9 @@ class IndEx():
         
         t = np.logspace(-6,0,101)
         
+        Ax.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         Ax.semilogx(t,Is,color='k',linewidth=4)
         Ax.semilogx(ti*np.array([1.,1.]),np.array([0,1.3*Imax]),color='r',ls='-',linewidth=3)
-        Ax.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
         
         Ax.set_xlabel('Time [s]',fontsize=FS+2)
         Ax.set_ylabel('$\mathbf{I_s (\omega)}$ [A]',fontsize=FS+2,labelpad=-10)
