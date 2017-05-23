@@ -17,9 +17,12 @@ from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 #   PLOTTING FUNCTIONS FOR WIDGETS
 ##############################################
 
-def fcn_Cosine_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
+def fcn_Cosine_Widget(I,a1,a2,xRx,zRx,azm,logR,logL,logf):
     
-    
+    R = 10**logR
+    L = 10**logL
+    f = 10**logf
+
     xmin, xmax, dx, zmin, zmax, dz = -20., 20., 0.5, -20., 20., 0.5
     X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
     X = np.transpose(X)
@@ -46,8 +49,12 @@ def fcn_Cosine_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
     plt.show(fig1)
 
 
-def fcn_FDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
+def fcn_FDEM_Widget(I,a1,a2,xRx,zRx,azm,logR,logL,logf):
     
+    R = 10**logR
+    L = 10**logL
+    f = 10**logf
+
     FS = 20
     
     xmin, xmax, dx, zmin, zmax, dz = -20., 20., 0.5, -20., 20., 0.5
@@ -92,7 +99,11 @@ def fcn_FDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,f):
     plt.show(fig1)
 
 
-def fcn_TDEM_Widget(I,a1,a2,xRx,zRx,azm,R,L,t):
+def fcn_TDEM_Widget(I,a1,a2,xRx,zRx,azm,logR,logL,logt):
+
+    R = 10**logR
+    L = 10**logL
+    t = 10**logt
     
     FS = 20
     
