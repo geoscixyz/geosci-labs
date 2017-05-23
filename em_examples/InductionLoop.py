@@ -17,37 +17,6 @@ from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 #   PLOTTING FUNCTIONS FOR WIDGETS
 ##############################################
 
-def fcn_Cosine_Widget(I,a1,a2,xRx,zRx,azm,logR,logL,logf):
-    
-    R = 10**logR
-    L = 10**logL
-    f = 10**logf
-
-    xmin, xmax, dx, zmin, zmax, dz = -20., 20., 0.5, -20., 20., 0.5
-    X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
-    X = np.transpose(X)
-    Z = np.transpose(Z)  
-
-    Obj = IndEx(I,a1,a2,xRx,zRx,azm,R,L)
-    t_range = (4/f)*np.linspace(0,1,num=100)
-    
-    
-    Obj.calc_PrimaryLoop()                                      # Primary Field at Loop Center
-    Bpx,Bpz,Babs = Obj.calc_PrimaryRegion(X,Z)
-    Ire,Iim,Is,phi = Obj.calc_IndCurrent_cos_range(f,t_range)    
-    
-    fig1 = plt.figure(figsize=(13,8))
-    Ax11 = fig1.add_axes([0,0.66,0.52,0.34])
-    Ax12 = fig1.add_axes([0.55,0.66,0.46,0.34])
-    Ax21 = fig1.add_axes([0.1,0.38,0.8,0.32])
-    Ax22 = fig1.add_axes([0.1,0,0.8,0.32])
-    
-    Ax11,Cplot = Obj.plot_PrimaryRegion(X,Z,Bpx,Bpz,Babs,Ax11);
-    Ax12 = Obj.plot_PrimaryLoop(Ax12)
-    Ax21,Ax21b,Ax22 = Obj.plot_InducedCurrent_cos(Ax21,Ax22,Ire,Iim,Is,phi,f,t_range)
-    
-    plt.show(fig1)
-
 
 def fcn_FDEM_Widget(I,a1,a2,xRx,zRx,azm,logR,logL,logf):
     
