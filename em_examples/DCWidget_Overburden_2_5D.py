@@ -10,6 +10,7 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
+from .Base import widgetify
 
 from ipywidgets import interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Widget
 
@@ -245,11 +246,12 @@ def calculateRhoA(survey, VM, VN, A, B, M, N):
     return rho_a
 
 def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
-         overburden_wide, target_thick, target_wide, whichprimary,
+         target_thick, target_wide, whichprimary,
                  ellips_a, ellips_b, xc, zc, Field, Type, Scale):
 
     labelsize = 12.
     ticksize = 10.
+    overburden_wide = 2000.
 
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
@@ -260,7 +262,7 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
 
     mtrue, mhalf, mair, mover = model_valley(lnsig_air=np.log(1e-8), ln_sigback=ln_sigHalf, ln_over=ln_sigLayer,
                  ln_sigtarget=ln_sigTarget , overburden_thick =overburden_thick,
-                 overburden_wide=overburden_wide, target_thick=target_thick, target_wide =target_wide,
+                 target_thick=target_thick, target_wide =target_wide,
                  a=ellips_a, b=ellips_b, xc=xc, zc=zc)
 
     src, primary_field, air_field, total_field = model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary=whichprimary)
@@ -373,6 +375,11 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
             if Scale == 'Log':
                 linthresh = 10.
                 pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=linthresh, linscale=0.2), "cmap": "jet_r"}
+
+        #prepare for masking arrays - 'conventional' arrays won't do it
+        u = np.ma.array(u)
+        #mask values below a certain threshold
+        u = np.ma.masked_where(mtrue <= np.log(1e-8) , u)
 
     elif Field == 'Potential':
 
@@ -514,11 +521,6 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
             uPrim = getSensitivity(survey, A, B, M, N, mhalf)
             u = uTotal - uPrim
         # u = np.log10(abs(u))
-
-    #prepare for masking arrays - 'conventional' arrays won't do it
-    #u = np.ma.array(u)
-    #mask values below a certain threshold
-    #u = np.ma.masked_where(mtrue <= np.log(1e-8) , u)
 
     if Scale == 'Log':
         eps = 1e-16
@@ -665,7 +667,7 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
     plt.show()
 
 def valley_app():
-    app = interact_manual(PLOT,
+    app = widgetify(PLOT, manual=True,
                 survey=ToggleButtons(options=['Dipole-Dipole', 'Dipole-Pole', 'Pole-Dipole', 'Pole-Pole'], value='Dipole-Dipole'),
                 xc=FloatSlider(min=-1005., max=1000., step=10., value=0.), #, continuous_update=False),
                 zc=FloatSlider(min=-1000., max=1000., step=10., value=250.), #, continuous_update=False),
@@ -675,7 +677,7 @@ def valley_app():
                 rholayer=FloatText(min=1e-8, max=1e8, value=100., description='$\\rho_2$'), #, continuous_update=False, description='$\\rho_2$'),
                 rhoTarget=FloatText(min=1e-8, max=1e8, value=500., description='$\\rho_3$'), #, continuous_update=False, description='$\\rho_3$'),
                 overburden_thick=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
-                overburden_wide=fixed(2000.), #, continuous_update=False),
+                #overburden_wide=fixed(2000.), #, continuous_update=False),
                 target_thick=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
                 target_wide=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
                 A=FloatSlider(min=-1010., max=1010., step=20., value=-510.), #, continuous_update=False),
