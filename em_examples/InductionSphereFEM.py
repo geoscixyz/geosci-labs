@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib.path import Path
+import matplotlib.patches as patches
 
 
 
@@ -24,7 +26,7 @@ def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,
 	Hxi,Hyi,Hzi,Habsi = Obj.fcn_ComputeFrequencyResponse(fvec,sig,mur,a,x0,y0,z0,xrx,yrx,zrx)
 
 	fig1 = plt.figure(figsize=(17,6))
-	Ax1 = fig1.add_axes([0.04,0,0.42,1])
+	Ax1 = fig1.add_axes([0.04,0,0.43,1])
 	Ax2 = fig1.add_axes([0.6,0,0.4,1])
 
 	if Comp == 'x':
@@ -47,28 +49,38 @@ def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,
 	plt.show(fig1)
 
 
-def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,zrx,f,Phase):
+def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,zrx,f,Flag):
 
-	ytx = 0.
-	y0 = 0.
-	yrx = 0.
-	Y = 0.
+	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
 	fvec = np.logspace(0,8,49)
 
-	xmin, xmax, dx, zmin, zmax, dz = -20., 20., 0.25, -20., 20., 0.25
+	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.25, -40., 20., 0.25
 	X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
 	X = np.transpose(X)
 	Z = np.transpose(Z)
 
-	Obj = SphereFEM(m,orient,xtx,ytx,ztx)
+	Obj = SphereFEM(m,orient,xtx,0.,ztx)
 
-	Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,y0,z0,X,Y,Z)
-	Hxi,Hyi,Hzi,Habsi = Obj.fcn_ComputeFrequencyResponse(fvec,sig,mur,a,x0,y0,z0,xrx,yrx,zrx)
+	Hxi,Hyi,Hzi,Habsi = Obj.fcn_ComputeFrequencyResponse(fvec,sig,mur,a,x0,0.,z0,xrx,0.,zrx)
 
 	fig1 = plt.figure(figsize=(17,6))
-	Ax1 = fig1.add_axes([0.04,0,0.42,1])
+	Ax1 = fig1.add_axes([0.04,0,0.38,1])
 	Ax2 = fig1.add_axes([0.6,0,0.4,1])
+
+	Ax1 = plotProfileTxRxSphere(Ax1,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient)
+
+	if Flag == 'Hp':
+		Hpx,Hpy,Hpz = fcn_ComputePrimary(m,orient,xtx,0.,ztx,X,0.,Z)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,Hpx,Hpz,Flag)
+	elif Flag == 'Hs_real':
+		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,np.real(Hx),np.real(Hz),Flag)
+	elif Flag == 'Hs_imag':
+		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,np.imag(Hx),np.imag(Hz),Flag)
+
+
 
 	if orient == 'x':
 		Ax2 = plotResponseFEM(Ax2,fvec,Hxi,orient)
@@ -238,6 +250,58 @@ def plotResponseFEM(Ax,f,H,Comp):
 	return Ax
 
 
+def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
+
+	phi = np.linspace(0,2*np.pi,41)
+	psi = np.linspace(0,np.pi,41)
+
+	if orient == 'x':
+		Xtx = xtx + 0.5*np.cos(phi)
+		Ztx = ztx + 2*np.sin(phi)
+		Xrx = xrx + 0.5*np.cos(phi)
+		Zrx = zrx + 2*np.sin(phi)
+	elif orient == 'z':
+		Xtx = xtx + 2*np.cos(phi)
+		Ztx = ztx + 0.5*np.sin(phi)
+		Xrx = xrx + 2*np.cos(phi)
+		Zrx = zrx + 0.5*np.sin(phi)
+
+	Xs = x0 + a*np.cos(psi)
+	Zs1 = z0 + a*np.sin(psi)
+	Zs2 = z0 - a*np.sin(psi)
+
+	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.max(Z),np.max(Z)]),facecolor=(0.9,0.9,0.9))
+	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.min(Z),np.min(Z)]),facecolor=(0.6,0.6,0.6),linewidth=2)
+	Ax.fill_between(Xs,Zs1,Zs2,facecolor=(0.4,0.4,0.4),linewidth=2)
+
+	Ax.plot(Xtx,Ztx,'k',linewidth=4)
+	Ax.plot(Xrx,Zrx,'k',linewidth=4)
+
+	Ax.set_xbound(np.min(X),np.max(X))
+	Ax.set_ybound(np.min(Z),np.max(Z))
+
+	return Ax
+
+
+def plotProfileXZplane(Ax,X,Z,Hx,Hz,Flag):
+
+	FS = 20
+
+	if Flag == 'Hp':
+		Ax.streamplot(X,Z,Hx,Hz,color='b',linewidth=3,arrowsize=1.5)
+		Ax.set_title('Primary Field',fontsize=FS+6)
+	elif Flag == 'Hs_real':
+		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3,arrowsize=1.5)
+		Ax.set_title('Secondary Field (real)',fontsize=FS+6)
+	elif Flag == 'Hs_imag':
+		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3,arrowsize=1.5)
+		Ax.set_title('Secondary Field (imaginary)',fontsize=FS+6)
+    
+	Ax.set_xbound(np.min(X),np.max(X))
+	Ax.set_ybound(np.min(Z),np.max(Z))
+	Ax.set_xlabel('X [m]',fontsize=FS+2)
+	Ax.set_ylabel('Z [m]',fontsize=FS+2,labelpad=-10)
+	Ax.tick_params(labelsize=FS-2)
 
 
 
