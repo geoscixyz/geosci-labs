@@ -11,11 +11,14 @@ import matplotlib.patches as patches
 #   PLOTTING FUNCTIONS FOR WIDGETS
 ##############################################
 
-def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,xrx,yrx,zrx,f,Comp,Phase):
+def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,xrx,yrx,zrx,logf,Comp,Phase):
+
+	sig = 10**sig
+	f = 10**logf
 
 	fvec = np.logspace(0,8,49)
 
-	xmin, xmax, dx, ymin, ymax, dy = -20., 20., 0.25, -20., 20., 0.25
+	xmin, xmax, dx, ymin, ymax, dy = -30., 30., 0.25, -30., 30., 0.25
 	X,Y = np.mgrid[xmin:xmax+dx:dx, ymin:ymax+dy:dy]
 	X = np.transpose(X)
 	Y = np.transpose(Y)
@@ -49,7 +52,10 @@ def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,
 	plt.show(fig1)
 
 
-def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,zrx,f,Flag):
+def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,zrx,logf,Flag):
+
+	sig = 10**sig
+	f = 10**logf
 
 	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
@@ -154,15 +160,18 @@ def plotAnomalyXYplane(Ax,f,X,Y,Z,H,Comp,Phase):
 	Sign[H<0] = 0.
 	H[H<0] = 0.
 
+	Cmap = 'RdYlBu'
+	#Cmap = 'seismic_r'
+
 	if Comp == 'abs':
 		TickLabels = MAX*np.array([1.,1e-1,1e-2,1e-3,1e-4,0.,-1e-4,-1e-3,-1e-2,-1e-1,-1])
 		TickLabels = ["%.1e" % x for x in TickLabels]
-		Cplot = Ax.contourf(X,Y,Sign*H,50,cmap='seismic_r', vmin=-5, vmax=5)
+		Cplot = Ax.contourf(X,Y,Sign*H,50,cmap=Cmap, vmin=-5, vmax=5)
 		cbar = plt.colorbar(Cplot, ax=Ax, pad=0.02, ticks=-np.linspace(-5,5,11))
 	else:
 		TickLabels = MAX*np.array([-1.,-1e-1,-1e-2,-1e-3,-1e-4,0.,1e-4,1e-3,1e-2,1e-1,1])
 		TickLabels = ["%.1e" % x for x in TickLabels]
-		Cplot = Ax.contourf(X,Y,Sign*H,50,cmap='seismic_r', vmin=-5, vmax=5)
+		Cplot = Ax.contourf(X,Y,Sign*H,50,cmap=Cmap, vmin=-5, vmax=5)
 		cbar = plt.colorbar(Cplot, ax=Ax, pad=0.02, ticks=np.linspace(-5,5,11))
 
 	if Comp == 'x':
@@ -198,9 +207,9 @@ def plotPlaceTxRxSphereXY(Ax,xtx,ytx,xrx,yrx,x0,y0,a):
 	FS = 20
 
 	Ax.scatter(xtx,ytx,s=100,color='k')
-	Ax.text(xtx-0.5,ytx+1,'$\mathbf{Tx}$',fontsize=FS+6)
+	Ax.text(xtx-0.75,ytx+1.5,'$\mathbf{Tx}$',fontsize=FS+6)
 	Ax.scatter(xrx,yrx,s=100,color='k')
-	Ax.text(xrx-0.5,yrx-2.5,'$\mathbf{Rx}$',fontsize=FS+6)
+	Ax.text(xrx-0.75,yrx-4,'$\mathbf{Rx}$',fontsize=FS+6)
 
 	xs = x0 + a*np.cos(np.linspace(0,2*np.pi,41))
 	ys = y0 + a*np.sin(np.linspace(0,2*np.pi,41))
@@ -288,13 +297,13 @@ def plotProfileXZplane(Ax,X,Z,Hx,Hz,Flag):
 	FS = 20
 
 	if Flag == 'Hp':
-		Ax.streamplot(X,Z,Hx,Hz,color='b',linewidth=3,arrowsize=1.5)
+		Ax.streamplot(X,Z,Hx,Hz,color='b',linewidth=3.5,arrowsize=2)
 		Ax.set_title('Primary Field',fontsize=FS+6)
 	elif Flag == 'Hs_real':
-		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3,arrowsize=1.5)
+		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3.5,arrowsize=2)
 		Ax.set_title('Secondary Field (real)',fontsize=FS+6)
 	elif Flag == 'Hs_imag':
-		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3,arrowsize=1.5)
+		Ax.streamplot(X,Z,Hx,Hz,color='r',linewidth=3.5,arrowsize=2)
 		Ax.set_title('Secondary Field (imaginary)',fontsize=FS+6)
     
 	Ax.set_xbound(np.min(X),np.max(X))
