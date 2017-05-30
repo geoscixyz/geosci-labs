@@ -37,7 +37,7 @@ def widgetify(fun, layout=None, manual=False, **kwargs):
 
     f.widget = w
     # defaults =  #dict([(key, val.value) for key, val in kwargs.iteritems() if isinstance(val, Widget)])
+    app.update()
     #app.on_displayed(f(**(w.kwargs)))
-    #w.on_widget_constructed(f(**(w.kwargs)))
 
     return w
