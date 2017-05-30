@@ -35,19 +35,19 @@ def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,
 	if Comp == 'x':
 		Ax1 = plotAnomalyXYplane(Ax1,f,X,Y,ztx,Hx,Comp,Phase)
 		Ax1 = plotPlaceTxRxSphereXY(Ax1,xtx,ytx,xrx,yrx,x0,y0,a)
-		Ax2 = plotResponseFEM(Ax2,fvec,Hxi,Comp)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hxi,Comp)
 	elif Comp == 'y':
 		Ax1 = plotAnomalyXYplane(Ax1,f,X,Y,ztx,Hy,Comp,Phase)
 		Ax1 = plotPlaceTxRxSphereXY(Ax1,xtx,ytx,xrx,yrx,x0,y0,a)
-		Ax2 = plotResponseFEM(Ax2,fvec,Hyi,Comp)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hyi,Comp)
 	elif Comp == 'z':
 		Ax1 = plotAnomalyXYplane(Ax1,f,X,Y,ztx,Hz,Comp,Phase)
 		Ax1 = plotPlaceTxRxSphereXY(Ax1,xtx,ytx,xrx,yrx,x0,y0,a)
-		Ax2 = plotResponseFEM(Ax2,fvec,Hzi,Comp)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hzi,Comp)
 	elif Comp == 'abs':
 		Ax1 = plotAnomalyXYplane(Ax1,f,X,Y,ztx,Habs,Comp,Phase)
 		Ax1 = plotPlaceTxRxSphereXY(Ax1,xtx,ytx,xrx,yrx,x0,y0,a)
-		Ax2 = plotResponseFEM(Ax2,fvec,Habsi,Comp)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Habsi,Comp)
 
 	plt.show(fig1)
 
@@ -69,6 +69,7 @@ def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,z
 	Obj = SphereFEM(m,orient,xtx,0.,ztx)
 
 	Hxi,Hyi,Hzi,Habsi = Obj.fcn_ComputeFrequencyResponse(fvec,sig,mur,a,x0,0.,z0,xrx,0.,zrx)
+	Hxf,Hyf,Hzf = fcn_ComputePrimary(m,orient,xtx,0.,ztx,x0,0.,z0)
 
 	fig1 = plt.figure(figsize=(17,6))
 	Ax1 = fig1.add_axes([0.04,0,0.38,1])
@@ -78,24 +79,75 @@ def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,z
 
 	if Flag == 'Hp':
 		Hpx,Hpy,Hpz = fcn_ComputePrimary(m,orient,xtx,0.,ztx,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,Hpx,Hpz,Flag)
 	elif Flag == 'Hs_real':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.real(Hx),np.real(Hz),Flag)
 	elif Flag == 'Hs_imag':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.imag(Hx),np.imag(Hz),Flag)
 
-
+	
 
 	if orient == 'x':
-		Ax2 = plotResponseFEM(Ax2,fvec,Hxi,orient)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hxi,orient)
 	elif orient == 'z':
-		Ax2 = plotResponseFEM(Ax2,fvec,Hzi,orient)
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hzi,orient)
 
 	plt.show(fig1)
 
+def fcn_FDEM_InductionSphereProfileEM31Widget(xtx,ztx,L,m,orient,x0,z0,a,sig,mur,logf,Flag):
 
+	xtx = xtx - L/2
+	xrx = xtx + L
+	zrx = ztx
+	sig = 10**sig
+	f = 10**logf
+
+	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
+
+	fvec = np.logspace(0,8,49)
+
+	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.25, -40., 20., 0.25
+	X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
+	X = np.transpose(X)
+	Z = np.transpose(Z)
+
+	Obj = SphereFEM(m,orient,xtx,0.,ztx)
+
+	Hxi,Hyi,Hzi,Habsi = Obj.fcn_ComputeFrequencyResponse(fvec,sig,mur,a,x0,0.,z0,xrx,0.,zrx)
+	Hxf,Hyf,Hzf = fcn_ComputePrimary(m,orient,xtx,0.,ztx,x0,0.,z0)
+
+	fig1 = plt.figure(figsize=(17,6))
+	Ax1 = fig1.add_axes([0.04,0,0.38,1])
+	Ax2 = fig1.add_axes([0.6,0,0.4,1])
+
+	Ax1 = plotProfileTxRxSphere(Ax1,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient)
+
+	if Flag == 'Hp':
+		Hpx,Hpy,Hpz = fcn_ComputePrimary(m,orient,xtx,0.,ztx,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,Hpx,Hpz,Flag)
+	elif Flag == 'Hs_real':
+		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,np.real(Hx),np.real(Hz),Flag)
+	elif Flag == 'Hs_imag':
+		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Ax1 = plotProfileXZplane(Ax1,X,Z,np.imag(Hx),np.imag(Hz),Flag)
+
+	
+
+	if orient == 'x':
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hxi,orient)
+	elif orient == 'z':
+		Ax2 = plotResponseFEM(Ax2,f,fvec,Hzi,orient)
+
+	plt.show(fig1)
 
 ##############################################
 #   GLOBAL FUNTIONS
@@ -221,17 +273,20 @@ def plotPlaceTxRxSphereXY(Ax,xtx,ytx,xrx,yrx,x0,y0,a):
 
 	return Ax
 
-def plotResponseFEM(Ax,f,H,Comp):
+def plotResponseFEM(Ax,fi,f,H,Comp):
 
 	FS = 20
 
 	xTicks = (np.logspace(np.log(np.min(f)),np.log(np.max(f)),9))
-	
+	Ylim = np.array([np.min(np.real(H)),np.max(np.real(H))])
+
 	Ax.grid('both', linestyle='-', linewidth=0.8, color=[0.8, 0.8, 0.8])
 	Ax.semilogx(f,0*f,color='k',linewidth=2)
 	Ax.semilogx(f,np.real(H),color='k',linewidth=4,label="Real")
 	Ax.semilogx(f,np.imag(H),color='k',linewidth=4,ls='--',label="Imaginary")
+	Ax.semilogx(np.array([fi,fi]),1.1*Ylim,linewidth=3,color='r')
 	Ax.set_xbound(np.min(f),np.max(f))
+	Ax.set_ybound(1.1*Ylim)
 	Ax.set_xlabel('Frequency [Hz]',fontsize=FS+2)
 	Ax.tick_params(labelsize=FS-2)
 	Ax.yaxis.set_major_formatter(FormatStrFormatter('%.1e'))
@@ -248,6 +303,7 @@ def plotResponseFEM(Ax,f,H,Comp):
 	elif Comp == 'abs':
 		Ax.set_ylabel('$\mathbf{|H|}$ [A/m]',fontsize=FS+4,labelpad=-5)
 		Ax.set_title('$\mathbf{|H|}$ Response at $\mathbf{Rx}$',fontsize=FS+6)
+
 
 	if np.max(np.real(H[-1])) > 0.:
 		handles, labels = Ax.get_legend_handles_labels()
@@ -281,7 +337,7 @@ def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
 
 	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.max(Z),np.max(Z)]),facecolor=(0.9,0.9,0.9))
 	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.min(Z),np.min(Z)]),facecolor=(0.6,0.6,0.6),linewidth=2)
-	Ax.fill_between(Xs,Zs1,Zs2,facecolor=(0.4,0.4,0.4),linewidth=2)
+	Ax.fill_between(Xs,Zs1,Zs2,facecolor=(0.4,0.4,0.4),linewidth=4)
 
 	Ax.plot(Xtx,Ztx,'k',linewidth=4)
 	Ax.plot(Xrx,Zrx,'k',linewidth=4)
@@ -312,6 +368,20 @@ def plotProfileXZplane(Ax,X,Z,Hx,Hz,Flag):
 	Ax.set_ylabel('Z [m]',fontsize=FS+2,labelpad=-10)
 	Ax.tick_params(labelsize=FS-2)
 
+
+
+def plotProfileTxRxArrow(Ax,x0,z0,Hxf,Hzf,Flag):
+
+	Habsf = np.sqrt(Hxf**2 + Hzf**2)
+	dx = Hxf/Habsf
+	dz = Hzf/Habsf
+
+	if Flag == 'Hp':
+		Ax.arrow(x0-2.5*dx, z0-2.75*dz, 3*dx, 3*dz, fc=(0.,0.,0.8), ec="k",head_width=2.5, head_length=2.5,width=1)
+	else:
+		Ax.arrow(x0+2.5*dx, z0+2.75*dz, -3*dx, -3*dz, fc=(0.8,0.,0.), ec="k",head_width=2.5, head_length=2.5,width=1)
+
+	return Ax
 
 
 
