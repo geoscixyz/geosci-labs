@@ -15,7 +15,7 @@ class MyApp(Box):
 
     @property
     def kwargs(self):
-        instanceCheck = lambda x: isinstance(x, ToggleButton), isinstance(x, ToggleButtons) or isinstance(x, FloatSlider) or isinstance(x, IntSlider) or isinstance(x, FloatText) or isinstance(x, fixed) or isinstance(x, Checkbox)
+        instanceCheck = lambda x: isinstance(x, ToggleButton) or isinstance(x, ToggleButtons) or isinstance(x, FloatSlider) or isinstance(x, IntSlider) or isinstance(x, FloatText) or isinstance(x, fixed) or isinstance(x, Checkbox)
         return dict(
             [(key, val.value) for key, val in self._kwargs.iteritems()
             if instanceCheck(val)]
