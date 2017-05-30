@@ -663,7 +663,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     ax[1].set_aspect('equal')
-    # plt.show()
+    plt.show()
     # return fig, ax
 
 
