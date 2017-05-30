@@ -57,6 +57,12 @@ def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,z
 	sig = 10**sig
 	f = 10**logf
 
+	if orient == "Vert. Coaxial":
+		orient = 'x'
+	elif orient == "Horiz. Coplanar":
+		orient = 'z'
+
+
 	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
 	fvec = np.logspace(0,8,49)
@@ -106,6 +112,11 @@ def fcn_FDEM_InductionSphereProfileEM31Widget(xtx,ztx,L,m,orient,x0,z0,a,sig,mur
 	zrx = ztx
 	sig = 10**sig
 	f = 10**logf
+
+	if orient == "Vert. Coaxial":
+		orient = 'x'
+	elif orient == "Horiz. Coplanar":
+		orient = 'z'
 
 	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
@@ -266,7 +277,7 @@ def plotPlaceTxRxSphereXY(Ax,xtx,ytx,xrx,yrx,x0,y0,a):
 	xs = x0 + a*np.cos(np.linspace(0,2*np.pi,41))
 	ys = y0 + a*np.sin(np.linspace(0,2*np.pi,41))
 
-	Ax.plot(xs,ys,ls=':',color='k',linewidth=8)
+	Ax.plot(xs,ys,ls=':',color='k',linewidth=3)
 
 	Ax.set_xbound(Xlim)
 	Ax.set_ybound(Ylim)
@@ -317,6 +328,8 @@ def plotResponseFEM(Ax,fi,f,H,Comp):
 
 def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
 
+	FS = 22
+
 	phi = np.linspace(0,2*np.pi,41)
 	psi = np.linspace(0,np.pi,41)
 
@@ -341,9 +354,13 @@ def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
 
 	Ax.plot(Xtx,Ztx,'k',linewidth=4)
 	Ax.plot(Xrx,Zrx,'k',linewidth=4)
+	Ax.plot(x0+a*np.cos(phi),z0+a*np.sin(phi),'k',linewidth=2)
 
 	Ax.set_xbound(np.min(X),np.max(X))
 	Ax.set_ybound(np.min(Z),np.max(Z))
+
+	Ax.text(xtx-4,ztx+2,'$\mathbf{Tx}$',fontsize=FS)
+	Ax.text(xrx,zrx+2,'$\mathbf{Rx}$',fontsize=FS)
 
 	return Ax
 
@@ -377,9 +394,9 @@ def plotProfileTxRxArrow(Ax,x0,z0,Hxf,Hzf,Flag):
 	dz = Hzf/Habsf
 
 	if Flag == 'Hp':
-		Ax.arrow(x0-2.5*dx, z0-2.75*dz, 3*dx, 3*dz, fc=(0.,0.,0.8), ec="k",head_width=2.5, head_length=2.5,width=1)
+		Ax.arrow(x0-2.5*dx, z0-2.75*dz, 3*dx, 3*dz, fc=(0.,0.,0.8), ec="k",head_width=2.5, head_length=2.5,width=1,linewidth=2)
 	else:
-		Ax.arrow(x0+2.5*dx, z0+2.75*dz, -3*dx, -3*dz, fc=(0.8,0.,0.), ec="k",head_width=2.5, head_length=2.5,width=1)
+		Ax.arrow(x0+2.5*dx, z0+2.75*dz, -3*dx, -3*dz, fc=(0.8,0.,0.), ec="k",head_width=2.5, head_length=2.5,width=1,linewidth=2)
 
 	return Ax
 
