@@ -245,7 +245,7 @@ def calculateRhoA(survey, VM, VN, A, B, M, N):
 
     return rho_a
 
-def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick,
+def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick, overburden_wide,
          target_thick, target_wide, whichprimary,
                  ellips_a, ellips_b, xc, zc, Field, Type, Scale):
 
@@ -677,7 +677,7 @@ def valley_app():
                 rholayer=FloatText(min=1e-8, max=1e8, value=100., description='$\\rho_2$'), #, continuous_update=False, description='$\\rho_2$'),
                 rhoTarget=FloatText(min=1e-8, max=1e8, value=500., description='$\\rho_3$'), #, continuous_update=False, description='$\\rho_3$'),
                 overburden_thick=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
-                #overburden_wide=fixed(2000.), #, continuous_update=False),
+                overburden_wide=fixed(2000.), #, continuous_update=False),
                 target_thick=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
                 target_wide=FloatSlider(min=0., max=1000., step= 10., value=200.), #, continuous_update=False),
                 A=FloatSlider(min=-1010., max=1010., step=20., value=-510.), #, continuous_update=False),
@@ -691,13 +691,5 @@ def valley_app():
                 )
     return app
 
-#app = valley_app();
-#app
-
-
 if __name__ == '__main__':
     app = valley_app()
-    instanceCheck = lambda x: isinstance(x, ToggleButtons) or isinstance(x, FloatSlider) or isinstance(x, IntSlider) or isinstance(x, FloatText) or isinstance(x, fixed)
-    kwargs = dict([(val._kwarg, val.value) for val in app.widget.children[:-2] if instanceCheck(val)])
-    kwargs['overburden_wide'] = 1200.
-    app.widget.on_displayed(PLOT(**kwargs))
