@@ -717,6 +717,8 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
     ax[1].set_ylim([ymin,ymax])
     ax[1].set_aspect('equal')
 
+    plt.show()
+
 
 def ResLayer_app():
     app = widgetify(PLOT,

@@ -593,7 +593,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     ax[1].set_ylim([ymin,ymax])
     ax[1].set_aspect('equal')
 
-    # plt.show()
+    plt.show()
     # return fig, ax
 
 def cylinder_app():
