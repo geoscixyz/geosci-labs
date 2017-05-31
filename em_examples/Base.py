@@ -13,7 +13,7 @@ class MyApp(ipywidgets.Box):
 
     @property
     def kwargs(self):
-        instanceCheck = lambda x: isinstance(x, ipywidgets.widget.Widget) or isinstance(x, ipywidgets.fixed)
+        instanceCheck = lambda x: isinstance(x, (ipywidgets.widget.Widget, ipywidgets.fixed))
         return dict(
             [(key, val.value) for key, val in self._kwargs.iteritems()
             if instanceCheck(val)]
