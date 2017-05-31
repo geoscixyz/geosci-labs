@@ -16,9 +16,9 @@ def fcn_FDEM_InductionSpherePlaneWidget(xtx,ytx,ztx,m,orient,x0,y0,z0,a,sig,mur,
 	sig = 10**sig
 	f = 10**logf
 
-	fvec = np.logspace(0,8,49)
+	fvec = np.logspace(0,8,41)
 
-	xmin, xmax, dx, ymin, ymax, dy = -30., 30., 0.25, -30., 30., 0.25
+	xmin, xmax, dx, ymin, ymax, dy = -30., 30., 0.3, -30., 30., 0.4
 	X,Y = np.mgrid[xmin:xmax+dx:dx, ymin:ymax+dy:dy]
 	X = np.transpose(X)
 	Y = np.transpose(Y)
@@ -65,9 +65,9 @@ def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,z
 
 	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
-	fvec = np.logspace(0,8,49)
+	fvec = np.logspace(0,8,41)
 
-	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.25, -40., 20., 0.25
+	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.3, -40., 20., 0.4
 	X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
 	X = np.transpose(X)
 	Z = np.transpose(Z)
@@ -89,11 +89,13 @@ def fcn_FDEM_InductionSphereProfileWidget(xtx,ztx,m,orient,x0,z0,a,sig,mur,xrx,z
 		Ax1 = plotProfileXZplane(Ax1,X,Z,Hpx,Hpz,Flag)
 	elif Flag == 'Hs_real':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
-		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Chi = fcn_ComputeExcitation_FEM(f,sig,mur,a)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,np.real(Chi)*Hxf,np.real(Chi)*Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.real(Hx),np.real(Hz),Flag)
 	elif Flag == 'Hs_imag':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
-		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Chi = fcn_ComputeExcitation_FEM(f,sig,mur,a)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,np.imag(Chi)*Hxf,np.imag(Chi)*Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.imag(Hx),np.imag(Hz),Flag)
 
 	
@@ -120,9 +122,9 @@ def fcn_FDEM_InductionSphereProfileEM31Widget(xtx,ztx,L,m,orient,x0,z0,a,sig,mur
 
 	# Same global functions can be used but with ytx, y0, yrx, Y = 0.
 
-	fvec = np.logspace(0,8,49)
+	fvec = np.logspace(0,8,41)
 
-	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.25, -40., 20., 0.25
+	xmin, xmax, dx, zmin, zmax, dz = -30., 30., 0.3, -40., 20., 0.4
 	X,Z = np.mgrid[xmin:xmax+dx:dx, zmin:zmax+dz:dz]
 	X = np.transpose(X)
 	Z = np.transpose(Z)
@@ -144,11 +146,13 @@ def fcn_FDEM_InductionSphereProfileEM31Widget(xtx,ztx,L,m,orient,x0,z0,a,sig,mur
 		Ax1 = plotProfileXZplane(Ax1,X,Z,Hpx,Hpz,Flag)
 	elif Flag == 'Hs_real':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
-		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Chi = fcn_ComputeExcitation_FEM(f,sig,mur,a)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,np.real(Chi)*Hxf,np.real(Chi)*Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.real(Hx),np.real(Hz),Flag)
 	elif Flag == 'Hs_imag':
 		Hx,Hy,Hz,Habs = Obj.fcn_ComputeFrequencyResponse(f,sig,mur,a,x0,0.,z0,X,0.,Z)
-		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,Hxf,Hzf,Flag)
+		Chi = fcn_ComputeExcitation_FEM(f,sig,mur,a)
+		Ax1 = plotProfileTxRxArrow(Ax1,x0,z0,np.imag(Chi)*Hxf,np.imag(Chi)*Hzf,Flag)
 		Ax1 = plotProfileXZplane(Ax1,X,Z,np.imag(Hx),np.imag(Hz),Flag)
 
 	
@@ -331,7 +335,7 @@ def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
 	FS = 22
 
 	phi = np.linspace(0,2*np.pi,41)
-	psi = np.linspace(0,np.pi,41)
+	psi = np.linspace(0,np.pi,21)
 
 	if orient == 'x':
 		Xtx = xtx + 0.5*np.cos(phi)
@@ -344,17 +348,23 @@ def plotProfileTxRxSphere(Ax,xtx,ztx,x0,z0,a,xrx,zrx,X,Z,orient):
 		Xrx = xrx + 2*np.cos(phi)
 		Zrx = zrx + 0.5*np.sin(phi)
 
-	Xs = x0 + a*np.cos(psi)
-	Zs1 = z0 + a*np.sin(psi)
-	Zs2 = z0 - a*np.sin(psi)
+	# Xs = x0 + a*np.cos(psi)
+	# Zs1 = z0 + a*np.sin(psi)
+	# Zs2 = z0 - a*np.sin(psi)
+
+	XS = x0 + a*np.cos(phi)
+	ZS = z0 + a*np.sin(phi)
 
 	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.max(Z),np.max(Z)]),facecolor=(0.9,0.9,0.9))
 	Ax.fill_between(np.array([np.min(X),np.max(X)]),np.array([0.,0.]),np.array([np.min(Z),np.min(Z)]),facecolor=(0.6,0.6,0.6),linewidth=2)
-	Ax.fill_between(Xs,Zs1,Zs2,facecolor=(0.4,0.4,0.4),linewidth=4)
+	# Ax.fill_between(Xs,Zs1,Zs2,facecolor=(0.4,0.4,0.4),linewidth=4)
+
+	polyObj = plt.Polygon(np.c_[XS,ZS],closed=True,facecolor=((0.4,0.4,0.4)),edgecolor='k',linewidth=2)
+	Ax.add_patch(polyObj)
 
 	Ax.plot(Xtx,Ztx,'k',linewidth=4)
 	Ax.plot(Xrx,Zrx,'k',linewidth=4)
-	Ax.plot(x0+a*np.cos(phi),z0+a*np.sin(phi),'k',linewidth=2)
+	# Ax.plot(x0+a*np.cos(phi),z0+a*np.sin(phi),'k',linewidth=2)
 
 	Ax.set_xbound(np.min(X),np.max(X))
 	Ax.set_ybound(np.min(Z),np.max(Z))
@@ -396,7 +406,7 @@ def plotProfileTxRxArrow(Ax,x0,z0,Hxf,Hzf,Flag):
 	if Flag == 'Hp':
 		Ax.arrow(x0-2.5*dx, z0-2.75*dz, 3*dx, 3*dz, fc=(0.,0.,0.8), ec="k",head_width=2.5, head_length=2.5,width=1,linewidth=2)
 	else:
-		Ax.arrow(x0+2.5*dx, z0+2.75*dz, -3*dx, -3*dz, fc=(0.8,0.,0.), ec="k",head_width=2.5, head_length=2.5,width=1,linewidth=2)
+		Ax.arrow(x0-2.5*dx, z0-2.75*dz, 3*dx, 3*dz, fc=(0.8,0.,0.), ec="k",head_width=2.5, head_length=2.5,width=1,linewidth=2)
 
 	return Ax
 
