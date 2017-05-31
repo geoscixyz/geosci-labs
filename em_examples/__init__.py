@@ -5,6 +5,7 @@ from . import DC_cylinder
 from . import DCLayers
 from . import DCsphere
 from . import DCWidget
+from . import DCWidget_Overburden_2_5D
 from . import DCWidgetPlate2_5D
 from . import DCWidgetPlate_2D
 from . import DCWidgetResLayer2_5D

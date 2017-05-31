@@ -1,3 +1,4 @@
+
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
@@ -251,7 +252,6 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick, ove
 
     labelsize = 12.
     ticksize = 10.
-    overburden_wide = 2000.
 
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []

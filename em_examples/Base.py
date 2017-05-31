@@ -1,10 +1,8 @@
-from ipywidgets import (
-    interactive, VBox, HBox, Box, Widget, interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Checkbox
-)
+import ipywidgets
 from IPython.display import display
 import matplotlib.pyplot as plt
 
-class MyApp(Box):
+class MyApp(ipywidgets.Box):
     def __init__(self, widgets, kwargs):
         self._kwargs = kwargs
         self._widgets = widgets
@@ -15,7 +13,7 @@ class MyApp(Box):
 
     @property
     def kwargs(self):
-        instanceCheck = lambda x: isinstance(x, ToggleButtons) or isinstance(x, FloatSlider) or isinstance(x, IntSlider) or isinstance(x, FloatText) or isinstance(x, fixed) or isinstance(x, Checkbox)
+        instanceCheck = lambda x: isinstance(x, (ipywidgets.widget.Widget, ipywidgets.fixed))
         return dict(
             [(key, val.value) for key, val in self._kwargs.iteritems()
             if instanceCheck(val)]
@@ -26,10 +24,10 @@ def widgetify(fun, layout=None, manual=False, **kwargs):
     f = fun
 
     if manual:
-        app = interact_manual(f, **kwargs)
+        app = ipywidgets.interact_manual(f, **kwargs)
         app = app.widget
     else:
-        app = interactive(f, **kwargs)
+        app = ipywidgets.interactive(f, **kwargs)
 
     # if layout is None:
     # TODO: add support for changing layouts
