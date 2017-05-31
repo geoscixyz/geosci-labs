@@ -18,6 +18,7 @@ import FDEMPlanewave
 import FreqtoTime
 import HarmonicVMDCylWidget
 import InductionLoop
+import InductionSphereFEM
 import Loop
 import MT
 import PlanewaveWidgetFD
