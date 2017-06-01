@@ -50,15 +50,14 @@ def get(nbname, nbpath):
         check = nbexe.returncode
         if check == 0:
             print("\n ..... {0} Passed ..... \n".format(nbname))
-            print(os.path.splitext(nbpath)[0])
-            print("{0}.html".format(os.path.splitext(nbpath)[0]))
+            print("   removing {0}.html".format(os.path.splitext(nbpath)[0]))
             subprocess.call([
                 "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
             ])
         else:
             print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
             print("Captured Output: \n")
-            print(err)
+            print("{}".format(err))
 
         self.assertTrue(check == 0)
 
