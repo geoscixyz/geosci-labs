@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.constants import mu_0, epsilon_0
 
-from ipywidgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+from ipywidgets import (
+    interact, interactive, IntSlider, widget, FloatText, FloatSlider
+)
 
 def WaveVelSkind(frequency, epsr, sigma):
     omega = np.pi*np.complex128(frequency)
@@ -14,7 +16,7 @@ def WaveVelSkind(frequency, epsr, sigma):
 def WaveVelandSkindWidget(epsr, sigma):
     frequency = np.logspace(1, 9, 61)
     vel, skind = WaveVelSkind(frequency, epsr, 10**sigma)
-    figure, ax = plt.subplots(1,2, figsize = (10, 4))
+    figure, ax = plt.subplots(1, 2, figsize = (10, 4))
     ax[0].loglog(frequency, vel, 'b', lw=3)
     ax[1].loglog(frequency, skind, 'r', lw=3)
     ax[0].set_ylim(1e6, 1e9)

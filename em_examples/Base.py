@@ -1,8 +1,6 @@
 from ipywidgets import (
     interactive, VBox, HBox, Box, Widget
 )
-from IPython.display import display
-
 
 class MyApp(Box):
     def __init__(self, widgets, kwargs):
@@ -15,10 +13,10 @@ class MyApp(Box):
 
     @property
     def kwargs(self):
-        return dict(
-            [(key, val.value) for key, val in self._kwargs.iteritems()
-            if isinstance(val, Widget)]
-        )
+        return dict([
+            (key, val.value) for key, val in self._kwargs.iteritems()
+            if isinstance(val, Widget)
+        ])
 
 
 
