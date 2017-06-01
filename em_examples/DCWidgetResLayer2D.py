@@ -11,7 +11,7 @@ import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
 
-from ipywidgets import  interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 from .Base import widgetify
 
@@ -691,6 +691,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhoHalf,rhoLa
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     ax[1].set_aspect('equal')
+
+    plt.show()
 
 
 def ResLayer_app():

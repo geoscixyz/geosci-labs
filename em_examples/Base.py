@@ -1,11 +1,11 @@
-from ipywidgets import (
-    interactive, VBox, HBox, Box, Widget
-)
+import ipywidgets
+from IPython.display import display
+import matplotlib.pyplot as plt
 
-class MyApp(Box):
+class MyApp(ipywidgets.Box):
     def __init__(self, widgets, kwargs):
         self._kwargs = kwargs
-
+        self._widgets = widgets
         super(MyApp, self).__init__(widgets)
         self.layout.display = 'flex'
         self.layout.flex_flow = 'column'
@@ -13,16 +13,21 @@ class MyApp(Box):
 
     @property
     def kwargs(self):
-        return dict([
-            (key, val.value) for key, val in self._kwargs.iteritems()
-            if isinstance(val, Widget)
-        ])
+        instanceCheck = lambda x: isinstance(x, (ipywidgets.widget.Widget, ipywidgets.fixed))
+        return dict(
+            [(key, val.value) for key, val in self._kwargs.iteritems()
+            if instanceCheck(val)]
+        )
 
+def widgetify(fun, layout=None, manual=False, **kwargs):
 
-
-def widgetify(fun, layout=None, **kwargs):
     f = fun
-    app = interactive(f, **kwargs)
+
+    if manual:
+        app = ipywidgets.interact_manual(f, **kwargs)
+        app = app.widget
+    else:
+        app = ipywidgets.interactive(f, **kwargs)
 
     # if layout is None:
     # TODO: add support for changing layouts
@@ -30,6 +35,7 @@ def widgetify(fun, layout=None, **kwargs):
 
     f.widget = w
     # defaults =  #dict([(key, val.value) for key, val in kwargs.iteritems() if isinstance(val, Widget)])
-    app.on_displayed(f(**(w.kwargs)))
+    app.update()
+    #app.on_displayed(f(**(w.kwargs)))
 
     return w

@@ -681,12 +681,12 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
     ax[1].set_xlim([-40.,40.])
     ax[1].set_ylim([-40.,5.])
     # ax[1].set_aspect('equal')
-    # plt.show()
+    plt.show()
     # return fig, ax
 
 
 def plate_app():
-    app = widgetify(PLOT,
+    app = widgetify(PLOT, manual = True,
         survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
         dx = FloatSlider(min=1.,max=1000.,step=1.,value=10., continuous_update=False),
         dz = FloatSlider(min=1.,max=200.,step=1.,value=10., continuous_update=False),
@@ -702,5 +702,5 @@ def plate_app():
         Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
         Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
         Scale = ToggleButtons(options =['Linear','Log'],value='Linear'),
-        __manual = True)
+        )
     return app

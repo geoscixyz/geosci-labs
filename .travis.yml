@@ -1,7 +1,17 @@
 language: python
 python:
   - 2.7
+  - 3.6
+
+matrix:
+  allow_failures:
+    - python: 3.6
+
 sudo: false
+
+env:
+  global:
+    - PYPI_PY=2.7  # deploy to pypi from python 3.6
 
 env:
     - TEST_DIR="tests"
@@ -32,6 +42,16 @@ install:
 # Run test
 script:
   - nosetests $TEST_DIR
+
+after_success:
+  #deploy to pypi
+  - if [ $TRAVIS_PYTHON_VERSION == $PYPI_PY -n "$TRAVIS_TAG" ]; then
+      openssl aes-256-cbc -K $encrypted_99d6f572e516_key -iv $encrypted_99d6f572e516_iv -in credentials.tar.gz.enc -out credentials.tar.gz -d;
+      tar -xvzf credentials.tar.gz;
+      mv credentials/.pypirc ~/.pypirc ;
+      python setup.py bdist_wheel --universal ;
+      travis_wait 20 twine upload -r pypi --skip-existing dist/* ;
+    fi
 
 notifications:
   slack: ubcgif:1Z2lR3XYRSM3GHflG71ZHEN6

@@ -717,9 +717,11 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
     ax[1].set_ylim([ymin,ymax])
     ax[1].set_aspect('equal')
 
+    plt.show()
+
 
 def ResLayer_app():
-    app = widgetify(PLOT,
+    app = widgetify(PLOT, manual = True,
         survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
         zcLayer = FloatSlider(min=-10.,max=0.,step=1.,value=-10., continuous_update=False,description='$zc_{layer}$'),
         dzLayer = FloatSlider(min=0.5,max=5.,step=0.5,value=1., continuous_update=False,description='$dz_{layer}$'),
@@ -736,7 +738,6 @@ def ResLayer_app():
         Field = ToggleButtons(options =['Model','Potential','E','J','Charge','Sensitivity'],value='Model'),
         Type = ToggleButtons(options =['Total','Primary','Secondary'],value='Total'),
         Scale = ToggleButtons(options =['Linear','Log'],value='Linear'),
-        __manual = True
     )
     return app
 
