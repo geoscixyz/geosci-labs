@@ -3,15 +3,11 @@ python:
   - 2.7
   - 3.6
 
-matrix:
-  allow_failures:
-    - python: 3.6
-
 sudo: false
 
 env:
   global:
-    - PYPI_PY=2.7  # deploy to pypi from python 3.6
+    - PYPI_PY=3.6  # deploy to pypi from python 3.6
 
 env:
     - TEST_DIR="tests"

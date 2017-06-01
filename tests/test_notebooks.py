@@ -6,6 +6,8 @@ import subprocess
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook
 
+# add names of notebooks to ignore here.
+py2Ignore = []
 
 TESTDIR = os.path.abspath(__file__)
 NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-3] + ['em_apps/']) # where are the notebooks?
@@ -30,6 +32,11 @@ def get(nbname, nbpath):
     def test_func(self):
         print("\n--------------- Testing {0} ---------------".format(nbname))
         print("   {0}".format(nbpath))
+
+        if nbname in py2Ignore and sys.version_info[0] == 2:
+            print(" Skipping {}".format(nbname))
+            return
+
         nbexe = subprocess.Popen(
             [
                 "jupyter", "nbconvert", "{0}".format(nbpath), "--execute",
@@ -43,11 +50,11 @@ def get(nbname, nbpath):
         check = nbexe.returncode
         if check == 0:
             print("\n ..... {0} Passed ..... \n".format(nbname))
+            print(os.path.splitext(nbpath)[0])
+            print("{0}.html".format(os.path.splitext(nbpath)[0]))
             subprocess.call([
-                "rm", "{0}.html".format(os.path.sep.join(
-                    os.path.abspath(".").split(os.path.sep) +
-                    [nbpath.split(os.path.sep)[-1][:-6]]
-                ))])
+                "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
+            ])
         else:
             print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
             print("Captured Output: \n")
