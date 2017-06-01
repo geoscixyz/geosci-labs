@@ -15,6 +15,7 @@ from .View import DataView
 
 matplotlib.rcParams['font.size'] = 12
 
+
 def PlaneEHfield(z, t=0., f=1., sig=1., mu=mu_0,  epsilon=epsilon_0, E0=1.):
     """
         Plane wave propagating downward (negative z (depth))

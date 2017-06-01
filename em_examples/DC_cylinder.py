@@ -9,19 +9,20 @@ import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
+import warnings
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
-import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 from .Base import widgetify
+
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 
 # Mesh, sigmaMap can be globals global
 npad = 15
 growrate = 2.
 cs = 0.5
-hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
-hy = [(cs,npad, -growrate),(cs,100)]
+hx = [(cs, npad, -growrate), (cs, 200), (cs, npad, growrate)]
+hy = [(cs, npad, -growrate), (cs, 100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
 circmap = Maps.ParametricCircleMap(mesh)
 idmap = Maps.IdentityMap(mesh)
@@ -34,13 +35,13 @@ xmin = -40.
 xmax = 40.
 ymin = -40.
 ymax = 5.
-xylim = np.c_[[xmin,ymin],[xmax,ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim,mesh)
-indx = (mesh.gridFx[:,0]>=xmin) & (mesh.gridFx[:,0]<=xmax) \
-    & (mesh.gridFx[:,1]>=ymin) & (mesh.gridFx[:,1]<=ymax)
-indy = (mesh.gridFy[:,0]>=xmin) & (mesh.gridFy[:,0]<=xmax) \
-    & (mesh.gridFy[:,1]>=ymin) & (mesh.gridFy[:,1]<=ymax)
-indF = np.concatenate((indx,indy))
+xylim = np.c_[[xmin, ymin], [xmax, ymax]]
+indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indx = (mesh.gridFx[:, 0] >= xmin) & (mesh.gridFx[:, 0] <= xmax) \
+    & (mesh.gridFx[:, 1] >= ymin) & (mesh.gridFx[:, 1] <= ymax)
+indy = (mesh.gridFy[:, 0] >= xmin) & (mesh.gridFy[:, 0] <= xmax) \
+    & (mesh.gridFy[:, 1] >= ymin) & (mesh.gridFy[:, 1] <= ymax)
+indF = np.concatenate((indx, indy))
 
 
 def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
