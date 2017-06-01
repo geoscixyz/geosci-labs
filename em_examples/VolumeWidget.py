@@ -8,16 +8,18 @@ from mpl_toolkits.mplot3d import proj3d
 
 from .Base import widgetify
 
+
 class Arrow3D(FancyArrowPatch):
     def __init__(self, xs, ys, zs, *args, **kwargs):
-        FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
+        FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
         self._verts3d = xs, ys, zs
 
     def draw(self, renderer):
         xs3d, ys3d, zs3d = self._verts3d
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
-        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+        self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
+
 
 def polyplane(verts, alpha=0.2, color="green"):
     poly = Poly3DCollection(verts)
@@ -25,47 +27,50 @@ def polyplane(verts, alpha=0.2, color="green"):
     poly.set_facecolor(color)
     return poly
 
-def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300, X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, nRx=10, plane="XZ", **kwargs):
+
+def plotObj3D(
+    fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300,
+    X1=-20, X2=80, Y1=-50, Y2=50, Z1=-50, Z2=50, nRx=10, plane="XZ", **kwargs
+):
     plt.rcParams.update({'font.size': 13})
     # define the survey area
     if fig is None:
-        fig = plt.figure(figsize = (7, 7))
-    if  ax is None:
+        fig = plt.figure(figsize=(7, 7))
+    if ax is None:
         ax = fig.add_subplot(111, projection='3d')
     # fixed
     xoffset_rx = offset_rx
     yoffset_rx = 0.
 
     if plane == "XZ":
-        x = np.r_[X1,X2,X2,X1,X1]
+        x = np.r_[X1, X2, X2, X1, X1]
         y = np.ones(5)*offset_plane
-        z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x,y,z)]
+        z = np.r_[Z1, Z1, Z2, Z2, Z1]
+        verts = [zip(x, y, z)]
 
     elif plane == "YZ":
         x = np.ones(5)*offset_plane
-        y = np.r_[Y1,Y2,Y2,Y1,Y1]
-        z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x, y,z)]
+        y = np.r_[Y1, Y2, Y2, Y1, Y1]
+        z = np.r_[Z1, Z1, Z2, Z2, Z1]
+        verts = [zip(x, y, z)]
 
     polya = polyplane(verts)
 
-
-    x = np.r_[X1,X2,X2,X1,X1]
-    y = np.r_[Y1,Y1,Y2,Y2,Y1]
+    x = np.r_[X1, X2, X2, X1, X1]
+    y = np.r_[Y1, Y1, Y2, Y2, Y1]
     z = np.ones(5)*0.
-    verts = [zip(x, y,z)]
+    verts = [zip(x, y, z)]
 
     polyb = polyplane(verts, color="grey")
 
     x = np.ones(5)*50.
-    y = np.r_[Y1,Y2,Y2,Y1,Y1]
-    z = np.r_[Z1,Z1,Z2,Z2,Z1]
+    y = np.r_[Y1, Y2, Y2, Y1, Y1]
+    z = np.r_[Z1, Z1, Z2, Z2, Z1]
     plt.plot(x, y, z, "k:", lw=1)
 
-    x = np.r_[X1,X2,X2,X1,X1]
+    x = np.r_[X1, X2, X2, X1, X1]
     y = np.ones(5)*0.
-    z = np.r_[Z1,Z1,Z2,Z2,Z1]
+    z = np.r_[Z1, Z1, Z2, Z2, Z1]
     plt.plot(x, y, z, "k:", lw=1)
 
     ax.add_collection3d(polya)
@@ -104,15 +109,25 @@ def InteractivePlanes(planevalue="XZ", offsetvalue=0.):
     def foo(Plane, Offset, nRx):
         X0, Y0, Z0 = -20, -50, -50
         X2, Y2, Z2 = X0+100., Y0+100., Z0+100.
-        return plotObj3D(offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2, nRx=nRx, plane=Plane)
-    out = widgetify(foo
-                    ,Offset=widgets.FloatSlider(min=-100, max=100, step=5., value=offsetvalue, continuous_update=False) \
-                    # ,X0=widgets.FloatText(value=-20) \
-                    # ,Y0=widgets.FloatText(value=-50.) \
-                    # ,Z0=widgets.FloatText(value=-50.) \
-                    ,nRx=widgets.IntSlider(min=4,max=200,step=2,value=40, continuous_update=False)
-                    ,Plane=widgets.ToggleButtons(options=['XZ','YZ'], value=planevalue) \
-                    )
+        return plotObj3D(
+            offset_plane=Offset, X1=X0, X2=X2, Y1=Y0, Y2=Y2, Z1=Z0, Z2=Z2,
+            nRx=nRx, plane=Plane
+        )
+
+    out = widgetify(
+        foo,
+        Offset=widgets.FloatSlider(
+            min=-100, max=100, step=5., value=offsetvalue,
+            continuous_update=False
+        ),
+        # ,X0=widgets.FloatText(value=-20) \
+        # ,Y0=widgets.FloatText(value=-50.) \
+        # ,Z0=widgets.FloatText(value=-50.) \
+        nRx=widgets.IntSlider(
+            min=4, max=200, step=2, value=40, continuous_update=False
+        ),
+        Plane=widgets.ToggleButtons(options=['XZ', 'YZ'], value=planevalue)
+    )
     return out
 
 if __name__ == '__main__':
