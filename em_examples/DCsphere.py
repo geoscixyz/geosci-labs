@@ -1,8 +1,10 @@
 import numpy as np
 from scipy import special
 
-deg2rad  = lambda deg: deg/180.*np.pi
-rad2deg  = lambda rad: rad*180./np.pi
+
+deg2rad = lambda deg: deg/180.*np.pi
+rad2deg = lambda rad: rad*180./np.pi
+
 
 def AnBnfun(n, radius, x0, rho, rho1, I=1.):
     const = I*rho/(4*np.pi)
@@ -12,8 +14,10 @@ def AnBnfun(n, radius, x0, rho, rho1, I=1.):
     Bn = const * 1. / x0 ** (n+1.) * (2*n+1) * (rho1) / bunmo
     return An, Bn
 
-def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, \
-                 flag = "sec", order=12):
+
+def DCSpherePointCurrent(
+    txloc, rxloc, xc, radius, rho, rho1, flag = "sec", order=12
+):
 # def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, \
 #                  flag = "sec", order=12):
     """

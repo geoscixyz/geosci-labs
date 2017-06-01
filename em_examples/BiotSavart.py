@@ -3,6 +3,7 @@ import scipy.sparse as sp
 from SimPEG import Utils
 from scipy.constants import mu_0
 
+
 def BiotSavartFun(mesh, r_pts, component = 'z'):
     """
         Compute systematrix G using Biot-Savart Law

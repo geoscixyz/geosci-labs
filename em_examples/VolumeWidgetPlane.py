@@ -5,9 +5,10 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
-from VolumeWidget import Arrow3D, polyplane
 
+from .VolumeWidget import Arrow3D, polyplane
 from .Base import widgetify
+
 
 def plotObj3D(fig=None, ax=None, offset_plane=0., offset_rx=50., elev=20, azim=300, X1=-500., X2=500, Y1=-500, Y2=500, Z1=-1000, Z2=0, nRx=10, plane="XZ", **kwargs):
     plt.rcParams.update({'font.size': 13})

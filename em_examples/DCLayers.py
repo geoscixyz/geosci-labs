@@ -1,7 +1,6 @@
 import numpy as np
 
 from SimPEG import Mesh, Maps, Utils, SolverLU
-# from SimPEG.EM.Static import DC
 from scipy.constants import epsilon_0
 
 import matplotlib.pyplot as plt

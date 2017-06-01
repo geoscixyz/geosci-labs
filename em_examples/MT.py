@@ -123,19 +123,19 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
     hatches=['/'  , '+', 'x', '|' , '\\', '-'  , 'o' , 'O' , '.' , '*' ]
 
     # Write the physical properties of air
-    ax.annotate(("Air, $\\rho$ =%g ohm-m")%(np.inf), 
-            xy=(-widthg/2., -np.abs(z.max())/2.), xycoords='data', 
-            xytext=(-widthg/2., -np.abs(z.max())/2.), textcoords='data', 
+    ax.annotate(("Air, $\\rho$ =%g ohm-m")%(np.inf),
+            xy=(-widthg/2., -np.abs(z.max())/2.), xycoords='data',
+            xytext=(-widthg/2., -np.abs(z.max())/2.), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\epsilon_r$= %g")%(eps[0]), 
-            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data', 
-            xytext=(-widthg/2., -np.abs(z.max())/3.), textcoords='data', 
+    ax.annotate(("$\epsilon_r$= %g")%(eps[0]),
+            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data',
+            xytext=(-widthg/2., -np.abs(z.max())/3.), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\mu_r$= %g")%(mu[0]), 
-            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data', 
-            xytext=(0, -np.abs(z.max())/3.), textcoords='data', 
+    ax.annotate(("$\mu_r$= %g")%(mu[0]),
+            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data',
+            xytext=(0, -np.abs(z.max())/3.), textcoords='data',
             fontsize=14.)
 
     # Write the physical properties of the differents layers up to the (n-1)-th and fill it with pattern
@@ -143,19 +143,19 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
         if topn[i] == topn[i+1]:
             pass
         else:
-            ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[i]), 
-                xy=(0., (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(0., (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[i]),
+                xy=(0., (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(0., (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
-            ax.annotate(("$\epsilon_r$= %g")%(eps[i]), 
-                xy=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\epsilon_r$= %g")%(eps[i]),
+                xy=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
-            ax.annotate(("$\mu_r$= %g")%(mu[i]), 
-                xy=(-widthg/2., (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(-widthg/2., (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\mu_r$= %g")%(mu[i]),
+                xy=(-widthg/2., (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(-widthg/2., (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
             ax.plot(widthn, topn[i]*np.ones_like(widthn), color='black')
@@ -165,73 +165,73 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
     ax.plot(widthn, topn[-1]*np.ones_like(widthn), color='black')
     ax.fill_between(widthn, topn[-1], z.max(), alpha=0.3, color="none", edgecolor='black', hatch=hatches[(len(topn)-2)%10])
 
-    ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[-1]), 
-            xy=(0., (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(0., (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[-1]),
+            xy=(0., (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(0., (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\epsilon_r$= %g")%(eps[-1]), 
-            xy=(-widthg/1.1, (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(-widthg/1.1, (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\epsilon_r$= %g")%(eps[-1]),
+            xy=(-widthg/1.1, (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(-widthg/1.1, (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\mu_r$= %g")%(mu[-1]), 
-            xy=(-widthg/2., (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(-widthg/2., (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\mu_r$= %g")%(mu[-1]),
+            xy=(-widthg/2., (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(-widthg/2., (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
     # plot Trees!
-    ax.annotate("", 
-            xy=(widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
@@ -286,7 +286,7 @@ def appres(F, H, sig, chg, taux, c, mu, eps, n):
 
     return Res, Phase
 
-# Evaluate Up, Down components, E and H field, for a frequency range, 
+# Evaluate Up, Down components, E and H field, for a frequency range,
 # a discretized depth range and a time range (use to calculate envelope)
 def calculateEHzt(F, H, sig, chg, taux, c, mu, eps, n, zsample, tsample):
 
@@ -374,12 +374,12 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
 
         axH.set_xlabel('Amplitude Magnetic Field H (A/m)', color='red', fontsize=16)
 
-        ax[2].fill_betweenx(zc, np.squeeze(np.asarray(np.real(Exzt.min(axis=1)))), 
-                      np.squeeze(np.asarray(np.real(Exzt.max(axis=1)))), 
+        ax[2].fill_betweenx(zc, np.squeeze(np.asarray(np.real(Exzt.min(axis=1)))),
+                      np.squeeze(np.asarray(np.real(Exzt.max(axis=1)))),
                       color='blue', alpha=0.1)
 
-        axH.fill_betweenx(zc, np.squeeze(np.asarray(np.real(Hyzt.min(axis=1)))), 
-                      np.squeeze(np.asarray(np.real(Hyzt.max(axis=1)))), 
+        axH.fill_betweenx(zc, np.squeeze(np.asarray(np.real(Hyzt.min(axis=1)))),
+                      np.squeeze(np.asarray(np.real(Hyzt.max(axis=1)))),
                       color='red', alpha=0.1)
 
         ax[2] = PlotConfiguration(H, sig, eps, mu, ax[2], (1.5*np.abs(Exzt).max()), zc)

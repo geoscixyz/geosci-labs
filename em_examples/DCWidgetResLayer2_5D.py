@@ -1,10 +1,3 @@
-#import sys
-#sys.path.append("./simpeg")
-#sys.path.append("./simpegdc/")
-
-#import warnings
-#warnings.filterwarnings('ignore')
-
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np

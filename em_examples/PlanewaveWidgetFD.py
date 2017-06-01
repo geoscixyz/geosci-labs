@@ -1,17 +1,19 @@
 from __future__ import print_function
 import numpy as np
-from View import DataView
 from SimPEG import EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-matplotlib.rcParams['font.size'] = 12
 from ipywidgets import *
-from DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from scipy.constants import mu_0, epsilon_0
-from VolumeWidget import polyplane
-from FDEMPlanewave import *
+
+from .DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
+from .VolumeWidget import polyplane
+from .FDEMPlanewave import *
+from .View import DataView
+
+matplotlib.rcParams['font.size'] = 12
 
 def PlaneEHfield(z, t=0., f=1., sig=1., mu=mu_0,  epsilon=epsilon_0, E0=1.):
     """
