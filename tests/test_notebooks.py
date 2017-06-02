@@ -57,8 +57,6 @@ def get(nbname, nbpath):
                 out = ex.preprocess(nb, {})
             except CellExecutionError:
                 print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-                print("Captured Output: \n")
-                print("{}".format(out))
                 raise
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
