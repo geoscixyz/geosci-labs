@@ -1,7 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-
 import numpy as np
 from ipywidgets import *
 from mpl_toolkits.mplot3d import Axes3D
@@ -50,22 +49,22 @@ def plotObj3D(
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.ones(5)*offset_plane
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
-        verts = [zip(x, y, z)]
+        verts = zip(x, y, z)
 
     elif plane == "YZ":
         x = np.ones(5)*offset_plane
         y = np.r_[Y1, Y2, Y2, Y1, Y1]
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
-        verts = [zip(x, y, z)]
+        verts = zip(x, y, z)
 
-    polya = polyplane(verts)
+    polya = polyplane([verts])
 
     x = np.r_[X1, X2, X2, X1, X1]
     y = np.r_[Y1, Y1, Y2, Y2, Y1]
     z = np.ones(5)*0.
-    verts = [zip(x, y, z)]
+    verts = zip(x, y, z)
 
-    polyb = polyplane(verts, color="grey")
+    polyb = polyplane([verts], color="grey")
 
     x = np.ones(5)*50.
     y = np.r_[Y1, Y2, Y2, Y1, Y1]
@@ -98,12 +97,11 @@ def plotObj3D(
     ax.set_ylabel('Y (m)')
     ax.set_zlabel('Z (m)')
 
-
     ax.set_xlim3d(X1, X2)
     ax.set_ylim3d(Y1, Y2)
     ax.set_zlim3d(Z1, Z2)
 
-    ax.view_init(elev,azim)
+    ax.view_init(elev, azim)
 
     plt.show()
     return ax
