@@ -268,12 +268,12 @@ def get_ElectricField(XYZ,sig0,sig1,R,E0):
     input: grid, outer sigma, inner sigma, radius of the sphere, strength of the electric field
     '''
 
-    x,y,z= XYZ[:,0], XYZ[:,1], XYZ[:,2]
+    x,y,z = XYZ[:,0], XYZ[:,1], XYZ[:,2]
 
     r_cur=r(x,y,z)  # current radius
 
-    ind0= (r_cur>R)
-    ind1= (r_cur<=R)
+    ind0 = (r_cur>R)
+    ind1 = (r_cur<=R)
 
     assert (ind0 + ind1).all(), 'Some indicies not included'
 
@@ -282,13 +282,13 @@ def get_ElectricField(XYZ,sig0,sig1,R,E0):
 
     Et = np.zeros(shape=(len(x),3))
 
-    Et[ind0,0] = E0 + E0*R**3./(r_cur[ind0]**5.)*sigf(sig0,sig1)*(2.*x[ind0]**2.-y[ind0]**2.-z[ind0]**2.);
-    Et[ind0,1] = E0*R**3./(r_cur[ind0]**5.)*3.*x[ind0]*y[ind0]*sigf(sig0,sig1);
-    Et[ind0,2] = E0*R**3./(r_cur[ind0]**5.)*3.*x[ind0]*z[ind0]*sigf(sig0,sig1);
+    Et[ind0,0] = E0 + E0*R**3./(r_cur[ind0]**5.)*sigf(sig0,sig1)*(2.*x[ind0]**2.-y[ind0]**2.-z[ind0]**2.)
+    Et[ind0,1] = E0*R**3./(r_cur[ind0]**5.)*3.*x[ind0]*y[ind0]*sigf(sig0,sig1)
+    Et[ind0,2] = E0*R**3./(r_cur[ind0]**5.)*3.*x[ind0]*z[ind0]*sigf(sig0,sig1)
 
-    Et[ind1,0] = 3.*sig0/(sig1+2.*sig0)*E0;
-    Et[ind1,1] = 0.;
-    Et[ind1,2] = 0.;
+    Et[ind1,0] = 3.*sig0/(sig1+2.*sig0)*E0
+    Et[ind1,1] = 0.
+    Et[ind1,2] = 0.
 
     Es = Et - Ep
 
@@ -563,7 +563,7 @@ def MN_Potential_total(sig0,sig1,R,E0,start,end,nbmp,mn):
 def two_configurations_comparison(XYZ,sig0,sig1,sig2,R0,R1,E0,xstart,ystart,xend,yend,nb_dipole,electrode_spacing,PlotOpt):#,linearcolor):
 
     #Define the mesh
-    xr,yr,zr = np.unique(XYZ[:,0]),np.unique(XYZ[:,1]),np.unique(XYZ[:,2])
+    xr,yr,zr = np.unique(XYZ[:, 0]),np.unique(XYZ[:, 1]),np.unique(XYZ[:, 2])
 
     #Defining the Profile
     start = np.array([xstart,ystart])
@@ -721,16 +721,19 @@ def interact_conductiveSphere(R,log_sig0,log_sig1,Figure1a,Figure1b,Figure2a,Fig
     plt.show()
 
 #Interactive Visualisation of the responses of two configurations to a (pseudo) DC resistivity survey
-def interactive_two_configurations_comparison(log_sig0,log_sig1,log_sig2,R0,R1,xstart,ystart,xend,yend,dipole_number,electrode_spacing,matching_spheres_example):
+def interactive_two_configurations_comparison(
+    log_sig0, log_sig1, log_sig2, R0, R1, xstart, ystart, xend, yend,
+    dipole_number, electrode_spacing, matching_spheres_example
+):
 
-    sig0,sig1 = conductivity_log_wrapper(log_sig0,log_sig1)
+    sig0, sig1 = conductivity_log_wrapper(log_sig0, log_sig1)
     sig2 = 10.**log_sig2
-    E0   = 1.           # inducing field strength in V/m
+    E0 = 1.           # inducing field strength in V/m
     n = 100             #level of discretisation
     xr = np.linspace(-200., 200., n) # X-axis discretization
     yr = xr.copy()      # Y-axis discretization
     zr = np.r_[0]          # identical to saying `zr = np.array([0])`
-    XYZ = ndgrid(xr,yr,zr) # Space Definition
+    XYZ = ndgrid(xr, yr, zr) # Space Definition
     PlotOpt = 'Total'
 
     if matching_spheres_example:
@@ -739,11 +742,10 @@ def interactive_two_configurations_comparison(log_sig0,log_sig1,log_sig2,R0,R1,x
         sig2 = 1.310344828 * 10**(-3)
         R0   = 20.
         R1   = 40.
-
-        two_configurations_comparison(XYZ,sig0,sig1,sig2,R0,R1,E0,xstart,ystart,xend,yend,dipole_number,electrode_spacing,PlotOpt)
+        two_configurations_comparison(XYZ, sig0, sig1, sig2, R0, R1, E0, xstart, ystart, xend, yend, dipole_number, electrode_spacing, PlotOpt)
 
     else:
-        two_configurations_comparison(XYZ,sig0,sig1,sig2,R0,R1,E0,xstart,ystart,xend,yend,dipole_number,electrode_spacing,PlotOpt)
+        two_configurations_comparison(XYZ, sig0, sig1, sig2, R0, R1, E0, xstart, ystart, xend, yend, dipole_number, electrode_spacing, PlotOpt)
 
     plt.tight_layout(True)
     plt.show()
