@@ -308,11 +308,11 @@ def cylinder_app():
 
 def DC2Dsurvey(flag="PoleDipole"):
 
-    if flag =="PoleDipole":
+    if flag == "PoleDipole":
         ntx, nmax = xr.size-2, 8
-    elif flag =="DipolePole":
+    elif flag == "DipolePole":
         ntx, nmax = xr.size-2, 8
-    elif flag =="DipoleDipole":
+    elif flag == "DipoleDipole":
         ntx, nmax = xr.size-3, 8
     else:
         raise Exception('Not Implemented')
@@ -330,7 +330,7 @@ def DC2Dsurvey(flag="PoleDipole"):
             else:
                 M = np.c_[xr[i+1:ntx+1], np.ones(ntx-i)*zloc]
                 N = np.c_[xr[i+2:i+2+nmax], np.ones(ntx-i)*zloc]
-        elif flag =="DipolePole":
+        elif flag == "DipolePole":
             A = np.r_[xr[i], zloc]
             B = np.r_[xr[i+1], zloc]
             if i < ntx-nmax+1:
@@ -339,7 +339,7 @@ def DC2Dsurvey(flag="PoleDipole"):
             else:
                 M = np.c_[xr[i+2:ntx+2], np.ones(ntx-i)*zloc]
                 N = np.c_[np.ones(ntx-i)*mesh.vectorCCx.max(), np.ones(ntx-i)*zloc]
-        elif flag =="DipoleDipole":
+        elif flag == "DipoleDipole":
             A = np.r_[xr[i], zloc]
             B = np.r_[xr[i+1], zloc]
             if i < ntx-nmax:
@@ -375,15 +375,15 @@ def getPseudoLocs(xr, ntx, nmax, flag = "PoleDipole"):
     for i in range(ntx):
         if i < ntx-nmax+1:
 
-            if flag is 'DipoleDipole':
+            if flag == 'DipoleDipole':
                 txmid = xr[i]+dxr[i]*0.5
                 rxmid = xr[i+1:i+1+nmax]+dxr[i+1:i+1+nmax]*0.5
 
-            elif flag is 'PoleDipole':
+            elif flag == 'PoleDipole':
                 txmid = xr[i]
                 rxmid = xr[i+1:i+1+nmax]+dxr[i+1:i+1+nmax]*0.5
 
-            elif flag is 'DipolePole':
+            elif flag == 'DipolePole':
                 txmid = xr[i]+dxr[i]*0.5
                 rxmid = xr[i+1:i+1+nmax]
 
@@ -391,15 +391,15 @@ def getPseudoLocs(xr, ntx, nmax, flag = "PoleDipole"):
             xloc.append(mid)
             yloc.append(np.arange(nmax)+1.)
         else:
-            if flag is 'DipoleDipole':
+            if flag == 'DipoleDipole':
                 txmid = xr[i]+dxr[i]*0.5
                 rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
 
-            elif flag is 'PoleDipole':
+            elif flag == 'PoleDipole':
                 txmid = xr[i]
                 rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
 
-            elif flag is 'DipolePole':
+            elif flag == 'DipolePole':
                 txmid = xr[i]+dxr[i]*0.5
                 rxmid = xr[i+1:ntx+1]
 
@@ -540,13 +540,13 @@ def DipoleDipolefun(i):
 def PseudoSectionWidget(survey,flag):
     dx = 5
     xr = np.arange(-40,41,dx)
-    if flag =="PoleDipole":
+    if flag == "PoleDipole":
         ntx, nmax = xr.size-2, 8
         dxr = np.diff(xr)
-    elif flag =="DipolePole":
+    elif flag == "DipolePole":
         ntx, nmax = xr.size-1, 7
         dxr = xr
-    elif flag =="DipoleDipole":
+    elif flag == "DipoleDipole":
         ntx, nmax = xr.size-3, 8
         dxr = np.diff(xr)
     xzlocs = getPseudoLocs(dxr, ntx, nmax,flag)
