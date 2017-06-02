@@ -2,6 +2,9 @@ import unittest
 import sys
 import os
 import subprocess
+import nbformat
+from nbconvert.preprocessors import ClearOutputPreprocessor, ExecutePreprocessor
+
 
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook
@@ -37,29 +40,52 @@ def get(nbname, nbpath):
             print(" Skipping {}".format(nbname))
             return
 
-        nbexe = subprocess.Popen(
-            [
-                "jupyter", "nbconvert", "{0}".format(nbpath), "--execute",
-                "--ExecutePreprocessor.timeout=600",
-                "--ExecutePreprocessor.kernel_name='python{}'".format(sys.version_info[0])
-            ],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        output, err = nbexe.communicate()
-        check = nbexe.returncode
-        if check == 0:
-            print("\n ..... {0} Passed ..... \n".format(nbname))
-            print("   removing {0}.html".format(os.path.splitext(nbpath)[0]))
-            subprocess.call([
-                "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
-            ])
-        else:
-            print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-            print("Captured Output: \n")
-            print("{}".format(err))
+        ep = ClearOutputPreprocessor()
 
-        self.assertTrue(check == 0)
+        with open(nbpath) as f:
+            nb = nbformat.read(f, as_version=4)
+
+            ep.preprocess(nb, {})
+
+            ex = ExecutePreprocessor(
+                timeout=600,
+                kernel_name='python{}'.format(sys.version_info[0]),
+                # {}
+            )
+
+            try:
+                out = ex.preprocess(nb, {})
+            except CellExecutionError:
+                print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
+                print("Captured Output: \n")
+                print("{}".format(out))
+                raise
+
+            print("\n ..... {0} Passed ..... \n".format(nbname))
+
+        # nbexe = subprocess.Popen(
+        #     [
+        #         "jupyter", "nbconvert", "{0}".format(nbpath), "--execute",
+        #         "--ExecutePreprocessor.timeout=600",
+        #         "--ExecutePreprocessor.kernel_name='python{}'".format(sys.version_info[0])
+        #     ],
+        #     stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        #     stderr=subprocess.PIPE
+        # )
+        # output, err = nbexe.communicate()
+        # check = nbexe.returncode
+        # if check == 0:
+        #     print("\n ..... {0} Passed ..... \n".format(nbname))
+        #     print("   removing {0}.html".format(os.path.splitext(nbpath)[0]))
+        #     subprocess.call([
+        #         "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
+        #     ])
+        # else:
+        #     print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
+        #     print("Captured Output: \n")
+        #     print("{}".format(err))
+
+        # self.assertTrue(check == 0)
 
     return test_func
 
