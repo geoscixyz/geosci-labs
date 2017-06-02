@@ -614,7 +614,7 @@ class DataView(object):
                         xy=(
                             (
                                 pltvalue.real[:, slice_ind].min() +
-                                pltvalue.real[:,slice_ind].max()
+                                pltvalue.real[:, slice_ind].max()
                             )/2.,
                             axymin+(axymax-axymin)/4.
                             ),
@@ -622,7 +622,7 @@ class DataView(object):
                         xytext=(
                             (
                                 pltvalue.real[:, slice_ind].min() +
-                                pltvalue.real[:,slice_ind].max()
+                                pltvalue.real[:, slice_ind].max()
                             )/2.,
                             axymin+(axymax-axymin)/4.),
                         textcoords='data',
@@ -653,7 +653,7 @@ class DataView(object):
                         xycoords='data',
                         xytext=(
                             (
-                                pltvalue.real[slice_ind, :].min()+
+                                pltvalue.real[slice_ind, :].min() +
                                 pltvalue.real[slice_ind, :].max()
                             )/2.,
                             axymin+(axymax-axymin)/4.),
@@ -678,15 +678,19 @@ class DataView(object):
                                 (
                                     np.log10(self.sigvec.min()) +
                                     np.log10(self.sigvec.max())
-                                )/2),
+
+                            )/2
+                            ),
                             axymin+(axymax-axymin)/4.),
                         xycoords='data',
                         xytext=(
                             10.**(
                                 (
-                                    np.log10(self.sigvec.min())+
+                                    np.log10(self.sigvec.min()) +
                                     np.log10(self.sigvec.max())
-                                )/2),
+
+                            )/2
+                            ),
                             axymin+(axymax-axymin)/4.),
                         textcoords='data',
                         fontsize=14.
@@ -718,7 +722,9 @@ class DataView(object):
                                 (
                                     np.log10(self.fvec.min()) +
                                     np.log10(self.fvec.max())
-                                )/2),
+
+                            )/2
+                            ),
                             axymin+(axymax-axymin)/4.
                         ),
                         textcoords='data',
@@ -745,8 +751,8 @@ class DataView(object):
         ax0.set_ylabel("E field, Real part (V/m)")
         ax1.set_ylabel("E field, Imag part (V/m)")
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.plot(self.fvec, self.val_xfs.real[sigind, :], color="blue")
         ax1.plot(self.fvec, self.val_xfs.imag[sigind, :], color="red")
@@ -769,7 +775,9 @@ class DataView(object):
                 10.**(
                     (
                         np.log10(self.fvec.min()) +
-                        np.log10(self.fvec.max()))/2),
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
                 ax0ymin+(ax0ymax-ax0ymin)/4.
             ),
             xycoords='data',
@@ -778,7 +786,9 @@ class DataView(object):
                     (
                         np.log10(self.fvec.min()) +
                         np.log10(self.fvec.max())
-                    )/2),
+
+                    )/2
+                ),
                 ax0ymin+(ax0ymax-ax0ymin)/4.
             ),
             textcoords='data',
@@ -801,8 +811,9 @@ class DataView(object):
                     (
                         np.log10(self.fvec.min()) +
                         np.log10(self.fvec.max()))/2
-                    ), ax1ymin+(ax1ymax-ax1ymin)/4.
-                ),
+                    ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+        ),
             textcoords='data',
             fontsize=14.)
 
@@ -827,8 +838,8 @@ class DataView(object):
         ax0.set_ylabel("E field, Amplitude (V/m)")
         ax1.set_ylabel("E field, Phase (deg)")
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.plot(self.fvec, np.absolute(self.val_xfs[sigind, :]), color="blue")
         ax1.plot(self.fvec, phase(self.val_xfs[sigind, :]), color="red")
@@ -838,8 +849,8 @@ class DataView(object):
         ax1ymin = phase(self.val_xfs[sigind, :]).min()
         ax1ymax = phase(self.val_xfs[sigind, :]).max()
 
-        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs[sigind,:]),
-        #            np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_xfs[sigind, :]),
+        #            np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind, :])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -922,8 +933,8 @@ class DataView(object):
         ax1ymin = self.val_xfs.imag[:, freqind].min()
         ax1ymax = self.val_xfs.imag[:, freqind].max()
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1011,8 +1022,8 @@ class DataView(object):
         ax1ymin = phase(self.val_xfs[:, freqind]).min()
         ax1ymax = phase(self.val_xfs[:, freqind]).max()
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1020,13 +1031,33 @@ class DataView(object):
         ax0.set_xscale('log')
         ax1.set_xscale('log')
 
-        ax0.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+        ax0.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
-        ax1.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
+        ax1.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
             xy=(
                 10.**(
                     (
@@ -1103,8 +1134,8 @@ class DataView(object):
         ax0.set_ylabel("E field, Real part (V/m)")
         ax1.set_ylabel("E field, Imag part (V/m)")
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.plot(self.fvec, self.val_yfs.real[sigind, :], color="blue")
         ax1.plot(self.fvec, self.val_yfs.imag[sigind, :], color="red")
@@ -1148,41 +1179,67 @@ class DataView(object):
 
         ax1.annotate(
             ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
         return ax0, ax1
 
-    def plot_1D_AP_f_y(self,absloc,coordloc,ax0,ax1,sigind):
+    def plot_1D_AP_f_y(self, absloc, coordloc, ax0, ax1, sigind):
 
         if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
+            obsLoc = np.c_[absloc, coordloc, self.z]
         elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
+            obsLoc = np.c_[absloc, self.y, coordloc]
         elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
+            obsLoc = np.c_[self.x, absloc, coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
 
         ax0.set_xlabel("Frequency (Hz)")
         ax1.set_xlabel("Frequency (Hz)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
         ax1.set_ylabel("E field, Phase (deg)")
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
+        ax0.plot(self.fvec, np.absolute(self.val_yfs[sigind, :]), color="blue")
+        ax1.plot(self.fvec, phase(self.val_yfs[sigind, :]), color="red")
 
-        ax0.plot(self.fvec,np.absolute(self.val_yfs[sigind,:]),color="blue")
-        ax1.plot(self.fvec,phase(self.val_yfs[sigind,:]),color="red")
+        ax0ymin, ax0ymax = (
+            np.absolute(self.val_yfs[sigind, :]).min(),
+            np.absolute(self.val_yfs[sigind, :]).max()
+        )
+        ax1ymin, ax1ymax = (
+            phase(self.val_yfs[sigind, :]).min(),
+            phase(self.val_yfs[sigind, :]).max()
+        )
 
-        ax0ymin, ax0ymax = np.absolute(self.val_yfs[sigind,:]).min(),np.absolute(self.val_yfs[sigind,:]).max()
-        ax1ymin, ax1ymax = phase(self.val_yfs[sigind,:]).min(),phase(self.val_yfs[sigind,:]).max()
-
-        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs[sigind,:]),
-        #            np.linspace(ax2ymin,ax2ymax,len(self.val_yfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_yfs[sigind, :]),
+        #            np.linspace(ax2ymin,ax2ymax,len(self.val_yfs[sigind, :])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1190,42 +1247,83 @@ class DataView(object):
         ax0.set_xscale('log')
         ax1.set_xscale('log')
 
-        ax0.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+        ax0.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.)
 
-        ax1.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+        ax1.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.)
 
-        return ax0,ax1
+        return ax0, ax1
 
-    def plot_1D_RI_sig_y(self,absloc,coordloc,ax0,ax1,freqind):
+    def plot_1D_RI_sig_y(self,absloc,coordloc,ax0, ax1,freqind):
 
         if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
+            obsLoc = np.c_[absloc, coordloc, self.z]
         elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
+            obsLoc = np.c_[absloc, self.y, coordloc]
         elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
+            obsLoc = np.c_[self.x, absloc, coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
         ax0.set_ylabel("E field, Real part (V/m)")
         ax1.set_ylabel("E field, Imag part (V/m)")
 
-        ax0.plot(self.sigvec,self.val_yfs.real[:,freqind],color="blue")
-        ax1.plot(self.sigvec,self.val_yfs.imag[:,freqind],color="red")
+        ax0.plot(self.sigvec,self.val_yfs.real[:, freqind], color="blue")
+        ax1.plot(self.sigvec,self.val_yfs.imag[:, freqind], color="red")
 
-        ax0ymin, ax0ymax = self.val_yfs.real[:,freqind].min(),self.val_yfs.real[:,freqind].max()
-        ax1ymin, ax1ymax = self.val_yfs.imag[:,freqind].min(),self.val_yfs.imag[:,freqind].max()
+        ax0ymin, ax0ymax = self.val_yfs.real[:, freqind].min(),self.val_yfs.real[:, freqind].max()
+        ax1ymin, ax1ymax = self.val_yfs.imag[:, freqind].min(),self.val_yfs.imag[:, freqind].max()
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1233,115 +1331,84 @@ class DataView(object):
         ax0.set_xscale('log')
         ax1.set_xscale('log')
 
-        ax0.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+        ax0.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
            fontsize=14.)
 
-        ax1.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+        ax1.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
            fontsize=14.)
 
-        return ax0,ax1
+        return ax0, ax1
 
 
-    def plot_1D_AP_sig_y(self,absloc,coordloc,ax0,ax1,freqind):
+    def plot_1D_AP_sig_y(self,absloc,coordloc,ax0, ax1,freqind):
 
         if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
+            obsLoc = np.c_[absloc, coordloc, self.z]
         elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
+            obsLoc = np.c_[absloc, self.y, coordloc]
         elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
+            obsLoc = np.c_[self.x, absloc, coordloc]
 
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
 
         ax0.set_xlabel("Conductivity (S/m)")
         ax1.set_xlabel("Conductivity (S/m)")
         ax0.set_ylabel("E field, Amplitude (V/m)")
         ax1.set_ylabel("E field, Phase (deg)")
 
-        ax0.plot(self.sigvec,np.absolute(self.val_yfs[:,freqind]),color="blue")
-        ax1.plot(self.sigvec,phase(self.val_yfs[:,freqind]),color="red")
+        ax0.plot(self.sigvec,np.absolute(self.val_yfs[:, freqind]), color="blue")
+        ax1.plot(self.sigvec,phase(self.val_yfs[:, freqind]), color="red")
 
-        ax0ymin, ax0ymax = np.absolute(self.val_yfs[:,freqind]).min(),np.absolute(self.val_yfs[:,freqind]).max()
-        ax1ymin, ax1ymax = phase(self.val_yfs[:,freqind]).min(),phase(self.val_yfs[:,freqind]).max()
+        ax0ymin, ax0ymax = np.absolute(self.val_yfs[:, freqind]).min(),np.absolute(self.val_yfs[:, freqind]).max()
+        ax1ymin, ax1ymax = phase(self.val_yfs[:, freqind]).min(),phase(self.val_yfs[:, freqind]).max()
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
-
-        ax0.set_ylim(ax0ymin, ax0ymax)
-        ax1.set_ylim(ax1ymin, ax1ymax)
-
-        ax0.set_xscale('log')
-        ax1.set_xscale('log')
-
-        ax0.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-           fontsize=14.)
-
-        ax1.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
-           fontsize=14.)
-
-        return ax0,ax1
-
-    def plot_1D_phasor_f_y(self,absloc,coordloc,ax,sigind):
-
-        if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
-        elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
-        elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
-
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
-
-        ax.plot(self.val_yfs.real[sigind,:],self.val_yfs.imag[sigind,:])
-
-    def plot_1D_phasor_sig_y(self,absloc,coordloc,ax,freqind):
-
-        if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
-        elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
-        elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
-
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
-
-        ax.plot(self.val_yfs.real[:,freqind],self.val_yfs.imag[:,freqind])
-
-
-    def plot_1D_RI_f_z(self,absloc,coordloc,ax0,ax1,sigind):
-
-        if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
-        elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
-        elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
-
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
-
-        ax0.set_xlabel("Frequency (Hz)")
-        ax1.set_xlabel("Frequency (Hz)")
-        ax0.set_ylabel("E field, Real part (V/m)")
-        ax1.set_ylabel("E field, Imag part (V/m)")
-
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
-
-
-        ax0.plot(self.fvec,self.val_zfs.real[sigind,:],color="blue")
-        ax1.plot(self.fvec,self.val_zfs.imag[sigind,:],color="red")
-
-        ax0ymin, ax0ymax = self.val_zfs.real[sigind,:].min(),self.val_zfs.real[sigind,:].max()
-
-        ax1ymin, ax1ymax = self.val_zfs.imag[sigind,:].min(),self.val_zfs.imag[sigind,:].max()
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_yfs[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_yfs[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1349,105 +1416,356 @@ class DataView(object):
         ax0.set_xscale('log')
         ax1.set_xscale('log')
 
-        ax0.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-            fontsize=14.)
-
-        ax1.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
-            fontsize=14.)
-
-        return ax0,ax1
-
-    def plot_1D_AP_f_z(self,absloc,coordloc,ax0,ax1,sigind):
-
-        if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
-        elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
-        elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
-
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
-
-        ax0.set_xlabel("Frequency (Hz)")
-        ax1.set_xlabel("Frequency (Hz)")
-        ax0.set_ylabel("E field, Amplitude (V/m)")
-        ax1.set_ylabel("E field, Phase (deg)")
-
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
-
-
-        ax0.plot(self.fvec,np.absolute(self.val_zfs[sigind,:]),color="blue")
-        ax1.plot(self.fvec,phase(self.val_zfs[sigind,:]),color="red")
-
-        ax0ymin, ax0ymax = np.absolute(self.val_zfs[sigind,:]).min(),np.absolute(self.val_zfs[sigind,:]).max()
-        ax1ymin, ax1ymax = phase(self.val_zfs[sigind,:]).min(),phase(self.val_zfs[sigind,:]).max()
-
-        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs[sigind,:]),
-        #            np.linspace(ax2ymin,ax2ymax,len(self.val_zfs[sigind,:])),linestyle="dashed",color="black",linewidth=3.0)
-
-        ax0.set_ylim(ax0ymin, ax0ymax)
-        ax1.set_ylim(ax1ymin, ax1ymax)
-
-        ax0.set_xscale('log')
-        ax1.set_xscale('log')
-
-        ax0.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-            fontsize=14.)
-
-        ax1.annotate(("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
-            fontsize=14.)
-
-        return ax0,ax1
-
-    def plot_1D_RI_sig_z(self,absloc,coordloc,ax0,ax1,freqind):
-
-        if self.normal.upper() == "Z":
-            obsLoc=np.c_[absloc,coordloc,self.z]
-        elif self.normal.upper() == "Y":
-            obsLoc=np.c_[absloc,self.y,coordloc]
-        elif self.normal.upper() == "X":
-            obsLoc=np.c_[self.x,absloc,coordloc]
-
-        self.eval_loc(self.srcLoc,obsLoc, self.sigvec, self.fvec, self.orientation,self.func1D)
-
-        ax0.set_xlabel("Conductivity (S/m)")
-        ax1.set_xlabel("Conductivity (S/m)")
-        ax0.set_ylabel("E field, Real part (V/m)")
-        ax1.set_ylabel("E field, Imag part (V/m)")
-
-        ax0.plot(self.sigvec,self.val_zfs.real[:,freqind],color="blue")
-        ax1.plot(self.sigvec,self.val_zfs.imag[:,freqind],color="red")
-
-        ax0ymin, ax0ymax = self.val_zfs.real[:,freqind].min(),self.val_zfs.real[:,freqind].max()
-        ax1ymin, ax1ymax = self.val_zfs.imag[:,freqind].min(),self.val_zfs.imag[:,freqind].max()
-
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
-
-        ax0.set_ylim(ax0ymin, ax0ymax)
-        ax1.set_ylim(ax1ymin, ax1ymax)
-
-        ax0.set_xscale('log')
-        ax1.set_xscale('log')
-
-        ax0.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+        ax0.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
-        ax1.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+        ax1.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        return ax0, ax1
+
+    def plot_1D_phasor_f_y(self, absloc, coordloc, ax, sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc = np.c_[absloc, coordloc, self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc = np.c_[absloc, self.y, coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc = np.c_[self.x, absloc, coordloc]
+
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
+
+        ax.plot(self.val_yfs.real[sigind, :], self.val_yfs.imag[sigind, :])
+
+    def plot_1D_phasor_sig_y(self, absloc, coordloc, ax, freqind):
+
+        if self.normal.upper() == "Z":
+            obsLoc = np.c_[absloc, coordloc, self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc = np.c_[absloc, self.y, coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc = np.c_[self.x, absloc, coordloc]
+
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
+
+        ax.plot(self.val_yfs.real[:, freqind], self.val_yfs.imag[:, freqind])
+
+    def plot_1D_RI_f_z(self, absloc, coordloc, ax0, ax1, sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc = np.c_[absloc, coordloc, self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc = np.c_[absloc, self.y, coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc = np.c_[self.x, absloc, coordloc]
+
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
+
+        ax0.set_xlabel("Frequency (Hz)")
+        ax1.set_xlabel("Frequency (Hz)")
+        ax0.set_ylabel("E field, Real part (V/m)")
+        ax1.set_ylabel("E field, Imag part (V/m)")
+
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_xfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_xfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
+
+        ax0.plot(self.fvec, self.val_zfs.real[sigind, :], color="blue")
+        ax1.plot(self.fvec, self.val_zfs.imag[sigind, :], color="red")
+
+        ax0ymin, ax0ymax = (
+            self.val_zfs.real[sigind, :].min(),
+            self.val_zfs.real[sigind, :].max()
+        )
+
+        ax1ymin, ax1ymax = (
+            self.val_zfs.imag[sigind, :].min(),
+            self.val_zfs.imag[sigind, :].max()
+        )
+
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        ax1.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max()))/2
+                    ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        return ax0, ax1
+
+    def plot_1D_AP_f_z(self, absloc, coordloc, ax0, ax1, sigind):
+
+        if self.normal.upper() == "Z":
+            obsLoc = np.c_[absloc, coordloc, self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc = np.c_[absloc, self.y, coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc = np.c_[self.x, absloc, coordloc]
+
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
+
+        ax0.set_xlabel("Frequency (Hz)")
+        ax1.set_xlabel("Frequency (Hz)")
+        ax0.set_ylabel("E field, Amplitude (V/m)")
+        ax1.set_ylabel("E field, Phase (deg)")
+
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
+
+        ax0.plot(self.fvec, np.absolute(self.val_zfs[sigind, :]), color="blue")
+        ax1.plot(self.fvec, phase(self.val_zfs[sigind, :]), color="red")
+
+        ax0ymin, ax0ymax = (
+            np.absolute(self.val_zfs[sigind, :]).min(),
+            np.absolute(self.val_zfs[sigind, :]).max()
+        )
+        ax1ymin, ax1ymax = (
+            phase(self.val_zfs[sigind, :]).min(),
+            phase(self.val_zfs[sigind, :]).max()
+        )
+
+        #ax2.plot(self.fvec[freqind]*np.ones_like(self.val_zfs[sigind, :]),
+        #            np.linspace(ax2ymin,ax2ymax,len(self.val_zfs[sigind, :])),linestyle="dashed", color="black",linewidth=3.0)
+
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        ax1.annotate(
+            ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        return ax0, ax1
+
+    def plot_1D_RI_sig_z(self, absloc, coordloc, ax0, ax1, freqind):
+
+        if self.normal.upper() == "Z":
+            obsLoc = np.c_[absloc, coordloc, self.z]
+        elif self.normal.upper() == "Y":
+            obsLoc = np.c_[absloc, self.y, coordloc]
+        elif self.normal.upper() == "X":
+            obsLoc = np.c_[self.x, absloc, coordloc]
+
+        self.eval_loc(
+            self.srcLoc, obsLoc, self.sigvec, self.fvec, self.orientation,
+            self.func1D
+        )
+
+        ax0.set_xlabel("Conductivity (S/m)")
+        ax1.set_xlabel("Conductivity (S/m)")
+        ax0.set_ylabel("E field, Real part (V/m)")
+        ax1.set_ylabel("E field, Imag part (V/m)")
+
+        ax0.plot(self.sigvec, self.val_zfs.real[:, freqind], color="blue")
+        ax1.plot(self.sigvec, self.val_zfs.imag[:, freqind], color="red")
+
+        ax0ymin = self.val_zfs.real[:, freqind].min()
+        ax0ymax = self.val_zfs.real[:, freqind].max()
+        ax1ymin = self.val_zfs.imag[:, freqind].min()
+        ax1ymax = self.val_zfs.imag[:, freqind].max()
+
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs.real[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs.real[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
+
+        ax0.set_ylim(ax0ymin, ax0ymax)
+        ax1.set_ylim(ax1ymin, ax1ymax)
+
+        ax0.set_xscale('log')
+        ax1.set_xscale('log')
+
+        ax0.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max()))/2
+                ), ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
+            fontsize=14.
+        )
+
+        ax1.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max()))/2
+                ), ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
@@ -1477,11 +1795,17 @@ class DataView(object):
         )
         ax1.plot(self.sigvec, phase(self.val_zfs[:, freqind]), color="red")
 
-        ax0ymin, ax0ymax = np.absolute(self.val_zfs[:,freqind]).min(),np.absolute(self.val_zfs[:,freqind]).max()
-        ax1ymin, ax1ymax = phase(self.val_zfs[:,freqind]).min(),phase(self.val_zfs[:,freqind]).max()
+        ax0ymin, ax0ymax = (
+            np.absolute(self.val_zfs[:, freqind]).min(),
+            np.absolute(self.val_zfs[:, freqind]).max()
+        )
+        ax1ymin, ax1ymax = (
+            phase(self.val_zfs[:, freqind]).min(),
+            phase(self.val_zfs[:, freqind]).max()
+        )
 
-        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs[:,freqind]),
-        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs[:,freqind])),linestyle="dashed",color="black",linewidth=3.0)
+        #ax0.plot(self.sigvec[sigind]*np.ones_like(self.val_zfs[:, freqind]),
+        #         np.linspace(ax0ymin,ax0ymax,len(self.val_zfs[:, freqind])),linestyle="dashed", color="black",linewidth=3.0)
 
         ax0.set_ylim(ax0ymin, ax0ymax)
         ax1.set_ylim(ax1ymin, ax1ymax)
@@ -1489,21 +1813,59 @@ class DataView(object):
         ax0.set_xscale('log')
         ax1.set_xscale('log')
 
-        ax0.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+        ax0.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
-        ax1.annotate(("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax1ymin+(ax1ymax-ax1ymin)/4.), textcoords='data',
+        ax1.annotate(
+            ("f =%0.5f Hz") % (self.fvec[freqind]),
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax1ymin+(ax1ymax-ax1ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
-        return ax0,ax1
+        return ax0, ax1
 
-    def plot_1D_phasor_f_z(self,absloc,coordloc,ax,sigind):
+    def plot_1D_phasor_f_z(self, absloc, coordloc, ax, sigind):
 
         if self.normal.upper() == "Z":
             obsLoc = np.c_[absloc, coordloc, self.z]
@@ -1635,9 +1997,9 @@ class DataView(object):
             ax2ymax = np.absolute(self.val_xfs[sigind, :]).max()
 
             ax2.plot(
-                self.fvec[freqind]*np.ones_like(self.val_xfs[sigind,:]),
-                np.linspace(ax2ymin,ax2ymax,len(self.val_xfs[sigind,:])),
-                linestyle="dashed",color="black",linewidth=3.0
+                self.fvec[freqind]*np.ones_like(self.val_xfs[sigind, :]),
+                np.linspace(ax2ymin, ax2ymax, len(self.val_xfs[sigind, :])),
+                linestyle="dashed", color="black", linewidth=3.0
             )
 
             ax2.set_ylim(ax2ymin, ax2ymax)
@@ -1651,15 +2013,51 @@ class DataView(object):
 
         ax0.annotate(
             ("f =%0.5f Hz") % (self.fvec[freqind]),
-            xy=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.sigvec.min())+np.log10(self.sigvec.max()))/2), ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.sigvec.min()) +
+                        np.log10(self.sigvec.max())
+                    )/2
+                ),
+                ax0ymin+(ax0ymax-ax0ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
         ax2.annotate(
             ("$\sigma$ =%0.5f S/m") % (self.sigvec[sigind]),
-            xy=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
-            xytext=(10.**((np.log10(self.fvec.min())+np.log10(self.fvec.max()))/2), ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+            xy=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax2ymin+(ax2ymax-ax2ymin)/4.
+            ),
+            xycoords='data',
+            xytext=(
+                10.**(
+                    (
+                        np.log10(self.fvec.min()) +
+                        np.log10(self.fvec.max())
+                    )/2
+                ),
+                ax2ymin+(ax2ymax-ax2ymin)/4.
+            ),
+            textcoords='data',
             fontsize=14.
         )
 
@@ -1694,7 +2092,9 @@ class DataView(object):
             ax0ymax = self.val_yfs.real[:, freqind].max()
 
             ax0.plot(
-                self.sigvec[sigind]*np.ones_like(self.val_yfs.real[:, freqind]),
+                self.sigvec[sigind]*np.ones_like(
+                    self.val_yfs.real[:, freqind]
+                ),
                 np.linspace(
                     ax0ymin, ax0ymax, len(self.val_yfs.real[:, freqind])
                 ),
@@ -1718,7 +2118,7 @@ class DataView(object):
 
             ax2.set_ylim(ax2ymin, ax2ymax)
 
-        elif mode=="AP":
+        elif mode == "AP":
 
             ax0.set_xlabel("Conductivity (S/m)")
             ax0.set_ylabel("E field, Amplitude (V/m)")
@@ -1735,7 +2135,10 @@ class DataView(object):
                 self.sigvec, phase(self.val_yfs[:, freqind]), color="red"
             )
 
-            ax0ymin, ax0ymax = np.absolute(self.val_yfs[:,freqind]).min(),np.absolute(self.val_yfs[:,freqind]).max()
+            ax0ymin, ax0ymax = (
+                np.absolute(self.val_yfs[:, freqind]).min(),
+                np.absolute(self.val_yfs[:, freqind]).max()
+            )
 
             ax0.plot(
                 self.sigvec[sigind]*np.ones_like(self.val_yfs[:, freqind]),
@@ -1771,14 +2174,22 @@ class DataView(object):
         ax2.set_xscale('log')
         ax3.set_xscale('log')
 
-        #ax0.annotate(("$\f$ =%5.5f Hz") % (self.fvec[freqind]*10**(3)),
+        #ax0.annotate(
+        # ("$\f$ =%5.5f Hz") % (self.fvec[freqind]*10**(3)),
         #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-         #   fontsize=14.)
+        #    xytext=(self.sigvec.max()/100.,
+        # ax0ymin+(ax0ymax-ax0ymin)/4.
+        # ),
+        # textcoords='data',
+        #   fontsize=14.)
 
-        #ax2.annotate(("$\sigma$ =%3.3f mS/m") % (self.sigvec[sigind]*10**(3)),
+        #ax2.annotate(
+        # ("$\sigma$ =%3.3f mS/m") % (self.sigvec[sigind]*10**(3)),
         #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
-        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+        #    xytext=(self.fvec.max()/100.,
+        # ax2ymin+(ax2ymax-ax2ymin)/4.
+        # ),
+        # textcoords='data',
         #    fontsize=14.)
         plt.tight_layout()
 
@@ -1896,14 +2307,22 @@ class DataView(object):
         ax2.set_xscale('log')
         ax3.set_xscale('log')
 
-        #ax0.annotate(("$\f$ =%5.5f Hz") % (self.fvec[freqind]*10**(3)),
+        #ax0.annotate(
+        # ("$\f$ =%5.5f Hz") % (self.fvec[freqind]*10**(3)),
         #    xy=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), xycoords='data',
-        #    xytext=(self.sigvec.max()/100., ax0ymin+(ax0ymax-ax0ymin)/4.), textcoords='data',
-         #   fontsize=14.)
+        #    xytext=(self.sigvec.max()/100.,
+        # ax0ymin+(ax0ymax-ax0ymin)/4.
+        # ),
+        # textcoords='data',
+        #   fontsize=14.)
 
-        #ax2.annotate(("$\sigma$ =%3.3f mS/m") % (self.sigvec[sigind]*10**(3)),
+        #ax2.annotate(
+        # ("$\sigma$ =%3.3f mS/m") % (self.sigvec[sigind]*10**(3)),
         #    xy=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), xycoords='data',
-        #    xytext=(self.fvec.max()/100., ax2ymin+(ax2ymax-ax2ymin)/4.), textcoords='data',
+        #    xytext=(self.fvec.max()/100.,
+        # ax2ymin+(ax2ymax-ax2ymin)/4.
+        # ),
+        # textcoords='data',
         #    fontsize=14.)
 
         plt.tight_layout()
