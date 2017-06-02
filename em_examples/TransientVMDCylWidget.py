@@ -10,7 +10,8 @@ import numpy as np
 from PIL import Image
 from scipy.constants import mu_0
 import requests
-from StringIO import StringIO
+# from StringIO import StringIO
+from io import StringIO
 
 from .Base import widgetify
 from .DipoleWidgetFD import DisPosNegvalues

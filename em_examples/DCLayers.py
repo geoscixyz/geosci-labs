@@ -29,6 +29,7 @@ rhomax = 1e3
 eps = 1e-9 # to stabilize division
 infinity = 100 # what is "far enough"
 
+
 def r(xyz, src_loc):
     """
     Distance from source to points on an xyz grid
@@ -37,7 +38,7 @@ def r(xyz, src_loc):
         (xyz[:, 0] - src_loc[0])**2 +
         (xyz[:, 1] - src_loc[1])**2 +
         (xyz[:, 2] - src_loc[2])**2
-    )+ eps
+     )+ eps
 
 
 def sum_term(rho1, rho2, h, r):
@@ -250,7 +251,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     ax[0].text(x.max()+1, ylim.max()-0.1*ylim.max(), '$\\rho_a$ = %2.2f'%(rho_a(VM, VN, A, B, M, N)),
                 verticalalignment='bottom', bbox=props, fontsize = 14)
 
-    if imgplt is 'Model':
+    if imgplt == 'Model':
         model = rho2*np.ones(pltgrid.shape[0])
         model[pltgrid[:, 1] >= -h] = rho1
         model = model.reshape(x.size, z.size, order='F')
@@ -260,7 +261,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
         clim = [rhomin, rhomax]
         clabel = 'Resistivity ($\Omega$m)'
 
-    # elif imgplt is 'potential':
+    # elif imgplt == 'potential':
     #     Vplt = layer_potentials(rho1, rho2, h, np.r_[A, 0., 0.], np.r_[B, 0., 0.], np.c_[pltgrid, np.zeros_like(pltgrid[:, 0])])
     #     Vplt = Vplt.reshape(x.size, z.size, order='F')
     #     cb = ax[1].pcolor(xplt, zplt, Vplt)
@@ -269,7 +270,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     #     clim = ylim
     #     clabel = 'Potential (V)'
 
-    elif imgplt is 'Potential':
+    elif imgplt == 'Potential':
         Pc = mesh.getInterpolationMat(pltgrid, 'CC')
 
         V = solve_2D_potentials(rho1, rho2, h, np.r_[A, 0., 0.], np.r_[B, 0., 0.])
@@ -292,7 +293,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
         clim = np.r_[-15., 15.]
         clabel = 'Potential (V)'
 
-    elif imgplt is 'E':
+    elif imgplt == 'E':
 
         Pc = mesh.getInterpolationMat(pltgrid, 'CC')
 
@@ -317,7 +318,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
 
         clabel = 'Electric Field (V/m)'
 
-    elif imgplt is 'J':
+    elif imgplt == 'J':
 
         Pc = mesh.getInterpolationMat(pltgrid, 'CC')
 

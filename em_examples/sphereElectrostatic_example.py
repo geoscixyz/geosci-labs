@@ -686,7 +686,7 @@ def interact_conductiveSphere(R,log_sig0,log_sig1,Figure1a,Figure1b,Figure2a,Fig
             ax[0] = Plot_ChargesDensity(XYZ,sig0,sig1,R,E0,ax[0])
 
 
-    if Figure1a== 'Configuration':
+    if Figure1a == 'Configuration':
         ax[1] = Plot_Primary_Potential(XYZ,sig0,sig1,R,E0,ax[1])
         print('While figure1 is plotting Configuration, figure2 plots the primary field')
 
