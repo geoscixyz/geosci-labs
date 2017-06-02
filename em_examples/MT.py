@@ -52,23 +52,23 @@ omega = lambda f: 2.*np.pi*f
 k = lambda mu, sig, eps, f: np.sqrt(mu*mu_0*eps*epsilon_0*(2.*np.pi*f)**2.-1.j*mu*mu_0*sig*omega(f))
 
 # Define a frquency range for a survey
-frange = lambda minfreq, maxfreq, step: np.logspace(minfreq, maxfreq, num = step, base = 10.)
+frange = lambda minfreq, maxfreq, step: np.logspace(minfreq, maxfreq, num = int(step), base = 10.)
 
 # Functions to create random physical Perties for a n-layered earth
 thick = lambda minthick, maxthick, nlayer: np.append(np.array([1.2*10.**5]),
-                                                     np.ndarray.round(minthick + (maxthick-minthick)* np.random.rand(nlayer-1, 1)
+                                                     np.ndarray.round(minthick + (maxthick-minthick)* np.random.rand(int(nlayer)-1, 1)
                                                             , decimals =1))
 
 sig = lambda minsig, maxsig, nlayer: np.append(np.array([0.]),
-                                               np.ndarray.round(10.**minsig + (10.**maxsig-10.**minsig)* np.random.rand(nlayer, 1)
+                                               np.ndarray.round(10.**minsig + (10.**maxsig-10.**minsig)* np.random.rand(int(nlayer), 1)
                                                       , decimals=3))
 
 mu  = lambda minmu, maxmu, nlayer: np.append(np.array([1.]),
-                                             np.ndarray.round(minmu + (maxmu-minmu)* np.random.rand(nlayer, 1)
+                                             np.ndarray.round(minmu + (maxmu-minmu)* np.random.rand(int(nlayer), 1)
                                                     , decimals=1))
 
 eps = lambda mineps, maxeps, nlayer: np.append(np.array([1.]),
-                                               np.ndarray.round(mineps + (maxeps-mineps)* np.random.rand(nlayer, 1)
+                                               np.ndarray.round(mineps + (maxeps-mineps)* np.random.rand(int(nlayer), 1)
                                                                 , decimals=1))
 
 # Evaluate Impedance Z of a layer
@@ -425,24 +425,25 @@ def PlotAppRes3Layers_wrapper(fmin, fmax, nbdata, h1, h2, rhol1, rhol2, rhol3, m
     PlotAppRes(frangn, thick3, sig3, chg3_0, taux3, c3, mu3, eps3, 3, F_Envelope, PlotEnvelope)
 
 def MT1D_app():
-    app = widgetify(PlotAppRes3Layers_wrapper,
-            fmin = FloatText(min=1e-5, max=1e5, value = 1e-5, continuous_update=False),
-            fmax = FloatText(min=1e-5, max=1e5, value = 1e5, continuous_update=False),
-            nbdata = IntSlider(min =10, max=100, value = 100, step =10, continuous_update=False),
-            h1=FloatSlider(min=0., max=10000., step=50., value=500., continuous_update=False),
-            h2=FloatSlider(min=0., max=10000., step=50., value=1000., continuous_update=False),
-            rhol1=FloatText(min=1e-8, max=1e8, value = 100., continuous_update=False, description='$\\rho_1$'),
-            rhol2=FloatText(min=1e-8, max=1e8, value = 1000., continuous_update=False, description='$\\rho_2$'),
-            rhol3=FloatText(min=1e-8, max=1e8, value = 10., continuous_update=False, description='$\\rho_3$'),
-            mul1=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_1$'),
-            mul2=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_2$'),
-            mul3=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_3$'),
-            epsl1=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_1$'),
-            epsl2=FloatSlider(min=1., max=80., step=1, value=1., continuous_update=False, description='$\\varepsilon_2$'),
-            epsl3=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_3$'),
-            PlotEnvelope=ToggleButton(options =True, description='Plot Envelope fields'),
-            F_Envelope=FloatText(min = 1e-5, max=1e5, value=1e4, continuous_update=False, description='F')
-            )
+    app = widgetify(
+        PlotAppRes3Layers_wrapper,
+        fmin = FloatText(min=1e-5, max=1e5, value = 1e-5, continuous_update=False),
+        fmax = FloatText(min=1e-5, max=1e5, value = 1e5, continuous_update=False),
+        nbdata = IntSlider(min =10, max=100, value = 100, step =10, continuous_update=False),
+        h1=FloatSlider(min=0., max=10000., step=50., value=500., continuous_update=False),
+        h2=FloatSlider(min=0., max=10000., step=50., value=1000., continuous_update=False),
+        rhol1=FloatText(min=1e-8, max=1e8, value = 100., continuous_update=False, description='$\\rho_1$'),
+        rhol2=FloatText(min=1e-8, max=1e8, value = 1000., continuous_update=False, description='$\\rho_2$'),
+        rhol3=FloatText(min=1e-8, max=1e8, value = 10., continuous_update=False, description='$\\rho_3$'),
+        mul1=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_1$'),
+        mul2=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_2$'),
+        mul3=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_3$'),
+        epsl1=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_1$'),
+        epsl2=FloatSlider(min=1., max=80., step=1, value=1., continuous_update=False, description='$\\varepsilon_2$'),
+        epsl3=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_3$'),
+        PlotEnvelope=ToggleButton(options =True, description='Plot Envelope fields'),
+        F_Envelope=FloatText(min = 1e-5, max=1e5, value=1e4, continuous_update=False, description='F')
+    )
     return app
 
 def run(n, plotIt=True):
