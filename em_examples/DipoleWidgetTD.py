@@ -165,7 +165,7 @@ class DipoleWidgetTD(object):
             unit =  " (A/m$^2$) "
             fieldname = "Current density"
         else:
-            print tempstr
+            print(tempstr)
             raise NotImplementedError()
 
         label = fieldname + unit

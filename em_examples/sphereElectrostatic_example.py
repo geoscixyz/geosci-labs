@@ -688,7 +688,7 @@ def interact_conductiveSphere(R,log_sig0,log_sig1,Figure1a,Figure1b,Figure2a,Fig
 
     if Figure1a== 'Configuration':
         ax[1] = Plot_Primary_Potential(XYZ,sig0,sig1,R,E0,ax[1])
-        print 'While figure1 is plotting Configuration, figure2 plots the primary field'
+        print('While figure1 is plotting Configuration, figure2 plots the primary field')
 
     elif Figure2a == 'Total':
         if Figure2b == 'Potential':

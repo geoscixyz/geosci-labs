@@ -144,7 +144,7 @@ if __name__ == '__main__':
     out = Mijfun(0., 0., 0., 0., 0., 10., 0, 0., 0., 0.)
     anal = mu_0*np.pi / (2*10**3)
     err = abs(out-anal)
-    print err
+    print(err)
     showIt = False
     import matplotlib.pyplot as plt
     f = np.logspace(-3, 3, 61)

@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-from FDEMDipolarfields import *
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
@@ -16,6 +15,7 @@ from ipywidgets import *
 
 from .View import DataView
 from .Base import widgetify
+from .FDEMDipolarfields import *
 
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):

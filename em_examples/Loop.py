@@ -126,7 +126,7 @@ def BiotSavart(locs,mesh,Js):
             rsq = np.linalg.norm(r,axis=1)**3.
             B = B + c*cr/rsq[:,None]
         else:
-            print 'error: index of J out of bounds (number of edges in the mesh)'
+            print('error: index of J out of bounds (number of edges in the mesh)')
 
     return B
 
@@ -222,9 +222,9 @@ def circularloop(a,obsloc,I=1.):
     ((a**2.-r2)*ellipe(k2)+alpha2*ellipk(k2))
     Bz[np.isnan(Bz)] = 0.
 
-    #print Bx.shape
-    #print By.shape
-    #print Bz.shape
+    #print(Bx.shape)
+    #print(By.shape)
+    #print(Bz.shape)
     B = np.hstack([Bx,By,Bz])
 
     return B

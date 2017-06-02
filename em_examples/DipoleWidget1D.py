@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
-from View import DataView
 from SimPEG import EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -16,6 +15,7 @@ warnings.filterwarnings("ignore")
 from ipywidgets import *
 
 from .Base import widgetify
+from .View import DataView
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     dx = x2-x1
