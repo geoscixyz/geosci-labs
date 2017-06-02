@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
 from scipy.constants import mu_0, epsilon_0
 import matplotlib.pyplot as plt
