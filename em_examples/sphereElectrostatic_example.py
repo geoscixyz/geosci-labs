@@ -566,8 +566,8 @@ def two_configurations_comparison(XYZ,sig0,sig1,sig2,R0,R1,E0,xstart,ystart,xend
     xr,yr,zr = np.unique(XYZ[:, 0]),np.unique(XYZ[:, 1]),np.unique(XYZ[:, 2])
 
     #Defining the Profile
-    start = np.array([xstart,ystart])
-    end = np.array([xend,yend])
+    start = np.array([xstart, ystart])
+    end = np.array([xend, yend])
 
     #Calculating the data from the defined survey line for Configuration 0 and 1
     MP0,EL0,VtdMP0,VtdMPn0,VsdMP0,VsdMPn0 = MN_Potential_total(sig0,sig1,R0,E0,start,end,nb_dipole,electrode_spacing)
