@@ -29,19 +29,20 @@ ftsize_axis  = 14      #font size for axis ticks
 ftsize_label = 14      #font size for axis labels
 
 # Radius function, useful sigma ratio, and log scale converter
-r  = lambda x,y,z: np.sqrt(x**2.+y**2.+z**2.)
-sigf = lambda sig0,sig1: (sig1-sig0)/(sig1+2.*sig0)
+r = lambda x, y, z: np.sqrt(x**2.+y**2.+z**2.)
+sigf = lambda sig0, sig1: (sig1-sig0)/(sig1+2.*sig0)
+
 
 #tools to convert log conductivity in conductivity
-def conductivity_log_wrapper(log_sig0,log_sig1):
+def conductivity_log_wrapper(log_sig0, log_sig1):
     sig0 = 10.**log_sig0
     sig1 = 10.**log_sig1
 
-    return sig0,sig1
+    return sig0, sig1
 
 # Examples
 #Plot the configuration. Label=False is used to generate a general case figure
-def get_Setup(XYZ,sig0,sig1,R,E0,ax,label,colorsphere):
+def get_Setup(XYZ, sig0, sig1, R, E0, ax, label, colorsphere):
     '''
     XYZ: ndgrid
     sig0: conductivity of the background
@@ -54,97 +55,128 @@ def get_Setup(XYZ,sig0,sig1,R,E0,ax,label,colorsphere):
     '''
 
     xplt = np.linspace(-R, R, num=100)
-    xr,yr,zr = np.unique(XYZ[:,0]),np.unique(XYZ[:,1]),np.unique(XYZ[:,2])
+    xr, yr, zr = (
+        np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    )
     dx = xr[1]-xr[0]
     top = np.sqrt(R**2-xplt**2)
     bot = -np.sqrt(R**2-xplt**2)
 
-    if R != 0:
-        ax.plot(xplt, top, xplt, bot, color=colorsphere,linewidth=1.5)
-        ax.fill_between(xplt,bot,top,color=colorsphere,alpha=0.5 )
-        ax.arrow(0.,0.,np.sqrt(2.)*R/2.,np.sqrt(2.)*R/2.,head_width=0.,head_length=0.)
+    if R > 0:
+        ax.plot(xplt, top, xplt, bot, color=colorsphere, linewidth=1.5)
+        ax.fill_between(xplt, bot, top, color=colorsphere, alpha=0.5 )
+        ax.arrow(
+            0., 0., np.sqrt(2.)*R/2., np.sqrt(2.)*R/2., head_width=0.,
+            head_length=0.
+        )
 
         if label:
-            ax.annotate(("$\sigma_1$=%3.3f mS/m")%(sig1*10.**(3.)),
-            xy=(0.,-R/2.), xycoords='data',
-            xytext=(0.,-R/2.), textcoords='data',
-            fontsize=14.)
-            ax.annotate(("$\sigma_0$= %3.3f mS/m")%(sig0*10.**(3.)),
-            xy=(0.,-1.5*R), xycoords='data',
-            xytext=(0.,-1.5*R), textcoords='data',
-            fontsize=14.)
-            ax.annotate(('$\mathbf{E_0} = %1i \mathbf{\hat{x}}$ V/m')%(E0),
-            xy=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), xycoords='data',
-            xytext=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), textcoords='data',
-            fontsize=14.)
-            ax.annotate(('$R$ = %1i m')%(R),
-            xy=(R/4.+(xr[1]-xr[0]),R/4.), xycoords='data',
-            xytext=(R/4.+(xr[1]-xr[0]),R/4.), textcoords='data',
-            fontsize=14.)
-            ax.set_ylabel('Y coordinate ($m$)',fontsize = ftsize_label)
-            ax.set_xlabel('X coordinate ($m$)',fontsize = ftsize_label)
+            ax.annotate(
+                ("$\sigma_1$={:3.3f} mS/m".format(sig1*10.**(3.))),
+                xy=(0., -R/2.), xycoords='data',
+                xytext=(0., -R/2.), textcoords='data',
+                fontsize=14.
+            )
+            ax.annotate(
+                ("$\sigma_0$= {:3.3f} mS/m".format(sig0*10.**(3.))),
+                xy=(0., -1.5*R), xycoords='data',
+                xytext=(0., -1.5*R), textcoords='data',
+                fontsize=14.
+            )
+            ax.annotate(
+                ('$\mathbf{E_0} = {:1.0f} \mathbf{\hat{x}}$ V/m'.format(E0)),
+                xy=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                xycoords='data',
+                xytext=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                textcoords='data',
+                fontsize=14.
+            )
+            ax.annotate(
+                ('$R$ = {:1.0f} m'.format(R)),
+                xy=(R/4.+(xr[1]-xr[0]), R/4.), xycoords='data',
+                xytext=(R/4.+(xr[1]-xr[0]),R/4.), textcoords='data',
+                fontsize=14.
+            )
+            ax.set_ylabel('Y coordinate ($m$)', fontsize = ftsize_label)
+            ax.set_xlabel('X coordinate ($m$)', fontsize = ftsize_label)
             ax.tick_params(labelsize=ftsize_axis)
 
         else:
             ax.set_xticklabels([])
             ax.set_yticklabels([])
-            ax.text(-1.,-np.sqrt(R)/2.-10.,'$\sigma_1$',fontsize=14)
-            ax.text(-0.05,-R-10,'$\sigma_0$',fontsize=14)
-            ax.annotate(('$\mathbf{E_0} = E_0 \mathbf{\hat{x}}$ V/m'),
-            xy=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), xycoords='data',
-            xytext=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), textcoords='data',
-            fontsize=14.)
-            ax.annotate(('$R$'),
-            xy=(R/4.+(xr[1]-xr[0]),R/4.), xycoords='data',
-            xytext=(R/4.+(xr[1]-xr[0]),R/4.), textcoords='data',
-            fontsize=14.)
-            ax.set_xlabel('x',fontsize=12)
-            ax.set_ylabel('y',fontsize=12)
+            ax.text(-1., -np.sqrt(R)/2.-10., '$\sigma_1$', fontsize=14)
+            ax.text(-0.05, -R-10, '$\sigma_0$', fontsize=14)
+            ax.annotate(
+                ('$\mathbf{E_0} = E_0 \mathbf{\hat{x}}$ V/m'),
+                xy=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                xycoords='data',
+                xytext=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                textcoords='data',
+                fontsize=14.
+            )
+            ax.annotate(
+                ('$R$'),
+                xy=(R/4.+(xr[1]-xr[0]),R/4.), xycoords='data',
+                xytext=(R/4.+(xr[1]-xr[0]),R/4.), textcoords='data',
+                fontsize=14.
+            )
+            ax.set_xlabel('x', fontsize=12)
+            ax.set_ylabel('y', fontsize=12)
 
     else:
         if label:
-            ax.annotate(("$\sigma_0$= %3.3f mS/m")%(sig0*10.**(3.)),
-            xy=(0.,-1.5*R), xycoords='data',
-            xytext=(0.,-1.5*R), textcoords='data',
-            fontsize=14.)
-            ax.annotate(('$\mathbf{E_0} = %1i  \mathbf{\hat{x}}$ V/m')%(E0),
-            xy=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), xycoords='data',
-            xytext=(xr.min()+np.abs(xr.max()-xr.min())/20.,0), textcoords='data',
-            fontsize=14.)
-            ax.set_ylabel('Y coordinate ($m$)',fontsize = ftsize_label)
-            ax.set_xlabel('X coordinate ($m$)',fontsize = ftsize_label)
+            ax.annotate(
+                ("$\sigma_0$= {:3.3f} mS/m".format(sig0*10.**(3.))),
+                xy=(0., -1.5*R), xycoords='data',
+                xytext=(0., -1.5*R), textcoords='data',
+                fontsize=14.
+            )
+            ax.annotate(
+                ('$\mathbf{E_0} = {1.0f} \mathbf{\hat{x}}$ V/m'.format(E0)),
+                xy=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                xycoords='data',
+                xytext=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
+                textcoords='data',
+                fontsize=14
+            )
+            ax.set_ylabel('Y coordinate ($m$)', fontsize=ftsize_label)
+            ax.set_xlabel('X coordinate ($m$)', fontsize=ftsize_label)
             ax.tick_params(labelsize=ftsize_axis)
 
         else:
             ax.set_xticklabels([])
             ax.set_yticklabels([])
-            ax.text(-0.05,-10,'$\sigma_0$',fontsize=14)
-            ax.text(xr.min()+np.abs(xr.max()-xr.min())/20., 0, '$\mathbf{E_0} = E_0 \mathbf{\hat{x}}$ V/m', fontsize=14)
-            ax.set_xlabel('x',fontsize=12)
-            ax.set_ylabel('y',fontsize=12)
+            ax.text(-0.05, -10, '$\sigma_0$', fontsize=14)
+            ax.text(
+                xr.min()+np.abs(xr.max()-xr.min())/20., 0,
+                '$\mathbf{E_0} = E_0 \mathbf{\hat{x}}$ V/m',
+                fontsize=14
+            )
+            ax.set_xlabel('x', fontsize=12)
+            ax.set_ylabel('y', fontsize=12)
 
-
-    ax.set_xlim([xr.min(),xr.max()])
-    ax.set_ylim([yr.min(),yr.max()])
-    [ax.arrow(xr.min(),_,np.abs(xr.max()-xr.min())/20.,0.,head_width=5.,head_length=2.,color='k') for _ in np.linspace(yr.min(),yr.max(),num=10)]
-    ax.patch.set_facecolor([0.4,0.7,0.4])
+    ax.set_xlim([xr.min(), xr.max()])
+    ax.set_ylim([yr.min(), yr.max()])
+    [ax.arrow(
+        xr.min(), _, np.abs(xr.max()-xr.min())/20., 0., head_width=5.,
+        head_length=2., color='k'
+    ) for _ in np.linspace(yr.min(), yr.max(), num=10)]
+    ax.patch.set_facecolor([0.4, 0.7, 0.4])
     ax.patch.set_alpha(0.2)
 
     ax.set_aspect('equal')
-
-
-
     return ax
 
-def get_Conductivity(XYZ,sig0,sig1,R):
+
+def get_Conductivity(XYZ, sig0, sig1, R):
     '''
     Define the conductivity for each point of the space
     '''
-    x,y,z = XYZ[:,0],XYZ[:,1],XYZ[:,2]
-    r_view=r(x,y,z)
+    x, y, z = XYZ[:, 0], XYZ[:, 1], XYZ[:, 2]
+    r_view = r(x, y, z)
 
-    ind0= (r_view>R)
-    ind1= (r_view<=R)
+    ind0 = (r_view > R)
+    ind1 = (r_view <= R)
 
     assert (ind0 + ind1).all(), 'Some indicies not included'
 
@@ -156,18 +188,18 @@ def get_Conductivity(XYZ,sig0,sig1,R):
     return Sigma
 
 
-def get_Potential(XYZ,sig0,sig1,R,E0):
+def get_Potential(XYZ, sig0, sig1, R, E0):
 
     '''
     Function that returns the total, the primary and the secondary potentials, assumes an x-oriented inducing field and that the sphere is at the origin
     :input: grid, outer sigma, inner sigma, radius of the sphere, strength of the electric field
     '''
 
-    x,y,z = XYZ[:,0],XYZ[:,1],XYZ[:,2]
+    x, y, z = XYZ[:, 0], XYZ[:, 1], XYZ[:, 2]
 
-    sig_cur = sigf(sig0,sig1)
+    sig_cur = sigf(sig0, sig1)
 
-    r_cur = r(x,y,z)  # current radius
+    r_cur = r(x, y, z)  # current radius
 
     ind0 = (r_cur > R)
     ind1 = (r_cur <= R)
@@ -181,39 +213,43 @@ def get_Potential(XYZ,sig0,sig1,R,E0):
     Vt[ind0] = -E0*x[ind0]*(1.-sig_cur*R**3./r_cur[ind0]**3.) # total potential outside the sphere
     Vt[ind1] = -E0*x[ind1]*3.*sig0/(sig1+2.*sig0)             # inside the sphere
 
+    Vp = -E0*x  # primary potential
 
-    Vp = - E0*x  # primary potential
+    Vs = Vt-Vp  # secondary potential
 
-    Vs = Vt - Vp # secondary potential
+    return Vt, Vp, Vs
 
-    return Vt,Vp,Vs
 
-#plot the primary potential on ax
-def Plot_Primary_Potential(XYZ,sig0,sig1,R,E0,ax):
+# plot the primary potential on ax
+def Plot_Primary_Potential(XYZ, sig0, sig1, R, E0, ax):
 
-    Vt,Vp,Vs = get_Potential(XYZ,sig0,sig1,R,E0)
-
-    xr,yr,zr = np.unique(XYZ[:,0]),np.unique(XYZ[:,1]),np.unique(XYZ[:,2])
+    Vt, Vp, Vs = get_Potential(XYZ, sig0, sig1, R, E0)
+    xr, yr, zr = (
+        np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    )
 
     xcirc = xr[np.abs(xr) <= R]
 
-    Pplot = ax.pcolor(xr,yr,Vp.reshape(xr.size,yr.size))
-    ax.plot(xcirc,np.sqrt(R**2-xcirc**2),'--k',xcirc,-np.sqrt(R**2-xcirc**2),'--k')
-    ax.set_title('Primary Potential',fontsize=ftsize_title)
-    cb = plt.colorbar(Pplot,ax=ax)
-    cb.set_label(label= 'Potential ($V$)',size=ftsize_label)
+    Pplot = ax.pcolor(xr, yr, Vp.reshape(xr.size, yr.size))
+    ax.plot(
+        xcirc, np.sqrt(R**2-xcirc**2), '--k', xcirc, -np.sqrt(R**2-xcirc**2),
+        '--k'
+    )
+    ax.set_title('Primary Potential', fontsize=ftsize_title)
+    cb = plt.colorbar(Pplot, ax=ax)
+    cb.set_label(label='Potential ($V$)', size=ftsize_label)
     cb.ax.tick_params(labelsize=ftsize_axis)
-    ax.set_xlim([xr.min(),xr.max()])
-    ax.set_ylim([yr.min(),yr.max()])
-    ax.set_ylabel('Y coordinate ($m$)',fontsize = ftsize_label)
-    ax.set_xlabel('X coordinate ($m$)',fontsize = ftsize_label)
+    ax.set_xlim([xr.min(), xr.max()])
+    ax.set_ylim([yr.min(), yr.max()])
+    ax.set_ylabel('Y coordinate ($m$)', fontsize=ftsize_label)
+    ax.set_xlabel('X coordinate ($m$)', fontsize=ftsize_label)
     ax.set_aspect('equal')
     ax.tick_params(labelsize=ftsize_axis)
 
     return ax
 
 #plot the total potential on ax
-def Plot_Total_Potential(XYZ,sig0,sig1,R,E0,ax):
+def Plot_Total_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     Vt,Vp,Vs = get_Potential(XYZ,sig0,sig1,R,E0)
 
