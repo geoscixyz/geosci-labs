@@ -49,20 +49,20 @@ def plotObj3D(
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.ones(5)*offset_plane
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
-        verts = (x, y, z)
+        verts = zip(x, y, z)
 
     elif plane == "YZ":
         x = np.ones(5)*offset_plane
         y = np.r_[Y1, Y2, Y2, Y1, Y1]
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
-        verts = (x, y, z)
+        verts = zip(x, y, z)
 
     polya = polyplane([verts])
 
     x = np.r_[X1, X2, X2, X1, X1]
     y = np.r_[Y1, Y1, Y2, Y2, Y1]
     z = np.ones(5)*0.
-    verts = (x, y, z)
+    verts = zip(x, y, z)
 
     polyb = polyplane([verts], color="grey")
 
@@ -84,9 +84,10 @@ def plotObj3D(
     ax.plot(xoffset_rx*np.ones(nRx), yoffset_rx*np.ones(nRx), np.linspace(Z1, Z2, nRx), "r.", ms=4)
     ax.plot(np.linspace(X1, X2, nRx), np.zeros(nRx), np.zeros(nRx), "b-", ms=4)
 
-    a = Arrow3D([0,0], [0,0],
-                [8,-8], mutation_scale=10,
-                lw=2, arrowstyle="<->", color="r")
+    a = Arrow3D(
+        [0, 0], [0, 0], [8, -8], mutation_scale=10,
+        lw=2, arrowstyle="<->", color="r"
+    )
     ax.add_artist(a)
 
     ax.text(0, 0, Z2, "Tx hole")
