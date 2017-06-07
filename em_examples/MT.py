@@ -334,8 +334,8 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
     figheight = 12
     fig = plt.figure(figsize=(figwdith, figheight))
     ax0 = plt.subplot2grid((figheight, figwdith), (0, 0), colspan=int(2*figwdith/3-1), rowspan=int(figheight/2-1))
-    ax1 = plt.subplot2grid((figheight, figwdith), (figheight/2, 0), colspan=int(2*figwdith/3-1), rowspan=int(figheight/2-1))
-    ax2 = plt.subplot2grid((figheight, figwdith), (0, 2*figwdith/3+1), colspan=int(figwdith/3-1), rowspan=int(figheight))
+    ax1 = plt.subplot2grid((figheight, figwdith), (int(figheight/2), 0), colspan=int(2*figwdith/3-1), rowspan=int(figheight/2-1))
+    ax2 = plt.subplot2grid((figheight, figwdith), (0, int(2*figwdith/3+1)), colspan=int(figwdith/3-1), rowspan=int(figheight))
     ax = [ax0, ax1, ax2]
 
     ax[0].scatter(F, Res, color='black')
