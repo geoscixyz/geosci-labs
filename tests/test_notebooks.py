@@ -51,12 +51,14 @@ def get(nbname, nbpath):
             ex = ExecutePreprocessor(
                 timeout=600,
                 kernel_name='python{}'.format(sys.version_info[0]),
+                allow_errors=True
             )
 
             try:
                 out = ex.preprocess(nb, {})
             except CellExecutionError:
                 print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
+                print out['traceback']
                 raise
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
