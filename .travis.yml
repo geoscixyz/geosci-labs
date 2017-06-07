@@ -26,7 +26,7 @@ before_install:
 
 
 install:
-  - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets nbformat nbconvert
+  - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy nose matplotlib ipywidgets nbformat nbconvert
   # - git clone https://github.com/simpeg/simpeg.git
   # - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
   - export PYTHONPATH=$PWD:$PATH
