@@ -58,7 +58,7 @@ def get(nbname, nbpath):
                 out = ex.preprocess(nb, {})
             except CellExecutionError:
                 print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-                print out['traceback']
+                print(nb['traceback'])
                 raise
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
