@@ -25,7 +25,7 @@ class Arrow3D(FancyArrowPatch):
 
 
 def polyplane(verts, alpha=0.2, color="green"):
-    poly = Poly3DCollection(list[verts])
+    poly = Poly3DCollection(list(verts))
     poly.set_alpha(alpha)
     poly.set_facecolor(color)
     return poly
