@@ -574,10 +574,10 @@ def MN_Potential_total(sig0, sig1, R, E0, start, end, nbmp, mn):
     #Dipoles'Electrodes positions around each midpoints
     EL = np.zeros(shape=(2*nbmp, 2))
     for n in range(0, len(EL), 2):
-        EL[n, 0]   = MP[n/2, 0] - ((end[0]-start[0])/D)*mn/2.
-        EL[n+1, 0] = MP[n/2, 0] + ((end[0]-start[0])/D)*mn/2.
-        EL[n, 1]   = MP[n/2, 1] - ((end[1]-start[1])/D)*mn/2.
-        EL[n+1, 1] = MP[n/2, 1] + ((end[1]-start[1])/D)*mn/2.
+        EL[n, 0]   = MP[int(n/2), 0] - ((end[0]-start[0])/D)*mn/2.
+        EL[n+1, 0] = MP[int(n/2), 0] + ((end[0]-start[0])/D)*mn/2.
+        EL[n, 1]   = MP[int(n/2), 1] - ((end[1]-start[1])/D)*mn/2.
+        EL[n+1, 1] = MP[int(n/2), 1] + ((end[1]-start[1])/D)*mn/2.
 
     VtEL = np.zeros(2*nbmp) #Total Potential (Vt-) at each electrode (-EL)
     VsEL = np.zeros(2*nbmp) #Secondary Potential (Vt-) at each electrode (-EL)
