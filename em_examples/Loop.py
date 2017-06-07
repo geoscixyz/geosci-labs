@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from SimPEG import Mesh, Utils
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,6 +15,7 @@ from SimPEG.EM import TDEM
 from SimPEG.EM.Analytics.TDEM import hzAnalyticDipoleT,hzAnalyticCentLoopT
 from scipy.interpolate import interp2d,LinearNDInterpolator
 from scipy.special import ellipk,ellipe
+
 
 def rectangular_plane_layout(mesh,corner, closed = False,I=1.):
     """
@@ -121,7 +126,7 @@ def BiotSavart(locs,mesh,Js):
             rsq = np.linalg.norm(r,axis=1)**3.
             B = B + c*cr/rsq[:,None]
         else:
-            print 'error: index of J out of bounds (number of edges in the mesh)'
+            print('error: index of J out of bounds (number of edges in the mesh)')
 
     return B
 
@@ -217,9 +222,9 @@ def circularloop(a,obsloc,I=1.):
     ((a**2.-r2)*ellipe(k2)+alpha2*ellipk(k2))
     Bz[np.isnan(Bz)] = 0.
 
-    #print Bx.shape
-    #print By.shape
-    #print Bz.shape
+    #print(Bx.shape)
+    #print(By.shape)
+    #print(Bz.shape)
     B = np.hstack([Bx,By,Bz])
 
     return B

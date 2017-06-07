@@ -3,35 +3,17 @@ python:
   - 2.7
   - 3.6
 
-matrix:
-  allow_failures:
-    - python: 3.6
-
 sudo: false
 
 env:
   global:
-    - PYPI_PY=2.7  # deploy to pypi from python 3.6
+    - PYPI_PY=3.6  # deploy to pypi from python 3.6
 
 env:
-    - TEST_DIR="tests"
-
-# Setup anaconda
-before_install:
-  # - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then wget http://repo.continuum.io/miniconda/Miniconda-3.8.3-Linux-x86_64.sh -O miniconda.sh; else wget http://repo.continuum.io/miniconda/Miniconda3-3.8.3-Linux-x86_64.sh -O miniconda.sh; fi
-  # - chmod +x miniconda.sh
-  # - ./miniconda.sh -b
-  # - export PATH=/home/travis/anaconda/bin:/home/travis/miniconda/bin:$PATH
-  # - conda update --yes conda
-  - pip install --upgrade pip
+  - TEST_DIR="tests"
 
 install:
-  # - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets
-  # - git clone https://github.com/simpeg/simpeg.git
-  # - cd simpeg; git checkout dev; git pull; python setup.py build_ext --inplace; cd ..
-  # - export PATH=$PWD:$PATH
-  # - export PYTHONPATH=$PWD:$PYTHONPATH
-
+  - pip install --upgrade pip
   - pip install -r requirements.txt
   - echo $PWD
   - cd ../

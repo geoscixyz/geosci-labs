@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh
@@ -11,9 +14,10 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
-from .Base import widgetify
 
 from ipywidgets import interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Widget
+
+from .Base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 12

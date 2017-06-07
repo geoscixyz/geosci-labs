@@ -1,6 +1,9 @@
+from __future__ import print_function
+from __future__ import absolute_import
+
 import ipywidgets
-from IPython.display import display
 import matplotlib.pyplot as plt
+
 
 class MyApp(ipywidgets.Box):
     def __init__(self, widgets, kwargs):
@@ -13,11 +16,11 @@ class MyApp(ipywidgets.Box):
 
     @property
     def kwargs(self):
-        instanceCheck = lambda x: isinstance(x, (ipywidgets.widget.Widget, ipywidgets.fixed))
-        return dict(
-            [(key, val.value) for key, val in self._kwargs.iteritems()
-            if instanceCheck(val)]
-        )
+        return dict([
+            (key, val.value) for key, val in self._kwargs.items()
+            if isinstance(val, (ipywidgets.widget.Widget, ipywidgets.fixed))
+        ])
+
 
 def widgetify(fun, layout=None, manual=False, **kwargs):
 

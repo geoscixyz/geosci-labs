@@ -1,17 +1,23 @@
 from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
-from View import DataView
 from SimPEG import EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-matplotlib.rcParams['font.size'] = 12
 from ipywidgets import *
-from DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from scipy.constants import mu_0, epsilon_0
-from VolumeWidget import polyplane
-from FDEMPlanewave import *
+
+from .DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
+from .VolumeWidget import polyplane
+from .FDEMPlanewave import *
+from .View import DataView
+
+matplotlib.rcParams['font.size'] = 12
+
 
 def PlaneEHfield(z, t=0., f=1., sig=1., mu=mu_0,  epsilon=epsilon_0, E0=1.):
     """
@@ -51,19 +57,19 @@ class PolarEllipse(object):
         x = np.r_[X1,X2,X2,X1,X1]
         y = np.zeros(5)
         z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x,y,z)]
+        verts = zip(x,y,z)
         polya = polyplane(verts, color="red", alpha=0.1)
         ax.plot(x, y, z, "r-", lw=1, alpha=0.2)
         x = np.r_[X1,X2,X2,X1,X1]
         y = np.r_[Y1,Y1,Y2,Y2,Y1]
         z = np.zeros(5)
-        verts = [zip(x, y,z)]
+        verts = zip(x, y,z)
         polyb = polyplane(verts, color="blue", alpha=0.1)
         ax.plot(x, y, z, "b-", lw=1, alpha=0.2)
         x = np.ones(5)*t[itime]
         y = np.r_[Y1,Y2,Y2,Y1,Y1]
         z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x, y,z)]
+        verts = zip(x, y,z)
         polyc = polyplane(verts, color="grey", alpha=0.1)
         ax.plot(x, y, z, "k-", lw=1, alpha=0.2)
 
@@ -142,7 +148,7 @@ class PlanewaveWidget(DipoleWidgetFD):
         if normal =="Y" or normal=="y":
             xyz_line = np.c_[x, np.ones_like(x)*self.y, y]
             self.dataview.xyz_line =  xyz_line
-        if normal =="Z" or normal=="z":
+        if normal == "Z" or normal == "z":
             xyz_line = np.c_[x, y, np.ones_like(x)*self.z]
             self.dataview.xyz_line =  xyz_line
 

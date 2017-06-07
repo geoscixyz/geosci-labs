@@ -1,9 +1,6 @@
-#import sys
-#sys.path.append("./simpeg")
-#sys.path.append("./simpegdc/")
-
-#import warnings
-#warnings.filterwarnings('ignore')
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh

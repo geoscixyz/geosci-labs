@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from scipy.constants import epsilon_0, mu_0
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,23 +52,23 @@ omega = lambda f: 2.*np.pi*f
 k = lambda mu, sig, eps, f: np.sqrt(mu*mu_0*eps*epsilon_0*(2.*np.pi*f)**2.-1.j*mu*mu_0*sig*omega(f))
 
 # Define a frquency range for a survey
-frange = lambda minfreq, maxfreq, step: np.logspace(minfreq, maxfreq, num = step, base = 10.)
+frange = lambda minfreq, maxfreq, step: np.logspace(minfreq, maxfreq, num = int(step), base = 10.)
 
 # Functions to create random physical Perties for a n-layered earth
 thick = lambda minthick, maxthick, nlayer: np.append(np.array([1.2*10.**5]),
-                                                     np.ndarray.round(minthick + (maxthick-minthick)* np.random.rand(nlayer-1, 1)
+                                                     np.ndarray.round(minthick + (maxthick-minthick)* np.random.rand(int(nlayer)-1, 1)
                                                             , decimals =1))
 
 sig = lambda minsig, maxsig, nlayer: np.append(np.array([0.]),
-                                               np.ndarray.round(10.**minsig + (10.**maxsig-10.**minsig)* np.random.rand(nlayer, 1)
+                                               np.ndarray.round(10.**minsig + (10.**maxsig-10.**minsig)* np.random.rand(int(nlayer), 1)
                                                       , decimals=3))
 
 mu  = lambda minmu, maxmu, nlayer: np.append(np.array([1.]),
-                                             np.ndarray.round(minmu + (maxmu-minmu)* np.random.rand(nlayer, 1)
+                                             np.ndarray.round(minmu + (maxmu-minmu)* np.random.rand(int(nlayer), 1)
                                                     , decimals=1))
 
 eps = lambda mineps, maxeps, nlayer: np.append(np.array([1.]),
-                                               np.ndarray.round(mineps + (maxeps-mineps)* np.random.rand(nlayer, 1)
+                                               np.ndarray.round(mineps + (maxeps-mineps)* np.random.rand(int(nlayer), 1)
                                                                 , decimals=1))
 
 # Evaluate Impedance Z of a layer
@@ -123,19 +127,19 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
     hatches=['/'  , '+', 'x', '|' , '\\', '-'  , 'o' , 'O' , '.' , '*' ]
 
     # Write the physical properties of air
-    ax.annotate(("Air, $\\rho$ =%g ohm-m")%(np.inf), 
-            xy=(-widthg/2., -np.abs(z.max())/2.), xycoords='data', 
-            xytext=(-widthg/2., -np.abs(z.max())/2.), textcoords='data', 
+    ax.annotate(("Air, $\\rho$ =%g ohm-m")%(np.inf),
+            xy=(-widthg/2., -np.abs(z.max())/2.), xycoords='data',
+            xytext=(-widthg/2., -np.abs(z.max())/2.), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\epsilon_r$= %g")%(eps[0]), 
-            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data', 
-            xytext=(-widthg/2., -np.abs(z.max())/3.), textcoords='data', 
+    ax.annotate(("$\epsilon_r$= %g")%(eps[0]),
+            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data',
+            xytext=(-widthg/2., -np.abs(z.max())/3.), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\mu_r$= %g")%(mu[0]), 
-            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data', 
-            xytext=(0, -np.abs(z.max())/3.), textcoords='data', 
+    ax.annotate(("$\mu_r$= %g")%(mu[0]),
+            xy=(-widthg/2., -np.abs(z.max())/3.), xycoords='data',
+            xytext=(0, -np.abs(z.max())/3.), textcoords='data',
             fontsize=14.)
 
     # Write the physical properties of the differents layers up to the (n-1)-th and fill it with pattern
@@ -143,19 +147,19 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
         if topn[i] == topn[i+1]:
             pass
         else:
-            ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[i]), 
-                xy=(0., (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(0., (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[i]),
+                xy=(0., (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(0., (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
-            ax.annotate(("$\epsilon_r$= %g")%(eps[i]), 
-                xy=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\epsilon_r$= %g")%(eps[i]),
+                xy=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(-widthg/1.1, (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
-            ax.annotate(("$\mu_r$= %g")%(mu[i]), 
-                xy=(-widthg/2., (2.*topn[i]+topn[i+1])/3), xycoords='data', 
-                xytext=(-widthg/2., (2.*topn[i]+topn[i+1])/3), textcoords='data', 
+            ax.annotate(("$\mu_r$= %g")%(mu[i]),
+                xy=(-widthg/2., (2.*topn[i]+topn[i+1])/3), xycoords='data',
+                xytext=(-widthg/2., (2.*topn[i]+topn[i+1])/3), textcoords='data',
                 fontsize=14.)
 
             ax.plot(widthn, topn[i]*np.ones_like(widthn), color='black')
@@ -165,73 +169,73 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
     ax.plot(widthn, topn[-1]*np.ones_like(widthn), color='black')
     ax.fill_between(widthn, topn[-1], z.max(), alpha=0.3, color="none", edgecolor='black', hatch=hatches[(len(topn)-2)%10])
 
-    ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[-1]), 
-            xy=(0., (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(0., (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\\rho$ =%g ohm-m")%(1./sig[-1]),
+            xy=(0., (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(0., (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\epsilon_r$= %g")%(eps[-1]), 
-            xy=(-widthg/1.1, (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(-widthg/1.1, (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\epsilon_r$= %g")%(eps[-1]),
+            xy=(-widthg/1.1, (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(-widthg/1.1, (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
-    ax.annotate(("$\mu_r$= %g")%(mu[-1]), 
-            xy=(-widthg/2., (2.*topn[-1]+z.max())/3), xycoords='data', 
-            xytext=(-widthg/2., (2.*topn[-1]+z.max())/3), textcoords='data', 
+    ax.annotate(("$\mu_r$= %g")%(mu[-1]),
+            xy=(-widthg/2., (2.*topn[-1]+z.max())/3), xycoords='data',
+            xytext=(-widthg/2., (2.*topn[-1]+z.max())/3), textcoords='data',
             fontsize=14.)
 
     # plot Trees!
-    ax.annotate("", 
-            xy=(widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.2*widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(1.2*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.2*widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(1.2*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -1.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -1.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.5, head_length=0.5', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -3./4.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -3./4.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.6, head_length=0.6', color='green', linewidth=2.)
             )
 
-    ax.annotate("", 
-            xy=(1.5*widthg/2., -1./2.*z.max()/10.), xycoords='data', 
-            xytext=(1.5*widthg/2., 0.), textcoords='data', 
+    ax.annotate("",
+            xy=(1.5*widthg/2., -1./2.*z.max()/10.), xycoords='data',
+            xytext=(1.5*widthg/2., 0.), textcoords='data',
             arrowprops=dict(arrowstyle='->, head_width=0.7, head_length=0.7', color='green', linewidth=2.)
             )
 
@@ -286,7 +290,7 @@ def appres(F, H, sig, chg, taux, c, mu, eps, n):
 
     return Res, Phase
 
-# Evaluate Up, Down components, E and H field, for a frequency range, 
+# Evaluate Up, Down components, E and H field, for a frequency range,
 # a discretized depth range and a time range (use to calculate envelope)
 def calculateEHzt(F, H, sig, chg, taux, c, mu, eps, n, zsample, tsample):
 
@@ -329,9 +333,9 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
     figwdith = 18
     figheight = 12
     fig = plt.figure(figsize=(figwdith, figheight))
-    ax0 = plt.subplot2grid((figheight, figwdith), (0, 0), colspan=2*figwdith/3-1, rowspan=figheight/2-1)
-    ax1 = plt.subplot2grid((figheight, figwdith), (figheight/2, 0), colspan=2*figwdith/3-1, rowspan=figheight/2-1)
-    ax2 = plt.subplot2grid((figheight, figwdith), (0, 2*figwdith/3+1), colspan=figwdith/3-1, rowspan=figheight)
+    ax0 = plt.subplot2grid((figheight, figwdith), (0, 0), colspan=int(2*figwdith/3-1), rowspan=int(figheight/2-1))
+    ax1 = plt.subplot2grid((figheight, figwdith), (int(figheight/2), 0), colspan=int(2*figwdith/3-1), rowspan=int(figheight/2-1))
+    ax2 = plt.subplot2grid((figheight, figwdith), (0, int(2*figwdith/3+1)), colspan=int(figwdith/3-1), rowspan=int(figheight))
     ax = [ax0, ax1, ax2]
 
     ax[0].scatter(F, Res, color='black')
@@ -374,12 +378,12 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
 
         axH.set_xlabel('Amplitude Magnetic Field H (A/m)', color='red', fontsize=16)
 
-        ax[2].fill_betweenx(zc, np.squeeze(np.asarray(np.real(Exzt.min(axis=1)))), 
-                      np.squeeze(np.asarray(np.real(Exzt.max(axis=1)))), 
+        ax[2].fill_betweenx(zc, np.squeeze(np.asarray(np.real(Exzt.min(axis=1)))),
+                      np.squeeze(np.asarray(np.real(Exzt.max(axis=1)))),
                       color='blue', alpha=0.1)
 
-        axH.fill_betweenx(zc, np.squeeze(np.asarray(np.real(Hyzt.min(axis=1)))), 
-                      np.squeeze(np.asarray(np.real(Hyzt.max(axis=1)))), 
+        axH.fill_betweenx(zc, np.squeeze(np.asarray(np.real(Hyzt.min(axis=1)))),
+                      np.squeeze(np.asarray(np.real(Hyzt.max(axis=1)))),
                       color='red', alpha=0.1)
 
         ax[2] = PlotConfiguration(H, sig, eps, mu, ax[2], (1.5*np.abs(Exzt).max()), zc)
@@ -421,24 +425,25 @@ def PlotAppRes3Layers_wrapper(fmin, fmax, nbdata, h1, h2, rhol1, rhol2, rhol3, m
     PlotAppRes(frangn, thick3, sig3, chg3_0, taux3, c3, mu3, eps3, 3, F_Envelope, PlotEnvelope)
 
 def MT1D_app():
-    app = widgetify(PlotAppRes3Layers_wrapper,
-            fmin = FloatText(min=1e-5, max=1e5, value = 1e-5, continuous_update=False),
-            fmax = FloatText(min=1e-5, max=1e5, value = 1e5, continuous_update=False),
-            nbdata = IntSlider(min =10, max=100, value = 100, step =10, continuous_update=False),
-            h1=FloatSlider(min=0., max=10000., step=50., value=500., continuous_update=False),
-            h2=FloatSlider(min=0., max=10000., step=50., value=1000., continuous_update=False),
-            rhol1=FloatText(min=1e-8, max=1e8, value = 100., continuous_update=False, description='$\\rho_1$'),
-            rhol2=FloatText(min=1e-8, max=1e8, value = 1000., continuous_update=False, description='$\\rho_2$'),
-            rhol3=FloatText(min=1e-8, max=1e8, value = 10., continuous_update=False, description='$\\rho_3$'),
-            mul1=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_1$'),
-            mul2=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_2$'),
-            mul3=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_3$'),
-            epsl1=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_1$'),
-            epsl2=FloatSlider(min=1., max=80., step=1, value=1., continuous_update=False, description='$\\varepsilon_2$'),
-            epsl3=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_3$'),
-            PlotEnvelope=ToggleButton(options =True, description='Plot Envelope fields'),
-            F_Envelope=FloatText(min = 1e-5, max=1e5, value=1e4, continuous_update=False, description='F')
-            )
+    app = widgetify(
+        PlotAppRes3Layers_wrapper,
+        fmin = FloatText(min=1e-5, max=1e5, value = 1e-5, continuous_update=False),
+        fmax = FloatText(min=1e-5, max=1e5, value = 1e5, continuous_update=False),
+        nbdata = IntSlider(min =10, max=100, value = 100, step =10, continuous_update=False),
+        h1=FloatSlider(min=0., max=10000., step=50., value=500., continuous_update=False),
+        h2=FloatSlider(min=0., max=10000., step=50., value=1000., continuous_update=False),
+        rhol1=FloatText(min=1e-8, max=1e8, value = 100., continuous_update=False, description='$\\rho_1$'),
+        rhol2=FloatText(min=1e-8, max=1e8, value = 1000., continuous_update=False, description='$\\rho_2$'),
+        rhol3=FloatText(min=1e-8, max=1e8, value = 10., continuous_update=False, description='$\\rho_3$'),
+        mul1=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_1$'),
+        mul2=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_2$'),
+        mul3=FloatSlider(min=1., max=1.2, step=0.01, value=1., continuous_update=False, description='$\\mu_3$'),
+        epsl1=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_1$'),
+        epsl2=FloatSlider(min=1., max=80., step=1, value=1., continuous_update=False, description='$\\varepsilon_2$'),
+        epsl3=FloatSlider(min=1., max=80., step=1., value=1., continuous_update=False, description='$\\varepsilon_3$'),
+        PlotEnvelope=ToggleButton(options =True, description='Plot Envelope fields'),
+        F_Envelope=FloatText(min = 1e-5, max=1e5, value=1e4, continuous_update=False, description='F')
+    )
     return app
 
 def run(n, plotIt=True):

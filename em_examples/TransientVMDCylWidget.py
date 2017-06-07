@@ -1,16 +1,22 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from ipywidgets import *
 from SimPEG import Mesh, Maps, EM, Utils
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from DipoleWidgetFD import DisPosNegvalues
-from BiotSavart import BiotSavartFun
 from scipy.constants import mu_0
 import requests
-from StringIO import StringIO
+# from StringIO import StringIO
+from io import StringIO
 
 from .Base import widgetify
+from .DipoleWidgetFD import DisPosNegvalues
+from .BiotSavart import BiotSavartFun
+
 
 class TransientVMDCylWidget(object):
     """FDEMCylWidgete"""
