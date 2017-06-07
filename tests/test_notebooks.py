@@ -34,6 +34,7 @@ def get(nbname, nbpath):
 
     # use nbconvert to execute the notebook
     def test_func(self):
+        passing = True
         print("\n--------------- Testing {0} ---------------".format(nbname))
         print("   {0}".format(nbpath))
 
@@ -54,14 +55,31 @@ def get(nbname, nbpath):
                 allow_errors=True
             )
 
-            try:
-                out = ex.preprocess(nb, {})
-            except CellExecutionError:
-                print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-                print(nb['traceback'])
-                raise
+            out = ex.preprocess(nb, {})
 
-            print("\n ..... {0} Passed ..... \n".format(nbname))
+            for cell in out[0]['cells']:
+                if 'outputs' in cell.keys():
+                    for output in cell['outputs']:
+                        if output['output_type'] == 'error': #in output.keys():
+                            passed = False
+                            print(
+                                "\n <<<<< {0} FAILED  >>>>> \n".format(nbname)
+                            )
+
+                            print('{} in cell [{}] \n-----------\n{}\n-----------\n'.format(
+                                    output['ename'], cell['execution_count'], cell['source']
+                                )
+                            )
+
+                            print('- - - - - - - - - Traceback - - - - - - - - - \n')
+                            for o in output['traceback']:
+                                print("{}".format(o))
+                            print('\n - - - - - - - end Traceback - - - - - - - -\n')
+
+            if passed is False:
+                raise CellExecutionError
+            else:
+                print("\n ..... {0} Passed ..... \n".format(nbname))
 
         # nbexe = subprocess.Popen(
         #     [
