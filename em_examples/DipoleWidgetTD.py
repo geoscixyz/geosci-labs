@@ -426,6 +426,8 @@ def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
 
 
         ax1.grid(True)
+        plt.show()
+
     Q2 = widgetify(foo
                     ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole') \
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
@@ -480,6 +482,7 @@ def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5,
         ax.set_ylabel(label)
         ax.set_xlabel("Time (sec)")
         ax.grid(True)
+        plt.show()
 
     Q3 = widgetify(foo
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
