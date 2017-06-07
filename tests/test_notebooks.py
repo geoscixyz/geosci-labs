@@ -60,26 +60,46 @@ def get(nbname, nbpath):
             for cell in out[0]['cells']:
                 if 'outputs' in cell.keys():
                     for output in cell['outputs']:
-                        if output['output_type'] == 'error': #in output.keys():
-                            passed = False
-                            print(
-                                "\n <<<<< {0} FAILED  >>>>> \n".format(nbname)
-                            )
+                        if output['output_type'] == 'error':  #in output.keys():
+                            passing = False
 
-                            print('{} in cell [{}] \n-----------\n{}\n-----------\n'.format(
-                                    output['ename'], cell['execution_count'], cell['source']
-                                )
-                            )
-
-                            print('- - - - - - - - - Traceback - - - - - - - - - \n')
+                            err_msg = []
                             for o in output['traceback']:
-                                print("{}".format(o))
-                            print('\n - - - - - - - end Traceback - - - - - - - -\n')
+                                err_msg += ["{}".format(o)]
+                            err_msg = "\n".join(err_msg)
 
-            if passed is False:
-                raise CellExecutionError
-            else:
-                print("\n ..... {0} Passed ..... \n".format(nbname))
+                            msg = """
+\n <<<<< {} FAILED  >>>>> \n
+{} in cell [{}] \n-----------\n{}\n-----------\n
+'----------------- >> begin Traceback << ----------------- \n'
+{}\n
+'\n----------------- >> end Traceback << -----------------\n'
+                            """.format(
+                                nbname, output['ename'],
+                                cell['execution_count'], cell['source'],
+                                err_msg
+                            )
+
+
+                            # print(
+                            #     "\n <<<<< {0} FAILED  >>>>> \n".format(nbname)
+                            # )
+
+                            # print('{} in cell [{}] \n-----------\n{}\n-----------\n'.format(
+                            #         output['ename'], cell['execution_count'], cell['source']
+                            #     )
+                            # )
+
+                            # print('- - - - - - - - - Traceback - - - - - - - - - \n')
+
+                            # print('\n- - - - - - - - end Traceback - - - - - - - -\n')
+
+            assert passing, msg
+            # if passing is False:
+
+            #     raise Exception(msg)  # CellExecutionError
+            # else:
+            print("\n ..... {0} Passed ..... \n".format(nbname))
 
         # nbexe = subprocess.Popen(
         #     [
