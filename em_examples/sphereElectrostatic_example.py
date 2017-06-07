@@ -84,7 +84,9 @@ def get_Setup(XYZ, sig0, sig1, R, E0, ax, label, colorsphere):
                 fontsize=14.
             )
             ax.annotate(
-                ('$\mathbf{E_0} = {:1.0f} \mathbf{\hat{x}}$ V/m'.format(E0)),
+                ('{} = {:1.0f} {} V/m'.format(
+                    "$\mathbf{E_0}$", E0, "$\mathbf{\hat{x}}$"
+                )),
                 xy=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
                 xycoords='data',
                 xytext=(xr.min()+np.abs(xr.max()-xr.min())/20., 0),
