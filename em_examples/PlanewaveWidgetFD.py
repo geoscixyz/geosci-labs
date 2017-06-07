@@ -148,7 +148,7 @@ class PlanewaveWidget(DipoleWidgetFD):
         if normal =="Y" or normal=="y":
             xyz_line = np.c_[x, np.ones_like(x)*self.y, y]
             self.dataview.xyz_line =  xyz_line
-        if normal =="Z" or normal=="z":
+        if normal == "Z" or normal == "z":
             xyz_line = np.c_[x, y, np.ones_like(x)*self.z]
             self.dataview.xyz_line =  xyz_line
 
