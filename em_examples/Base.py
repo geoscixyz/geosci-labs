@@ -17,7 +17,7 @@ class MyApp(ipywidgets.Box):
     @property
     def kwargs(self):
         return dict([
-            (key, val.value) for key, val in self._kwargs.iteritems()
+            (key, val.value) for key, val in self._kwargs.items()
             if isinstance(val, (ipywidgets.widget.Widget, ipywidgets.fixed))
         ])
 
