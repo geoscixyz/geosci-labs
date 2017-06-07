@@ -36,7 +36,7 @@ def plotObj3D(
     x = np.r_[X1, X2, X2, X1, X1]
     y = np.ones(5)*offset_plane
     z = np.r_[Z1, Z1, Z2, Z2, Z1]
-    verts = [zip(x, y, z)]
+    verts = zip(x, y, z)
     polya = polyplane(verts, color="red")
     plt.plot(x, y, z, "k:", lw=1)
 
@@ -44,14 +44,14 @@ def plotObj3D(
     x = np.ones(5)*offset_plane
     y = np.r_[Y1, Y2, Y2, Y1, Y1]
     z = np.r_[Z1, Z1, Z2, Z2, Z1]
-    verts = [zip(x, y, z)]
+    verts = zip(x, y, z)
     polyb = polyplane(verts, color="blue")
     plt.plot(x, y, z, "k:", lw=1)
 
     x = np.r_[X1, X2, X2, X1, X1]
     y = np.r_[Y1, Y1, Y2, Y2, Y1]
     z = np.ones(5)*0.
-    verts = [zip(x, y, z)]
+    verts = zip(x, y, z)
 
     polyc = polyplane(verts, color="grey", alpha=0.4)
 

@@ -25,7 +25,7 @@ class Arrow3D(FancyArrowPatch):
 
 
 def polyplane(verts, alpha=0.2, color="green"):
-    poly = Poly3DCollection(list(verts))
+    poly = Poly3DCollection(list([verts]))
     poly.set_alpha(alpha)
     poly.set_facecolor(color)
     return poly
@@ -57,14 +57,14 @@ def plotObj3D(
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
         verts = zip(x, y, z)
 
-    polya = polyplane([verts])
+    polya = polyplane(verts)
 
     x = np.r_[X1, X2, X2, X1, X1]
     y = np.r_[Y1, Y1, Y2, Y2, Y1]
     z = np.ones(5)*0.
     verts = zip(x, y, z)
 
-    polyb = polyplane([verts], color="grey")
+    polyb = polyplane(verts, color="grey")
 
     x = np.ones(5)*50.
     y = np.r_[Y1, Y2, Y2, Y1, Y1]

@@ -57,19 +57,19 @@ class PolarEllipse(object):
         x = np.r_[X1,X2,X2,X1,X1]
         y = np.zeros(5)
         z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x,y,z)]
+        verts = zip(x,y,z)
         polya = polyplane(verts, color="red", alpha=0.1)
         ax.plot(x, y, z, "r-", lw=1, alpha=0.2)
         x = np.r_[X1,X2,X2,X1,X1]
         y = np.r_[Y1,Y1,Y2,Y2,Y1]
         z = np.zeros(5)
-        verts = [zip(x, y,z)]
+        verts = zip(x, y,z)
         polyb = polyplane(verts, color="blue", alpha=0.1)
         ax.plot(x, y, z, "b-", lw=1, alpha=0.2)
         x = np.ones(5)*t[itime]
         y = np.r_[Y1,Y2,Y2,Y1,Y1]
         z = np.r_[Z1,Z1,Z2,Z2,Z1]
-        verts = [zip(x, y,z)]
+        verts = zip(x, y,z)
         polyc = polyplane(verts, color="grey", alpha=0.1)
         ax.plot(x, y, z, "k-", lw=1, alpha=0.2)
 
