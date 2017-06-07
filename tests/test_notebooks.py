@@ -71,9 +71,9 @@ def get(nbname, nbpath):
                             msg = """
 \n <<<<< {} FAILED  >>>>> \n
 {} in cell [{}] \n-----------\n{}\n-----------\n
-'----------------- >> begin Traceback << ----------------- \n'
+----------------- >> begin Traceback << ----------------- \n
 {}\n
-'\n----------------- >> end Traceback << -----------------\n'
+\n----------------- >> end Traceback << -----------------\n
                             """.format(
                                 nbname, output['ename'],
                                 cell['execution_count'], cell['source'],
