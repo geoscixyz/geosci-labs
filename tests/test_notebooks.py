@@ -80,25 +80,8 @@ def get(nbname, nbpath):
                                 err_msg
                             )
 
+                            assert passing, msg
 
-                            # print(
-                            #     "\n <<<<< {0} FAILED  >>>>> \n".format(nbname)
-                            # )
-
-                            # print('{} in cell [{}] \n-----------\n{}\n-----------\n'.format(
-                            #         output['ename'], cell['execution_count'], cell['source']
-                            #     )
-                            # )
-
-                            # print('- - - - - - - - - Traceback - - - - - - - - - \n')
-
-                            # print('\n- - - - - - - - end Traceback - - - - - - - -\n')
-
-            assert passing, msg
-            # if passing is False:
-
-            #     raise Exception(msg)  # CellExecutionError
-            # else:
             print("\n ..... {0} Passed ..... \n".format(nbname))
 
         # nbexe = subprocess.Popen(
