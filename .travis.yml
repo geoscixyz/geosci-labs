@@ -15,7 +15,7 @@ env:
 install:
   - pip install --upgrade pip
   - pip install -r requirements.txt
-  - pip install epymod
+  - pip install empymod
   - echo $PWD
   - cd ../
   - git clone https://github.com/geoscixyz/em_apps.git
