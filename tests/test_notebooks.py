@@ -15,7 +15,6 @@ TESTDIR = os.path.abspath(__file__)
 NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + ['notebooks/']) # where are the notebooks?
 
 
-
 def setUp():
     nbpaths = []  # list of notebooks, with file paths
     nbnames = []  # list of notebook names (for making the tests)
@@ -33,6 +32,7 @@ def get(nbname, nbpath):
 
     # use nbconvert to execute the notebook
     def test_func(self):
+        passing = True
         print("\n--------------- Testing {0} ---------------".format(nbname))
         print("   {0}".format(nbpath))
 
@@ -53,38 +53,34 @@ def get(nbname, nbpath):
                 allow_errors=True
             )
 
-            try:
-                out = ex.preprocess(nb, {})
-            except CellExecutionError:
-                print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-                print(nb['traceback'])
-                raise
+            out = ex.preprocess(nb, {})
+
+            for cell in out[0]['cells']:
+                if 'outputs' in cell.keys():
+                    for output in cell['outputs']:
+                        if output['output_type'] == 'error':  #in output.keys():
+                            passing = False
+
+                            err_msg = []
+                            for o in output['traceback']:
+                                err_msg += ["{}".format(o)]
+                            err_msg = "\n".join(err_msg)
+
+                            msg = """
+\n <<<<< {} FAILED  >>>>> \n
+{} in cell [{}] \n-----------\n{}\n-----------\n
+----------------- >> begin Traceback << ----------------- \n
+{}\n
+\n----------------- >> end Traceback << -----------------\n
+                            """.format(
+                                nbname, output['ename'],
+                                cell['execution_count'], cell['source'],
+                                err_msg
+                            )
+
+                            assert passing, msg
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
-
-        # nbexe = subprocess.Popen(
-        #     [
-        #         "jupyter", "nbconvert", "{0}".format(nbpath), "--execute",
-        #         "--ExecutePreprocessor.timeout=600",
-        #         "--ExecutePreprocessor.kernel_name='python{}'".format(sys.version_info[0])
-        #     ],
-        #     stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-        #     stderr=subprocess.PIPE
-        # )
-        # output, err = nbexe.communicate()
-        # check = nbexe.returncode
-        # if check == 0:
-        #     print("\n ..... {0} Passed ..... \n".format(nbname))
-        #     print("   removing {0}.html".format(os.path.splitext(nbpath)[0]))
-        #     subprocess.call([
-        #         "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
-        #     ])
-        # else:
-        #     print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-        #     print("Captured Output: \n")
-        #     print("{}".format(err))
-
-        # self.assertTrue(check == 0)
 
     return test_func
 
