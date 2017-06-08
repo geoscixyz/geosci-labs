@@ -34,7 +34,6 @@ from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane
 
-
 __version__ = '0.0.10'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'

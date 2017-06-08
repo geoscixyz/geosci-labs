@@ -261,6 +261,7 @@ class HarmonicVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
+        plt.show()
 
     def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
 
@@ -371,6 +372,7 @@ class HarmonicVMDCylWidget(object):
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
+            plt.show()
 
 
         out = widgetify(foo

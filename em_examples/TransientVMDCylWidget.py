@@ -229,6 +229,7 @@ class TransientVMDCylWidget(object):
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
         ax.text(-85, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        plt.show()
 
     def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
                          radius=1., z0=0., x0=10.):
@@ -284,6 +285,7 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... no By for VMD"
 
             elif Field == "dBdt":
@@ -298,6 +300,7 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... no dBydt for VMD"
 
             else:
@@ -309,13 +312,14 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... only Ey for VMD"
 
             if Scale == "log":
                 val_p, val_n = DisPosNegvalues(val)
                 ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
                 ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
-                ax.legend(("(+)", "(-)"), loc=4, fontsize = 10)
+                ax.legend(("(+)", "(-)"), loc=1, fontsize = 10)
             else:
                 ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
 
@@ -325,6 +329,7 @@ class TransientVMDCylWidget(object):
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
+            plt.show()
 
 
         out = widgetify(foo
