@@ -7,13 +7,12 @@ from nbconvert.preprocessors import ClearOutputPreprocessor, ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
 
 # add names of notebooks to ignore here.
-py2Ignore = []
+py2Ignore = ['MarineCSEM_LayeredEarth.ipynb']
 
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook
 TESTDIR = os.path.abspath(__file__)
 NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + ['notebooks/']) # where are the notebooks?
-
 
 
 def setUp():
