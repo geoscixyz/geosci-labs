@@ -11,10 +11,12 @@ from nbconvert.preprocessors.execute import CellExecutionError
 # notebook
 
 # add names of notebooks to ignore here.
-py2Ignore = []
+py2Ignore = ['MarineCSEM_LayeredEarth.ipynb']
 
 TESTDIR = os.path.abspath(__file__)
-NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-3] + ['em_apps/']) # where are the notebooks?
+NBDIR = os.path.sep.join(
+    TESTDIR.split(os.path.sep)[:-3] + ['em_apps/']
+) # where are the notebooks?
 
 
 def setUp():
@@ -60,7 +62,7 @@ def get(nbname, nbpath):
             for cell in out[0]['cells']:
                 if 'outputs' in cell.keys():
                     for output in cell['outputs']:
-                        if output['output_type'] == 'error':  #in output.keys():
+                        if output['output_type'] == 'error':
                             passing = False
 
                             err_msg = []
@@ -83,31 +85,6 @@ def get(nbname, nbpath):
                             assert passing, msg
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
-
-        # nbexe = subprocess.Popen(
-        #     [
-        #         "jupyter", "nbconvert", "{0}".format(nbpath), "--execute",
-        #         "--ExecutePreprocessor.timeout=600",
-        #         "--ExecutePreprocessor.kernel_name='python{}'".format(sys.version_info[0])
-        #     ],
-        #     stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-        #     stderr=subprocess.PIPE
-        # )
-        # output, err = nbexe.communicate()
-        # check = nbexe.returncode
-        # if check == 0:
-        #     print("\n ..... {0} Passed ..... \n".format(nbname))
-        #     print("   removing {0}.html".format(os.path.splitext(nbpath)[0]))
-        #     subprocess.call([
-        #         "rm", "{0}.html".format(os.path.splitext(nbpath)[0])
-        #     ])
-        # else:
-        #     print("\n <<<<< {0} FAILED >>>>> \n".format(nbname))
-        #     print("Captured Output: \n")
-        #     print("{}".format(err))
-
-        # self.assertTrue(check == 0)
-
     return test_func
 
 
