@@ -10,7 +10,6 @@ import numpy as np
 from PIL import Image
 from scipy.constants import mu_0
 import requests
-# from StringIO import StringIO
 from io import StringIO
 
 from .Base import widgetify
@@ -104,8 +103,8 @@ class TransientVMDCylWidget(object):
 
     def simulate(self, srcLoc, rxLoc, time, radius=1.):
 
-        bz = EM.TDEM.Rx.Point_b(rxLoc,time,'z')
-        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc,time,'z')
+        bz = EM.TDEM.Rx.Point_b(rxLoc, time, orientation='z')
+        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation='z')
         src = EM.TDEM.Src.CircularLoop([bz],
                                        waveform=EM.TDEM.Src.StepOffWaveform(),
                                        loc=srcLoc, radius=radius)

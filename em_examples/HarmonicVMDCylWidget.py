@@ -8,7 +8,6 @@ from SimPEG import Mesh, Maps, EM, Utils
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-
 from scipy.constants import mu_0
 import requests
 from io import StringIO
@@ -16,6 +15,7 @@ from io import StringIO
 from .Base import widgetify
 from .DipoleWidgetFD import DisPosNegvalues
 from .BiotSavart import BiotSavartFun
+
 
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
