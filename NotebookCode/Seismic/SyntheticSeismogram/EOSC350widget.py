@@ -29,7 +29,7 @@ def ViewWiggle(syndata, obsdata):
     ax[1].set_title("Noisy CMP gather")
 
 def NoisyNMOWidget(t0, v):
-    syndata = np.load('obsdata1.npy')
+    syndata = np.load('../NotebookCode/Seismic/SyntheticSeismogram/obsdata1.npy')
     dx = 20
     xorig = np.arange(38)*dx
     time = HyperbolicFun(t0, xorig, v)
@@ -67,7 +67,7 @@ def NoisyNMOWidget(t0, v):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load('time1.npy')
+    time_data = np.load('../NotebookCode/Seismic/SyntheticSeismogram/time1.npy')
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -90,7 +90,7 @@ def NoisyNMOWidget(t0, v):
     ax3.set_title("Stacked trace")
 
 def CleanNMOWidget(t0, v):
-    syndata = np.load('syndata1.npy')
+    syndata = np.load('../NotebookCode/Seismic/SyntheticSeismogram/syndata1.npy')
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
@@ -129,7 +129,7 @@ def CleanNMOWidget(t0, v):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load('time1.npy')
+    time_data = np.load('../NotebookCode/Seismic/SyntheticSeismogram/time1.npy')
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -158,7 +158,7 @@ def HyperbolicFun(t0, x, velocity):
 def NMOstackthree(data, tintercept, v1, v2, v3):
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load('time1.npy')
+    time = np.load('../NotebookCode/Seismic/SyntheticSeismogram/time1.npy')
     traces = np.zeros((3,time.size))
     vtemp = np.r_[v1, v2, v3]
     for itry in range(3):
@@ -198,7 +198,7 @@ def NMOstack(data, xorig, time, v):
 def NMOstackSingle(data, tintercept, v):
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load('time1.npy')
+    time = np.load('../NotebookCode/Seismic/SyntheticSeismogram/time1.npy')
     singletrace = NMOstack(data, xorig, time, v)
 
     fig, ax = plt.subplots(1, 1, figsize=(7, 8))

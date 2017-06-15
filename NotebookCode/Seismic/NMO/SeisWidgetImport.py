@@ -6,5 +6,5 @@ import matplotlib
 set_matplotlib_formats('png')
 matplotlib.rcParams['savefig.dpi'] = 70 # Change this to adjust figure size
 import numpy as np
-syndata = np.load('syndata1.npy')
-obsdata = np.load('obsdata1.npy')
+syndata = np.load('../NotebookCode/Seismic/NMO/syndata1.npy')
+obsdata = np.load('../NotebookCode/Seismic/NMO/obsdata1.npy')
