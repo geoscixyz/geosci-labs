@@ -86,11 +86,11 @@ class definePrism(object):
 
 def plotProfile(prob2D, x0, data, Binc, Bdec, Bigrf, susc, Q, rinc, rdec):
     if data is 'MonSt':
-        filename = "../NotebookCode/Mag/data/Lab1_monday_TA.csv"
+        filename = "../assets/Mag/data/Lab1_monday_TA.csv"
     elif data is 'WedSt':
-        filename = "../NotebookCode/Mag/data/Lab1_Wednesday_student.csv"
+        filename = "../assets/Mag/data/Lab1_Wednesday_student.csv"
     elif data is 'WedTA':
-        filename = "../NotebookCode/Mag/data/Lab1_Wednesday_TA.csv"
+        filename = "../assets/Mag/data/Lab1_Wednesday_TA.csv"
 
     dat = pd.DataFrame(pd.read_csv(filename, header = 0))
     tf  = dat["MAG_MEAN"].values

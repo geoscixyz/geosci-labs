@@ -8,8 +8,8 @@ from PIL import Image
 
 
 def PrimaryWidget(tinterpL, epsrL, tinterpH, epsrH):
-    data = np.load("../NotebookCode/GPR/shot_raypaths.npy")
-    time = np.load("../NotebookCode/GPR/time.npy")
+    data = np.load("../assets/GPR/shot_raypaths.npy")
+    time = np.load("../assets/GPR/time.npy")
     dt = time[1]-time[0]
     v1 = 1./np.sqrt(epsilon_0*epsrL*mu_0)
     v2 = 1./np.sqrt(epsilon_0*epsrH*mu_0)
@@ -41,7 +41,7 @@ def PrimaryWidget(tinterpL, epsrL, tinterpH, epsrH):
     plt.show()
 
 def PrimaryFieldWidget(tinterp, epsr):
-    imgcmp = Image.open('../NotebookFigures/GPR/ubc_GPRcmp.png')
+    imgcmp = Image.open('../figures/GPR/ubc_GPRcmp.png')
     fig = plt.figure(figsize = (6,7))
     ax = plt.subplot(111)
     plt.imshow(imgcmp, extent = [0, 150, 150, 0])
@@ -60,7 +60,7 @@ def PrimaryFieldWidget(tinterp, epsr):
     plt.show()
 
 def PipeWidget(epsr, h, xc, r):
-    imgcmp = Image.open('../NotebookFigures/GPR/ubc_GPRdata.png')
+    imgcmp = Image.open('../figures/GPR/ubc_GPRdata.png')
     imgcmp = imgcmp.resize((400, 500))
     fig = plt.figure(figsize = (7,8))
     ax = plt.subplot(111)
@@ -81,7 +81,7 @@ def PipeWidget(epsr, h, xc, r):
     plt.show()
 
 def WallWidget(epsr, h, x1, x2):
-    imgcmp = Image.open('../NotebookFigures/GPR/ubc_GPRdata.png')
+    imgcmp = Image.open('../figures/GPR/ubc_GPRdata.png')
     imgcmp = imgcmp.resize((400, 500))
     fig = plt.figure(figsize = (7,8))
     ax = plt.subplot(111)
