@@ -44,7 +44,7 @@ setup(
         'SimPEG>=0.4.1',
         'jupyter',
     ],
-    author = 'Lindsey Heagy',
+    author = 'GeoSci Developers',
     author_email = 'lheagy@eos.ubc.ca',
     description = 'gpgLabs',
     long_description = LONG_DESCRIPTION,
