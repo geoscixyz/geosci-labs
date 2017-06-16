@@ -49,7 +49,7 @@ setup(
     description = 'gpgLabs',
     long_description = LONG_DESCRIPTION,
     keywords = 'geophysics, electromagnetics',
-    url = 'http://em.geosci.xyz',
+    url = 'http://gpg.geosci.xyz',
     download_url = 'https://github.com/geoscixyz/gpgLabs',
     classifiers=CLASSIFIERS,
     platforms = ['Windows', 'Linux', 'Solaris', 'Mac OS-X', 'Unix'],
