@@ -43,6 +43,7 @@ setup(
         'properties[math]',
         'SimPEG>=0.4.1',
         'jupyter',
+        'JSAnimation'
     ],
     author = 'GeoSci Developers',
     author_email = 'lheagy@eos.ubc.ca',

@@ -14,7 +14,7 @@ except Exception, e:
 
 def fempipeWidget(alpha, pipedepth):
     respEW, respNS, X, Y = fempipe(alpha, pipedepth)
-    fig = plt.figure(figsize = (8, 6))
+    fig = plt.figure(figsize = (12, 9))
     ax0 = plt.subplot2grid((2,2), (0,0))
     ax1 = plt.subplot2grid((2,2), (0,1))
     ax2 = plt.subplot2grid((2,2), (1,0), colspan=2)

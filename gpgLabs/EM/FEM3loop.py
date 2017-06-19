@@ -126,7 +126,7 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
         real_response=np.real(c_response)*1000.
         imag_response=np.imag(c_response)*1000.
 
-    fig, ax = plt.subplots(2,2, figsize = (10,6))
+    fig, ax = plt.subplots(2,2, figsize = (14,8))
 
     ax[0][0].semilogx(alf,fre,'.-b')
     ax[0][0].semilogx(alf,fim,'.--g')
@@ -138,8 +138,8 @@ def fem3loop(L,R,xc,yc,zc,dincl,ddecl,S,ht,f,xmin,xmax,dx,showDataPts=False):
     ax[0][0].grid(which='major', color = '0.6', linestyle='-',linewidth='0.5')
     ax[0][0].grid(which='minor',color='0.6',linestyle='-',linewidth='0.5')
 
-    kx = np.ceil(xp.size/2.)
-    ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')
+    kx = int(np.ceil(xp.size/2.))
+    ax[0][1].plot(y[kx,:],real_response[kx,:],'.-b')   # kx
     ax[0][1].plot(y[kx,:],imag_response[kx,:],'.--g')
     # ax[0][1].legend(['Real','Imag'],loc=2)
     ax[0][1].set_xlabel('Easting')

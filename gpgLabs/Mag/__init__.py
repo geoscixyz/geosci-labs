@@ -1,8 +1,4 @@
-from . import DC
-from . import EM
-from . import GPR
-from . import Mag
-from . import Seismic
+from . import importMag
 
 
 __version__ = '0.0.1'

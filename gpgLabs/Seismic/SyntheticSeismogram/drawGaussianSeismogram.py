@@ -13,4 +13,4 @@ ax.fill_between(x, f, np.zeros_like(f), color='k')
 ax.set_title('Seismic Wavelet',fontsize=13)
 ax.set_xlabel('Time (ms)')
 
-fig.savefig('SeisWavelet.png',dpi=300)
+#fig.savefig('SeisWavelet.png',dpi=300)
