@@ -5,4 +5,6 @@ ipywidgets
 pandas
 jupyter_dashboards
 Pillow
-git+git://github.com/simpeg/simpeg.git
+SimPEG
+discretize
+JSAnimation
