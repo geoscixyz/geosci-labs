@@ -11,6 +11,7 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.interpolate import griddata
+import warnings
 from ipywidgets import (
     interactive, IntSlider, FloatSlider, FloatText, ToggleButtons, VBox
     )
@@ -343,7 +344,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
     # define as G = dV_halfspace / rho_halfspace
     appres = dpred/dini/sighalf
     appresobs = dobs/dini/sighalf
-    pred = griddata(xzlocs[:, 0], xzlocs[:, 1], appres, xi, yi,
+    pred = griddata(xzlocs, appres, (xi, yi),
                     method='linear')
 
     if plotFlag is not None:
@@ -376,7 +377,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
         ax2.set_xlabel("Distance (m)")
 
     else:
-        obs = griddata(xzlocs[:, 0], xzlocs[:, 1], appresobs, xi, yi,
+        obs = griddata(xzlocs, appresobs, (xi, yi),
                        method='linear')
         fig = plt.figure(figsize=(12, 9))
         ax1 = plt.subplot(311)
@@ -416,7 +417,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
             ax3.text(-38, 7, "Predicted")
         elif predmis == "mis":
             mis = (appresobs-appres)/(0.1*appresobs)
-            Mis = griddata(xzlocs[:, 0], xzlocs[:, 1], mis, xi, yi,
+            Mis = griddata(xzlocs, mis, (xi, yi),
                            method='linear')
             dat3 = ax3.contourf(xi, yi, Mis, 10)
             ax3.contour(xi, yi, Mis, 10, colors='k', alpha=0.5)
