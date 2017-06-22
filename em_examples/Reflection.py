@@ -1,8 +1,13 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
 from scipy.constants import mu_0, epsilon_0
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams["font.size"] = 14
+
 
 def getReflectionandTransmission(sig1, sig2, f, theta_i, eps1=epsilon_0, eps2=epsilon_0, mu1=mu_0, mu2=mu_0,dtype="TE"):
     """

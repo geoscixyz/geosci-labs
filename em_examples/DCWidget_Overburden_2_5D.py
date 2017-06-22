@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
@@ -10,9 +14,10 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
-from .Base import widgetify
 
 from ipywidgets import interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Widget
+
+from .Base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 12
@@ -251,7 +256,6 @@ def PLOT(survey, A, B, M, N, rhohalf, rholayer, rhoTarget, overburden_thick, ove
 
     labelsize = 12.
     ticksize = 10.
-    overburden_wide = 2000.
 
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []

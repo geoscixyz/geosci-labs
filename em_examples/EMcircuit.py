@@ -1,4 +1,8 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from __future__ import division
+
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erf
@@ -140,7 +144,7 @@ if __name__ == '__main__':
     out = Mijfun(0., 0., 0., 0., 0., 10., 0, 0., 0., 0.)
     anal = mu_0*np.pi / (2*10**3)
     err = abs(out-anal)
-    print err
+    print(err)
     showIt = False
     import matplotlib.pyplot as plt
     f = np.logspace(-3, 3, 61)

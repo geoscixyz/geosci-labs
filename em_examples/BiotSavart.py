@@ -1,7 +1,12 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
 import scipy.sparse as sp
 from SimPEG import Utils
 from scipy.constants import mu_0
+
 
 def BiotSavartFun(mesh, r_pts, component = 'z'):
     """

@@ -1,9 +1,6 @@
-#import sys
-#sys.path.append("./simpeg")
-#sys.path.append("./simpegdc/")
-
-#import warnings
-#warnings.filterwarnings('ignore')
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from SimPEG import Mesh, Maps, SolverLU, Utils
 import SimPEG.Utils as Utils
@@ -16,19 +13,20 @@ import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
+import warnings
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
-import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 from .Base import widgetify
+
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 
 # Mesh, sigmaMap can be globals global
 npad = 15
 growrate = 2.
 cs = 0.5
-hx = [(cs,npad, -growrate),(cs,200),(cs,npad, growrate)]
-hy = [(cs,npad, -growrate),(cs,100)]
+hx = [(cs, npad, -growrate), (cs, 200), (cs, npad, growrate)]
+hy = [(cs, npad, -growrate), (cs, 100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
 circmap = Maps.ParametricCircleMap(mesh)
 idmap = Maps.IdentityMap(mesh)
@@ -41,19 +39,19 @@ xmin = -40.
 xmax = 40.
 ymin = -40.
 ymax = 5.
-xylim = np.c_[[xmin,ymin],[xmax,ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim,mesh)
-indx = (mesh.gridFx[:,0]>=xmin) & (mesh.gridFx[:,0]<=xmax) \
-    & (mesh.gridFx[:,1]>=ymin) & (mesh.gridFx[:,1]<=ymax)
-indy = (mesh.gridFy[:,0]>=xmin) & (mesh.gridFy[:,0]<=xmax) \
-    & (mesh.gridFy[:,1]>=ymin) & (mesh.gridFy[:,1]<=ymax)
-indF = np.concatenate((indx,indy))
+xylim = np.c_[[xmin, ymin], [xmax, ymax]]
+indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indx = (mesh.gridFx[:, 0] >= xmin) & (mesh.gridFx[:, 0] <= xmax) \
+    & (mesh.gridFx[:, 1] >= ymin) & (mesh.gridFx[:, 1] <= ymax)
+indy = (mesh.gridFy[:, 0] >= xmin) & (mesh.gridFy[:, 0] <= xmax) \
+    & (mesh.gridFy[:, 1] >= ymin) & (mesh.gridFy[:, 1] <= ymax)
+indF = np.concatenate((indx, indy))
 
 
-def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,yc=-20.):
+def cylinder_fields(A,B,r,sigcyl,sighalf,xc=0.,zc=-20.):
 
-    circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
-    circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, yc, r]
+    circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, zc, r]
+    circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, zc, r]
 
     mhalf = circmap*circhalf
     mtrue = circmap*circtrue
@@ -234,7 +232,7 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
     return rho_a
 
-def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Scale):
+def plot_Surface_Potentials(survey,A,B,M,N,r,xc,zc,rhohalf,rhocyl,Field,Type,Scale):
 
     labelsize = 12.
     ticksize = 10.
@@ -245,7 +243,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
 
-    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,yc)
+    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(A,B,r,sigcyl,sighalf,xc,zc)
 
     fig, ax = plt.subplots(2,1,figsize=(9*1.5,9*1.5),sharex=True)
     fig.subplots_adjust(right=0.8)
@@ -317,8 +315,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     ax[0].legend(['Model Potential','Half-Space Potential'], loc=3, fontsize = labelsize)
 
     #Subplot 2: Fields
-    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
-    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+yc,linestyle = 'dashed',color='k')
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+zc,linestyle = 'dashed',color='k')
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+zc,linestyle = 'dashed',color='k')
 
     if Field == 'Model':
 
@@ -489,7 +487,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
     dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
-    cylinderPoints = getCylinderPoints(xc,yc,r)
+    cylinderPoints = getCylinderPoints(xc,zc,r)
 
     if(rhocyl != rhohalf):
         ax[1].plot(cylinderPoints[:,0],cylinderPoints[:,1], linestyle = 'dashed', color='k')
@@ -498,7 +496,7 @@ def plot_Surface_Potentials(survey,A,B,M,N,r,xc,yc,rhohalf,rhocyl,Field,Type,Sca
         qTotal = total_field[src,'charge']
         qPrim = primary_field[src,'charge']
         qSecondary = qTotal - qPrim
-        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,yc,r,qSecondary)
+        qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(xc,zc,r,qSecondary)
         ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
         ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
         if(qPosAvgLoc[0] > qNegAvgLoc[0]):
@@ -603,7 +601,7 @@ def cylinder_app():
             rhohalf  = FloatText(min=1e-8,max=1e8, value = 500., continuous_update=False,description='$\\rho_1$'),
             r = FloatSlider(min=1.,max=20.,step=1.,value=10., continuous_update=False),
             xc = FloatSlider(min=-20.,max=20.,step=1.,value=0., continuous_update=False),
-            yc = FloatSlider(min=-20.,max=0.,step=1.,value=-30., continuous_update=False),
+            zc = FloatSlider(min=-20.,max=0.,step=1.,value=-30., continuous_update=False),
             A = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-30.25, continuous_update=False),
             B = FloatSlider(min=-30.25,max=30.25,step=0.5,value=30.25, continuous_update=False),
             M = FloatSlider(min=-30.25,max=30.25,step=0.5,value=-10.25, continuous_update=False),

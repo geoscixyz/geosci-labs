@@ -1,11 +1,14 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
-from View import DataView
 from SimPEG import EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-from TDEMDipolarfields import *
+
 matplotlib.rcParams['font.size'] = 12
 import warnings
 warnings.filterwarnings("ignore")
@@ -13,6 +16,9 @@ warnings.filterwarnings("ignore")
 from ipywidgets import *
 
 from .Base import widgetify
+from .View import DataView
+from .TDEMDipolarfields import *
+
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     dx = x2-x1
@@ -159,7 +165,7 @@ class DipoleWidgetTD(object):
             unit =  " (A/m$^2$) "
             fieldname = "Current density"
         else:
-            print tempstr
+            print(tempstr)
             raise NotImplementedError()
 
         label = fieldname + unit
@@ -420,6 +426,8 @@ def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
 
 
         ax1.grid(True)
+        plt.show()
+
     Q2 = widgetify(foo
                     ,Profile=widgets.ToggleButtons(options=['Rxhole','Txhole','TxProfile'], value='Rxhole') \
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
@@ -474,6 +482,7 @@ def InteractiveDipoleDecay(self, xyz_loc, Field, compvalue, sig=1e-2, Tmin=1e-5,
         ax.set_ylabel(label)
         ax.set_xlabel("Time (sec)")
         ax.grid(True)
+        plt.show()
 
     Q3 = widgetify(foo
                     ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \

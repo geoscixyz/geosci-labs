@@ -1,8 +1,11 @@
 from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from FreqtoTime import transFilt
+from .FreqtoTime import transFilt
 
 def ColeColePelton(f, sigmaInf, eta, tau, c, option):
     """
@@ -64,4 +67,5 @@ def vizColeCole(sigres="sigma", eta=0.1, tau=0.1, c=0.5, t1=800, t2=1400):
         axColeRT.fill_between(time[tind]*1e3, valT[tind], 0., color='k', alpha=0.5)
     for tl in axColeI.get_yticklabels():
         tl.set_color('r')
+    plt.show()
 #     return fig

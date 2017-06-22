@@ -1,16 +1,21 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from ipywidgets import *
 from SimPEG import Mesh, Maps, EM, Utils
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from DipoleWidgetFD import DisPosNegvalues
-from BiotSavart import BiotSavartFun
 from scipy.constants import mu_0
 import requests
-from StringIO import StringIO
+from io import StringIO
 
 from .Base import widgetify
+from .DipoleWidgetFD import DisPosNegvalues
+from .BiotSavart import BiotSavartFun
+
 
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -256,6 +261,7 @@ class HarmonicVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
+        plt.show()
 
     def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
 
@@ -366,6 +372,7 @@ class HarmonicVMDCylWidget(object):
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
+            plt.show()
 
 
         out = widgetify(foo

@@ -1,16 +1,21 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from ipywidgets import *
 from SimPEG import Mesh, Maps, EM, Utils
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from DipoleWidgetFD import DisPosNegvalues
-from BiotSavart import BiotSavartFun
 from scipy.constants import mu_0
 import requests
-from StringIO import StringIO
+from io import StringIO
 
 from .Base import widgetify
+from .DipoleWidgetFD import DisPosNegvalues
+from .BiotSavart import BiotSavartFun
+
 
 class TransientVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -98,8 +103,8 @@ class TransientVMDCylWidget(object):
 
     def simulate(self, srcLoc, rxLoc, time, radius=1.):
 
-        bz = EM.TDEM.Rx.Point_b(rxLoc,time,'z')
-        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc,time,'z')
+        bz = EM.TDEM.Rx.Point_b(rxLoc, time, orientation='z')
+        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation='z')
         src = EM.TDEM.Src.CircularLoop([bz],
                                        waveform=EM.TDEM.Src.StepOffWaveform(),
                                        loc=srcLoc, radius=radius)
@@ -223,6 +228,7 @@ class TransientVMDCylWidget(object):
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
         ax.text(-85, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        plt.show()
 
     def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
                          radius=1., z0=0., x0=10.):
@@ -278,6 +284,7 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... no By for VMD"
 
             elif Field == "dBdt":
@@ -292,6 +299,7 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... no dBydt for VMD"
 
             else:
@@ -303,13 +311,14 @@ class TransientVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
+                    plt.show()
                     return "Dude, think twice ... only Ey for VMD"
 
             if Scale == "log":
                 val_p, val_n = DisPosNegvalues(val)
                 ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
                 ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
-                ax.legend(("(+)", "(-)"), loc=4, fontsize = 10)
+                ax.legend(("(+)", "(-)"), loc=1, fontsize = 10)
             else:
                 ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
 
@@ -319,6 +328,7 @@ class TransientVMDCylWidget(object):
             ax.set_ylabel(label)
             ax.set_title(title)
             ax.grid(True)
+            plt.show()
 
 
         out = widgetify(foo
