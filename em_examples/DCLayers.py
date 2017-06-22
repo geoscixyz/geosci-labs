@@ -393,12 +393,12 @@ def plot_layer_potentials_app():
         N = FloatSlider(
             min=-30., max=30., step=1., value=10., continuous_update=False
         ),
-        rho1 = FloatSlider(
-            min=rhomin, max=rhomax, step=10., value = 500.,
+        rho1 = FloatText(
+            min=rhomin, max=rhomax, value = 500.,
             continuous_update=False, description='$\\rho_1$'
         ),
-        rho2 = FloatSlider(
-            min=rhomin, max=rhomax, step=10., value = 500.,
+        rho2 = FloatText(
+            min=rhomin, max=rhomax, value = 500.,
             continuous_update=False, description='$\\rho_2$'
         ),
         h = FloatSlider(
