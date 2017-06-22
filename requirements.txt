@@ -8,3 +8,4 @@ Pillow
 SimPEG
 discretize
 JSAnimation
+em_examples
