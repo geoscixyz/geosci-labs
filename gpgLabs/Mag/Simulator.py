@@ -180,8 +180,8 @@ def ViewMagSurvey2D(survey):
     cntr = [East, North]
 
     out = widgets.interactive(MagSurvey2D,
-                    East=widgets.FloatSlider(min=xlim[0]*0.95, max=xlim[1]*1.05, step=10, value=cntr[0],continuous_update=False),
-                    North=widgets.FloatSlider(min=ylim[0]*0.95, max=ylim[1]*1.05, step=10, value=cntr[1],continuous_update=False),
+                    East=widgets.FloatSlider(min=cntr[0]-Lx, max=cntr[0]+Lx, step=10, value=cntr[0],continuous_update=False),
+                    North=widgets.FloatSlider(min=cntr[1]-Ly, max=cntr[1]+Ly, step=10, value=cntr[1],continuous_update=False),
                     Width=widgets.FloatSlider(min=10, max=Lx*1.05, step=10, value=Lx*1.05, continuous_update=False),
                     Height=widgets.FloatSlider(min=10, max=Ly*1.05, step=10, value=Ly*1.05, continuous_update=False),
                     Azimuth=widgets.FloatSlider(min=-90, max=90, step=5, value=0, continuous_update=False),
