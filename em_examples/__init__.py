@@ -8,7 +8,7 @@ from . import CondUtils
 from . import DC_cylinder
 from . import DCLayers
 from . import DCsphere
-from . import DCWidget
+from . import DC_Pseudosections
 from . import DCWidget_Overburden_2_5D
 from . import DCWidgetPlate2_5D
 from . import DCWidgetPlate_2D
