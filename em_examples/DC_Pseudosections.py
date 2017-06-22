@@ -443,11 +443,13 @@ def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
 
 def DC2DPseudoWidget():
     return widgetify(
-        DC2DPseudoWidgetWrapper,
-        rhohalf=FloatSlider(min=10, max=1000, step=1, value=1000,
-                            continuous_update=False),
-        rhosph=FloatSlider(min=10, max=1000, step=1, value=50,
-                           continuous_update=False),
+        DC2DPseudoWidgetWrapper, manual = True,
+        rhohalf=FloatText(min=10, max=1000, value=1000,
+                            continuous_update=False,
+                            description='$\\rho_1$'),
+        rhosph=FloatText(min=10, max=1000, value=50,
+                           continuous_update=False,
+                           description='$\\rho_2$'),
         xc=FloatSlider(min=-40, max=40, step=1, value=0,
                        continuous_update=False),
         zc=FloatSlider(min=-20, max=0, step=1, value=-10,
@@ -468,11 +470,13 @@ def DC2DfwdWrapper(rhohalf, rhosph, xc, zc, r, predmis, surveyType):
 
 def DC2DfwdWidget():
     return widgetify(
-        DC2DfwdWrapper,
-        rhohalf=FloatSlider(min=10, max=1000, step=1, value=1000,
-                            continuous_update=False),
-        rhosph=FloatSlider(min=10, max=1000, step=1, value=50,
-                           continuous_update=False),
+        DC2DfwdWrapper, manual = True,
+        rhohalf=FloatText(min=10, max=1000, value=1000,
+                            continuous_update=False,
+                            description='$\\rho_1$'),
+        rhosph=FloatText(min=10, max=1000, value=50,
+                           continuous_update=False,
+                           description='$\\rho_2$'),
         xc=FloatSlider(min=-40, max=40, step=1, value=0,
                        continuous_update=False),
         zc=FloatSlider(min=-20, max=0, step=1, value=-10,
