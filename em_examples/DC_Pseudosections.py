@@ -18,11 +18,11 @@ from ipywidgets import (
 
 from .Base import widgetify
 
-#only use this if you are sure things are working
+# only use this if you are sure things are working
 warnings.filterwarnings('ignore')
 
 
-# Mesh, mapping can be globals global
+# Mesh, mapping can be globals
 npad = 8
 cs = 0.5
 hx = [(cs, npad, -1.3), (cs, 200), (cs, npad, 1.3)]
@@ -48,10 +48,10 @@ indF = np.concatenate((indx, indy))
 
 
 def DC2Dsurvey(flag="PoleDipole"):
-    '''
+    """
     Function that define a surface DC survey
-    :string flag: 'PoleDipole', 'DipoleDipole', 'DipolePole'
-    '''
+    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
+    """
     if flag == "PoleDipole":
         ntx, nmax = xr.size-2, 8
     elif flag == "DipolePole":
@@ -120,10 +120,15 @@ def DC2Dsurvey(flag="PoleDipole"):
 
 
 def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
-    '''
+    """
     Compute the midpoint pseudolocation
     for each Transmitter-Receiver pair of a survey
-    '''
+
+    :param numpy.array xr: electrodes positions
+    :param int ntx: number of transmitter
+    :param int nmax: max number of receiver per source
+    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
+    """
     xloc = []
     yloc = []
     for i in range(ntx):
@@ -166,9 +171,14 @@ def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
 
 
 def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
-    '''
+    """
     Plot the Pseudolocation associated with source i and receiver j
-    '''
+
+    :param int i: source index
+    :param int j: receiver index
+    :param SimPEG.survey survey: SimPEG survey object
+    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
+    """
     matplotlib.rcParams['font.size'] = 14
     nmax = 8
     dx = 5
@@ -184,12 +194,10 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
     plt.plot(xr, np.zeros_like(xr), 'ko', markersize=4)
     if flag == "PoleDipole":
         plt.plot(TxLoc[0][0], np.zeros(1), 'rv', markersize=10)
-        # print([TxLoc[0][0],0])
         ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data',
                     xytext=(-4.25, 7.5), textcoords='offset points')
     else:
         plt.plot([TxLoc[0][0], TxLoc[1][0]], np.zeros(2), 'rv', markersize=10)
-        # print([[TxLoc[0][0],0],[TxLoc[1][0],0]])
         ax.annotate('A', xy=(TxLoc[0][0], np.zeros(1)), xycoords='data',
                     xytext=(-4.25, 7.5), textcoords='offset points')
         ax.annotate('B', xy=(TxLoc[1][0], np.zeros(1)), xycoords='data',
@@ -263,10 +271,12 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
 
 
 def DipoleDipolefun(i):
-    '''
+    """
     Plotting function to display all receivers and pseudolocations
-    for each source i
-    '''
+    of a dipole-dipole survey for each source i
+
+    :param int i: source index
+    """
     matplotlib.rcParams['font.size'] = 14
     plt.figure(figsize=(10, 3))
     nmax = 8
@@ -303,6 +313,14 @@ def DipoleDipolefun(i):
 
 
 def PseudoSectionWidget(survey, flag):
+    """
+    Wigdet to visualize the pseudolocations
+    associated with a particular survey
+    for each pair source-receiver
+
+    :param SimPEG.survey survey: Survey object
+    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
+    """
     dx = 5
     xr = np.arange(-40, 41, dx)
     if flag == "PoleDipole":
@@ -323,6 +341,12 @@ def PseudoSectionWidget(survey, flag):
 
 
 def MidpointPseudoSectionWidget():
+    """
+    Widget function to display receivers and pseudolocations
+    of a dipole-dipole survey for each source i
+
+    :param int i: source index
+    """
     ntx = 18
     return widgetify(
         DipoleDipolefun,
@@ -331,6 +355,28 @@ def MidpointPseudoSectionWidget():
 
 def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
                dobs, uncert, predmis, nmax=8, plotFlag=None):
+    """
+    Function to display the pseudosection obtained through a survey
+    over a known geological model
+
+    :param TensorMesh mesh: discretization of the model
+    :param SimPEG.Survey survey: survey object
+    :param SimPEG.SigmaMap mapping: sigmamap of the model
+    :param numpy.array xr: electrodes positions
+    :param numpy.array xzlocs: pseudolocations
+    :param float rhohalf: Resistivity of the half-space
+    :param float rhoblk: Resistivity of the cylinder
+    :param float xc: horizontal center of the cylinder
+    :param float zc: vertical center of the cylinder
+    :param float r: radius of the cylinder
+    :param numpy.array dobs: observed data
+    :param numpy.array uncert: uncertainities of the data
+    :param str predmis: Choose between 'mis' to display the data misfit
+                        or 'pred' to display the predicted data
+    :param int nmax: Maximum number of receivers for each source
+    :param bool plotFlag: Plot only the predicted data
+                          or also the observed and misfit
+    """
     matplotlib.rcParams['font.size'] = 14
     sighalf, sigblk = 1./rhohalf, 1./rhoblk
     m0 = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
