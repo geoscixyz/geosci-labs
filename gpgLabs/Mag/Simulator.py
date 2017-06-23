@@ -220,6 +220,7 @@ def plotMagSurvey2D(survey, a, b, npts, data=None,
     ax.text(x[-1], y[-1], 'B', fontsize=16,
              color='w', horizontalalignment='right')
 
+    plt.show()
     return
 
 
