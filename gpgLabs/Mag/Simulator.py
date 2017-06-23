@@ -55,7 +55,6 @@ def PFSimulator(prism, survey):
                               Profile_cty=widgets.FloatSlider(value=cty, min=ylim[0], max=ylim[1], step=0.1, continuous_update=False, color='black'),)
     return out
 
-    # Create problem
 
 def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
                Profile_azm, Profile_len, Profile_npt,
@@ -118,8 +117,12 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
                 Profile_len, Profile_npt, fig=f, ax=ax0)
 
     ax1 = plt.subplot(2, 2, 2)
-    MagSurvey2D(survey, Profile_ctx, Profile_cty, Profile_azm,
-                Profile_len, Profile_npt, data=dpred, fig=f, ax=ax1, vmin=vmin, vmax=vmax)
+    ax1 = MagSurvey2D(survey, Profile_ctx, Profile_cty, Profile_azm,
+                      Profile_len, Profile_npt, data=dpred, fig=f, ax=ax1,
+                      vmin=vmin, vmax=vmax)
+
+    ax1.set_yticklabels([])
+    ax1.set_ylabel('')
 
     ax2 = plt.subplot(2, 1, 2)
     MagSurveyProfile(survey, Profile_ctx, Profile_cty, Profile_azm,
@@ -130,7 +133,8 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
 
 def ViewMagSurvey2D(survey):
 
-    def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
+    def MagSurvey2D(East, North, Width, Height,
+                    Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
         Azimuth /= 180./np.pi
@@ -173,21 +177,21 @@ def ViewMagSurvey2D(survey):
 
     Lx = xlim[1] - xlim[0]
     Ly = ylim[1] - ylim[0]
-    diag = (Lx**2. + Ly**2.)**0.5 /2.
+    diag = (Lx**2. + Ly**2.)**0.5 / 2.
 
     East = np.mean(xlim)
     North = np.mean(ylim)
     cntr = [East, North]
 
     out = widgets.interactive(MagSurvey2D,
-                    East=widgets.FloatSlider(min=cntr[0]-Lx, max=cntr[0]+Lx, step=10, value=cntr[0],continuous_update=False),
-                    North=widgets.FloatSlider(min=cntr[1]-Ly, max=cntr[1]+Ly, step=10, value=cntr[1],continuous_update=False),
-                    Width=widgets.FloatSlider(min=10, max=Lx*1.05, step=10, value=Lx*1.05, continuous_update=False),
-                    Height=widgets.FloatSlider(min=10, max=Ly*1.05, step=10, value=Ly*1.05, continuous_update=False),
-                    Azimuth=widgets.FloatSlider(min=-90, max=90, step=5, value=0, continuous_update=False),
-                    Length=widgets.FloatSlider(min=10, max=diag, step=10, value= Ly, continuous_update=False),
-                    Npts=widgets.BoundedFloatText(min=10, max=100, step=1, value=20, continuous_update=False),
-                    Profile=widgets.ToggleButton(description='Profile', value=False))
+                              East=widgets.FloatSlider(min=cntr[0]-Lx, max=cntr[0]+Lx, step=10, value=cntr[0],continuous_update=False),
+                              North=widgets.FloatSlider(min=cntr[1]-Ly, max=cntr[1]+Ly, step=10, value=cntr[1],continuous_update=False),
+                              Width=widgets.FloatSlider(min=10, max=Lx*1.05, step=10, value=Lx*1.05, continuous_update=False),
+                              Height=widgets.FloatSlider(min=10, max=Ly*1.05, step=10, value=Ly*1.05, continuous_update=False),
+                              Azimuth=widgets.FloatSlider(min=-90, max=90, step=5, value=0, continuous_update=False),
+                              Length=widgets.FloatSlider(min=10, max=diag, step=10, value= Ly, continuous_update=False),
+                              Npts=widgets.BoundedFloatText(min=10, max=100, step=1, value=20, continuous_update=False),
+                              Profile=widgets.ToggleButton(description='Profile', value=False))
 
     return out
 
@@ -210,17 +214,18 @@ def plotMagSurvey2D(survey, a, b, npts, data=None,
         data = survey.dobs
 
     # Use SimPEG.PF ploting function
-    PF.Magnetics.plot_obs_2D(rxLoc, d=data, fig=fig,  ax=ax, vmin=vmin, vmax=vmax, marker=False, cmap='RdBu_r')
+    PF.Magnetics.plot_obs_2D(rxLoc, d=data, fig=fig,  ax=ax,
+                             vmin=vmin, vmax=vmax, marker=False, cmap='RdBu_r')
 
     x, y = linefun(a[0], b[0], a[1], b[1], npts)
 
     ax.plot(x, y, 'w.', ms=10)
 
-    ax.text(x[0], y[0], 'A', fontsize=16, color='w', horizontalalignment='left')
+    ax.text(x[0], y[0], 'A', fontsize=16, color='w', ha='left')
     ax.text(x[-1], y[-1], 'B', fontsize=16,
-             color='w', horizontalalignment='right')
+            color='w', ha='right')
 
-    return
+    return ax
 
 
 def plotProfile(survey, a, b, npts, data=None,
@@ -267,9 +272,6 @@ def plotProfile(survey, a, b, npts, data=None,
 
     ax.set_xlabel("Distance (m)")
     ax.set_ylabel("Magnetic field (nT)")
-
-    #ax.text(distance.min(), dline.max()*0.8, 'A', fontsize = 16)
-    # ax.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
     ax.legend(("survey", "simulated"), bbox_to_anchor=(0.5, -0.3))
     ax.grid(True)
     plt.show()
@@ -296,7 +298,8 @@ def linefun(x1, x2, y1, y2, nx, tol=1e-3):
 
 def ViewPrism(survey):
 
-    def Prism(update, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec, View_dip, View_azm, View_lim):
+    def Prism(update, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec,
+              View_dip, View_azm, View_lim):
 
         prism = definePrism()
         prism.dx, prism.dy, prism.dz, prism.z0 = dx, dy, dz, elev
@@ -331,12 +334,11 @@ def ViewPrism(survey):
                               View_lim=widgets.FloatSlider(min=1, max=2*lim, step=1, value=lim, continuous_update=False),
                               )
 
-
-
     return out
 
 
-def plotObj3D(prism, survey, View_dip, View_azm, View_lim, fig=None, axs=None, title=None):
+def plotObj3D(prism, survey, View_dip, View_azm, View_lim,
+              fig=None, axs=None, title=None):
 
     """
     Plot the prism in 3D
@@ -380,36 +382,35 @@ def plotObj3D(prism, survey, View_dip, View_azm, View_lim, fig=None, axs=None, t
     offy = prism.yc
     offz = prism.zc
 
-    #print xyz
     # Face 1
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[:4, 0] + offx,
-                                               xyz[:4, 1] + offy,
-                                               xyz[:4, 2] + offz))]))
+                                                xyz[:4, 1] + offy,
+                                                xyz[:4, 2] + offz))]))
 
     # Face 2
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[4:, 0] + offx,
-                                               xyz[4:, 1] + offy,
-                                               xyz[4:, 2] + offz))], facecolors='w'))
+                                                xyz[4:, 1] + offy,
+                                                xyz[4:, 2] + offz))], facecolors='w'))
 
     # Face 3
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[[0, 1, 5, 4], 0] + offx,
-                                               xyz[[0, 1, 5, 4], 1] + offy,
-                                               xyz[[0, 1, 5, 4], 2] + offz))]))
+                                                xyz[[0, 1, 5, 4], 1] + offy,
+                                                xyz[[0, 1, 5, 4], 2] + offz))]))
 
     # Face 4
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[[3, 2, 6, 7], 0] + offx,
-                                               xyz[[3, 2, 6, 7], 1] + offy,
-                                               xyz[[3, 2, 6, 7], 2] + offz))]))
+                                                xyz[[3, 2, 6, 7], 1] + offy,
+                                                xyz[[3, 2, 6, 7], 2] + offz))]))
 
-   # Face 5
+    # Face 5
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[[0, 4, 7, 3], 0] + offx,
-                                               xyz[[0, 4, 7, 3], 1] + offy,
-                                               xyz[[0, 4, 7, 3], 2] + offz))]))
+                                                xyz[[0, 4, 7, 3], 1] + offy,
+                                                xyz[[0, 4, 7, 3], 2] + offz))]))
 
-   # Face 6
+    # Face 6
     axs.add_collection3d(Poly3DCollection([list(zip(xyz[[1, 5, 6, 2], 0] + offx,
-                                               xyz[[1, 5, 6, 2], 1] + offy,
-                                               xyz[[1, 5, 6, 2], 2] + offz))]))
+                                                xyz[[1, 5, 6, 2], 1] + offy,
+                                                xyz[[1, 5, 6, 2], 2] + offz))]))
 
     axs.set_xlabel('Easting (X; m)')
     axs.set_ylabel('Northing (Y; m)')
@@ -435,7 +436,6 @@ class definePrism(object):
 
     x0, y0, z0, dx, dy, dz = 0., 0., 0., 1., 1., 1.
     pinc, pdec = 0., 0.
-
 
     # Define the nodes of the prism
     @property
@@ -488,7 +488,7 @@ def fitline(prism, survey):
 
         xyzLoc = survey2D.srcField.rxList[0].locs
         survey2D.param = [Bigrf, Binc, Bdec]
-        survey2D.srcField.rxList[0].locs[:,2] += depth
+        survey2D.srcField.rxList[0].locs[:, 2] += depth
         prob.survey = survey2D
 
         prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
@@ -500,7 +500,7 @@ def fitline(prism, survey):
 
         dpred = np.zeros_like(fields[0])
         for b in fields:
-            dpred += (b +Bigrf)
+            dpred += (b + Bigrf)
 
         a = np.r_[xyzLoc[:, 0].min(), 0]
         b = np.r_[xyzLoc[:, 0].max(), 0]

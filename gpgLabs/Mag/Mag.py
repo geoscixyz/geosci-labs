@@ -16,7 +16,7 @@ class problem(object):
             - Rinc, Rdec : inclination and declination of remnance in block
 
     """
-    #Bdec, Binc, Bigrf = 90., 0., 50000.
+    # Bdec, Binc, Bigrf = 90., 0., 50000.
     Q, rinc, rdec = 0., 0., 0.
     uType, mType = 'tf', 'induced'
     susc = 1.
@@ -26,18 +26,20 @@ class problem(object):
     @property
     def Mind(self):
         # Define magnetization direction as sum of induced and remanence
-        mind = MagUtils.dipazm_2_xyz(self.survey.srcField.param[1], self.survey.srcField.param[2])
-        R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+        mind = MagUtils.dipazm_2_xyz(self.survey.srcField.param[1],
+                                     self.survey.srcField.param[2])
+        R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec,
+                                    normal=False)
         Mind = self.susc*self.Higrf*R.dot(mind.T)
-        # Mind = self.susc*self.Higrf*PF.Magnetics.dipazm_2_xyz(self.Binc - self.prism.pinc,
-        #                                                self.Bdec - self.prism.pdec)
+
         return Mind
 
     @property
     def Mrem(self):
 
         mrem = MagUtils.dipazm_2_xyz(self.rinc, self.rdec)
-        R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+        R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec,
+                                    normal=False)
         Mrem = self.Q*self.susc*self.Higrf * R.dot(mrem.T)
 
         return Mrem
@@ -59,14 +61,18 @@ class problem(object):
             yLoc = rxLoc[:, 1] - self.prism.yc
             zLoc = rxLoc[:, 2] - self.prism.zc
 
-            R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
+            R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec,
+                                        normal=False)
 
             rxLoc = R.dot(np.c_[xLoc, yLoc, zLoc].T).T
 
-            rxLoc = np.c_[rxLoc[:, 0] + self.prism.xc, rxLoc[:, 1] + self.prism.yc, rxLoc[:, 2] + self.prism.zc]
+            rxLoc = np.c_[rxLoc[:, 0] + self.prism.xc,
+                          rxLoc[:, 1] + self.prism.yc,
+                          rxLoc[:, 2] + self.prism.zc]
 
             # Create the linear forward system
-            self._G = Intrgl_Fwr_Op(self.prism.xn, self.prism.yn, self.prism.zn, rxLoc)
+            self._G = Intrgl_Fwr_Op(self.prism.xn,
+                                    self.prism.yn, self.prism.zn, rxLoc)
 
         return self._G
 
@@ -110,7 +116,7 @@ class problem(object):
         if self.uType == 'tf':
             # Projection matrix
             Ptmi = MagUtils.dipazm_2_xyz(self.survey.srcField.param[1],
-                                      self.survey.srcField.param[2])
+                                         self.survey.srcField.param[2])
 
             u = Utils.mkvc(Ptmi.dot(bvec))
 
