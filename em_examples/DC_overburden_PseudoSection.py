@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from SimPEG import Mesh, Maps, SolverLU, Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
-from SimPEG.EM.Static import DC
+from SimPEG.EM.Static import DC, IP
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
@@ -17,7 +17,10 @@ from scipy.constants import epsilon_0
 from scipy.interpolate import griddata
 import copy
 
-from ipywidgets import interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Widget
+from ipywidgets import (
+    interact, interact_manual, IntSlider, FloatSlider,
+    FloatText, ToggleButtons, fixed, Widget
+    )
 
 from .Base import widgetify
 
@@ -35,7 +38,7 @@ xmax = 1000.
 ymin = -1000.
 ymax = 100.
 dx = 60.
-xr = np.arange(xmin,xmax+1.,dx)
+xr = np.arange(xmin, xmax+1., dx)
 dxr = np.diff(xr)
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
 indCC, meshcore = ExtractCoreMesh(xylim, mesh)
@@ -45,8 +48,10 @@ indF = np.concatenate((indx, indy))
 
 nmax = 8
 
-def model_valley(lnsig_air=np.log(1e-8), ln_sigback=np.log(1e-4), ln_over=np.log(1e-2),
-                 ln_sigtarget=np.log(1e-3), overburden_thick=200., overburden_wide=1000.,
+
+def model_valley(lnsig_air=np.log(1e-8), ln_sigback=np.log(1e-4),
+                 ln_over=np.log(1e-2), ln_sigtarget=np.log(1e-3),
+                 overburden_thick=200., overburden_wide=1000.,
                  target_thick=200., target_wide=400.,
                  a=1000., b=500., xc=0., zc=250.):
 
@@ -57,12 +62,15 @@ def model_valley(lnsig_air=np.log(1e-8), ln_sigback=np.log(1e-4), ln_over=np.log
     mtrue[ellips] = lnsig_air
     mair = copy.deepcopy(mtrue)
 
-    #overb = (mesh.gridCC[:, 1] >-overburden_thick) & (mesh.gridCC[:, 1]<=0)&(mesh.gridCC[:, 0] >-overburden_wide/2.)&(mesh.gridCC[:, 0] <overburden_wide/2.)
-    #mtrue[overb] = ln_over*np.ones_like(mtrue[overb])
-    bottom_valley = mesh.gridCC[ellips, 1].min()
-    overb = (mesh.gridCC[:, 1] >= bottom_valley) & (mesh.gridCC[:, 1] < bottom_valley+overburden_thick) & ellips
-    mtrue[overb] = ln_over*np.ones_like(mtrue[overb])
-    mair[overb] = ln_sigback
+    # overb = (mesh.gridCC[:, 1] >-overburden_thick) & (mesh.gridCC[:, 1]<=0)&(mesh.gridCC[:, 0] >-overburden_wide/2.)&(mesh.gridCC[:, 0] <overburden_wide/2.)
+    # mtrue[overb] = ln_over*np.ones_like(mtrue[overb])
+    if np.any(ellips):
+        bottom_valley = mesh.gridCC[ellips, 1].min()
+        overb = (mesh.gridCC[:, 1] >= bottom_valley) & (mesh.gridCC[:, 1] < bottom_valley+overburden_thick) & ellips
+        mtrue[overb] = ln_over*np.ones_like(mtrue[overb])
+        mair[overb] = ln_sigback
+    else:
+        bottom_valley = 0.
     mover = copy.deepcopy(mtrue)
 
     target = (mesh.gridCC[:, 1] > bottom_valley-target_thick) & (mesh.gridCC[:, 1] < bottom_valley) & (mesh.gridCC[:, 0] > -target_wide/2.) & (mesh.gridCC[:, 0] < target_wide/2.)
@@ -72,9 +80,11 @@ def model_valley(lnsig_air=np.log(1e-8), ln_sigback=np.log(1e-4), ln_over=np.log
 
     return mtrue, mhalf, mair, mover
 
+
 def findnearest(A):
     idx = np.abs(mesh.gridCC[:, 0, None]-A).argmin(axis=0)
     return mesh.gridCC[idx, 0]
+
 
 def get_Surface(mtrue, A):
     active = (mtrue > (np.log(1e-8)))
@@ -84,9 +94,11 @@ def get_Surface(mtrue, A):
     idm = []
     surface = []
     for i in range(ind.shape[1]):
-        idm.append(np.where(np.all(mesh.gridCC == np.r_[nearpoint[i], np.max(mesh.gridCC[ind[:, i], 1])], axis=1)))
+        idm.append(np.where(np.all(mesh.gridCC == np.r_[nearpoint[i], np.max(mesh.gridCC[ind[:, i], 1])],
+                   axis=1)))
         surface.append(mesh.gridCC[idm[-1], 1])
     return Utils.mkvc(np.r_[idm]), Utils.mkvc(np.r_[surface])
+
 
 def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary='overburden'):
 
@@ -107,7 +119,7 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary='overburden'):
     # survey_prim = DC.Survey([src])
     survey_prim = DC.Survey([src])
     survey_air = DC.Survey([src])
-    #problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
     # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem_prim = DC.Problem3D_CC(mesh, sigmaMap=mapping)
@@ -150,6 +162,7 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary='overburden'):
 
     return src, primary_field, air_field, total_field
 
+
 def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
     phi = field_obj['phi']
@@ -169,6 +182,7 @@ def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
     return XLoc, phiSurface, phiScale
 
+
 def getCylinderPoints(xc, zc, a, b):
     xLocOrig1 = np.arange(-a, a+a/10., a/10.)
     xLocOrig2 = np.arange(a, -a-a/10., -a/10.)
@@ -183,14 +197,13 @@ def getCylinderPoints(xc, zc, a, b):
     cylinderPoints = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
     return cylinderPoints
 
+
 def get_OverburdenPoints(cylinderPoints, overburden_thick):
     bottom = cylinderPoints[:, 1].min()
     indb = np.where(cylinderPoints[:, 1] < 0.)
     overburdenPoints = [np.maximum(cylinderPoints[i, 1], bottom+overburden_thick) for i in indb]
     return np.vstack([cylinderPoints[indb, 0], overburdenPoints]).T
 
-
-# In[30]:
 
 def getPlateCorners(target_thick, target_wide, cylinderPoints):
 
@@ -202,6 +215,7 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
     plateCorners = rotPlateCorners + np.hstack([np.repeat(xc, 4).reshape([4, 1]), np.repeat(zc, 4).reshape([4, 1])])
     return plateCorners
 
+
 def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
     xLocOrig1 = np.arange(-target_wide/2., target_wide/2.+target_wide/10., target_wide/10.)
     xLocOrig2 = np.arange(target_wide/2., -target_wide/2.-target_wide/10., -target_wide/10.)
@@ -211,6 +225,7 @@ def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
     corner
 
     targetpoint = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
+
 
 def getSensitivity(survey, A, B, M, N, model):
 
@@ -237,9 +252,10 @@ def getSensitivity(survey, A, B, M, N, model):
 
     return J
 
+
 def calculateRhoA(survey, VM, VN, A, B, M, N):
 
-    #to stabilize division
+    # to stabilize division
     eps = 1e-9
 
     if(survey == "Dipole-Dipole"):
@@ -257,7 +273,8 @@ def calculateRhoA(survey, VM, VN, A, B, M, N):
 
     return rho_a
 
-def getPseudoLocs(xr, ntx, nmax, flag = "PoleDipole"):
+
+def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
     xloc = []
     yloc = []
     for i in range(ntx):
@@ -298,10 +315,11 @@ def getPseudoLocs(xr, ntx, nmax, flag = "PoleDipole"):
     ylocvec = np.hstack(yloc)
     return np.c_[xlocvec, ylocvec]
 
-def DC2Dsurvey(mtrue,flag="PoleDipole", nmax=8):
+
+def DC2Dsurvey(mtrue, flag="PoleDipole", nmax=8):
 
     if flag == "PoleDipole":
-        ntx  = xr.size-2
+        ntx = xr.size-2
     elif flag == "DipolePole":
         ntx = xr.size-2
     elif flag == "DipoleDipole":
@@ -377,13 +395,97 @@ def DC2Dsurvey(mtrue,flag="PoleDipole", nmax=8):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
+    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
     problem.pair(survey)
-
 
     return survey, xzlocs
 
-def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
+
+def IP2Dsurvey(miptrue, sigmadc, flag="PoleDipole", nmax=8):
+
+    if flag == "PoleDipole":
+        ntx = xr.size-2
+    elif flag == "DipolePole":
+        ntx = xr.size-2
+    elif flag == "DipoleDipole":
+        ntx = xr.size-3
+    else:
+        raise Exception('Not Implemented')
+    xzlocs = getPseudoLocs(xr, ntx, nmax, flag)
+
+    txList = []
+    zloc = -cs/2.
+    for i in range(ntx):
+        if flag == "PoleDipole":
+            A = np.r_[xr[i], zloc]
+            B = np.r_[mesh.vectorCCx.min(), zloc]
+            if i < ntx-nmax+1:
+                Mx = xr[i+1:i+1+nmax]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = xr[i+2:i+2+nmax]
+                _, Nz = get_Surface(miptrue, Nx)
+
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+            else:
+                Mx = xr[i+1:ntx+1]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = xr[i+2:i+2+nmax]
+                _, Nz = get_Surface(miptrue, Nx)
+
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+
+        elif flag == "DipolePole":
+            A = np.r_[xr[i], zloc]
+            B = np.r_[xr[i+1], zloc]
+            if i < ntx-nmax+1:
+                Mx = xr[i+2:i+2+nmax]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = np.ones(nmax)*mesh.vectorCCx.max()
+                _, Nz = get_Surface(miptrue, Nx)
+
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+
+            else:
+                Mx = xr[i+2:ntx+2]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = np.ones(ntx-i)*mesh.vectorCCx.max()
+                _, Nz = get_Surface(miptrue, Nx)
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+
+        elif flag == "DipoleDipole":
+            A = np.r_[xr[i], zloc]
+            B = np.r_[xr[i+1], zloc]
+            if i < ntx-nmax:
+                Mx = xr[i+2:i+2+nmax]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = xr[i+3:i+3+nmax]
+                _, Nz = get_Surface(miptrue, Nx)
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+
+            else:
+                Mx = xr[i+2:len(xr)-1]
+                _, Mz = get_Surface(miptrue, Mx)
+                Nx = xr[i+3:len(xr)]
+                _, Nz = get_Surface(miptrue, Nx)
+                M = np.c_[Mx, Mz]
+                N = np.c_[Nx, Nz]
+
+        rx = DC.Rx.Dipole(M, N)
+        src = DC.Src.Dipole([rx], A, B)
+        txList.append(src)
+
+    survey = IP.Survey(txList)
+    problem = IP.Problem3D_CC(mesh, sigma=sigmadc, etaMap=Maps.IdentityMap(mesh))
+    problem.pair(survey)
+
+    return survey, xzlocs
+
+def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
     matplotlib.rcParams['font.size'] = 14
     ntx = xr.size-2
     TxObj = survey.srcList
@@ -410,9 +512,7 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
 
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
-        # plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
-        # ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
-        # ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
+
         if flag == "DipolePole":
             plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
             ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
@@ -429,8 +529,6 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
         plt.plot(rxmid, np.zeros(1), 'bo')
         plt.plot(mid, midSep/2., 'go')
         plt.plot(np.r_[txmid, mid], np.r_[0, midSep/2.], 'k:')
-        # for j in range(nmax):
-            # plt.plot(np.r_[rxmid[j], mid[j]], np.r_[0, j+1], 'k:')
         plt.plot(np.r_[rxmid, mid], np.r_[0, midSep/2.], 'k:')
 
     else:
@@ -438,7 +536,6 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
             txmid = TxLoc[0][0]
         else:
             txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
-
 
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
@@ -452,11 +549,7 @@ def PseudoSectionPlotfnc(i,j,survey,flag="PoleDipole"):
             plt.plot(NLoc[0], np.zeros(1), 'b^', markersize=10)
             ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
             ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
-        # plt.plot([MLoc[0],NLoc[0]], np.zeros(2), 'b^', markersize=10)
-        # ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
-        # ax.annotate('N', xy=(NLoc[0], np.zeros(1)), xycoords='data', xytext=(-4.25, 7.5), textcoords='offset points')
 
-        # rxmid = xr[i+1:ntx+1]+dxr[i+1:ntx+1]*0.5
         mid = (txmid+rxmid)*0.5
         plt.plot((txmid+rxmid)*0.5, np.arange(mid.size)+1., 'bo')
         plt.plot(rxmid, np.zeros(rxmid.size), 'go')
@@ -505,7 +598,7 @@ def DipoleDipolefun(i):
     return
 
 
-def PseudoSectionWidget(survey,flag):
+def PseudoSectionWidget(survey, flag):
     if flag == "PoleDipole":
         ntx, nmax = xr.size-2, 8
         dxr = np.diff(xr)
@@ -515,17 +608,26 @@ def PseudoSectionWidget(survey,flag):
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size-3, 8
         dxr = np.diff(xr)
-    xzlocs = getPseudoLocs(dxr, ntx, nmax,flag)
-    PseudoSectionPlot = lambda i,j: PseudoSectionPlotfnc(i,j,survey,flag)
-    return widgetify(PseudoSectionPlot, i=IntSlider(min=0, max=ntx-1, step = 1, value=0),j=IntSlider(min=0, max=nmax-1, step = 1, value=0))
+    xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
+    PseudoSectionPlot = lambda i,j,flag: PseudoSectionPlotfnc(i, j, survey, flag)
+    return widgetify(PseudoSectionPlot,
+                     i=IntSlider(min=0, max=ntx-1, step=1, value=0),
+                     j=IntSlider(min=0, max=nmax-1, step=1, value=0),
+                     flag=ToggleButtons(options=['DipoleDipole', 'PoleDipole', 'DipolePole'],
+                                        description='Array Type'),)
 
 
 def MidpointPseudoSectionWidget():
     ntx = xr.size-2
-    return widgetify(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step = 1, value=0))
+    return widgetify(DipoleDipolefun, i=IntSlider(min=0, max=ntx-1, step=1, value=0))
 
-def DC2Dfwdfun(mesh, mapping, rhohalf, rholayer, rhoTarget, overburden_thick, overburden_wide,
-         target_thick, target_wide, ellips_a, ellips_b, xc, zc, predmis, surveyType, nmax=8, plotFlag=None):
+
+def DCIP2Dfwdfun(mesh, mapping,
+                 rhohalf, rholayer, rhoTarget,
+                 chghalf, chglayer, chgTarget,
+                 overburden_thick, overburden_wide,
+                 target_thick, target_wide, ellips_a, ellips_b, xc, zc,
+                 predmis, surveyType, nmax=8, which='DC', Scale='Linear'):
 
     matplotlib.rcParams['font.size'] = 14
 
@@ -533,159 +635,207 @@ def DC2Dfwdfun(mesh, mapping, rhohalf, rholayer, rhoTarget, overburden_thick, ov
     ln_sigLayer = np.log(1./rholayer)
     ln_sigHalf = np.log(1./rhohalf)
 
-    mtrue, mhalf, mair, mover = model_valley(lnsig_air=np.log(1e-8), ln_sigback=ln_sigHalf, ln_over=ln_sigLayer,
-                 ln_sigtarget=ln_sigTarget , overburden_thick =overburden_thick,
-                 target_thick=target_thick, target_wide =target_wide,
-                 a=ellips_a, b=ellips_b, xc=xc, zc=zc)
+    mtrue, mhalf, mair, mover = model_valley(lnsig_air=np.log(1e-8),
+                                             ln_sigback=ln_sigHalf,
+                                             ln_over=ln_sigLayer,
+                                             ln_sigtarget=ln_sigTarget,
+                                             overburden_thick =overburden_thick,
+                                             target_thick=target_thick,
+                                             target_wide =target_wide,
+                                             a=ellips_a, b=ellips_b,
+                                             xc=xc, zc=zc)
+    mdctrue = mtrue
 
-    survey, xzlocs = DC2Dsurvey(mtrue,surveyType)
+    if which == 'IP':
+        mtrue, mhalf, mair, mover = model_valley(lnsig_air=0.,
+                                                 ln_sigback=chghalf,
+                                                 ln_over=chglayer,
+                                                 ln_sigtarget=chgTarget,
+                                                 overburden_thick=overburden_thick,
+                                                 target_thick=target_thick,
+                                                 target_wide=target_wide,
+                                                 a=ellips_a, b=ellips_b, xc=xc,zc=zc)
 
-    dmhalf = survey.dpred(mhalf)
+        sigmadc = 1./(mapping*mdctrue)
+        survey, xzlocs = IP2Dsurvey(mtrue, sigmadc, surveyType, nmax=nmax)
+
+    else:
+        survey, xzlocs = DC2Dsurvey(mtrue, surveyType, nmax=nmax)
+
     dmover = survey.dpred(mover)
     dpred = survey.dpred(mtrue)
     xi, yi = np.meshgrid(np.linspace(xr.min(), xr.max(), 120), np.linspace(1., nmax, 100))
 
-    #Cheat to compute a geometric factor define as G = dV_halfspace / rho_halfspace
-    appresover = dmover/dmhalf/np.exp(ln_sigHalf)
-    apprestrue = dpred/dmhalf/np.exp(ln_sigHalf)
-    dtrue = griddata(xzlocs, apprestrue, (xi, yi), method='linear')
-    dtrue = np.ma.masked_where(np.isnan(dtrue),dtrue)
-
-    if plotFlag is not None:
-        fig = plt.figure(figsize = (12, 6))
-        ax1 = plt.subplot(211)
-        ax2 = plt.subplot(212)
-
-        u = np.ma.masked_where(mtrue <= np.log(1e-8) , np.log10(1./(mapping*mtrue)))
-        dat1 = mesh.plotImage(u, ax=ax1, clim=(u.min(),u.max()),
-                     grid=True, gridOpts={'color':'k', 'alpha':0.5})
-        cb1ticks = np.linspace(u.min(),u.max(),3)
-        cb1 = plt.colorbar(dat1[0], ax=ax1,ticks=cb1ticks)#,tickslabel =)  #, format="$10^{%4.1f}$")
-        cb1.ax.set_yticklabels(['{:.0f}'.format(10**x) for x in cb1ticks])#, fontsize=16, weight='bold')
-        cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(ymin, ymax)
-        ax1.set_xlim(xmin, xmax)
-        ax1.set_xlabel("")
-        ax1.set_ylabel("Depth (m)")
-        ax1.set_aspect('equal')
-
-        dat2 = ax2.contourf(xi, yi, dtrue, 10)
-        ax2.contour(xi, yi, dtrue, 10, colors='k', alpha=0.5)
-        ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb2 = plt.colorbar(dat2, ax=ax2)#, ticks=np.linspace(0, 3, 5))#format="$10^{%4.1f}$")
-        cb2.set_label("Apparent Resistivity \n (ohm-m)")
-        ax2.text(-38, 7, "Predicted")
-
-        ax2.set_ylim(nmax+1, 0.)
-        ax2.set_ylabel("N-spacing")
-        ax2.set_xlabel("Distance (m)")
-
+    # Cheat to compute a geometric factor
+    # define as G = dV_halfspace / rho_halfspace
+    if which == 'IP':
+        mtest = 10.*np.ones_like(mtrue)
+        mtest[mdctrue == np.log(1e-8)] = 0.
+        dhalf = survey.dpred(mtest)
+        appresover = 10.*(dmover/dhalf)
+        apprestrue = 10.*(dpred/dhalf)
     else:
-        dover = griddata(xzlocs, appresover, (xi, yi), method='linear')
-        dover = np.ma.masked_where(np.isnan(dover),dover)
-        fig = plt.figure(figsize=(12, 9))
-        ax1 = plt.subplot(311)
-        u = np.ma.masked_where(mtrue <= np.log(1e-8) , np.log10(1./(mapping*mtrue)))
-        dat1 = mesh.plotImage(u, ax=ax1, clim=(u.min(),u.max()),
-                     grid=True, gridOpts={'color':'k', 'alpha':0.5})
-        cb1ticks = np.linspace(u.min(),u.max(),3)
-        cb1 = plt.colorbar(dat1[0], ax=ax1,ticks=cb1ticks)#,tickslabel =)  #, format="$10^{%4.1f}$")
-        cb1.ax.set_yticklabels(['{:.0f}'.format(10**x) for x in cb1ticks])#, fontsize=16, weight='bold')
-        cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(ymin, ymax)
-        ax1.set_xlim(xmin, xmax)
-        ax1.set_xlabel("")
-        ax1.set_ylabel("Depth (m)")
-        #ax1.set_aspect('equal')
+        dmair = survey.dpred(mair)
+        appresover = dmover/dmair/np.exp(ln_sigHalf)
+        apprestrue = dpred/dmair/np.exp(ln_sigHalf)
 
-        ax2 = plt.subplot(312)
+    dtrue = griddata(xzlocs, apprestrue, (xi, yi), method='linear')
+    dtrue = np.ma.masked_where(np.isnan(dtrue), dtrue)
 
+    dover = griddata(xzlocs, appresover, (xi, yi), method='linear')
+    dover = np.ma.masked_where(np.isnan(dover), dover)
+
+    if which == 'IP':
+        label = 'Chargeability'
+    else:
+        label = 'Resistivity (Ohm-m)'
+
+    fig = plt.figure(figsize=(12, 9))
+    ax1 = plt.subplot(311)
+
+    if which == 'IP':
+        u = np.ma.masked_where(mdctrue <= np.log(1e-8), mtrue)
+    else:
+        u = np.ma.masked_where(mtrue <= np.log(1e-8), np.log10(1./(mapping*mtrue)))
+    dat1 = mesh.plotImage(u, ax=ax1, clim=(u.min(), u.max()),
+                          grid=True, gridOpts={'color': 'k', 'alpha': 0.5})
+
+    if which == 'IP':
+        cb1 = plt.colorbar(dat1[0], ax=ax1)
+    else:
+        cb1ticks = np.linspace(u.min(), u.max(), 3)
+        cb1 = plt.colorbar(dat1[0], ax=ax1, ticks=cb1ticks)
+        cb1.ax.set_yticklabels(['{:.0f}'.format(10**x) for x in cb1ticks])
+    cb1.set_label(label)
+
+    ax1.set_ylim(ymin, ymax)
+    ax1.set_xlim(xmin, xmax)
+    ax1.set_xlabel("")
+    ax1.set_ylabel("Depth (m)")
+
+    ax2 = plt.subplot(312)
+    if Scale == 'Log':
         lev_exp = np.arange(np.floor(np.log10(np.abs(dtrue.min()))),
-                    np.ceil(np.log10(dtrue.max()))+0.1,0.1)
+                            np.ceil(np.log10(dtrue.max()))+0.1,0.1)
 
         lev = np.power(10, lev_exp)
-        dat2 = ax2.contourf(xi, yi, dtrue,lev, locator=ticker.LogLocator())#norm=colors.SymLogNorm(linthresh=0.1, linscale=0.1)
-        ax2.contour(xi, yi, dtrue, lev,locator=ticker.LogLocator(), colors='k', alpha=0.5)
-        ax2.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-        cb2 = plt.colorbar(dat2, ax=ax2,ticks=np.logspace(0,5,6))#,ticks=np.logspace(np.floor(lev_exp.min()), np.ceil(lev_exp.max()), np.ceil(lev_exp.max())-np.floor(lev_exp.min())), format="%4.0f")#, ticks=np.linspace(0, 3, 5),format="$10^{%4.1f}$")
+        dat2 = ax2.contourf(xi, yi, dtrue, lev, locator=ticker.LogLocator())
+        ax2.contour(xi, yi, dtrue, lev, locator=ticker.LogLocator(), colors='k', alpha=0.5)
+        ax2.plot(xzlocs[:, 0], xzlocs[:, 1],'k.', ms=3)
 
-        cb2.set_label("Apparent Resistivity \n (ohm-m)")
-        ax2.set_ylim(nmax+1, 0.)
-        ax2.set_ylabel("N-spacing")
-        ax2.text(-38, 7, "Observed")
+        cb2 = plt.colorbar(dat2, ax=ax2,ticks=np.linspace(appresover.min(),
+                           appresover.max(), 5), format="%4.0f")
 
-        ax3 = plt.subplot(313)
-        if predmis=="Overburden":
+    else:
+        dat2 = ax2.contourf(xi, yi, dtrue, 10)
+        ax2.contour(xi, yi, dtrue, 10, colors='k', alpha=0.5)
+        ax2.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
+        cb2 = plt.colorbar(dat2, ax=ax2)
+
+    cb2.set_label('Apparent\n'+label)
+    ax2.set_ylim(nmax+1, 0.)
+    ax2.set_ylabel("N-spacing")
+    ax2.text(250, nmax-1, "Observed")
+
+    ax3 = plt.subplot(313)
+    if predmis == "Data Without Target":
+        if Scale == 'Log':
             dat3 = ax3.contourf(xi, yi, dover, lev, locator=ticker.LogLocator())
             ax3.contour(xi, yi, dover, lev, locator=ticker.LogLocator(), colors='k', alpha=0.5)
-            ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms = 3)
-            cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(appresover.min(), appresover.max(), 5),format="%4.0f")
-            cb3.set_label("Apparent Resistivity \n (ohm-m)")
-            ax3.text(-38, 7, "Predicted from Overburden only")
-        elif predmis=="misfit":
-            mis = (apprestrue-appresover)/(apprestrue)
+            ax3.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
+            cb3 = plt.colorbar(dat3, ax=ax3,
+                               ticks=np.linspace(appresover.min(), appresover.max(), 5),
+                               format="%4.0f")
+        else:
+            dat3 = ax3.contourf(xi, yi, dover, 10, vmin=dtrue.min(), vmax=dtrue.max())
+            ax3.contour(xi, yi, dover, 10, vmin=dtrue.min(),vmax=dtrue.max(), colors='k', alpha=0.5)
+            ax3.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
+            cb3 = plt.colorbar(dat3, ax=ax3, format="%4.0f")
+            cb3.set_clim(cb2.get_clim())
+        cb3.set_label('Apparent\n'+label)
+        ax3.text(250, nmax-1, "Predicted\nwithout Target")
+
+    else:
+        if predmis == "Difference":
+            mis = (apprestrue-appresover)
             Mis = griddata(xzlocs, mis, (xi, yi), method='linear')
-            dat3 = ax3.contourf(xi, yi, Mis, 10)
-            ax3.contour(xi, yi, Mis, 10, colors='k', alpha=0.5)
-            ax3.plot(xzlocs[:,0], xzlocs[:,1],'k.', ms=3)
-            cb3 = plt.colorbar(dat3, ax=ax3, ticks=np.linspace(mis.min(), mis.max(), 5), format="%4.2f")
-            cb3.set_label("Normalized misfit")
-            ax3.text(-38, 7, "Misifit")
-        ax3.set_ylim(nmax+1, 0.)
-        ax3.set_ylabel("N-spacing")
-        ax3.set_xlabel("Distance (m)")
+            if which == 'IP':
+                diflabel = 'Difference (chg unit)'
+            else:
+                diflabel = 'Difference (Ohm-m)'
+
+        else:
+            mis = (apprestrue-appresover)/apprestrue
+            Mis = griddata(xzlocs, mis, (xi, yi), method='linear')
+            diflabel = 'Normalized Difference (%)'
+
+        dat3 = ax3.contourf(xi, yi, Mis, 10)
+        ax3.contour(xi, yi, Mis, 10, colors='k', alpha=0.5)
+        ax3.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
+        cb3 = plt.colorbar(dat3, ax=ax3, format="%4.2f")
+        cb3.set_label(diflabel)
+        ax3.text(-38, 7, diflabel)
+    ax3.set_ylim(nmax+1, 0.)
+    ax3.set_ylabel("N-spacing")
+    ax3.set_xlabel("Distance (m)")
 
     plt.show()
     return
 
 
-def DC2DPseudoWidgetWrapper( rhohalf, rholayer, rhoTarget, overburden_thick, overburden_wide,
-         target_thick, target_wide, ellips_a, ellips_b, xc, zc, surveyType):
-    DC2Dfwdfun(mesh, mapping,  rhohalf, rholayer, rhoTarget, overburden_thick, overburden_wide,
-         target_thick, target_wide, ellips_a, ellips_b, xc, zc, 'pred',surveyType,plotFlag='PredOnly')
+def DC2DfwdWrapper(rhohalf, rholayer, rhoTarget,
+                   chghalf, chglayer, chgTarget,
+                   overburden_thick, overburden_wide,
+                   target_thick, target_wide, ellips_a, ellips_b, xc, zc,
+                   predmis, surveyType, nmax, which, Scale):
+    DCIP2Dfwdfun(mesh, mapping, rhohalf, rholayer, rhoTarget,
+                 chghalf, chglayer, chgTarget,
+                 overburden_thick, overburden_wide,
+                 target_thick, target_wide, ellips_a, ellips_b, xc, zc,
+                 predmis, surveyType, nmax, which, Scale)
     return None
 
-def DC2DPseudoWidget():
-    return widgetify(
-        DC2DPseudoWidgetWrapper,
-        #survey=ToggleButtons(options=['Dipole-Dipole', 'Dipole-Pole', 'Pole-Dipole', 'Pole-Pole'], value='Dipole-Dipole'),
-        xc=FloatSlider(min=-1005., max=1000., step=10., value=0., continuous_update=False),
-        zc=FloatSlider(min=-1000., max=1000., step=10., value=250., continuous_update=False),
-        ellips_a=FloatSlider(min=10., max=10000., step=100., value=1000., continuous_update=False),
-        ellips_b=FloatSlider(min=10., max=10000., step=100., value=500., continuous_update=False),
-        rhohalf=FloatText(min=1e-8, max=1e8, value=1000., description='$\\rho_1$', continuous_update=False),
-        rholayer=FloatText(min=1e-8, max=1e8, value=100., description='$\\rho_2$', continuous_update=False),
-        rhoTarget=FloatText(min=1e-8, max=1e8, value=500., description='$\\rho_3$', continuous_update=False),
-        overburden_thick=FloatSlider(min=0., max=1000., step= 10., value=250., continuous_update=False),
-        overburden_wide=fixed(2000.),#continuous_update=False),
-        target_thick=FloatSlider(min=0., max=1000., step= 10., value=200., continuous_update=False),
-        target_wide=FloatSlider(min=0., max=1000., step= 10., value=200., continuous_update=False),
-        surveyType = ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
-    )
 
-def DC2DfwdWrapper(rhohalf, rholayer, rhoTarget, overburden_thick, overburden_wide,
-                    target_thick, target_wide, ellips_a, ellips_b, xc, zc, predmis, surveyType):
-    DC2Dfwdfun(mesh, mapping, rhohalf, rholayer, rhoTarget,
-                overburden_thick, overburden_wide,
-                target_thick, target_wide,
-                ellips_a, ellips_b, xc, zc, predmis, surveyType)
-    return None
-
-def DC2DfwdWidget():
+def DCIP2DfwdWidget():
     return widgetify(
         DC2DfwdWrapper,
-        xc=FloatSlider(min=-1005., max=1000., step=10., value=0., continuous_update=False),
-        zc=FloatSlider(min=-1000., max=1000., step=10., value=250., continuous_update=False),
-        ellips_a=FloatSlider(min=10., max=10000., step=100., value=1000., continuous_update=False),
-        ellips_b=FloatSlider(min=10., max=10000., step=100., value=500., continuous_update=False),
-        rhohalf=FloatText(min=1e-8, max=1e8, value=1000., description='$\\rho_1$', continuous_update=False),
-        rholayer=FloatText(min=1e-8, max=1e8, value=100., description='$\\rho_2$', continuous_update=False),
-        rhoTarget=FloatText(min=1e-8, max=1e8, value=500., description='$\\rho_3$', continuous_update=False),
-        overburden_thick=FloatSlider(min=0., max=1000., step= 10., value=250., continuous_update=False),
-        overburden_wide=fixed(2000.),# continuous_update=False),
-        target_thick=FloatSlider(min=0., max=1000., step= 10., value=200., continuous_update=False),
-        target_wide=FloatSlider(min=0., max=1000., step= 10., value=200., continuous_update=False),
-        predmis=ToggleButtons(options=['Overburden','misfit']),
-        surveyType=ToggleButtons(options=['DipoleDipole','PoleDipole','DipolePole'])
-
+        xc=FloatSlider(min=-1005., max=1000., step=10., value=0.,
+                       continuous_update=False),
+        zc=FloatSlider(min=-1000., max=1000., step=10., value=250.,
+                       continuous_update=False),
+        ellips_a=FloatSlider(min=10., max=10000., step=100., value=1000.,
+                             continuous_update=False),
+        ellips_b=FloatSlider(min=10., max=10000., step=100., value=500.,
+                             continuous_update=False),
+        rhohalf=FloatText(min=1e-8, max=1e8, value=1000.,
+                          description='$\\rho_1$',
+                          continuous_update=False),
+        chghalf=FloatText(min=0., max=100, value=0.,
+                          description='$\\eta_1$',
+                          continuous_update=False),
+        rholayer=FloatText(min=1e-8, max=1e8, value=100.,
+                           description='$\\rho_2$',
+                           continuous_update=False),
+        chglayer=FloatText(min=0., max=100, value=20.,
+                           description='$\\eta_2$',
+                           continuous_update=False),
+        rhoTarget=FloatText(min=1e-8, max=1e8, value=500.,
+                            description='$\\rho_3$',
+                            continuous_update=False),
+        chgTarget=FloatText(min=0., max=100, value=10.,
+                            description='$\\eta_3$',
+                            continuous_update=False),
+        overburden_thick=FloatSlider(min=0., max=1000., step=10., value=250.,
+                                     continuous_update=False),
+        overburden_wide=fixed(2000.),
+        target_thick=FloatSlider(min=0., max=1000., step=10., value=200.,
+                                 continuous_update=False),
+        target_wide=FloatSlider(min=0., max=1000., step=10., value=200.,
+                                continuous_update=False),
+        predmis=ToggleButtons(options=["Data Without Target", 'Difference', 'Normalized Difference']),
+        surveyType=ToggleButtons(options=['DipoleDipole', 'PoleDipole', 'DipolePole'],
+                                 desciption='Array Type'),
+        which=ToggleButtons(options=['DC', 'IP'], description='Survey'),
+        nmax=IntSlider(min=1, max=16, value=8, description='Rx per Tx'),
+        Scale=ToggleButtons(options=['Linear', 'Log'])
     )
