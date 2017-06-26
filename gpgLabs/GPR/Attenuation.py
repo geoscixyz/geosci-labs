@@ -7,12 +7,24 @@ try:
 except Exception, e:
     from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
+
+##############################
+#           FUNCTIONS
+##############################
+
+
 def WaveVelSkind(frequency, epsr, sigma):
     omega = np.pi*np.complex128(frequency)
     k = np.sqrt(omega**2*mu_0*epsilon_0*epsr-1j*omega*mu_0*sigma)
     alpha = k.real
     beta = -k.imag
     return omega.real/alpha, 1./beta
+
+
+
+#####################################
+#           PLOTS
+#####################################
 
 def WaveVelandSkindWidget(epsr, sigma):
     frequency = np.logspace(1, 9, 61)
@@ -76,8 +88,13 @@ def WaveVelandSkindWidgetTBL(epsr, sigma):
 
     plt.show()
     return
+
+#####################################
+#           WIDGET
+#####################################
+
 def AttenuationWidgetTBL():
     i = interact(WaveVelandSkindWidgetTBL,
-                 epsr = FloatText(value=9.),
+                 epsr = FloatText(value=9.,min= 1., max=80.),
                  sigma= FloatSlider(min= -4., max = 1., step = 0.5, value=-1.5))
     return i
