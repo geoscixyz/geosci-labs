@@ -114,6 +114,7 @@ def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
     plt.plot(xconvert, y, lw = 2)
     plt.xticks(np.arange(11)*15,  np.arange(11)*0.8+2.4) #+2.4 for offset correction
     plt.xlim(0., 150.)
+    plt.ylim(146.,0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Offset (m)')
 
@@ -122,8 +123,8 @@ def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
 
 def PipeWidgetFcn(epsr, h, xc, r, dataImage):
     imgcmp = Image.open(dataImage)
-    imgcmp = imgcmp.resize((400, 500))
-    fig = plt.figure(figsize = (7,8))
+    imgcmp = imgcmp.resize((600, 800))
+    fig = plt.figure(figsize = (9,11))
     ax = plt.subplot(111)
 
     plt.imshow(imgcmp, extent = [0, 400, 250, 0])
@@ -135,7 +136,7 @@ def PipeWidgetFcn(epsr, h, xc, r, dataImage):
     plt.plot(xconvert, time*nano, 'r--',lw = 2)
     plt.xticks(np.arange(11)*40,  np.arange(11)*4.0 )
     plt.xlim(0., 400)
-    plt.ylim(250., 0.)
+    plt.ylim(240., 0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Survey line location (m)')
 
@@ -144,8 +145,8 @@ def PipeWidgetFcn(epsr, h, xc, r, dataImage):
 
 def WallWidgetFcn(epsr, h, x1, x2, dataImage):
     imgcmp = Image.open(dataImage)
-    imgcmp = imgcmp.resize((400, 500))
-    fig = plt.figure(figsize = (7,8))
+    imgcmp = imgcmp.resize((600, 800))
+    fig = plt.figure(figsize = (9,11))
     ax = plt.subplot(111)
 
     plt.imshow(imgcmp, extent = [0, 400, 250, 0])
@@ -167,7 +168,7 @@ def WallWidgetFcn(epsr, h, x1, x2, dataImage):
 #     plt.plot(xconvert[ind3], arrival(x[ind3], xc?, h, v)*nano, 'r--',lw = 2)
     plt.xticks(np.arange(11)*40,  np.arange(11)*4.0 )
     plt.xlim(0., 400)
-    plt.ylim(250., 0.)
+    plt.ylim(240., 0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Survey line location (m)')
 
