@@ -1,4 +1,8 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.rcParams["font.size"] = 16
+import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 try:
@@ -222,7 +226,7 @@ def viewSeisRefracSurvey(x0, dx,):
     plt.show()
     return ax
 
-def makeinteractSeisRefracSruvey():
+def makeinteractSeisRefracSurvey():
     Q = interactive(viewSeisRefracSurvey,
                  x0=IntSlider(min=0, max=10, step=1, value=0),
                  dx=IntSlider(min=1, max=10, step=1,value=8))
