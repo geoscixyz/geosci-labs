@@ -1,15 +1,24 @@
+import warnings
+warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
+from IPython.display import set_matplotlib_formats
+import matplotlib
+set_matplotlib_formats('png')
+matplotlib.rcParams['savefig.dpi'] = 70 # Change this to adjust figure size
+import numpy as np
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 try:
-    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
     pass
 except Exception, e:    
-    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
+    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
 
 
-def ViewWiggle(syndata, obsdata):
+def ViewWiggle(synDataFile, obsDataFile):
+    syndata = np.load(synDataFile)
+    obsdata = np.load(obsDataFile)
     dx = 20
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
@@ -33,8 +42,8 @@ def ViewWiggle(syndata, obsdata):
     ax[1].set_ylabel("Time (s)")
     ax[1].set_title("Noisy CMP gather")
 
-def NoisyNMOWidget(t0, v):
-    syndata = np.load('../assets/Seismic/NMO/obsdata1.npy')
+def NoisyNMOWidget(t0, v, dataFile, timeFile):
+    syndata = np.load(dataFile)
     dx = 20
     xorig = np.arange(38)*dx
     time = HyperbolicFun(t0, xorig, v)
@@ -72,7 +81,7 @@ def NoisyNMOWidget(t0, v):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load('../assets/Seismic/NMO/time1.npy')
+    time_data = np.load(timeFile)
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -96,8 +105,8 @@ def NoisyNMOWidget(t0, v):
 
     plt.show()
 
-def CleanNMOWidget(t0, v):
-    syndata = np.load('../assets/Seismic/NMO/syndata1.npy')
+def CleanNMOWidget(t0, v, dataFile, timeFile):
+    syndata = np.load(dataFile)
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
@@ -136,7 +145,7 @@ def CleanNMOWidget(t0, v):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load('../assets/Seismic/NMO/time1.npy')
+    time_data = np.load(timeFile)
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -164,10 +173,11 @@ def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
     return time
 
-def NMOstackthree(data, tintercept, v1, v2, v3):
+def NMOstackthree(dataFile, tintercept, v1, v2, v3, timeFile):
+    data = np.load(dataFile)
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load('../assets/Seismic/NMO/time1.npy')
+    time = np.load(timeFile)
     traces = np.zeros((3,time.size))
     vtemp = np.r_[v1, v2, v3]
     for itry in range(3):
@@ -204,10 +214,10 @@ def NMOstack(data, xorig, time, v):
         singletrace[i] = (mkvc(data)[sub2ind(data.shape, np.c_[np.arange(data.shape[0]), indmin])]).sum()
     return singletrace
 
-def NMOstackSingle(data, tintercept, v):
+def NMOstackSingle(data, tintercept, v, timeFile):
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load('../assets/Seismic/NMO/time1.npy')
+    time = np.load(timeFile)
     singletrace = NMOstack(data, xorig, time, v)
 
     fig, ax = plt.subplots(1, 1, figsize=(7, 8))
@@ -319,10 +329,10 @@ def mkvc(x, numDims=1):
     elif numDims == 3:
         return x.flatten(order='F')[:, np.newaxis, np.newaxis]
 
-def InteractClean():
-    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.))
+def InteractClean(cleanDataFile, cleanTimeFile):
+    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.), dataFile = fixed(cleanDataFile), timeFile = fixed(cleanTimeFile))
     return clean 
 
-def InteractNosiy():
-    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.))
+def InteractNosiy(noisyDataFile, noisyTimeFile):
+    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.), dataFile = fixed(noisyDataFile), timeFile = fixed(noisyTimeFile))
     return noisy
