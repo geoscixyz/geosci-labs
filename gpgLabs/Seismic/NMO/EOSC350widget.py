@@ -94,6 +94,8 @@ def NoisyNMOWidget(t0, v):
     ax3.set_xticks([-4.5, 0., 4.5])
     ax3.set_title("Stacked trace")
 
+    plt.show()
+
 def CleanNMOWidget(t0, v):
     syndata = np.load('../assets/Seismic/NMO/syndata1.npy')
     np.random.randn()
@@ -155,6 +157,8 @@ def CleanNMOWidget(t0, v):
     ax3.set_xlim(-4.5, 4.5)
     ax3.set_xticks([-4.5, 0., 4.5])
     ax3.set_title("Stacked trace")
+
+    plt.show();
 
 def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
