@@ -64,17 +64,17 @@ def animate(ii):
 
     dec = 0.
     inc = 90.
-    
+
     p.z0 = -ii*0.25
 #    if ii<19:
 #        dec = 0
 #        inc = -90. + ii*10.
-#        
+#
 #    else:
 #
 #        dec = 90.
 #        inc = 90. - (ii-19)*10.
-        
+
     MAG.plotObj3D(p, rx_h, View_elev, View_azim, npts2D, xylim, profile="X", fig= fig, axs = ax1, plotSurvey=False)
 
     block_xyz = np.asarray([[-.2, -.2, .2, .2, 0],
@@ -113,7 +113,7 @@ def animate(ii):
                                            xyz[[0, 3, 4], 2]-4)], facecolors='y'))
 
 
-    
+
 
     # Create problem
     prob = PF.problem()
@@ -179,22 +179,22 @@ def animate(ii):
     im2 =ax2.plot(distance, out_linei, 'b.-')
 
     global im3
-    
+
     # Compute theoritical field of a dipole
-    
-    
+
+
     r = (x**2. + y**2. + (rx_h-p.z0)**2.)**0.5
-    
+
     ang = np.arccos(np.abs(rx_h-p.z0)/r)
-    
-    
+
+
     dipole = -p.dx*p.dy*p.dz*susc*Bigrf/(4.*np.pi*r**3.)/1.02
     rcomp = dipole*(2.*np.cos(ang))
     theta = dipole*(np.sin(ang))
-    
+
     zfield = np.cos(ang)*rcomp - np.sin(ang)*theta
-    
-    print zfield.min()/out_linei.min()
+
+    print(zfield.min()/out_linei.min())
     im3 =ax2.plot(distance, zfield, 'r.-')
 
     clim = np.asarray([zfield.min()*1.2,zfield.max()/1.2])

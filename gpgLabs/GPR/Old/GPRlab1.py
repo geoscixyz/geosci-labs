@@ -3,71 +3,13 @@ from Wiggle import wiggle, PrimaryWave, ReflectedWave
 from scipy.constants import mu_0, epsilon_0
 import matplotlib.pyplot as plt
 from PIL import Image
-import warnings
-warnings.filterwarnings('ignore')
-from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
-
-
-########################################
-#           WIDGETS
-########################################
-
-def PrimaryWidget(dataFile,timeFile):
-
-    i = interact(PrimaryWidgetFcn,
-            epsrL = (1, 10, 1),
-            epsrH = (1, 20, 1),
-            tinterpL = (0, 150, 2),
-            tinterpH = (0, 150, 2),
-            dFile = fixed(dataFile),
-            tFile = fixed(timeFile))
-    
-    return i
 
 
 
-def PrimaryFieldWidget(radargramImage):
 
-    i = interact(PrimaryFieldWidgetFcn,
-            tinterp = (0, 80, 2),
-            epsr = (1, 40, 1),
-            radgramImg = fixed(radargramImage))
-    
-    return i
-
-
-def PipeWidget(radargramImage):
-
-    i = interact(PipeWidgetFcn,
-            epsr = (0, 100, 1),
-            h=(0.1, 2.0, 0.1),
-            xc=(0., 40., 0.2),
-            r=(0.1, 3, 0.1),
-            dataImage=fixed(radargramImage))
-    
-    return i
-
-
-def WallWidget(radargramImage):
-
-    i = interact(WallWidgetFcn,
-            epsr = (0, 100, 1),
-            h=(0.1, 2.0, 0.1),
-            x1=(1, 35, 1),
-            x2=(20, 40, 1),
-            dataImage=fixed(radargramImage))
-    
-    return i
-
-
-########################################
-#           FUNCTIONS
-########################################
-
-
-def PrimaryWidgetFcn(tinterpL, epsrL, tinterpH, epsrH, dFile, tFile):
-    data = np.load(dFile)
-    time = np.load(tFile)
+def PrimaryWidget(tinterpL, epsrL, tinterpH, epsrH):
+    data = np.load("../assets/GPR/shot_raypaths.npy")
+    time = np.load("../assets/GPR/time.npy")
     dt = time[1]-time[0]
     v1 = 1./np.sqrt(epsilon_0*epsrL*mu_0)
     v2 = 1./np.sqrt(epsilon_0*epsrH*mu_0)
@@ -98,10 +40,8 @@ def PrimaryWidgetFcn(tinterpL, epsrL, tinterpH, epsrH, dFile, tFile):
 
     plt.show()
 
-
-
-def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
-    imgcmp = Image.open(radgramImg)
+def PrimaryFieldWidget(tinterp, epsr):
+    imgcmp = Image.open('../figures/GPR/ubc_GPRcmp.png')
     fig = plt.figure(figsize = (6,7))
     ax = plt.subplot(111)
     plt.imshow(imgcmp, extent = [0, 150, 150, 0])
@@ -114,17 +54,15 @@ def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
     plt.plot(xconvert, y, lw = 2)
     plt.xticks(np.arange(11)*15,  np.arange(11)*0.8+2.4) #+2.4 for offset correction
     plt.xlim(0., 150.)
-    plt.ylim(146.,0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Offset (m)')
 
     plt.show()
 
-
-def PipeWidgetFcn(epsr, h, xc, r, dataImage):
-    imgcmp = Image.open(dataImage)
-    imgcmp = imgcmp.resize((600, 800))
-    fig = plt.figure(figsize = (9,11))
+def PipeWidget(epsr, h, xc, r):
+    imgcmp = Image.open('../figures/GPR/ubc_GPRdata.png')
+    imgcmp = imgcmp.resize((400, 500))
+    fig = plt.figure(figsize = (7,8))
     ax = plt.subplot(111)
 
     plt.imshow(imgcmp, extent = [0, 400, 250, 0])
@@ -136,17 +74,16 @@ def PipeWidgetFcn(epsr, h, xc, r, dataImage):
     plt.plot(xconvert, time*nano, 'r--',lw = 2)
     plt.xticks(np.arange(11)*40,  np.arange(11)*4.0 )
     plt.xlim(0., 400)
-    plt.ylim(240., 0.)
+    plt.ylim(250., 0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Survey line location (m)')
 
     plt.show()
 
-
-def WallWidgetFcn(epsr, h, x1, x2, dataImage):
-    imgcmp = Image.open(dataImage)
-    imgcmp = imgcmp.resize((600, 800))
-    fig = plt.figure(figsize = (9,11))
+def WallWidget(epsr, h, x1, x2):
+    imgcmp = Image.open('../figures/GPR/ubc_GPRdata.png')
+    imgcmp = imgcmp.resize((400, 500))
+    fig = plt.figure(figsize = (7,8))
     ax = plt.subplot(111)
 
     plt.imshow(imgcmp, extent = [0, 400, 250, 0])
@@ -168,11 +105,8 @@ def WallWidgetFcn(epsr, h, x1, x2, dataImage):
 #     plt.plot(xconvert[ind3], arrival(x[ind3], xc?, h, v)*nano, 'r--',lw = 2)
     plt.xticks(np.arange(11)*40,  np.arange(11)*4.0 )
     plt.xlim(0., 400)
-    plt.ylim(240., 0.)
+    plt.ylim(250., 0.)
     plt.ylabel('Time (ns)')
     plt.xlabel('Survey line location (m)')
 
     plt.show()
-
-
-
