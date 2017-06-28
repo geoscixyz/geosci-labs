@@ -1,11 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-try:
-    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox, ToggleButtons
-    pass
-except Exception, e:
-    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox, ToggleButtons
+from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox, ToggleButtons
 
 
 sigmin = 0.01

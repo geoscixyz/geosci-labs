@@ -5,11 +5,7 @@ import scipy.io
 import warnings
 warnings.filterwarnings('ignore')
 
-try:
-    from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
-    pass
-except Exception, e:
-    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
+from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
 
 
 def mind(x,y,z,dincl,ddecl,x0,y0,z0,aincl,adecl):
