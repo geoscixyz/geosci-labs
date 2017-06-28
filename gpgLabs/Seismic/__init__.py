@@ -1,3 +1,3 @@
-#from . import NMO
-#from . import RefractionSurvey
-from . import SyntheticSeismogram
+from . import NMOwidget
+from . import SeismicRefraction
+from . import syntheticSeismogram
