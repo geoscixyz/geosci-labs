@@ -12,7 +12,8 @@ import matplotlib.gridspec as gridspec
 try:
     from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
     pass
-except Exception, e:    
+# except Exception, e:
+except Exception as e:    
     from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
 
 

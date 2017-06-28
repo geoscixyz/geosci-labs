@@ -8,7 +8,8 @@ warnings.filterwarnings('ignore')
 try:
     from IPython.html.widgets import  interactive, IntSlider, widget, FloatText, FloatSlider
     pass
-except Exception, e:
+#except Exception, e:
+except Exception as e:
     from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
 
 import matplotlib.pyplot as plt
