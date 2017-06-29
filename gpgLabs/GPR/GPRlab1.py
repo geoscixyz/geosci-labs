@@ -1,5 +1,4 @@
 import numpy as np
-from Wiggle import wiggle, PrimaryWave, ReflectedWave
 from scipy.constants import mu_0, epsilon_0
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -7,6 +6,7 @@ import warnings
 warnings.filterwarnings('ignore')
 from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
 
+from .Wiggle import wiggle, PrimaryWave, ReflectedWave
 
 ########################################
 #           WIDGETS
@@ -21,7 +21,7 @@ def PrimaryWidget(dataFile,timeFile):
             tinterpH = (0, 150, 2),
             dFile = fixed(dataFile),
             tFile = fixed(timeFile))
-    
+
     return i
 
 
@@ -32,7 +32,7 @@ def PrimaryFieldWidget(radargramImage):
             tinterp = (0, 80, 2),
             epsr = (1, 40, 1),
             radgramImg = fixed(radargramImage))
-    
+
     return i
 
 
@@ -44,7 +44,7 @@ def PipeWidget(radargramImage):
             xc=(0., 40., 0.2),
             r=(0.1, 3, 0.1),
             dataImage=fixed(radargramImage))
-    
+
     return i
 
 
@@ -56,7 +56,7 @@ def WallWidget(radargramImage):
             x1=(1, 35, 1),
             x2=(20, 40, 1),
             dataImage=fixed(radargramImage))
-    
+
     return i
 
 
