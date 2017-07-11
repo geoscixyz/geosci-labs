@@ -2,7 +2,7 @@ numpy
 scipy
 matplotlib
 Pillow
-ipywidgets
+ipywidgets>=0.6.0
 properties[math]
 requests
 SimPEG
