@@ -1,7 +1,7 @@
-from . import DC
-from . import EM
-from . import GPR
-from . import Mag
+#from . import DC
+#from . import EM
+#from . import GPR
+#from . import Mag
 from . import Seismic
 
 

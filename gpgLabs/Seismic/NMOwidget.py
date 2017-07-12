@@ -2,6 +2,7 @@ import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
 from IPython.display import set_matplotlib_formats
 import matplotlib
+from SimPEG.Utils import download
 set_matplotlib_formats('png')
 matplotlib.rcParams['savefig.dpi'] = 70 # Change this to adjust figure size
 import numpy as np
@@ -18,8 +19,10 @@ except Exception as e:
 
 
 def ViewWiggle(synDataFile, obsDataFile):
-    syndata = np.load(synDataFile)
-    obsdata = np.load(obsDataFile)
+    syndat = download(synDataFile)
+    obsdat = download(obsDataFile)
+    syndata = np.load(syndat)
+    obsdata = np.load(obsdat)
     dx = 20
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
@@ -44,7 +47,10 @@ def ViewWiggle(synDataFile, obsDataFile):
     ax[1].set_title("Noisy CMP gather")
 
 def NoisyNMOWidget(t0, v, dataFile, timeFile):
-    syndata = np.load(dataFile)
+    syndat = download(dataFile)
+    syndata = np.load(syndat)
+    timdat = download(timeFile)
+    time_data = np.load(timdat)
     dx = 20
     xorig = np.arange(38)*dx
     time = HyperbolicFun(t0, xorig, v)
@@ -82,7 +88,6 @@ def NoisyNMOWidget(t0, v, dataFile, timeFile):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load(timeFile)
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -107,7 +112,10 @@ def NoisyNMOWidget(t0, v, dataFile, timeFile):
     plt.show()
 
 def CleanNMOWidget(t0, v, dataFile, timeFile):
-    syndata = np.load(dataFile)
+    syndat = download(dataFile)
+    syndata = np.load(syndat)
+    timdat = download(timeFile)
+    time_data = np.load(timdat)
     np.random.randn()
     dx = 20
     xorig = np.arange(38)*dx
@@ -146,7 +154,6 @@ def CleanNMOWidget(t0, v, dataFile, timeFile):
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
     
-    time_data = np.load(timeFile)
     singletrace = NMOstack(syndata, xorig, time_data, v) 
     # singletrace = singletrace 
 
@@ -175,10 +182,12 @@ def HyperbolicFun(t0, x, velocity):
     return time
 
 def NMOstackthree(dataFile, tintercept, v1, v2, v3, timeFile):
-    data = np.load(dataFile)
+    dat = download(dataFile)
+    data = np.load(syndat)
+    timdat = download(timeFile)
+    time = np.load(timdat)
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load(timeFile)
     traces = np.zeros((3,time.size))
     vtemp = np.r_[v1, v2, v3]
     for itry in range(3):
@@ -218,7 +227,8 @@ def NMOstack(data, xorig, time, v):
 def NMOstackSingle(data, tintercept, v, timeFile):
     dx = 20.
     xorig = np.arange(38)*dx
-    time = np.load(timeFile)
+    timdat = download(timeFile)
+    time = np.load(timdat)
     singletrace = NMOstack(data, xorig, time, v)
 
     fig, ax = plt.subplots(1, 1, figsize=(7, 8))
