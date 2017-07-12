@@ -19,8 +19,8 @@ except Exception as e:
 
 
 def ViewWiggle(synDataFile, obsDataFile):
-    syndat = download(synDataFile)
-    obsdat = download(obsDataFile)
+    syndat = download(synDataFile,verbose=False)
+    obsdat = download(obsDataFile,verbose=False)
     syndata = np.load(syndat)
     obsdata = np.load(obsdat)
     dx = 20
@@ -47,9 +47,9 @@ def ViewWiggle(synDataFile, obsDataFile):
     ax[1].set_title("Noisy CMP gather")
 
 def NoisyNMOWidget(t0, v, dataFile, timeFile):
-    syndat = download(dataFile)
+    syndat = download(dataFile,verbose=False)
     syndata = np.load(syndat)
-    timdat = download(timeFile)
+    timdat = download(timeFile,verbose=False)
     time_data = np.load(timdat)
     dx = 20
     xorig = np.arange(38)*dx
@@ -112,9 +112,9 @@ def NoisyNMOWidget(t0, v, dataFile, timeFile):
     plt.show()
 
 def CleanNMOWidget(t0, v, dataFile, timeFile):
-    syndat = download(dataFile)
+    syndat = download(dataFile,verbose=False)
     syndata = np.load(syndat)
-    timdat = download(timeFile)
+    timdat = download(timeFile,verbose=False)
     time_data = np.load(timdat)
     np.random.randn()
     dx = 20
@@ -182,9 +182,9 @@ def HyperbolicFun(t0, x, velocity):
     return time
 
 def NMOstackthree(dataFile, tintercept, v1, v2, v3, timeFile):
-    dat = download(dataFile)
+    dat = download(dataFile,verbose=False)
     data = np.load(dat)
-    timdat = download(timeFile)
+    timdat = download(timeFile,verbose=False)
     time = np.load(timdat)
     dx = 20.
     xorig = np.arange(38)*dx
@@ -227,7 +227,7 @@ def NMOstack(data, xorig, time, v):
 def NMOstackSingle(data, tintercept, v, timeFile):
     dx = 20.
     xorig = np.arange(38)*dx
-    timdat = download(timeFile)
+    timdat = download(timeFile,verbose=False)
     time = np.load(timdat)
     singletrace = NMOstack(data, xorig, time, v)
 
