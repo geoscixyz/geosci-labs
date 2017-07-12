@@ -183,7 +183,7 @@ def HyperbolicFun(t0, x, velocity):
 
 def NMOstackthree(dataFile, tintercept, v1, v2, v3, timeFile):
     dat = download(dataFile)
-    data = np.load(syndat)
+    data = np.load(dat)
     timdat = download(timeFile)
     time = np.load(timdat)
     dx = 20.
