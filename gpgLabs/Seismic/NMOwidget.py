@@ -18,9 +18,7 @@ except Exception as e:
     from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
 
 
-def ViewWiggle(synDataFile, obsDataFile):
-    syndat = download(synDataFile,verbose=False)
-    obsdat = download(obsDataFile,verbose=False)
+def ViewWiggle(syndat, obsdat):
     syndata = np.load(syndat)
     obsdata = np.load(obsdat)
     dx = 20
@@ -46,10 +44,8 @@ def ViewWiggle(synDataFile, obsDataFile):
     ax[1].set_ylabel("Time (s)")
     ax[1].set_title("Noisy CMP gather")
 
-def NoisyNMOWidget(t0, v, dataFile, timeFile):
-    syndat = download(dataFile,verbose=False)
+def NoisyNMOWidget(t0, v, syndat, timdat):
     syndata = np.load(syndat)
-    timdat = download(timeFile,verbose=False)
     time_data = np.load(timdat)
     dx = 20
     xorig = np.arange(38)*dx
@@ -111,10 +107,8 @@ def NoisyNMOWidget(t0, v, dataFile, timeFile):
 
     plt.show()
 
-def CleanNMOWidget(t0, v, dataFile, timeFile):
-    syndat = download(dataFile,verbose=False)
+def CleanNMOWidget(t0, v, syndat, timdat):
     syndata = np.load(syndat)
-    timdat = download(timeFile,verbose=False)
     time_data = np.load(timdat)
     np.random.randn()
     dx = 20
@@ -181,10 +175,8 @@ def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
     return time
 
-def NMOstackthree(dataFile, tintercept, v1, v2, v3, timeFile):
-    dat = download(dataFile,verbose=False)
+def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
     data = np.load(dat)
-    timdat = download(timeFile,verbose=False)
     time = np.load(timdat)
     dx = 20.
     xorig = np.arange(38)*dx
