@@ -333,9 +333,9 @@ def mkvc(x, numDims=1):
         return x.flatten(order='F')[:, np.newaxis, np.newaxis]
 
 def InteractClean(cleanDataFile, cleanTimeFile):
-    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.), dataFile = fixed(cleanDataFile), timeFile = fixed(cleanTimeFile))
+    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.), syndat = fixed(cleanDataFile), timdat = fixed(cleanTimeFile))
     return clean 
 
 def InteractNosiy(noisyDataFile, noisyTimeFile):
-    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.), dataFile = fixed(noisyDataFile), timeFile = fixed(noisyTimeFile))
+    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.), syndat = fixed(noisyDataFile), timdat = fixed(noisyTimeFile))
     return noisy
