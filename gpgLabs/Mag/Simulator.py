@@ -63,7 +63,8 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
 
     def MagSurvey2D(survey, Profile_ctx, Profile_cty, Profile_azm,
                     Profile_len, Profile_npt,
-                    data=None, fig=None, ax=None, vmin=None, vmax=None):
+                    data=None, fig=None, ax=None,
+                    vmin=None, vmax=None, pred=None):
 
         # Get the line extent from the 2D survey for now
         Profile_azm /= 180./np.pi
@@ -76,7 +77,8 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
         b = [Profile_ctx + dx, Profile_cty + dy]
 
         return plotMagSurvey2D(survey, a, b, Profile_npt,
-                               data=data, fig=fig, ax=ax, vmin=vmin, vmax=vmax)
+                               data=data, fig=fig, ax=ax,
+                               vmin=vmin, vmax=vmax, pred=pred)
 
     def MagSurveyProfile(survey, Profile_ctx, Profile_cty, Profile_azm,
                          Profile_len, Profile_npt,
@@ -113,15 +115,13 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
 
     f = plt.figure(figsize=(8, 8))
 
-    ax0 = plt.subplot(2, 2, 1)
+    ax0 = plt.subplot(1, 2, 1)
     MagSurvey2D(survey, Profile_ctx, Profile_cty, Profile_azm,
-                Profile_len, Profile_npt, fig=f, ax=ax0)
+                Profile_len, Profile_npt, fig=f, ax=ax0, pred=dpred,
+                vmin=survey.dobs.min(), vmax=survey.dobs.max())
 
-    ax1 = plt.subplot(2, 2, 2)
-    MagSurvey2D(survey, Profile_ctx, Profile_cty, Profile_azm,
-                Profile_len, Profile_npt, data=dpred, fig=f, ax=ax1, vmin=vmin, vmax=vmax)
-
-    ax2 = plt.subplot(2, 1, 2)
+    f = plt.figure(figsize=(12, 5))
+    ax2 = plt.subplot()
     MagSurveyProfile(survey, Profile_ctx, Profile_cty, Profile_azm,
                      Profile_len, Profile_npt, data=dpred, fig=f, ax=ax2)
 
@@ -192,7 +192,7 @@ def ViewMagSurvey2D(survey):
     return out
 
 
-def plotMagSurvey2D(survey, a, b, npts, data=None,
+def plotMagSurvey2D(survey, a, b, npts, data=None, pred=None,
                     fig=None, ax=None, vmin=None, vmax=None):
     """
     Plot the data and line profile inside the spcified limits
@@ -202,23 +202,37 @@ def plotMagSurvey2D(survey, a, b, npts, data=None,
         fig = plt.figure()
 
     if ax is None:
-        ax = plt.subplot()
+        ax = plt.subplot(1, 2, 1)
 
+    x, y = linefun(a[0], b[0], a[1], b[1], npts)
     rxLoc = survey.srcField.rxList[0].locs
 
     if data is None:
         data = survey.dobs
 
     # Use SimPEG.PF ploting function
-    PF.Magnetics.plot_obs_2D(rxLoc, d=data, fig=fig,  ax=ax, vmin=vmin, vmax=vmax, marker=False, cmap='RdBu_r')
-
-    x, y = linefun(a[0], b[0], a[1], b[1], npts)
+    PF.Magnetics.plot_obs_2D(rxLoc, d=data, fig=fig,  ax=ax,
+                             vmin=vmin, vmax=vmax,
+                             marker=False, cmap='RdBu_r')
 
     ax.plot(x, y, 'w.', ms=10)
-
-    ax.text(x[0], y[0], 'A', fontsize=16, color='w', horizontalalignment='left')
+    ax.text(x[0], y[0], 'A', fontsize=16, color='w', ha='left')
     ax.text(x[-1], y[-1], 'B', fontsize=16,
-             color='w', horizontalalignment='right')
+            color='w', ha='right')
+    ax.grid(True)
+
+    if pred is not None:
+        ax2 = plt.subplot(1, 2, 2)
+        PF.Magnetics.plot_obs_2D(rxLoc, d=pred, fig=fig,  ax=ax2, vmin=vmin,
+                                 vmax=vmax, marker=False, cmap='RdBu_r')
+        ax2.plot(x, y, 'w.', ms=10)
+        ax2.text(x[0], y[0], 'A', fontsize=16, color='w',
+                ha='left')
+        ax2.text(x[-1], y[-1], 'B', fontsize=16,
+                color='w', ha='right')
+        ax2.set_yticks([])
+        ax2.set_yticklabels("")
+        ax2.grid(True)
 
     plt.show()
     return
