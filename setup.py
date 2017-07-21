@@ -42,7 +42,11 @@ setup(
         'ipywidgets',
         'properties[math]',
         'SimPEG>=0.4.1',
-        'jupyter'
+        'jupyter',
+        'jupyter_dashboards',
+        'Pillow',
+        'discretize',
+        'em_examples'
     ],
     author = 'GeoSci Developers',
     author_email = 'lheagy@eos.ubc.ca',
