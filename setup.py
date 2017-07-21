@@ -42,8 +42,7 @@ setup(
         'ipywidgets',
         'properties[math]',
         'SimPEG>=0.4.1',
-        'jupyter',
-        'JSAnimation'
+        'jupyter'
     ],
     author = 'GeoSci Developers',
     author_email = 'lheagy@eos.ubc.ca',
