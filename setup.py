@@ -43,8 +43,6 @@ setup(
         'properties[math]',
         'SimPEG>=0.4.1',
         'jupyter',
-        'jupyter_dashboards',
-        'Pillow',
         'discretize',
         'em_examples'
     ],
