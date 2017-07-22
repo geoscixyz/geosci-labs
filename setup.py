@@ -34,15 +34,12 @@ setup(
     version = '0.0.4',
     packages = find_packages(),
     install_requires = [
-        'future',
         'numpy>=1.7',
         'scipy>=0.13',
         'matplotlib',
-        'pandas',
         'ipywidgets',
         'properties[math]',
         'SimPEG>=0.4.1',
-        'jupyter',
         'discretize',
         'em_examples'
     ],
