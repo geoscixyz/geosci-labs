@@ -31,6 +31,7 @@ from . import PlanewaveWidgetFD
 from . import Reflection
 from . import sphereElectrostatic_example
 from . import TransientVMDCylWidget
+from . import UXO_TEM_Widget
 from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane
