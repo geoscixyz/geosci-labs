@@ -51,9 +51,9 @@ def ImageDataWidget(TxType):
     
     if TxType is "EM61":
 
-        Out = interactive(fcnImageDataWidgetEM61,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_0$"),\
+        Out = interactive(fcnImageDataWidgetEM61,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_{true}$"),\
+            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_{true}$"),\
+            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_{true}$"),\
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
@@ -74,9 +74,9 @@ def ImageDataWidget(TxType):
             yTx=FloatSlider(min=-3., max=3., value=0., step=0.25, continuous_update=False, description = "Y location"))
     
     elif TxType is "TEMTADS":
-        Out = interactive(fcnImageDataWidgetTEMTADS,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_0$"),\
+        Out = interactive(fcnImageDataWidgetTEMTADS,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_{true}$"),\
+            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_{true}$"),\
+            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_{true}$"),\
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
@@ -97,9 +97,9 @@ def ImageDataWidget(TxType):
             yTx=FloatSlider(min=-3, max=3, value=0., step=0.25, continuous_update=False, description = "Tx y location"))
 
     elif TxType is "MPV":
-        Out = interactive(fcnImageDataWidgetMPV,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_0$"),\
+        Out = interactive(fcnImageDataWidgetMPV,x0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_{true}$"),\
+            y0=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$y_{true}$"),\
+            z0=FloatSlider(min=-2., max=-0.1, value=-0.5, step=0.05, continuous_update=False, description = "$z_{true}$"),\
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
