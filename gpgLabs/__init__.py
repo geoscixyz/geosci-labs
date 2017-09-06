@@ -5,7 +5,7 @@ from . import Mag
 from . import Seismic
 
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
