@@ -18,7 +18,7 @@ install:
 
 # Run test
 script:
-  - travis_wait 15 nosetests $TEST_DIR -v -s
+  - travis_wait 20 nosetests $TEST_DIR -v -s
 
 notifications:
   slack: ubcgif:1Z2lR3XYRSM3GHflG71ZHEN6
