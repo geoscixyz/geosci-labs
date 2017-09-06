@@ -8,6 +8,24 @@ from ipywidgets import interact, interactive, IntSlider, widget, FloatText, Floa
 
 from .Wiggle import wiggle, PrimaryWave, ReflectedWave
 
+import requests
+from io import BytesIO
+
+
+########################################
+#           DOWNLOAD FUNCTIONS
+########################################
+
+def downloadRadargramImage(URL):
+
+    urlObj = requests.get(URL)
+    imgcmp = Image.open(BytesIO(urlObj.content))
+
+    return imgcmp
+
+
+
+
 ########################################
 #           WIDGETS
 ########################################
@@ -43,21 +61,23 @@ def PipeWidget(radargramImage):
             h=(0.1, 2.0, 0.1),
             xc=(0., 40., 0.2),
             r=(0.1, 3, 0.1),
-            dataImage=fixed(radargramImage))
+            imgcmp=fixed(radargramImage))
 
     return i
 
 
-def WallWidget(radargramImage):
+def WallWidget(radargramImagePath):
 
     i = interact(WallWidgetFcn,
             epsr = (0, 100, 1),
             h=(0.1, 2.0, 0.1),
             x1=(1, 35, 1),
             x2=(20, 40, 1),
-            dataImage=fixed(radargramImage))
+            imgcmp=fixed(radargramImagePath))
 
     return i
+
+
 
 
 ########################################
@@ -121,8 +141,9 @@ def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
     plt.show()
 
 
-def PipeWidgetFcn(epsr, h, xc, r, dataImage):
-    imgcmp = Image.open(dataImage)
+def PipeWidgetFcn(epsr, h, xc, r, imgcmp):
+
+    # imgcmp = Image.open(dataImage)
     imgcmp = imgcmp.resize((600, 800))
     fig = plt.figure(figsize = (9,11))
     ax = plt.subplot(111)
@@ -143,8 +164,9 @@ def PipeWidgetFcn(epsr, h, xc, r, dataImage):
     plt.show()
 
 
-def WallWidgetFcn(epsr, h, x1, x2, dataImage):
-    imgcmp = Image.open(dataImage)
+def WallWidgetFcn(epsr, h, x1, x2, imgcmp):
+
+    # imgcmp = Image.open(dataImage)
     imgcmp = imgcmp.resize((600, 800))
     fig = plt.figure(figsize = (9,11))
     ax = plt.subplot(111)
