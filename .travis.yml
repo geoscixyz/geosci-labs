@@ -22,7 +22,7 @@ install:
 
 # Run test
 script:
-  - nosetests $TEST_DIR -v -s
+  - travis_wait 20 nosetests $TEST_DIR -v -s
 
 # upload to pypi on success
 after_success:
