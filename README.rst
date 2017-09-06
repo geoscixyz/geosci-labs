@@ -1,7 +1,7 @@
 em_apps
 =======
 
-.. image:: https://mybinder.org/badge.svg
+.. image:: http://mybinder.org/badge.svg
     :target: https://beta.mybinder.org/repo/geoscixyz/em_apps
     :alt: binders
 
