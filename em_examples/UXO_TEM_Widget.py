@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
-from scipy.sparse import csr_matrix
+from scipy import sparse as spar
+from scipy.sparse import linalg
 from SimPEG import mkvc
 import scipy.optimize as op
 from em_examples.Base import widgetify
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from IPython.display import display
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from scipy import sparse as spar
 
 
 
@@ -150,15 +152,15 @@ def InversionWidget(TxType):
             alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
             beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
             gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
-            Dx=FloatSlider(min=1., max=6., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
-            Dy=FloatSlider(min=1., max=6., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
+            Dx=FloatSlider(min=0.2, max=5., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
+            Dy=FloatSlider(min=0.2, max=5., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
             Nx=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_x$"),\
             Ny=IntSlider(min=2, max=10, value=10, step=1, continuous_update=False, description = "$N_y$"),\
-            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.1, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.1, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=3., value=-0.8, step=0.1, continuous_update=False, description = "$z_0$"),\
+            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
+            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"))
-
+            
     elif TxType is "TEMTADS":
 
         Out = interactive(fcnInversionWidgetTEMTADS,xt=FloatSlider(min=-2., max=2., value=0., step=0.05, continuous_update=False, description = "$x_{true}$"),\
@@ -179,13 +181,13 @@ def InversionWidget(TxType):
             alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
             beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
             gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
-            Dx=FloatSlider(min=1., max=6., value=2., step=0.1, continuous_update=False, description = "$D_x$"),\
-            Dy=FloatSlider(min=1., max=6., value=2., step=0.1, continuous_update=False, description = "$D_y$"),\
+            Dx=FloatSlider(min=0.2, max=5., value=2., step=0.1, continuous_update=False, description = "$D_x$"),\
+            Dy=FloatSlider(min=0.2, max=5., value=2., step=0.1, continuous_update=False, description = "$D_y$"),\
             Nx=IntSlider(min=2, max=10, value=3, step=1, continuous_update=False, description = "$N_x$"),\
             Ny=IntSlider(min=2, max=10, value=3, step=1, continuous_update=False, description = "$N_y$"),\
-            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.1, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.1, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=3., value=-0.8, step=0.1, continuous_update=False, description = "$z_0$"),\
+            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
+            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"))
 
     elif TxType is "MPV":
@@ -208,13 +210,13 @@ def InversionWidget(TxType):
             alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
             beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
             gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
-            Dx=FloatSlider(min=1., max=6., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
-            Dy=FloatSlider(min=1., max=6., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
+            Dx=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
+            Dy=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
             Nx=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_x$"),\
             Ny=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_y$"),\
-            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.1, continuous_update=False, description = "$x_0$"),\
-            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.1, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=3., value=-0.8, step=0.1, continuous_update=False, description = "$z_0$"),\
+            x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
+            y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"),\
             dComp=ToggleButtons(options=['X','Y','Z'], description = "Data Component"))
 
@@ -310,6 +312,9 @@ def fcnImageUXOWidget(psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha2,beta2,gamma
     Ax1.set_xticks([-2,-1,0,1,2])
     Ax1.set_yticks([-2,-1,0,1,2])
     Ax1.set_zticks([-2,-1,0,1,2])
+    Ax1.set_xticklabels([])
+    Ax1.set_yticklabels([])
+    Ax1.set_zticklabels([])
 
     Ax1.set_xbound(-2.5,2.5)
     Ax1.set_ybound(-2.5,2.5)
@@ -624,6 +629,7 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     P1 = uxoObj1.computeP(Hp,Brx)
     q = uxoObj1.computePolarVecs()
     da_true = np.dot(P1,q)
+    UB = 10*np.max(uxoObj1.L)
 
     # PREDICT TRUE DATA
     uxoObj2 = EM61problem(rt,phi,L,times,I)
@@ -643,19 +649,19 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn)
+    uxoObj2.updatePolarizations(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
-    m_vec = []
+    m_vec = [Misfit]
     
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
        
        MisPrev = Misfit
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn)
+       uxoObj2.updatePolarizations(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -725,9 +731,9 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(1,len(m_vec)+1),np.ones(len(m_vec)),lw=3,color='k',ls=':')
-    Ax21.plot(np.arange(1,len(m_vec)+1),m_vec,lw=2,color=(1,0,0))
-    Ax21.set_xbound(1,len(m_vec))
+    Ax21.plot(np.arange(0,len(m_vec)),np.ones(len(m_vec)),lw=3,color='k',ls=':')
+    Ax21.plot(np.arange(0,len(m_vec)),m_vec,lw=2,color=(1,0,0))
+    Ax21.set_xbound(0,len(m_vec)-1)
     Ax21.set_ybound(0,np.max(m_vec))
     Ax21.set_xlabel('Count',fontsize=FS)
     Ax21.set_ylabel('$\chi^2$ Misfit',fontsize=FS)
@@ -736,9 +742,14 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     rt_str = "$r_{true}$ = (" + '{:.2f}'.format(rt[0]) + "," + '{:.2f}'.format(rt[1]) + "," + '{:.2f}'.format(rt[2]) + ")"
     rn_str = "$r_{rec}$  = (" + '{:.2f}'.format(rn[0]) + "," + '{:.2f}'.format(rn[1]) + "," + '{:.2f}'.format(rn[2]) + ")"
     fm_str = "Final Misfit = " + '{:.2f}'.format(m_vec[-1])
-    Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
+    if COUNT is 1:
+        Ax21.text(0.1,0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.1,0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.1,0.74*m_vec[0],fm_str,fontsize=FS)
+    else:
+        Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
 
     # POLARIATIONS
     Lxt = uxoObj1.L[0:11]
@@ -791,6 +802,7 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     P1 = uxoObj1.computeP(Hp,Brx)
     q = uxoObj1.computePolarVecs()
     da_true = np.dot(P1,q)
+    UB = 10*np.max(uxoObj1.L)
 
     # PREDICT TRUE DATA
     uxoObj2 = TEMTADSproblem(rt,phi,L,times,I)
@@ -810,19 +822,19 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn)
+    uxoObj2.updatePolarizations(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
-    m_vec = []
+    m_vec = [Misfit]
     
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
        
        MisPrev = Misfit
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn)
+       uxoObj2.updatePolarizations(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -892,9 +904,9 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(1,len(m_vec)+1),np.ones(len(m_vec)),lw=3,color='k',ls=':')
-    Ax21.plot(np.arange(1,len(m_vec)+1),m_vec,lw=2,color=(1,0,0))
-    Ax21.set_xbound(1,len(m_vec))
+    Ax21.plot(np.arange(0,len(m_vec)),np.ones(len(m_vec)),lw=3,color='k',ls=':')
+    Ax21.plot(np.arange(0,len(m_vec)),m_vec,lw=2,color=(1,0,0))
+    Ax21.set_xbound(0,len(m_vec)-1)
     Ax21.set_ybound(0,np.max(m_vec))
     Ax21.set_xlabel('Count',fontsize=FS)
     Ax21.set_ylabel('$\chi^2$ Misfit',fontsize=FS)
@@ -903,9 +915,14 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     rt_str = "$r_{true}$ = (" + '{:.2f}'.format(rt[0]) + "," + '{:.2f}'.format(rt[1]) + "," + '{:.2f}'.format(rt[2]) + ")"
     rn_str = "$r_{rec}$  = (" + '{:.2f}'.format(rn[0]) + "," + '{:.2f}'.format(rn[1]) + "," + '{:.2f}'.format(rn[2]) + ")"
     fm_str = "Final Misfit = " + '{:.2f}'.format(m_vec[-1])
-    Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
+    if COUNT is 1:
+        Ax21.text(0.1,0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.1,0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.1,0.74*m_vec[0],fm_str,fontsize=FS)
+    else:
+        Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
 
 
     # POLARIATIONS
@@ -959,6 +976,7 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     P1 = uxoObj1.computeP(Hp,Brx)
     q = uxoObj1.computePolarVecs()
     da_true = np.dot(P1,q)
+    UB = 10*np.max(uxoObj1.L)
 
     # PREDICT TRUE DATA
     uxoObj2 = MPVproblem(rt,phi,L,times,I)
@@ -978,19 +996,19 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn)
+    uxoObj2.updatePolarizations(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
-    m_vec = []
+    m_vec = [Misfit]
     
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
        
        MisPrev = Misfit
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn)
+       uxoObj2.updatePolarizations(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -1077,9 +1095,9 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(1,len(m_vec)+1),np.ones(len(m_vec)),lw=3,color='k',ls=':')
-    Ax21.plot(np.arange(1,len(m_vec)+1),m_vec,lw=2,color=(1,0,0))
-    Ax21.set_xbound(1,len(m_vec)+1)
+    Ax21.plot(np.arange(0,len(m_vec)),np.ones(len(m_vec)),lw=3,color='k',ls=':')
+    Ax21.plot(np.arange(0,len(m_vec)),m_vec,lw=2,color=(1,0,0))
+    Ax21.set_xbound(0,len(m_vec)-1)
     Ax21.set_ybound(0,np.max(m_vec))
     Ax21.set_xlabel('Count',fontsize=FS)
     Ax21.set_ylabel('$\chi^2$ Misfit',fontsize=FS)
@@ -1088,9 +1106,14 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     rt_str = "$r_{true}$ = (" + '{:.2f}'.format(rt[0]) + "," + '{:.2f}'.format(rt[1]) + "," + '{:.2f}'.format(rt[2]) + ")"
     rn_str = "$r_{rec}$  = (" + '{:.2f}'.format(rn[0]) + "," + '{:.2f}'.format(rn[1]) + "," + '{:.2f}'.format(rn[2]) + ")"
     fm_str = "Final Misfit = " + '{:.2f}'.format(m_vec[-1])
-    Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
-    Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
+    if COUNT is 1:
+        Ax21.text(0.1,0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.1,0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.1,0.74*m_vec[0],fm_str,fontsize=FS)
+    else:
+        Ax21.text(0.4*len(m_vec),0.92*m_vec[0],rt_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.83*m_vec[0],rn_str,fontsize=FS)
+        Ax21.text(0.4*len(m_vec),0.74*m_vec[0],fm_str,fontsize=FS)
 
     # POLARIATIONS
     Lxt = uxoObj1.L[0:11]
@@ -1461,6 +1484,33 @@ class EM61problem(UXOTEM):
 
         return Phi/N
 
+    def computeMisfit2(self,q):
+
+        assert self.r0 is not None, "Must have current estimate of polarizations"
+        assert self.dunc is not None, "Must have set uncertainties"
+        assert self.dobs is not None, "Must have observed data"
+
+        dunc = mkvc(self.dunc)
+        dobs = mkvc(self.dobs)
+        r0 = self.r0
+
+        Hp = self.computeHp(r0=r0,update=False)
+        Brx = self.computeBrx(r0=r0,update=False)
+        P = self.computeP(Hp,Brx)
+
+        N = np.size(dobs)
+        M = len(self.times)
+
+        Px = np.kron(np.diag(np.ones(M)),P)
+
+        dpre = np.dot(Px,q)
+
+        v = (dpre-dobs)/dunc
+
+        Phi = np.dot(v.T,v)
+
+        return Phi/N
+
     def computeVecFcn(self,r0):
 
         assert self.q is not None, "Must have current estimate of polarizations"
@@ -1483,7 +1533,7 @@ class EM61problem(UXOTEM):
 
         return v
 
-    def updatePolarizations(self,r0):
+    def updatePolarizations(self,r0,UB):
 
         # Set operator and solution array
         Hp = self.computeHp(r0=r0)
@@ -1492,23 +1542,64 @@ class EM61problem(UXOTEM):
         dunc = self.dunc
         dobs = self.dobs
 
+        # Lmax = np.max(self.L)
+
         K = np.shape(dobs)[1]
         q = np.zeros((6,K))
 
         lb = np.zeros(6)
-        ub = np.inf*np.ones(6)
+        ub = UB*np.ones(6)
 
         for kk in range(0,K):
             
             LHS = P/np.c_[dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk]]
             RHS = dobs[:,kk]/dunc[:,kk]
+
+            # Original
             Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-5)
+
+            # Sol = op.lsq_linear(LHS,RHS,method='bvls',bounds=(lb,ub),tol=1e-5)
             q[:,kk] = Sol.x
+
+        self.q = q
+
+    def updatePolarizations2(self,r0,q0,UB):
+
+        # Set operator and solution array
+        # Hp = self.computeHp(r0=r0)
+        # Brx = self.computeBrx(r0=r0)
+        # P = self.computeP(Hp,Brx)
+        # dunc = self.dunc
+        # dobs = self.dobs
+
+        # Lmax = np.max(self.L)
+
+        
+        
+        q0 = mkvc(q0)
+        lb = np.zeros(len(q0))
+        ub = UB*np.ones(len(q0))
+
+
+        # Munc = sp.diags(mkvc(1/dunc))
+        # P = np.kron(sp.diags(np.ones(K)),P)
+        # LHS = np.dot(Munc,P)
+        # RHS = np.dot(Munc,mkvc(dobs/dunc))
+
+        # Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-5)
+
+
+        Sol = op.minimize(self.computeMisfit2,q0,tol=1e-6)
+
+        K = len(self.times)
+        q = np.reshape(Sol.x,shape=(6,K))
 
         self.q = q
 
     def updateLocation(self,r0):
 
+        lb = np.r_[-6.,-6.,-5.]
+        ub = np.r_[6.,6.,-0.1]
         # Sol = op.minimize(self.computeMisfit,r0,method='Powell',options={'xtol':1e-5})
         Sol = op.root(self.computeVecFcn,r0,method='lm',options={'xtol':1e-5})
 
@@ -1797,7 +1888,7 @@ class TEMTADSproblem(UXOTEM):
 
         return v
 
-    def updatePolarizations(self,r0):
+    def updatePolarizations(self,r0,UB):
 
         # Set operator and solution array
         Hp = self.computeHp(r0=r0)
@@ -1810,7 +1901,7 @@ class TEMTADSproblem(UXOTEM):
         q = np.zeros((6,K))
 
         lb = np.zeros(6)
-        ub = np.inf*np.ones(6)
+        ub = UB*np.ones(6)
 
         for kk in range(0,K):
             
@@ -2105,7 +2196,7 @@ class MPVproblem(UXOTEM):
 
         return v
 
-    def updatePolarizations(self,r0):
+    def updatePolarizations(self,r0,UB):
 
         # Set operator and solution array
         Hp = self.computeHp(r0=r0)
@@ -2118,7 +2209,7 @@ class MPVproblem(UXOTEM):
         q = np.zeros((6,K))
 
         lb = np.zeros(6)
-        ub = np.inf*np.ones(6)
+        ub = UB*np.ones(6)
 
         for kk in range(0,K):
             
