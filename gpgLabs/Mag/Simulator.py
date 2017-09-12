@@ -221,8 +221,16 @@ def plotMagSurvey2D(survey, a, b, npts, data=None, pred=None,
 
     if pred is not None:
         ax2 = plt.subplot(1, 2, 2)
-        PF.Magnetics.plot_obs_2D(rxLoc, d=pred, fig=fig,  ax=ax2, vmin=vmin,
-                                 vmax=vmax, marker=False, cmap='RdBu_r')
+
+        if pred.min() != pred.max():
+            PF.Magnetics.plot_obs_2D(rxLoc, d=pred, fig=fig,  ax=ax2,
+                                     vmin=vmin, vmax=vmax,
+                                     marker=False, cmap='RdBu_r')
+
+        else:
+            PF.Magnetics.plot_obs_2D(rxLoc, d=pred, fig=fig,  ax=ax2,
+                                     vmin=pred.min(), vmax=pred.max(),
+                                     marker=False, cmap='RdBu_r')
         ax2.plot(x, y, 'w.', ms=10)
         ax2.text(x[0], y[0], 'A', fontsize=16, color='w',
                 ha='left')
