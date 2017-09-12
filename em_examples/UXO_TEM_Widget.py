@@ -212,8 +212,8 @@ def InversionWidget(TxType):
             gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             Dx=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
             Dy=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
-            Nx=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_x$"),\
-            Ny=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_y$"),\
+            Nx=IntSlider(min=2, max=10, value=6, step=1, continuous_update=False, description = "$N_x$"),\
+            Ny=IntSlider(min=2, max=10, value=6, step=1, continuous_update=False, description = "$N_y$"),\
             x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
             y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
             z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
@@ -989,7 +989,8 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     P2 = uxoObj2.computeP(Hp,Brx)
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
+    # [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,[0.1,0.1,0.05])
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
@@ -2137,18 +2138,26 @@ class MPVproblem(UXOTEM):
         # Floor is a fraction of the largest amplitude anomaly for the earliest time channel
 
         M = np.shape(dpre)[0]
-        Floor = np.zeros(np.shape(dpre))
-        Floor[0:M:3,:] = FloorVal*np.max(np.abs(dpre[0:M:3,:]))
-        Floor[1:M:3,:] = FloorVal*np.max(np.abs(dpre[1:M:3,:]))
-        Floor[2:M:3,:] = FloorVal*np.max(np.abs(dpre[2:M:3,:]))
+        # Floor = np.zeros(np.shape(dpre))
+        # Floor[0:M:3,:] = FloorVal*np.max(np.abs(dpre[0:M:3,:]))
+        # Floor[1:M:3,:] = FloorVal*np.max(np.abs(dpre[1:M:3,:]))
+        # Floor[2:M:3,:] = FloorVal*np.max(np.abs(dpre[2:M:3,:]))
 
-        dunc = Floor + Pct*np.abs(dpre)
+        Floor = FloorVal*np.max(np.abs(dpre))*np.ones(np.shape(dpre))
+
+        if len(Pct) is 1:
+            dunc = Floor + Pct*np.abs(dpre)
+        else:
+            dunc = Floor
+            for ii in range(0,3):
+                dunc[ii:M:3] = dunc[ii:M:3] + Pct[ii]*np.abs(dpre[ii:M:3])
+
         dobs = dpre + dunc*np.random.normal(size=np.shape(dpre))
 
         self.dunc = dunc
         self.dobs = dobs
 
-        return dobs,dobs
+        return dobs,dunc
 
     def computeMisfit(self,r0):
 
@@ -2215,7 +2224,7 @@ class MPVproblem(UXOTEM):
             
             LHS = P/np.c_[dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk]]
             RHS = dobs[:,kk]/dunc[:,kk]
-            Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-5)
+            Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-7)
             q[:,kk] = Sol.x
 
         self.q = q
