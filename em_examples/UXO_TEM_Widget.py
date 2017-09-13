@@ -1,6 +1,5 @@
 import numpy as np
 import scipy as sp
-from cvxopt import matrix, solvers
 from scipy import sparse as spar
 from scipy.sparse import linalg
 from SimPEG import mkvc
@@ -1563,64 +1562,6 @@ class EM61problem(UXOTEM):
             q[:,kk] = Sol.x
 
         self.q = q
-
-
-    def updatePolarizations2(self,r0,UB):
-
-        # DID NOT HAVE MUCH SUCCESS INVERTING ALL POLARIZABILITIES TOGETHER
-
-        # Set operator and solution array
-        Hp = self.computeHp(r0=r0)
-        Brx = self.computeBrx(r0=r0)
-        P = self.computeP(Hp,Brx)
-        dunc = self.dunc
-        dobs = self.dobs
-
-        K = np.shape(dobs)[1]
-
-        # Constraints
-        lb = np.zeros(6*K)
-        ub = UB*np.ones(6*K)
-        # e = matrix(np.r_[np.zeros(6*(K-1)),lb,ub])
-        e = matrix(np.r_[lb,ub])
-
-        G = spar.kron(spar.diags([-np.ones(K),np.ones(K)],[0,1],shape=(K-1,K)),spar.diags(np.ones(6)))
-        I = spar.diags(np.ones(6*K))
-        G = spar.vstack([-I,I])
-
-        # Operators
-        # P = spar.kron(spar.diags(np.ones(K)),P)
-        # dobs = mkvc(dobs)
-        # dunc = mkvc(dunc)
-        # Wunc = spar.diags(1/dunc)
-        # P = (np.dot(Wunc,P))
-        # d = -dobs/dunc
-        # P = P.toarray()
-
-        P = np.kron(np.diag(np.ones(K)),P)
-        dobs = mkvc(dobs)
-        dunc = mkvc(dunc)
-        Wunc = np.diag(1/dunc)
-        P = np.dot(Wunc,P)
-        d = dobs/dunc
-        
-        A = matrix(np.dot(P.T,P))
-        q = matrix(np.dot(P.T,d))
-        G = matrix(G.toarray())
-        
-
-        # Optimization
-        Sol = solvers.qp(A, q, G=G, h=e)
-        # Sol = solvers.qp(A, q)
-        q = np.array(Sol['x'])
-        self.q = np.reshape(q,(6,K))
-
-        # Sol = op.lsq_linear(P,d,bounds=(lb,ub),tol=1e-5)
-        # self.q = np.reshape(Sol.x,(6,K))
-        
-
-        print(np.linalg.cond(A))
-
 
 
     def updateLocation(self,r0):
