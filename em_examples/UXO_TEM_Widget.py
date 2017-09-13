@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+from cvxopt import matrix, solvers
 from scipy import sparse as spar
 from scipy.sparse import linalg
 from SimPEG import mkvc
@@ -642,7 +643,7 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     P2 = uxoObj2.computeP(Hp,Brx)
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,0.05)
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
@@ -815,7 +816,7 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     P2 = uxoObj2.computeP(Hp,Brx)
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,0.05)
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
@@ -990,7 +991,8 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
     # [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,[0.1,0.1,0.05])
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,[0.1,0.1,0.05])
+    # dunc = np.sqrt(dunc)
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
@@ -1543,8 +1545,6 @@ class EM61problem(UXOTEM):
         dunc = self.dunc
         dobs = self.dobs
 
-        # Lmax = np.max(self.L)
-
         K = np.shape(dobs)[1]
         q = np.zeros((6,K))
 
@@ -1564,38 +1564,64 @@ class EM61problem(UXOTEM):
 
         self.q = q
 
-    def updatePolarizations2(self,r0,q0,UB):
+
+    def updatePolarizations2(self,r0,UB):
+
+        # DID NOT HAVE MUCH SUCCESS INVERTING ALL POLARIZABILITIES TOGETHER
 
         # Set operator and solution array
-        # Hp = self.computeHp(r0=r0)
-        # Brx = self.computeBrx(r0=r0)
-        # P = self.computeP(Hp,Brx)
-        # dunc = self.dunc
-        # dobs = self.dobs
+        Hp = self.computeHp(r0=r0)
+        Brx = self.computeBrx(r0=r0)
+        P = self.computeP(Hp,Brx)
+        dunc = self.dunc
+        dobs = self.dobs
 
-        # Lmax = np.max(self.L)
+        K = np.shape(dobs)[1]
 
+        # Constraints
+        lb = np.zeros(6*K)
+        ub = UB*np.ones(6*K)
+        # e = matrix(np.r_[np.zeros(6*(K-1)),lb,ub])
+        e = matrix(np.r_[lb,ub])
+
+        G = spar.kron(spar.diags([-np.ones(K),np.ones(K)],[0,1],shape=(K-1,K)),spar.diags(np.ones(6)))
+        I = spar.diags(np.ones(6*K))
+        G = spar.vstack([-I,I])
+
+        # Operators
+        # P = spar.kron(spar.diags(np.ones(K)),P)
+        # dobs = mkvc(dobs)
+        # dunc = mkvc(dunc)
+        # Wunc = spar.diags(1/dunc)
+        # P = (np.dot(Wunc,P))
+        # d = -dobs/dunc
+        # P = P.toarray()
+
+        P = np.kron(np.diag(np.ones(K)),P)
+        dobs = mkvc(dobs)
+        dunc = mkvc(dunc)
+        Wunc = np.diag(1/dunc)
+        P = np.dot(Wunc,P)
+        d = dobs/dunc
         
+        A = matrix(np.dot(P.T,P))
+        q = matrix(np.dot(P.T,d))
+        G = matrix(G.toarray())
         
-        q0 = mkvc(q0)
-        lb = np.zeros(len(q0))
-        ub = UB*np.ones(len(q0))
+
+        # Optimization
+        Sol = solvers.qp(A, q, G=G, h=e)
+        # Sol = solvers.qp(A, q)
+        q = np.array(Sol['x'])
+        self.q = np.reshape(q,(6,K))
+
+        # Sol = op.lsq_linear(P,d,bounds=(lb,ub),tol=1e-5)
+        # self.q = np.reshape(Sol.x,(6,K))
+        
+
+        print(np.linalg.cond(A))
 
 
-        # Munc = sp.diags(mkvc(1/dunc))
-        # P = np.kron(sp.diags(np.ones(K)),P)
-        # LHS = np.dot(Munc,P)
-        # RHS = np.dot(Munc,mkvc(dobs/dunc))
-
-        # Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-5)
-
-
-        Sol = op.minimize(self.computeMisfit2,q0,tol=1e-6)
-
-        K = len(self.times)
-        q = np.reshape(Sol.x,shape=(6,K))
-
-        self.q = q
 
     def updateLocation(self,r0):
 
