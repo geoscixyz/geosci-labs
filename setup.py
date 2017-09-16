@@ -44,6 +44,7 @@ setup(
         'properties[math]',
         'SimPEG>=0.4.1',
         'jupyter',
+        'cvxopt',
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
