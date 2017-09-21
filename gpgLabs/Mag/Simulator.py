@@ -92,7 +92,10 @@ def PlotFwrSim(prob, susc, comp, irt, Q, rinc, rdec,
         a = [Profile_ctx - dx, Profile_cty - dy]
         b = [Profile_ctx + dx, Profile_cty + dy]
 
-        return plotProfile(survey, a, b, Profile_npt,
+        xyz = survey.srcField.rxList[0].locs
+        dobs = survey.dobs
+
+        return plotProfile(xyz, dobs, a, b, Profile_npt,
                            data=data, fig=fig, ax=ax)
 
     survey = prob.survey
@@ -159,7 +162,9 @@ def ViewMagSurvey2D(survey):
 
             ax2 = plt.subplot(2, 1, 2)
 
-            plotProfile(survey, a, b, Npts, data=None,
+            xyz = surveySim.srcField.rxList[0].locs
+            dobs = surveySim.dobs
+            plotProfile(xyz, dobs, a, b, Npts, data=None,
                         fig=fig, ax=ax2)
 
         return surveySim
@@ -244,7 +249,7 @@ def plotMagSurvey2D(survey, a, b, npts, data=None, pred=None,
     return
 
 
-def plotProfile(survey, a, b, npts, data=None,
+def plotProfile(xyz, dobs, a, b, npts, data=None,
                 fig=None, ax=None, dType='3D'):
     """
     Plot the data and line profile inside the spcified limits
@@ -258,7 +263,7 @@ def plotProfile(survey, a, b, npts, data=None,
     if ax is None:
         ax = plt.subplot()
 
-    rxLoc = survey.srcField.rxList[0].locs
+    rxLoc = xyz
 
     x, y = linefun(a[0], b[0], a[1], b[1], npts)
 
@@ -266,10 +271,10 @@ def plotProfile(survey, a, b, npts, data=None,
 
     if dType == '2D':
         distance = rxLoc[:, 0]
-        dline = survey.dobs
+        dline = dobs
 
     else:
-        dline = griddata(rxLoc[:, :2], survey.dobs, (x, y), method='linear')
+        dline = griddata(rxLoc[:, :2], dobs, (x, y), method='linear')
 
     ax.plot(distance, dline, 'b.-')
 
@@ -339,9 +344,9 @@ def ViewPrism(survey):
 
     out = widgets.interactive(Prism,
                               update=widgets.ToggleButton(description='Refresh', value=False),
-                              dx=widgets.FloatSlider(min=1., max=2000., step=1., value=lim/4, continuous_update=False),
-                              dy=widgets.FloatSlider(min=1., max=2000., step=1., value=lim/4, continuous_update=False),
-                              dz=widgets.FloatSlider(min=1., max=2000., step=1., value=lim/4, continuous_update=False),
+                              dx=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
+                              dy=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
+                              dz=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
                               x0=widgets.FloatSlider(min=cntr[0]-1000, max=cntr[0]+1000, step=1., value=cntr[0], continuous_update=False),
                               y0=widgets.FloatSlider(min=cntr[1]-1000, max=cntr[1]+1000, step=1., value=cntr[1], continuous_update=False),
                               elev=widgets.FloatSlider(min=-1000., max=1000., step=1., value=0., continuous_update=False),
@@ -505,11 +510,13 @@ def fitline(prism, survey):
         prob = Mag.problem()
         prob.prism = prism.result
 
-        survey2D = survey
+        xyzLoc = survey.srcField.rxList[0].locs.copy()
+        xyzLoc[:, 2] += depth
 
-        xyzLoc = survey2D.srcField.rxList[0].locs
-        survey2D.param = [Bigrf, Binc, Bdec]
-        survey2D.srcField.rxList[0].locs[:,2] += depth
+        rxLoc = PF.BaseMag.RxObs(xyzLoc)
+        srcField = PF.BaseMag.SrcField([rxLoc], param=[Bigrf, Binc, Bdec])
+        survey2D = PF.BaseMag.LinearSurvey(srcField)
+        survey2D.dobs = survey.dobs
         prob.survey = survey2D
 
         prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
@@ -521,11 +528,11 @@ def fitline(prism, survey):
 
         dpred = np.zeros_like(fields[0])
         for b in fields:
-            dpred += (b +Bigrf)
+            dpred += (b + Bigrf)
 
         a = np.r_[xyzLoc[:, 0].min(), 0]
         b = np.r_[xyzLoc[:, 0].max(), 0]
-        return plotProfile(survey, a, b, 10, data=dpred, dType='2D')
+        return plotProfile(xyzLoc, survey2D.dobs, a, b, 10, data=dpred, dType='2D')
 
     Q = widgets.interactive(profiledata, Binc=widgets.FloatSlider(min=-90., max=90, step=5, value=90, continuous_update=False),
              Bdec=widgets.FloatSlider(min=-90., max=90, step=5, value=0, continuous_update=False),
