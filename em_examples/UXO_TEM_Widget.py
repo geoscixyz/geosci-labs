@@ -11,6 +11,7 @@ from IPython.display import display
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy import sparse as spar
+from cvxopt import solvers,matrix
 
 
 
@@ -23,18 +24,18 @@ def ImageUXOWidget():
     Out = interactive(fcnImageUXOWidget,psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=400., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=300., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=1000., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             tn=IntSlider(min=1, max=11, value=1., step=1, continuous_update=False, description = "Time channel"))
     
     return Out
@@ -59,18 +60,18 @@ def ImageDataWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             tn=IntSlider(min=1, max=11, value=1., step=1, continuous_update=False, description = "Time channel"),\
             xTx=FloatSlider(min=-3., max=3., value=0., step=0.25, continuous_update=False, description = "X location"),\
             yTx=FloatSlider(min=-3., max=3., value=0., step=0.25, continuous_update=False, description = "Y location"))
@@ -82,18 +83,18 @@ def ImageDataWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             tn=IntSlider(min=1, max=11, value=1., step=1, continuous_update=False, description = "Time channel"),\
             xTx=FloatSlider(min=-3, max=3, value=0., step=0.25, continuous_update=False, description = "Tx x location"),\
             yTx=FloatSlider(min=-3, max=3, value=0., step=0.25, continuous_update=False, description = "Tx y location"))
@@ -105,18 +106,18 @@ def ImageDataWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             tn=IntSlider(min=1, max=11, value=1., step=1, continuous_update=False, description = "Time channel"),\
             xTx=FloatSlider(min=-3, max=3, value=0., step=0.25, continuous_update=False, description = "Tx x location"),\
             yTx=FloatSlider(min=-3, max=3, value=0., step=0.25, continuous_update=False, description = "Tx y location"),\
@@ -140,25 +141,25 @@ def InversionWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=300., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=800., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
-            Dx=FloatSlider(min=0.2, max=5., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
-            Dy=FloatSlider(min=0.2, max=5., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
-            Nx=IntSlider(min=2, max=10, value=5, step=1, continuous_update=False, description = "$N_x$"),\
-            Ny=IntSlider(min=2, max=10, value=10, step=1, continuous_update=False, description = "$N_y$"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            Dx=FloatSlider(min=0.1, max=5., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
+            Dy=FloatSlider(min=0.1, max=5., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
+            Nx=IntSlider(min=1, max=20, value=10, step=1, continuous_update=False, description = "$N_x$"),\
+            Ny=IntSlider(min=1, max=20, value=10, step=1, continuous_update=False, description = "$N_y$"),\
             x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
             y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.4, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"))
             
     elif TxType is "TEMTADS":
@@ -169,25 +170,25 @@ def InversionWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=300., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=800., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             Dx=FloatSlider(min=0.2, max=5., value=2., step=0.1, continuous_update=False, description = "$D_x$"),\
             Dy=FloatSlider(min=0.2, max=5., value=2., step=0.1, continuous_update=False, description = "$D_y$"),\
-            Nx=IntSlider(min=2, max=10, value=3, step=1, continuous_update=False, description = "$N_x$"),\
-            Ny=IntSlider(min=2, max=10, value=3, step=1, continuous_update=False, description = "$N_y$"),\
+            Nx=IntSlider(min=1, max=6, value=3, step=1, continuous_update=False, description = "$N_x$"),\
+            Ny=IntSlider(min=1, max=6, value=3, step=1, continuous_update=False, description = "$N_y$"),\
             x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
             y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.4, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"))
 
     elif TxType is "MPV":
@@ -198,25 +199,25 @@ def InversionWidget(TxType):
             psi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\psi$"),\
             theta=FloatSlider(min=0, max=180., value=-0., step=10., continuous_update=False, description = "$\\theta$"),\
             phi=FloatSlider(min=-180., max=180., value=-0., step=10., continuous_update=False, description = "$\phi$"),\
-            k1=FloatSlider(min=100., max=1000., value=300., step=10., continuous_update=False, description = "$k_{x'}$"),\
-            alpha1=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{x'}$"),\
-            beta1=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
-            gamma1=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
-            k2=FloatSlider(min=100., max=1000., value=500., step=10., continuous_update=False, description = "$k_{y'}$"),\
-            alpha2=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{y'}$"),\
-            beta2=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
-            gamma2=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
-            k3=FloatSlider(min=100., max=1000., value=800., step=10., continuous_update=False, description = "$k_{z'}$"),\
-            alpha3=FloatSlider(min=1., max=2., value=1.4, step=0.1, continuous_update=False, description = "$\\alpha_{z'}$"),\
-            beta3=FloatSlider(min=1., max=1.5, value=1.3, step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
-            gamma3=FloatSlider(min=-4., max=-2., value=-3., step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
+            k1=FloatSlider(min=1., max=3., value=1., step=0.1, continuous_update=False, description = "$k_{x'}$"),\
+            alpha1=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{x'}$)"),\
+            beta1=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{x'}$"),\
+            gamma1=FloatSlider(min=-4., max=-2., value=-2.7, step=0.1, continuous_update=False, description = "log($\gamma_{x'}$)"),\
+            k2=FloatSlider(min=1., max=3., value=1.5, step=0.1, continuous_update=False, description = "$k_{y'}$"),\
+            alpha2=FloatSlider(min=-4., max=-2., value=-3.7, step=0.1, continuous_update=False, description = "log($\\alpha_{y'}$)"),\
+            beta2=FloatSlider(min=1., max=2., value=-1., step=0.1, continuous_update=False, description = "$\\beta_{y'}$"),\
+            gamma2=FloatSlider(min=-4., max=-2., value=-2.5, step=0.1, continuous_update=False, description = "log($\gamma_{y'}$)"),\
+            k3=FloatSlider(min=1., max=3., value=2., step=0.1, continuous_update=False, description = "$k_{z'}$"),\
+            alpha3=FloatSlider(min=-4., max=-2., value=-3.2, step=0.1, continuous_update=False, description = "log($\\alpha_{z'}$)"),\
+            beta3=FloatSlider(min=1., max=2., value=1., step=0.1, continuous_update=False, description = "$\\beta_{z'}$"),\
+            gamma3=FloatSlider(min=-4., max=-2., value=-2.2, step=0.1, continuous_update=False, description = "log($\gamma_{z'}$)"),\
             Dx=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_x$"),\
             Dy=FloatSlider(min=0.2, max=6., value=4., step=0.1, continuous_update=False, description = "$D_y$"),\
-            Nx=IntSlider(min=2, max=10, value=6, step=1, continuous_update=False, description = "$N_x$"),\
-            Ny=IntSlider(min=2, max=10, value=6, step=1, continuous_update=False, description = "$N_y$"),\
+            Nx=IntSlider(min=1, max=10, value=6, step=1, continuous_update=False, description = "$N_x$"),\
+            Ny=IntSlider(min=1, max=10, value=6, step=1, continuous_update=False, description = "$N_y$"),\
             x0=FloatSlider(min=-3., max=3., value=0.2, step=0.05, continuous_update=False, description = "$x_0$"),\
             y0=FloatSlider(min=-3., max=3., value=-0.15, step=0.05, continuous_update=False, description = "$y_0$"),\
-            z0=FloatSlider(min=-3., max=-0.1, value=-0.8, step=0.05, continuous_update=False, description = "$z_0$"),\
+            z0=FloatSlider(min=-3., max=-0.1, value=-0.4, step=0.05, continuous_update=False, description = "$z_0$"),\
             tn=IntSlider(min=1, max=11, value=1, step=1, continuous_update=False, description = "Time channel"),\
             dComp=ToggleButtons(options=['X','Y','Z'], description = "Data Component"))
 
@@ -243,7 +244,7 @@ def fcnImageUXOWidget(psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha2,beta2,gamma
     r0 = np.r_[0.,0.,0.]
     phi = np.r_[psi,theta,phi]
     times = times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I= 1.
 
     uxoObj = EM61problem(r0,phi,L,times,I)
@@ -367,7 +368,7 @@ def fcnImageDataWidgetEM61(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     r0 = np.r_[x0,y0,z0]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     uxoObj = EM61problem(r0,phi,L,times,I)
@@ -393,10 +394,10 @@ def fcnImageDataWidgetEM61(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
 
     # Anomaly
 
-    d_tn = 1e3*np.reshape(data[:,tn-1],(N,N))  # 1e3 for mV
+    d_tn = 1e6*np.reshape(data[:,tn-1],(N,N))  # 1e6 for uV
     Cplot = Ax1.contourf(X,Y,d_tn.T,40,cmap='viridis')
     cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02, format='%.2e')
-    cbar.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar.ax.tick_params(labelsize=FS-2)
 
     Ax1.set_xlabel('X [m]',fontsize=FS)
@@ -417,11 +418,11 @@ def fcnImageDataWidgetEM61(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
 
     # Decay
 
-    d_ij = 1e3*np.abs(data[25*i+j,:]) # 1e3 for mV
+    d_ij = 1e6*np.abs(data[25*i+j,:]) # 1e6 for uV
     Ax2.loglog(uxoObj.times,d_ij,color='k')
 
     Ax2.set_xlabel('t [s]',fontsize=FS)
-    Ax2.set_ylabel('|dB/dt| Field [mV]',fontsize=FS)
+    Ax2.set_ylabel('|dB/dt| Field [$\mu$V]',fontsize=FS)
     Ax2.tick_params(labelsize=FS-2)
 
     Ax2.set_xbound(np.min(uxoObj.times),np.max(uxoObj.times))
@@ -444,7 +445,7 @@ def fcnImageDataWidgetTEMTADS(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     r0 = np.r_[x0,y0,z0]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     uxoObj = TEMTADSproblem(r0,phi,L,times,I)
@@ -469,10 +470,10 @@ def fcnImageDataWidgetTEMTADS(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     FS = 18
 
     # Anomaly
-    di = np.reshape(data[12:25*N**2:25,tn-1],(N,N))
+    di = 1e6*np.reshape(data[12:25*N**2:25,tn-1],(N,N))
     Cplot = Ax1.contourf(X,Y,di.T,40,cmap='viridis')
     cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02)
-    cbar.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar.ax.tick_params(labelsize=FS-2)
 
     Ax1.set_xlabel('X [m]',fontsize=FS)
@@ -492,11 +493,11 @@ def fcnImageDataWidgetTEMTADS(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     Ax1.set_ybound(-3.,3.)
     
     # Decay
-    d_ij = 1e3*np.abs(data[i*25**2+j*25:i*25**2+(j+1)*25,:]) # 1e3 for mV
+    d_ij = 1e6*np.abs(data[i*25**2+j*25:i*25**2+(j+1)*25,:]) # 1e3 for mV
     Ax2.loglog(uxoObj.times,d_ij.T,color='k')
 
     Ax2.set_xlabel('t [s]',fontsize=FS)
-    Ax2.set_ylabel('|dB/dt| Field [mV]',fontsize=FS)
+    Ax2.set_ylabel('|dB/dt| Field [$\mu$V]',fontsize=FS)
     Ax2.tick_params(labelsize=FS-2)
 
     Ax2.set_xbound(np.min(uxoObj.times),np.max(uxoObj.times))
@@ -520,7 +521,7 @@ def fcnImageDataWidgetMPV(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     r0 = np.r_[x0,y0,z0]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     uxoObj = MPVproblem(r0,phi,L,times,I)
@@ -554,16 +555,16 @@ def fcnImageDataWidgetMPV(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     elif dComp is 'Z':
         k=2
 
-    di = np.reshape(data[6+k:15*N**2:15,tn-1],(N,N))
+    di = 1e6*np.reshape(data[6+k:15*N**2:15,tn-1],(N,N))
     Cplot = Ax1.contourf(X,Y,di.T,40,cmap='viridis')
     cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02)
 
     if dComp is 'X':
-        cbar.set_label('dBx/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar.set_label('dBx/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Y':
-        cbar.set_label('dBy/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar.set_label('dBy/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Z':
-        cbar.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar.ax.tick_params(labelsize=FS-2)
 
     Ax1.set_xlabel('X [m]',fontsize=FS)
@@ -582,16 +583,16 @@ def fcnImageDataWidgetMPV(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     Ax1.set_ybound(-3.,3.)
     
     # Decay
-    d_ijx = 1e3*np.abs(data[i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e3 for mV
-    d_ijy = 1e3*np.abs(data[1+i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e3 for mV
-    d_ijz = 1e3*np.abs(data[2+i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e3 for mV
+    d_ijx = 1e6*np.abs(data[i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e6 for uV
+    d_ijy = 1e6*np.abs(data[1+i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e6 for uV
+    d_ijz = 1e6*np.abs(data[2+i*15*25+j*15:i*15*25+(j+1)*15:3,:]) # 1e6 for uV
     maxdij = np.max(np.r_[d_ijx,d_ijy,d_ijz])
     Ax2.loglog(uxoObj.times,d_ijx.T,color='b')
     Ax2.loglog(uxoObj.times,d_ijy.T,color='r')
     Ax2.loglog(uxoObj.times,d_ijz.T,color='k')
 
     Ax2.set_xlabel('t [s]',fontsize=FS)
-    Ax2.set_ylabel('|dB/dt| Field [mV]',fontsize=FS)
+    Ax2.set_ylabel('|dB/dt| Field [$\mu$V]',fontsize=FS)
     Ax2.tick_params(labelsize=FS-2)
 
     Ax2.set_xbound(np.min(uxoObj.times),np.max(uxoObj.times))
@@ -605,6 +606,23 @@ def fcnImageDataWidgetMPV(x0,y0,z0,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     plt.show(Fig)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##################################
 # INVERSION WIDGET
 
@@ -614,7 +632,7 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     rt = np.r_[xt,yt,zt]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     # PREDICT TRUE ANOMALY
@@ -633,7 +651,17 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
 
     # PREDICT TRUE DATA
     uxoObj2 = EM61problem(rt,phi,L,times,I)
-    X2,Y2 = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
+    if Nx is 1:
+        Xn = 0.
+    else:
+        Xn = np.linspace(-Dx/2,Dx/2,Nx)
+
+    if Ny is 1:
+        Yn = 0.
+    else:
+        Yn = np.linspace(-Dy/2,Dy/2,Ny)
+    X2,Y2 = np.meshgrid(Xn,Yn)
+
     XYZ2 = np.c_[mkvc(X2),mkvc(Y2),0.1*np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
     A = uxoObj2.computeRotMatrix()
@@ -642,14 +670,15 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     P2 = uxoObj2.computeP(Hp,Brx)
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,0.05)
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-4,0.05)
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn,UB)
+    # uxoObj2.updatePolarizations(rn,UB)
+    uxoObj2.updatePolarizationsQP(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
@@ -661,7 +690,8 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn,UB)
+       # uxoObj2.updatePolarizations(rn,UB)
+       uxoObj2.updatePolarizationsQP(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -692,10 +722,10 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
     FS = 18
 
     # True Anomaly
-    d11 = 1e3*np.reshape(da_true[:,tn-1],(N,N))  # 1e3 for mV
+    d11 = 1e6*np.reshape(da_true[:,tn-1],(N,N))  # 1e6 for uV
     Cplot1 = Ax11.contourf(X1,Y1,d11.T,40,cmap='viridis')
     cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format='%.2e')
-    cbar1.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar1.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar1.ax.tick_params(labelsize=FS-2)
 
     Ax11.set_xlabel('X [m]',fontsize=FS)
@@ -704,17 +734,17 @@ def fcnInversionWidgetEM61(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alph
 
     titlestr1 = "Observed at t = " + '{:.3e}'.format(uxoObj1.times[tn-1]) + " s"
     Ax11.set_title(titlestr1,fontsize=FS+2)
-    Xn,Yn = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
-    Ax11.scatter(Xn,Yn,color=(1,1,1),s=3)
+    # Xn,Yn = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
+    Ax11.scatter(X2,Y2,color=(1,1,1),s=3)
 
     Ax11.set_xbound(-3.,3.)
     Ax11.set_ybound(-3.,3.)
     
     # Predicted Anomaly
-    d12 = 1e3*np.reshape(da_pre[:,tn-1],(N,N))  # 1e3 for mV
+    d12 = 1e6*np.reshape(da_pre[:,tn-1],(N,N))  # 1e3 for mV
     Cplot2 = Ax12.contourf(X1,Y1,d12.T,40,cmap='viridis')
     cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format='%.2e')
-    cbar2.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar2.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar2.ax.tick_params(labelsize=FS-2)
 
     Ax12.set_xlabel('X [m]',fontsize=FS)
@@ -787,7 +817,7 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     rt = np.r_[xt,yt,zt]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     # PREDICT TRUE ANOMALY
@@ -806,7 +836,17 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
 
     # PREDICT TRUE DATA
     uxoObj2 = TEMTADSproblem(rt,phi,L,times,I)
-    X2,Y2 = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
+    if Nx is 1:
+        Xn = 0.
+    else:
+        Xn = np.linspace(-Dx/2,Dx/2,Nx)
+
+    if Ny is 1:
+        Yn = 0.
+    else:
+        Yn = np.linspace(-Dy/2,Dy/2,Ny)
+    X2,Y2 = np.meshgrid(Xn,Yn)
+
     XYZ2 = np.c_[mkvc(X2),mkvc(Y2),0.1*np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
     A = uxoObj2.computeRotMatrix()
@@ -815,14 +855,14 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     P2 = uxoObj2.computeP(Hp,Brx)
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,0.05)
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-4,0.05)
 
     # SOLVE INVERSE PROBLEM
     Misfit = np.inf
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn,UB)
+    uxoObj2.updatePolarizationsQP(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
@@ -834,7 +874,7 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn,UB)
+       uxoObj2.updatePolarizationsQP(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -865,10 +905,10 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
     FS = 18
 
     # True Anomaly
-    d11 = 1e3*np.reshape(da_true[12:25*N**2:25,tn-1],(N,N))  # 1e3 for mV
+    d11 = 1e6*np.reshape(da_true[12:25*N**2:25,tn-1],(N,N))  # 1e6 for uV
     Cplot1 = Ax11.contourf(X1,Y1,d11.T,40,cmap='viridis')
     cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format='%.2e')
-    cbar1.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar1.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar1.ax.tick_params(labelsize=FS-2)
 
     Ax11.set_xlabel('X [m]',fontsize=FS)
@@ -877,17 +917,16 @@ def fcnInversionWidgetTEMTADS(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,a
 
     titlestr1 = "Observed at t = " + '{:.3e}'.format(uxoObj1.times[tn-1]) + " s"
     Ax11.set_title(titlestr1,fontsize=FS+2)
-    Xn,Yn = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
-    Ax11.scatter(Xn,Yn,color=(1,1,1),s=3)
+    Ax11.scatter(X2,Y2,color=(1,1,1),s=3)
 
     Ax11.set_xbound(-3.,3.)
     Ax11.set_ybound(-3.,3.)
     
     # Predicted Anomaly
-    d12 = 1e3*np.reshape(da_pre[12:25*N**2:25,tn-1],(N,N))  # 1e3 for mV
+    d12 = 1e6*np.reshape(da_pre[12:25*N**2:25,tn-1],(N,N))  # 1e6 for uV
     Cplot2 = Ax12.contourf(X1,Y1,d12.T,40,cmap='viridis')
     cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format='%.2e')
-    cbar2.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+    cbar2.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar2.ax.tick_params(labelsize=FS-2)
 
     Ax12.set_xlabel('X [m]',fontsize=FS)
@@ -961,7 +1000,7 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     rt = np.r_[xt,yt,zt]
     phi = np.r_[psi,theta,phi]
     times = np.logspace(-4,-2,11)
-    L = np.r_[k1,alpha1,beta1,10**gamma1,k2,alpha2,beta2,10**gamma2,k3,alpha3,beta3,10**gamma3]
+    L = np.r_[k1,10**alpha1,beta1,10**gamma1,k2,10**alpha2,beta2,10**gamma2,k3,10**alpha3,beta3,10**gamma3]
     I = 100.
 
     # PREDICT TRUE ANOMALY
@@ -980,7 +1019,17 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
 
     # PREDICT TRUE DATA
     uxoObj2 = MPVproblem(rt,phi,L,times,I)
-    X2,Y2 = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
+    if Nx is 1:
+        Xn = 0.
+    else:
+        Xn = np.linspace(-Dx/2,Dx/2,Nx)
+
+    if Ny is 1:
+        Yn = 0.
+    else:
+        Yn = np.linspace(-Dy/2,Dy/2,Ny)
+    X2,Y2 = np.meshgrid(Xn,Yn)
+
     XYZ2 = np.c_[mkvc(X2),mkvc(Y2),0.1*np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
     A = uxoObj2.computeRotMatrix()
@@ -990,7 +1039,7 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     q = uxoObj2.computePolarVecs()
     data = np.dot(P2,q)
     # [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-5,0.05)
-    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-3,[0.1,0.1,0.05])
+    [dobs,dunc] = uxoObj2.get_dobs_dunc(data,1e-4,[0.1,0.1,0.05])
     # dunc = np.sqrt(dunc)
 
     # SOLVE INVERSE PROBLEM
@@ -998,7 +1047,7 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
     dMis = np.inf
     rn = np.r_[x0,y0,z0]
     
-    uxoObj2.updatePolarizations(rn,UB)
+    uxoObj2.updatePolarizationsQP(rn,UB)
     Misfit = uxoObj2.computeMisfit(rn)
     
     COUNT = 0
@@ -1010,7 +1059,7 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
        
        rn,Sol = uxoObj2.updateLocation(rn)
        
-       uxoObj2.updatePolarizations(rn,UB)
+       uxoObj2.updatePolarizationsQP(rn,UB)
        
        Misfit = uxoObj2.computeMisfit(rn)
        dMis = np.abs(MisPrev - Misfit)
@@ -1048,15 +1097,15 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
         k=2
 
     # True Anomaly
-    d11 = 1e3*np.reshape(da_true[6+k:15*N**2:15,tn-1],(N,N))  # 1e3 for mV
+    d11 = 1e6*np.reshape(da_true[6+k:15*N**2:15,tn-1],(N,N))  # 1e6 for uV
     Cplot1 = Ax11.contourf(X1,Y1,d11.T,40,cmap='viridis')
     cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format='%.2e')
     if dComp is 'X':
-        cbar1.set_label('dBx/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar1.set_label('dBx/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Y':
-        cbar1.set_label('dBy/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar1.set_label('dBy/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Z':
-        cbar1.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar1.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar1.ax.tick_params(labelsize=FS-2)
 
     Ax11.set_xlabel('X [m]',fontsize=FS)
@@ -1065,22 +1114,21 @@ def fcnInversionWidgetMPV(xt,yt,zt,psi,theta,phi,k1,alpha1,beta1,gamma1,k2,alpha
 
     titlestr1 = "Observed at t = " + '{:.3e}'.format(uxoObj1.times[tn-1]) + " s"
     Ax11.set_title(titlestr1,fontsize=FS+2)
-    Xn,Yn = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
-    Ax11.scatter(Xn,Yn,color=(1,1,1),s=3)
+    Ax11.scatter(X2,Y2,color=(1,1,1),s=3)
 
     Ax11.set_xbound(-3.,3.)
     Ax11.set_ybound(-3.,3.)
     
     # Predicted Anomaly
-    d12 = 1e3*np.reshape(da_pre[6+k:15*N**2:15,tn-1],(N,N))  # 1e3 for mV
+    d12 = 1e6*np.reshape(da_pre[6+k:15*N**2:15,tn-1],(N,N))  # 1e6 for uV
     Cplot2 = Ax12.contourf(X1,Y1,d12.T,40,cmap='viridis')
     cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format='%.2e')
     if dComp is 'X':
-        cbar2.set_label('dBx/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar2.set_label('dBx/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Y':
-        cbar2.set_label('dBy/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar2.set_label('dBy/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     elif dComp is 'Z':
-        cbar2.set_label('dBz/dt [mV]', rotation=270, labelpad = 25, size=FS)
+        cbar2.set_label('dBz/dt [$\mu$V]', rotation=270, labelpad = 25, size=FS)
     cbar2.ax.tick_params(labelsize=FS-2)
 
     Ax12.set_xlabel('X [m]',fontsize=FS)
@@ -1563,6 +1611,47 @@ class EM61problem(UXOTEM):
 
         self.q = q
 
+    def updatePolarizationsQP(self,r0,UB):
+
+        # Set operator and solution array
+        Hp = self.computeHp(r0=r0)
+        Brx = self.computeBrx(r0=r0)
+        P = self.computeP(Hp,Brx)
+        dunc = self.dunc
+        dobs = self.dobs
+        
+        K = np.shape(dobs)[1]
+        q = np.zeros((6,K))
+        
+        # Bounds
+        ub = UB*np.ones(6)
+        e = matrix(np.r_[np.zeros(9),ub])
+
+        # Constraints
+        C1 = np.r_[np.c_[-1,0,0,0,0,0],np.c_[0,0,0,-1,0,0],np.c_[0,0,0,0,0,-1]]
+        C2 = np.r_[np.c_[-0.5,1,0,-0.5,0,0],np.c_[-0.5,0,1,0,0,-0.5],np.c_[0,0,0,-0.5,1,-0.5]]
+        C3 = np.r_[np.c_[-0.5,-1,0,-0.5,0,0],np.c_[-0.5,0,-1,0,0,-0.5],np.c_[0,0,0,-0.5,-1,-0.5]]
+
+        # G = sp.kron(sp.diags([-np.ones(K),np.ones(K)],[0,1],shape=(K-1,K)),sp.diags(np.ones(6)))
+        I = np.diag(np.ones(6))
+        G = np.r_[C1,C2,C3,I]
+        G = matrix(G)
+
+        solvers.options['show_progress'] = False
+        
+        for kk in range(0,K):
+            
+            LHS = P/np.c_[dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk]]
+            RHS = dobs[:,kk]/dunc[:,kk]
+
+            A = matrix(np.dot(LHS.T,LHS))
+            b = matrix(np.dot(LHS.T,-RHS))
+            
+            sol = solvers.qp(A, b, G=G, h=e)
+
+            q[:,kk] = np.reshape(sol['x'],(6))
+
+        self.q = q
 
     def updateLocation(self,r0):
 
@@ -1646,32 +1735,35 @@ class TEMTADSproblem(UXOTEM):
         
         if XYZ is False and r0 is False:
             assert self.TxLoc is not None, "TxLoc must be set already if XYZ = False"
-            XYZ = self.TxLoc
+            XYZ = self.RxLoc
             x0 = self.r0[0]
             y0 = self.r0[1]
             z0 = self.r0[2]
         elif XYZ is not False and r0 is False:
             self.defineSensorLoc(XYZ)
+            XYZ = self.RxLoc
             x0 = self.r0[0]
             y0 = self.r0[1]
             z0 = self.r0[2]
         elif XYZ is False and r0 is not False:
             assert self.TxLoc is not None, "TxLoc must be set already if XYZ = False"
-            XYZ = self.TxLoc
+            XYZ = self.RxLoc
             x0 = r0[0]
             y0 = r0[1]
             z0 = r0[2]
         else:
+            self.defineSensorLoc(XYZ)
+            XYZ = self.RxLoc
             x0 = r0[0]
             y0 = r0[1]
             z0 = r0[2]
         
         I  = self.I
         
-        dx1 = np.r_[2.,0.,-2.,0.]
-        dx2 = np.r_[0.,2.,0.,-2.]
-        x1p = np.r_[-1.,1.,1.,-1.,-1.]
-        x2p = np.r_[-1.,-1.,1.,1.,-1.]
+        dx1 = np.r_[0.4,0.,-0.4,0.]
+        dx2 = np.r_[0.,0.4,0.,-0.4]
+        x1p = np.r_[-0.2,0.2,0.2,-0.2,-0.2]
+        x2p = np.r_[-0.2,-0.2,0.2,0.2,-0.2]
         
         Hx0 = np.zeros(np.shape(XYZ)[0])
         Hy0 = np.zeros(np.shape(XYZ)[0])
@@ -1714,9 +1806,9 @@ class TEMTADSproblem(UXOTEM):
             Hz0 = Hz0 + Phi*(-Ix1*Rx2 + Ix2*Rx1)/R
 
         if update is True:
-            self.Hp = np.kron(np.c_[Hx0,Hy0,Hz0],np.ones((25,1)))
+            self.Hp = np.c_[Hx0,Hy0,Hz0]
             
-        return np.kron(np.c_[Hx0,Hy0,Hz0],np.ones((25,1)))
+        return np.c_[Hx0,Hy0,Hz0]
 
     def computeBrx(self,XYZ=False,r0=False,update=True):
         
@@ -1877,6 +1969,48 @@ class TEMTADSproblem(UXOTEM):
             RHS = dobs[:,kk]/dunc[:,kk]
             Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-5)
             q[:,kk] = Sol.x
+
+        self.q = q
+
+    def updatePolarizationsQP(self,r0,UB):
+
+        # Set operator and solution array
+        Hp = self.computeHp(r0=r0)
+        Brx = self.computeBrx(r0=r0)
+        P = self.computeP(Hp,Brx)
+        dunc = self.dunc
+        dobs = self.dobs
+        
+        K = np.shape(dobs)[1]
+        q = np.zeros((6,K))
+        
+        # Bounds
+        ub = UB*np.ones(6)
+        e = matrix(np.r_[np.zeros(9),ub])
+
+        # Constraints
+        C1 = np.r_[np.c_[-1,0,0,0,0,0],np.c_[0,0,0,-1,0,0],np.c_[0,0,0,0,0,-1]]
+        C2 = np.r_[np.c_[-0.5,1,0,-0.5,0,0],np.c_[-0.5,0,1,0,0,-0.5],np.c_[0,0,0,-0.5,1,-0.5]]
+        C3 = np.r_[np.c_[-0.5,-1,0,-0.5,0,0],np.c_[-0.5,0,-1,0,0,-0.5],np.c_[0,0,0,-0.5,-1,-0.5]]
+
+        # G = sp.kron(sp.diags([-np.ones(K),np.ones(K)],[0,1],shape=(K-1,K)),sp.diags(np.ones(6)))
+        I = np.diag(np.ones(6))
+        G = np.r_[C1,C2,C3,I]
+        G = matrix(G)
+
+        solvers.options['show_progress'] = False
+        
+        for kk in range(0,K):
+            
+            LHS = P/np.c_[dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk]]
+            RHS = dobs[:,kk]/dunc[:,kk]
+
+            A = matrix(np.dot(LHS.T,LHS))
+            b = matrix(np.dot(LHS.T,-RHS))
+            
+            sol = solvers.qp(A, b, G=G, h=e)
+
+            q[:,kk] = np.reshape(sol['x'],(6))
 
         self.q = q
 
@@ -2193,6 +2327,48 @@ class MPVproblem(UXOTEM):
             RHS = dobs[:,kk]/dunc[:,kk]
             Sol = op.lsq_linear(LHS,RHS,bounds=(lb,ub),tol=1e-7)
             q[:,kk] = Sol.x
+
+        self.q = q
+
+    def updatePolarizationsQP(self,r0,UB):
+
+        # Set operator and solution array
+        Hp = self.computeHp(r0=r0)
+        Brx = self.computeBrx(r0=r0)
+        P = self.computeP(Hp,Brx)
+        dunc = self.dunc
+        dobs = self.dobs
+        
+        K = np.shape(dobs)[1]
+        q = np.zeros((6,K))
+        
+        # Bounds
+        ub = UB*np.ones(6)
+        e = matrix(np.r_[np.zeros(9),ub])
+
+        # Constraints
+        C1 = np.r_[np.c_[-1,0,0,0,0,0],np.c_[0,0,0,-1,0,0],np.c_[0,0,0,0,0,-1]]
+        C2 = np.r_[np.c_[-0.5,1,0,-0.5,0,0],np.c_[-0.5,0,1,0,0,-0.5],np.c_[0,0,0,-0.5,1,-0.5]]
+        C3 = np.r_[np.c_[-0.5,-1,0,-0.5,0,0],np.c_[-0.5,0,-1,0,0,-0.5],np.c_[0,0,0,-0.5,-1,-0.5]]
+
+        # G = sp.kron(sp.diags([-np.ones(K),np.ones(K)],[0,1],shape=(K-1,K)),sp.diags(np.ones(6)))
+        I = np.diag(np.ones(6))
+        G = np.r_[C1,C2,C3,I]
+        G = matrix(G)
+
+        solvers.options['show_progress'] = False
+        
+        for kk in range(0,K):
+            
+            LHS = P/np.c_[dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk],dunc[:,kk]]
+            RHS = dobs[:,kk]/dunc[:,kk]
+
+            A = matrix(np.dot(LHS.T,LHS))
+            b = matrix(np.dot(LHS.T,-RHS))
+            
+            sol = solvers.qp(A, b, G=G, h=e)
+
+            q[:,kk] = np.reshape(sol['x'],(6))
 
         self.q = q
 
