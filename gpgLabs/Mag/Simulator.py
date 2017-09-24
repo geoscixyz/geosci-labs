@@ -528,8 +528,9 @@ def fitline(prism, survey):
 
         dpred = np.zeros_like(fields[0])
         for b in fields:
-            dpred += (b + Bigrf)
+            dpred += b
 
+        dpred += + Bigrf
         a = np.r_[xyzLoc[:, 0].min(), 0]
         b = np.r_[xyzLoc[:, 0].max(), 0]
         return plotProfile(xyzLoc, survey2D.dobs, a, b, 10, data=dpred, dType='2D')
