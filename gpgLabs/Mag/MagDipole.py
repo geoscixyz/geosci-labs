@@ -33,12 +33,12 @@ def VerticalMagneticLongDipoleLine(radius,L,stepsize=0.1,nstepmax=1000,dist_tol=
 
 def MagneticLongDipoleLine(dipoleloc,dipoledec,dipoleinc,dipoleL,radii,Nazi=10):
     x0, y0, z0 = dipoleloc[0], dipoleloc[1], dipoleloc[2]
-    
+
     # rotation matrix
     theta, alpha = -np.pi*(dipoleinc+90.)/180., -np.pi*dipoledec/180.
     Rx = np.array([[1.,0.,0.],[0.,np.cos(theta),-np.sin(theta)],[0.,np.sin(theta),np.cos(theta)]])
     Rz = np.array([[np.cos(alpha),-np.sin(alpha),0.],[np.sin(alpha),np.cos(alpha),0.],[0.,0.,1.]])
-    R = Rz @ Rx
+    R = np.dot(Rz,Rx)
 
     azimuth = np.linspace(0.,2*np.pi,num=Nazi,endpoint=False)
     xloc, yloc, zloc = [], [], []
@@ -55,11 +55,11 @@ def MagneticLongDipoleLine(dipoleloc,dipoledec,dipoleinc,dipoleL,radii,Nazi=10):
 
 def MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,obsloc,dipolemoment=1.):
     dec, inc, L = np.radians(dipoledec), np.radians(dipoleinc), dipoleL
-    x1 = L/2 * np.cos(inc) * np.sin(dec) 
-    y1 = L/2 * np.cos(inc) * np.cos(dec) 
+    x1 = L/2 * np.cos(inc) * np.sin(dec)
+    y1 = L/2 * np.cos(inc) * np.cos(dec)
     z1 = L/2 * -np.sin(inc)
     x2, y2, z2 = -x1, -y1, -z1
-    Q = dipolemoment * 4e-7 * np.pi / L 
+    Q = dipolemoment * 4e-7 * np.pi / L
     Bx1, By1, Bz1 = MagneticMonopoleField(obsloc,(x1+dipoleloc[0],y1+dipoleloc[1],z1+dipoleloc[2]),Q=Q)
     Bx2, By2, Bz2 = MagneticMonopoleField(obsloc,(x2+dipoleloc[0],y2+dipoleloc[1],z2+dipoleloc[2]),Q=-Q)
     return Bx1+Bx2, By1+By2, Bz1+Bz2
