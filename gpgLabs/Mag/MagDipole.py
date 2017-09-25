@@ -46,7 +46,7 @@ def MagneticLongDipoleLine(dipoleloc,dipoledec,dipoleinc,dipoleL,radii,Nazi=10):
         hloc, vloc = VerticalMagneticLongDipoleLine(r,dipoleL,stepsize=0.5)
         for a in azimuth:
             x, y, z = np.sin(a)*hloc, np.cos(a)*hloc, vloc
-            xyz = R @ np.vstack((x,y,z))
+            xyz = np.dot(R,np.vstack((x,y,z)))
             xloc.append(xyz[0]+x0)
             yloc.append(xyz[1]+y0)
             zloc.append(xyz[2]+z0)
