@@ -1,9 +1,9 @@
 em_apps
 =======
 
-.. image:: http://mybinder.org/badge.svg
-    :target: https://beta.mybinder.org/repo/geoscixyz/em_apps
-    :alt: binders
+.. .. image:: http://mybinder.org/badge.svg
+..    :target: https://beta.mybinder.org/repo/geoscixyz/em_apps
+..    :alt: binders
 
 .. image:: https://travis-ci.org/geoscixyz/em_apps.svg?branch=master
     :target: https://travis-ci.org/geoscixyz/em_apps
@@ -12,9 +12,9 @@ em_apps
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in
 `em_examples <http://github.com/geoscixyz/em_examples>`_. Numerical simulations are based on `SimPEG <http://simpeg.xyz>`_
 
-The notebooks are available on both
-- `binder <https://beta.mybinder.org/repo/geoscixyz/em_apps>`_
-- `Azure Notebooks <https://notebooks.azure.com/library/em_apps>`_
+The notebooks are available on
+.. - `binder <https://beta.mybinder.org/repo/geoscixyz/em_apps>`_
+- `Azure Notebooks <https://notebooks.azure.com/lheagy/libraries/em_apps>`_
 
 Notebook Structure
 ------------------
@@ -50,17 +50,8 @@ For developers
 - to develop code for these notebooks, please see http://github.com/geoscixyz/em_examples
 - when you generate a new notebook, please make sure that the filepath to its location follows the same structure as in `EM GeoSci <http://em.geosci.xyz>`_
 - add the notebook name and path to the index (index.ipynb)
-- and update the `binder <https://beta.mybinder.org>`_ so it can be shared with the world!
+.. - and update the `binder <https://beta.mybinder.org>`_ so it can be shared with the world!
 
-.. image:: ./images/binders.png
+.. .. image:: ./images/binders.png
 
-
-In EM GeoSci
-------------
-
-To add the binder badge to an rst file, include:
-
-```
-.. image:: http://mybinder.org/badge.svg :target: https://beta.mybinder.org/repo/geoscixyz/em_apps
-```
 
