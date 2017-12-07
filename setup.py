@@ -41,7 +41,6 @@ setup(
         'Pillow',
         'requests',
         'ipywidgets',
-        'properties[math]',
         'SimPEG>=0.4.1',
         'jupyter',
         'cvxopt',
