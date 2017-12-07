@@ -31,7 +31,7 @@ with open('README.rst') as f:
 
 setup(
     name = 'em_examples',
-    version = '0.0.15',
+    version = '0.0.16',
     packages = find_packages(),
     install_requires = [
         'future',
@@ -41,7 +41,6 @@ setup(
         'Pillow',
         'requests',
         'ipywidgets',
-        'properties[math]',
         'SimPEG>=0.4.1',
         'jupyter',
         'cvxopt',
