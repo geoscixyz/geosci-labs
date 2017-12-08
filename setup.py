@@ -31,7 +31,7 @@ with open('README.rst') as f:
 
 setup(
     name = 'gpgLabs',
-    version = '0.0.8',
+    version = '0.0.9',
     packages = find_packages(),
     install_requires = [
         'numpy>=1.7',
