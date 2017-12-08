@@ -31,16 +31,14 @@ with open('README.rst') as f:
 
 setup(
     name = 'gpgLabs',
-    version = '0.0.8',
+    version = '0.0.9',
     packages = find_packages(),
     install_requires = [
         'numpy>=1.7',
         'scipy>=0.13',
         'matplotlib',
         'ipywidgets',
-        'properties[math]',
         'SimPEG>=0.4.1',
-        'discretize',
         'em_examples'
     ],
     author = 'GeoSci Developers',
