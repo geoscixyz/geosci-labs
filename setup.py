@@ -38,9 +38,7 @@ setup(
         'scipy>=0.13',
         'matplotlib',
         'ipywidgets',
-        'properties[math]',
         'SimPEG>=0.4.1',
-        'discretize',
         'em_examples'
     ],
     author = 'GeoSci Developers',
