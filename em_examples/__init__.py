@@ -31,13 +31,12 @@ from . import PlanewaveWidgetFD
 from . import Reflection
 from . import sphereElectrostatic_example
 from . import TransientVMDCylWidget
-from . import UXO_TEM_Widget
 from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane
 
 
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
