@@ -31,7 +31,7 @@ with open('README.rst') as f:
 
 setup(
     name = 'em_examples',
-    version = '0.0.16',
+    version = '0.0.17',
     packages = find_packages(),
     install_requires = [
         'future',
@@ -43,7 +43,6 @@ setup(
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
-        'cvxopt',
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
