@@ -25,6 +25,7 @@ from . import FreqtoTime
 from . import HarmonicVMDCylWidget
 from . import InductionLoop
 from . import InductionSphereFEM
+from . import InductionSphereTEM
 from . import Loop
 from . import MT
 from . import PlanewaveWidgetFD
