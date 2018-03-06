@@ -1,0 +1,16 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - scipy
+  - matplotlib
+  - Pillow
+  - ipywidgets>=0.6.0
+  - requests
+  - pip:
+    - pymatsolver
+    - discretize
+    - SimPEG
+    - em_examples
+    - empymod
