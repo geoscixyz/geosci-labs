@@ -346,7 +346,7 @@ class HarmonicVMDCylWidget(object):
             )
 
         out = widgetify(
-            foo
+            foo,
             Field=widgets.ToggleButtons(
                 options=["E", "B", "Bsec", "J"], value=fieldvalue
             ),
@@ -468,7 +468,7 @@ class HarmonicVMDCylWidget(object):
             plt.show()
 
         out = widgetify(
-            foo
+            foo,
             Field=widgets.ToggleButtons(
                 options=["E", "B", "Bsec"], value=fieldvalue
             ),

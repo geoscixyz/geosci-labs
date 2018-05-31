@@ -317,7 +317,7 @@ class TransientVMDCylWidget(object):
             )
 
         out = widgetify(
-            foo
+            foo,
             Update=widgets.ToggleButtons(
                 options=["True", "False"], value="True"
             ),
