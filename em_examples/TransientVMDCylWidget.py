@@ -40,7 +40,7 @@ class TransientVMDCylWidget(object):
 
     def mirrorArray(self, x, direction="x"):
         X = x.reshape((self.nx_core, self.ny_core), order="F")
-        if direction == "x" or direction == "y" :
+        if direction == "x" or direction == "y":
             X2 = np.vstack((-np.flipud(X), X))
         else:
             X2 = np.vstack((np.flipud(X), X))
@@ -50,18 +50,29 @@ class TransientVMDCylWidget(object):
         """
             Generate cylindrically symmetric mesh
         """
-        #TODO: Make it adaptive due to z location
+
+        # TODO: Make it adaptive due to z location
         hx = [(cs, ncx), (cs, npad, 1.3)]
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
         self.mesh = Mesh.CylMesh([hx, 1, hz], '00C')
 
     def getCoreDomain(self, mirror=False, xmax=95, zmin=-95, zmax=95.):
 
-        self.activeCC = (self.mesh.gridCC[:,0] <= xmax) & (np.logical_and(self.mesh.gridCC[:,2] >= zmin, self.mesh.gridCC[:,2] <= zmax))
-        self.gridCCactive = self.mesh.gridCC[self.activeCC,:][:,[0, 2]]
+        self.activeCC = (
+            (self.mesh.gridCC[:, 0] <= xmax) &
+            (
+                np.logical_and(
+                    self.mesh.gridCC[:, 2] >= zmin,
+                    self.mesh.gridCC[:, 2] <= zmax
+                )
+            )
+        )
+        self.gridCCactive = self.mesh.gridCC[self.activeCC, :][:, [0, 2]]
 
         xind = (self.mesh.vectorCCx <= xmax)
-        yind = np.logical_and(self.mesh.vectorCCz >= zmin, self.mesh.vectorCCz <= zmax)
+        yind = np.logical_and(
+            self.mesh.vectorCCz >= zmin, self.mesh.vectorCCz <= zmax
+        )
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 
@@ -77,8 +88,9 @@ class TransientVMDCylWidget(object):
         self.Gz = BiotSavartFun(self.mesh, rxLoc, component='z')
         self.Gx = BiotSavartFun(self.mesh, rxLoc, component='x')
 
-
-    def setThreeLayerParam(self, h1=12, h2=12, sig0=1e-8, sig1=1e-2, sig2=1e-2, sig3=1e-2, chi=0.):
+    def setThreeLayerParam(
+        self, h1=12, h2=12, sig0=1e-8, sig1=1e-2, sig2=1e-2, sig3=1e-2, chi=0.
+    ):
         self.h1 = h1      # 1st layer thickness
         self.h2 = h2      # 2nd layer thickness
         self.z0 = 0.
@@ -90,15 +102,22 @@ class TransientVMDCylWidget(object):
         self.sig3 = sig3  # 3rd layer \sigma
 
         active = self.mesh.vectorCCz < self.z0
-        ind1 = (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
-        ind2 = (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
-        self.mapping = Maps.SurjectVertical1D(self.mesh) * Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nCz)
+        ind1 = (
+            (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
+        )
+        ind2 = (
+            (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
+        )
+        self.mapping = (
+            Maps.SurjectVertical1D(self.mesh) *
+            Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nCz)
+        )
         model = np.ones(self.mesh.nCz) * sig3
         model[ind1] = sig1
         model[ind2] = sig2
         self.m = model[active]
         self.mu = np.ones(self.mesh.nC)*mu_0
-        self.mu[self.mesh.gridCC[:, 2]<0.] = (1.+chi)*mu_0
+        self.mu[self.mesh.gridCC[:, 2] < 0.] = (1.+chi)*mu_0
         return self.m
 
     def simulate(self, srcLoc, rxLoc, time, radius=1.):
@@ -110,7 +129,11 @@ class TransientVMDCylWidget(object):
                                        loc=srcLoc, radius=radius)
         self.srcList = [src]
         prb = EM.TDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping)
-        prb.timeSteps = [(1e-06, 10), (5e-06, 10), (1e-05, 10), (5e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
+        prb.timeSteps = [
+            (1e-06, 10), (5e-06, 10), (1e-05, 10),
+            (5e-5, 10), (1e-4, 10), (5e-4, 10),
+            (1e-3, 10)
+        ]
         survey = EM.TDEM.Survey(self.srcList)
         prb.pair(survey)
         self.f = prb.fields(self.m)
@@ -120,17 +143,33 @@ class TransientVMDCylWidget(object):
 
     def getFields(self, itime):
         src = self.srcList[0]
-        Pfx = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fx")
-        Pfz = self.mesh.getInterpolationMat(self.mesh.gridCC[self.activeCC,:], locType="Fz")
+        Pfx = self.mesh.getInterpolationMat(
+            self.mesh.gridCC[self.activeCC, :], locType="Fx"
+        )
+        Pfz = self.mesh.getInterpolationMat(
+            self.mesh.gridCC[self.activeCC, :], locType="Fz"
+        )
         Ey = self.mesh.aveE2CC*self.f[src, "e", itime]
         Jy = Utils.sdiag(self.prb.sigma) * Ey
 
-        self.Ey = Utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
-        self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
-        self.Bx = Utils.mkvc(self.mirrorArray(Pfx*self.f[src, "b", itime], direction="x"))
-        self.Bz = Utils.mkvc(self.mirrorArray(Pfz*self.f[src, "b", itime], direction="z"))
-        self.dBxdt = Utils.mkvc(self.mirrorArray(-Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x"))
-        self.dBzdt = Utils.mkvc(self.mirrorArray(-Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z"))
+        self.Ey = Utils.mkvc(
+            self.mirrorArray(Ey[self.activeCC], direction="y")
+        )
+        self.Jy = Utils.mkvc(
+            self.mirrorArray(Jy[self.activeCC], direction="y")
+        )
+        self.Bx = Utils.mkvc(
+            self.mirrorArray(Pfx*self.f[src, "b", itime], direction="x")
+        )
+        self.Bz = Utils.mkvc(
+            self.mirrorArray(Pfz*self.f[src, "b", itime], direction="z")
+        )
+        self.dBxdt = Utils.mkvc(self.mirrorArray(
+            -Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x")
+        )
+        self.dBzdt = Utils.mkvc(self.mirrorArray(
+            -Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z")
+        )
 
     def getData(self):
         src = self.srcList[0]
@@ -144,15 +183,16 @@ class TransientVMDCylWidget(object):
         self.dBxdt = (-Pfx*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
         self.dBzdt = (-Pfz*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
 
-
-    def plotField(self, Field='B', view="vec", scale="linear", itime=0, Geometry=True):
+    def plotField(
+        self, Field='B', view="vec", scale="linear", itime=0, Geometry=True
+    ):
         fig = plt.figure(figsize=(10, 6))
         ax = plt.subplot(111)
         vec = False
         if view == "vec":
             tname = "Vector "
             title = tname+Field+"-field"
-        elif  view == "amp":
+        elif view == "amp":
             tname = "|"
             title = tname+Field+"|-field"
         else:
@@ -200,7 +240,7 @@ class TransientVMDCylWidget(object):
 
         elif Field == "J":
             label = "Current density (A/m$^2$)"
-            if view=="y":
+            if view == "y":
                 val = self.Jy
             else:
                 # ax.imshow(self.im)
@@ -208,17 +248,29 @@ class TransientVMDCylWidget(object):
                 ax.set_yticks([])
                 return "Dude, think twice ... only Jy for VMD"
 
-        out = Utils.plot2Ddata(self.mesh2D.gridCC, val, vec=vec, ax=ax, contourOpts={"cmap":"viridis"}, ncontour=50, scale=scale)
+        out = Utils.plot2Ddata(
+            self.mesh2D.gridCC, val, vec=vec, ax=ax,
+            contourOpts={"cmap": "viridis"},
+            ncontour=50, scale=scale
+        )
         if scale == "linear":
-            cb = plt.colorbar(out[0], ax=ax, ticks=np.linspace(out[0].vmin, out[0].vmax, 3), format="%.1e")
+            cb = plt.colorbar(
+                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                format="%.1e"
+            )
         elif scale == "log":
-            cb = plt.colorbar(out[0], ax=ax, ticks=np.linspace(out[0].vmin, out[0].vmax, 3), format="$10^{%.1f}$")
+            cb = plt.colorbar(
+                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                format="$10^{%.1f}$"
+            )
         else:
             raise Exception("We consdier only linear and log scale!")
         cb.set_label(label)
         xmax = self.mesh2D.gridCC[:, 0].max()
         if Geometry:
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5)
+            ax.plot(
+                np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5
+            )
             ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
             ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'k--', lw=0.5)
             ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'k--', lw=0.5)
@@ -227,46 +279,109 @@ class TransientVMDCylWidget(object):
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
-        ax.text(-85, 90, ("Time at %.3f ms")%(self.prb.times[itime]*1e3), fontsize = 12)
+        ax.text(
+            -85, 90, ("Time at %.3f ms") % (self.prb.times[itime]*1e3),
+            fontsize=12
+        )
         plt.show()
 
-    def InteractivePlane(self, scale="log", fieldvalue="E", compvalue="y", sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
-                         radius=1., z0=0., x0=10.):
-        def foo(Update, Field, AmpDir, Component, itime, Sigma0, Sigma1, Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, radius, Geometry=True):
+    def InteractivePlane(
+        self, scale="log", fieldvalue="E", compvalue="y",
+        sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
+        radius=1., z0=0., x0=10.
+    ):
+        def foo(
+            Update, Field, AmpDir, Component,
+            itime, Sigma0, Sigma1, Sigma2, Sigma3,
+            Sus, z, h1, h2, Scale,
+            rxOffset, radius, Geometry=True
+        ):
 
             if AmpDir == "Direction":
                 Component = "vec"
-            m = self.setThreeLayerParam(h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2, sig3=Sigma3, chi=Sus)
+            m = self.setThreeLayerParam(
+                h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2,
+                sig3=Sigma3, chi=Sus
+            )
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
-            if Update =="True":
-                dpred = self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
+            if Update:
+                dpred = self.simulate(
+                    self.srcLoc, self.rxLoc, self.time, self.radius
+                )
             self.getFields(itime)
-            return self.plotField(Field=Field, view=Component, scale=Scale, Geometry=Geometry, itime=itime)
+            return self.plotField(
+                Field=Field, view=Component, scale=Scale,
+                Geometry=Geometry, itime=itime
+            )
 
-        out = widgetify(foo
-                        ,Update=widgets.ToggleButtons(options=["True", "False"], value="True") \
-                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt", "J"], value=fieldvalue) \
-                        ,AmpDir=widgets.ToggleButtons(options=['None','Direction'], value="None") \
-                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,itime=widgets.IntSlider(min=1, max=70, step=1, value=1, continuous_update=False, description='Time index') \
-                        ,Sigma0=widgets.FloatText(value=sig0, continuous_update=False, description='$\sigma_0$ (S/m)') \
-                        ,Sigma1=widgets.FloatText(value=sig1, continuous_update=False, description='$\sigma_1$ (S/m)') \
-                        ,Sigma2=widgets.FloatText(value=sig2, continuous_update=False, description='$\sigma_2$ (S/m)') \
-                        ,Sigma3=widgets.FloatText(value=sig3, continuous_update=False, description='$\sigma_3$ (S/m)') \
-                        ,Sus=widgets.FloatText(value=0., continuous_update=False, description='$\chi$') \
-                        ,z=widgets.FloatSlider(min=0., max=48., step=3., value=z0, continuous_update=False, description='$z$ (m)') \
-                        ,h1=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_1$ (m)') \
-                        ,h2=widgets.FloatSlider(min=3., max=48., step=3., value=6., continuous_update=False, description='$h_2$ (m)') \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="linear") \
-                        ,rxOffset=widgets.FloatText(value=x0, continuous_update=False, description='x (m)') \
-                        ,radius=widgets.FloatText(value=radius, continuous_update=False, description='Tx radius (m)') \
-                        )
+        out = widgetify(
+            foo
+            Update=widgets.ToggleButtons(
+                options=["True", "False"], value="True"
+            ),
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "dBdt", "J"], value=fieldvalue
+            ),
+            AmpDir=widgets.ToggleButtons(
+                options=['None', 'Direction'], value="None"
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue,
+                description='Comp.'
+            ),
+            itime=widgets.IntSlider(
+                min=1, max=70, step=1, value=1,
+                continuous_update=False, description='Time index'
+            ),
+            Sigma0=widgets.FloatText(
+                value=sig0, continuous_update=False,
+                description='$\sigma_0$ (S/m)'
+            ),
+            Sigma1=widgets.FloatText(
+                value=sig1, continuous_update=False,
+                description='$\sigma_1$ (S/m)'
+            ),
+            Sigma2=widgets.FloatText(
+                value=sig2, continuous_update=False,
+                description='$\sigma_2$ (S/m)'
+            ),
+            Sigma3=widgets.FloatText(
+                value=sig3, continuous_update=False,
+                description='$\sigma_3$ (S/m)'
+            ),
+            Sus=widgets.FloatText(
+                value=0., continuous_update=False,
+                description='$\chi$'
+            ),
+            z=widgets.FloatSlider(
+                min=0., max=48., step=3., value=z0,
+                continuous_update=False, description='$z$ (m)'
+            ),
+            h1=widgets.FloatSlider(
+                min=3., max=48., step=3., value=6.,
+                continuous_update=False, description='$h_1$ (m)'
+            ),
+            h2=widgets.FloatSlider(
+                min=3., max=48., step=3., value=6.,
+                continuous_update=False, description='$h_2$ (m)'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="linear"
+            ),
+            rxOffset=widgets.FloatText(
+                value=x0, continuous_update=False,
+                description='x (m)'
+            ),
+            radius=widgets.FloatText(
+                value=radius, continuous_update=False,
+                description='Tx radius (m)'
+            ),
+        )
         return out
 
     def InteractiveData(self, fieldvalue="B", compvalue="z"):
-        # dpred = self.simulate(self.srcLoc, self.rxLoc, frequency, radius=radius)
         def foo(Field, Component, Scale):
             fig = plt.figure()
             ax = plt.subplot(111)
@@ -318,7 +433,7 @@ class TransientVMDCylWidget(object):
                 val_p, val_n = DisPosNegvalues(val)
                 ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
                 ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
-                ax.legend(("(+)", "(-)"), loc=1, fontsize = 10)
+                ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
             else:
                 ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
 
@@ -330,10 +445,18 @@ class TransientVMDCylWidget(object):
             ax.grid(True)
             plt.show()
 
+        out = widgetify(
+            foo,
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "dBdt"], value=fieldvalue
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue,
+                description='Comp.'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="log"
+            )
+        )
 
-        out = widgetify(foo
-                        ,Field=widgets.ToggleButtons(options=["E", "B", "dBdt"], value=fieldvalue) \
-                        ,Component=widgets.ToggleButtons(options=['x','y','z'], value=compvalue, description='Comp.') \
-                        ,Scale=widgets.ToggleButtons(options=['log','linear'], value="log") \
-                        )
         return out
