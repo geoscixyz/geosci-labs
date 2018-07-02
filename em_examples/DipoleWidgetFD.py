@@ -367,7 +367,7 @@ def DisPosNegvalues(val):
 def InteractiveDipoleProfile(self, sig, Field, Scale):
     srcLoc = np.r_[0., 0., 0.]
     orientation = "z"
-    nRx = 100.
+    nRx = int(100)
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
     def foo(Component, ComplexNumber, Sigma, Profile, F1, F2, F3, Scale, FixedScale=False):
