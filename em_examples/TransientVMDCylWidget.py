@@ -56,7 +56,7 @@ class TransientVMDCylWidget(object):
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
         self.mesh = Mesh.CylMesh([hx, 1, hz], '00C')
 
-    def getCoreDomain(self, mirror=False, xmax=95, zmin=-95, zmax=95.):
+    def getCoreDomain(self, mirror=False, xmax=200, zmin=-200, zmax=200.):
 
         self.activeCC = (
             (self.mesh.gridCC[:, 0] <= xmax) &
@@ -251,7 +251,7 @@ class TransientVMDCylWidget(object):
         out = Utils.plot2Ddata(
             self.mesh2D.gridCC, val, vec=vec, ax=ax,
             contourOpts={"cmap": "viridis"},
-            ncontour=50, scale=scale
+            ncontour=100, scale=scale
         )
         if scale == "linear":
             cb = plt.colorbar(
@@ -269,19 +269,19 @@ class TransientVMDCylWidget(object):
         xmax = self.mesh2D.gridCC[:, 0].max()
         if Geometry:
             ax.plot(
-                np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5
+                np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
             )
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'k--', lw=0.5)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'k--', lw=0.5)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
             ax.plot(0, self.srcLoc[2], 'ko', ms=4)
             ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
         ax.text(
-            -85, 90, ("Time at %.3f ms") % (self.prb.times[itime]*1e3),
-            fontsize=12
+            -150, 150, ("Time at %.3f ms") % (self.prb.times[itime]*1e3),
+            fontsize=16, color='w'
         )
         plt.show()
 
