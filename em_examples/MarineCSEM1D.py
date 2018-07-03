@@ -43,7 +43,7 @@ def show_canonical_model():
     ax1=plt.subplot(1, 2, 1)
     plt.plot(pres, -pdepth, 'k')
     plt.xscale('log')
-    plt.xlim([.2*np.array(res).min(), 2*np.array(res)[1:].max()])
+    plt.xlim([.2*np.array(res).min(), 100*np.array(res)[1:].max()])
     plt.ylim([-1.5*depth[-1], 500])
     plt.ylabel('z (m)')
     plt.xlabel(r'Resistivity $\rho_h\ (\Omega\,\rm{m})$')
@@ -57,11 +57,11 @@ def show_canonical_model():
     ax2.yaxis.tick_right()
     ax1.grid(True)
     ax2.grid(True)
-    ax1.text(2, -0.5*(-500 + d1), "Air")
-    ax1.text(2, -0.5*(d1 + d2), "Seawater")
-    ax1.text(2, -0.5*(d2 + d3), "Sea sediment")
-    ax1.text(2, -0.5*(d3 + d4) - 50., "Reservoir")
-    ax1.text(2, -0.5*(d4 + d4+1000.), "Sea sediment")
+    ax1.text(1.5, -0.5*(-500 + d1), "Air ($\\rho_0$)")
+    ax1.text(1.5, -0.5*(d1 + d2), "Seawater ($\\rho_1$)")
+    ax1.text(1.5, -0.5*(d2 + d3), "Sea sediment ($\\rho_2$)")
+    ax1.text(1.5, -0.5*(d3 + d4) - 50., "Reservoir ($\\rho_3$)")
+    ax1.text(1.5, -0.5*(d4 + d4+1000.), "Sea sediment ($\\rho_4$)")
     plt.show()
     return
 
@@ -185,7 +185,7 @@ def csem_fields_app(
     d=np.r_[0., np.cumsum(np.r_[dz1, dz2, dz3])]
     depth=[d[0], d[1], d[2], d[3]]       # Layer boundaries
     res=  [rho0,  rho1,  rho2,  rho3, rho4]  # Anomaly resistivities
-    aniso=[1., 1., rv_rh, 1., 1.]  # Layer anisotropies (same for anomaly and background)
+    aniso=[1., 1., np.sqrt(rv_rh), 1., 1.]  # Layer anisotropies (same for anomaly and background)
 
     # Modelling parameters
     verb=1
@@ -278,7 +278,8 @@ def FieldsApp():
 
 def csem_data_app(
     frequency, zsrc, zrx,
-    rho0, rho1, rho2, rho3, rho4, rv_rh, rho3BG,
+    rho0, rho1, rho2, rho3, rho4, rv_rh, rv_rh_bg,
+    rho2BG, rho3BG,
     dz1, dz2, dz3,
     Field, Plane, Component, Complex, scale,
     Fixed, vmin, vmax
@@ -288,9 +289,9 @@ def csem_data_app(
     d = np.r_[0., np.cumsum(np.r_[dz1, dz2, dz3])]
     depth = [d[0], d[1], d[2], d[3]]       # Layer boundaries
     res =   [rho0,  rho1,  rho2,  rho3, rho4]  # Anomaly resistivities
-    resBG =   [rho0,  rho1,  rho2,  rho3BG, rho4]  # Anomaly resistivities
-    aniso = [1., 1., rv_rh, 1., 1.]  # Layer anisotropies (same for anomaly and background)
-    anisoBG = [1., 1., 1., 1., 1.]  # Layer anisotropies (same for anomaly and background)
+    resBG =   [rho0,  rho1,  rho2BG,  rho3BG, rho4]  # Anomaly resistivities
+    aniso = [1., 1., np.sqrt(rv_rh), 1., 1.]  # Layer anisotropies (same for anomaly and background)
+    anisoBG = [1., 1., np.sqrt(rv_rh_bg), 1., 1.]  # Layer anisotropies (same for anomaly and background)
 
     # Modelling parameters
     verb = 1
@@ -317,11 +318,11 @@ def csem_data_app(
     if Field == "E":
         label = "Electric field (V/m)"
         data = csem_layered_earth(srcloc, rxlocs, depth, res, aniso, frequency, rx_direction=Component)
-        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, aniso, frequency, rx_direction=Component)
+        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, anisoBG, frequency, rx_direction=Component)
     elif Field == "H":
         label = "Magnetic field (A/m)"
         data = csem_layered_earth(srcloc, rxlocs, depth, res, aniso, frequency, rx_direction=Component, rx_type="magnetic")
-        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, aniso, frequency, rx_direction=Component, rx_type="magnetic")
+        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, anisoBG, frequency, rx_direction=Component, rx_type="magnetic")
     if Complex == "Real":
         val = data.real
         valBG = dataBG.real
@@ -347,7 +348,7 @@ def csem_data_app(
     ax.set_xlabel(xlabel)
     ax.set_ylabel(label)
     ax.set_yscale(scale)
-    ax.legend(("Canonical", "Background"))
+    ax.legend(("Response", "Background"))
     if Complex == "Amp":
         title = "|"+ Field + Component+"|"
     else:
@@ -363,11 +364,13 @@ def DataApp():
     rho1=FloatText(value=0.3, description='$\\rho_{1} \ (\Omega m)$'),
     rho2=FloatText(value=1., description='$\\rho_{2} \ (\Omega m)$'),
     rho3=FloatText(value=100., description='$\\rho_{3} \ (\Omega m)$'),
-    rho3BG=FloatText(value=1., description='$\\rho_{BG \ 3} \ (\Omega m)$'),
+    rho2BG=FloatText(value=1., description='$\\rho_{2}^{BG} \ (\Omega m)$'),
+    rho3BG=FloatText(value=1., description='$\\rho_{3}^{BG} \ (\Omega m)$'),
     rho4=FloatText(value=1., description='$\\rho_{4} \ (\Omega m)$'),
     zsrc=FloatText(value=-950., description='src height (m)'),
     zrx=FloatText(value=-1000., description='rx height (m)'),
     rv_rh=FloatText(value=1., description='$\\rho_{2 \ v} / \\rho_{2 \ h}$'),
+    rv_rh_bg=FloatText(value=1., description='$\\rho_{2 \ v}^{BG} / \\rho_{2 \ h}^{BG}$'),
     dz1=FloatText(value=1000., description="dz1 (m)"),
     dz2=FloatText(value=1000., description="dz2 (m)"),
     dz3=FloatText(value=200., description="dz3 (m)"),
