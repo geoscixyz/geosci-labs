@@ -35,6 +35,7 @@ from . import TransientVMDCylWidget
 from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane
+from . import MarineCSEM1D
 
 
 __version__ = '0.0.20'
