@@ -1,6 +1,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
+import sys
 
 from . import Attenuation
 from . import BiotSavart
@@ -35,6 +36,8 @@ from . import TransientVMDCylWidget
 from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane
+if sys.version_info[0] > 2:
+    from . import MarineCSEM1D
 
 
 __version__ = '0.0.20'
