@@ -5,5 +5,5 @@ Pillow
 ipywidgets>=0.6.0
 requests
 SimPEG
-em_examples>=0.0.21
+git+https://github.com/geoscixyz/em_examples.git@master
 empymod
