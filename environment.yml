@@ -12,6 +12,7 @@ dependencies:
   - pip:
     - pymatsolver
     - discretize
+    - deepdish
     - SimPEG
     - git+https://github.com/geoscixyz/em_examples.git@tdem_groundedsource
     - empymod
