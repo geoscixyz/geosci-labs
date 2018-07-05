@@ -7,7 +7,7 @@ from nbconvert.preprocessors import ClearOutputPreprocessor, ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
 
 # add names of notebooks to ignore here.
-py2Ignore = []
+py2Ignore = ["MarineCSEM_LayeredEarth"]
 
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook

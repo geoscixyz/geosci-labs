@@ -5,5 +5,5 @@ Pillow
 ipywidgets>=0.6.0
 requests
 SimPEG
-em_examples
+em_examples>=0.0.21
 empymod
