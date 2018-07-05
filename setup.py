@@ -43,6 +43,8 @@ setup(
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
+        'empymod',
+        'deepdish'
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
