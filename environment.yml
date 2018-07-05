@@ -12,5 +12,5 @@ dependencies:
     - pymatsolver
     - discretize
     - SimPEG
-    - em_examples
+    - git+https://github.com/geoscixyz/em_examples.git@master
     - empymod
