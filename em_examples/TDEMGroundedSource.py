@@ -29,7 +29,7 @@ def download_and_unzip_data(
 use_computed_results = True
 
 def load_or_run_results(
-    re_run=False, fname=None, 
+    re_run=False, fname=None,
     sigma_block=0.01,
     sigma_halfspace=0.01
 ):
@@ -38,10 +38,10 @@ def load_or_run_results(
             fname=fname, sigma_block=sigma_block, sigma_halfspace=sigma_halfspace
         )
     else:
-        downloads, directory = download_and_unzip_data()    
+        downloads, directory = download_and_unzip_data()
         fname = os.path.sep.join([directory, fname])
 
-    simulation_results = dd.io.load(fname)    
+    simulation_results = dd.io.load(fname)
     mesh = Mesh.TensorMesh(simulation_results['mesh']['h'], x0=simulation_results['mesh']['x0'])
     sigma = simulation_results['sigma']
     times = simulation_results['time']
@@ -82,7 +82,7 @@ def run_simulation(
     from SimPEG.EM import TDEM, Analytics, mu_0
     import numpy as np
     from SimPEG import Mesh, Maps, Utils, EM, Survey
-    from pymatsolver import PardisoSolver
+    from pymatsolver import Pardiso
     cs = 20
     ncx, ncy, ncz = 20, 20, 20
     npad = 10
@@ -108,7 +108,7 @@ def run_simulation(
 
     from scipy.interpolate import interp1d
     prb = TDEM.Problem3D_b(mesh, sigma = sigma, verbose=True)
-    prb.Solver = PardisoSolver
+    prb.Solver = Pardiso
     prb.solverOpts = {"is_symmetric":False}
     prb.timeSteps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
     t0 = 0.01+1e-4
@@ -147,7 +147,7 @@ def run_simulation(
 
     E, B, J = getEBJcore(src)
     tdem_gs = { "E": E, "B": B, "J": J,
-                "sigma": sigma_core, "mesh": meshCore.serialize(), 'time':prb.times-t0, 'input_currents':input_currents}    
+                "sigma": sigma_core, "mesh": meshCore.serialize(), 'time':prb.times-t0, 'input_currents':input_currents}
     dd.io.save(fname, tdem_gs)
 
 
@@ -163,7 +163,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
-        
+
 class PlotTDEM(object):
     """docstring for PlotTDEM"""
     mesh = None
@@ -182,8 +182,8 @@ class PlotTDEM(object):
         self.zmin, self.zmax = self.mesh.vectorCCz.min(), self.mesh.vectorCCz.max()
 
     def show_3d_survey_geometry(self, elev, azim, show_block=False):
-        X1, X2 = -250., 250. 
-        Y1, Y2 = -250., 250. 
+        X1, X2 = -250., 250.
+        Y1, Y2 = -250., 250.
         Z1, Z2 = -400., 0.
         def polyplane(verts, alpha=0.1, color="green"):
             poly = Poly3DCollection(verts)
@@ -291,35 +291,35 @@ class PlotTDEM(object):
             ind = np.argmin(abs(mesh.vectorCCz-loc))
             vx = VEC[:,0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,:,ind]
             vy = VEC[:,1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,:,ind]
-            vz = VEC[:,2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,:,ind]        
+            vz = VEC[:,2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,:,ind]
             xy = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
             if isz:
                 return Utils.mkvc(vz), xy
             else:
                 return np.c_[Utils.mkvc(vx), Utils.mkvc(vy)], xy
-        
+
         elif normal == "Y":
-            ind = np.argmin(abs(mesh.vectorCCx-loc))        
+            ind = np.argmin(abs(mesh.vectorCCx-loc))
             vx = VEC[:,0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,ind, :]
             vy = VEC[:,1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,ind, :]
             vz = VEC[:,2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:,ind, :]
-            xz = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)        
+            xz = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
             if isz:
                 return Utils.mkvc(vz), xy
-            else:        
-                return np.c_[Utils.mkvc(vx), Utils.mkvc(vz)] , xz       
-        
+            else:
+                return np.c_[Utils.mkvc(vx), Utils.mkvc(vz)] , xz
+
         elif normal == "X":
-            ind = np.argmin(abs(mesh.vectorCCy-loc))      
+            ind = np.argmin(abs(mesh.vectorCCy-loc))
             vx = VEC[:,0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind,:,:]
             vy = VEC[:,1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind,:,:]
-            vz = VEC[:,2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind,:,:]        
-            yz = Utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)        
+            vz = VEC[:,2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind,:,:]
+            yz = Utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
             if isz:
                 return Utils.mkvc(vz), xy
-            else:        
+            else:
                 return np.c_[Utils.mkvc(vy), Utils.mkvc(vz)], yz
-         
+
 
     def plot_electric_currents(self, itime):
         exy, xy = self.getSlices(self.mesh, self.J, itime, normal="Z", loc=-100.5)
@@ -343,16 +343,16 @@ class PlotTDEM(object):
         ax2.set_xlabel("X (m)")
         ax2.set_ylabel("Z (m)")
         ax1.set_xlim(self.xmin, self.xmax)
-        ax1.set_ylim(self.ymin, self.ymax)    
+        ax1.set_ylim(self.ymin, self.ymax)
         ax2.set_xlim(self.xmin, self.xmax)
-        ax2.set_ylim(self.zmin, self.zmax)    
-        
+        ax2.set_ylim(self.zmin, self.zmax)
+
         ax1.plot(ax1.get_xlim(), np.zeros(2), 'k--', lw=1)
         ax2.plot(ax1.get_xlim(), np.zeros(2)-100., 'k--', lw=1)
         title = ("Time at %.2f ms") % ((self.times[itime])*1e3)
         ax1.set_title(title)
-        plt.tight_layout()        
-        
+        plt.tight_layout()
+
 
     def plot_magnetic_flux(self, itime):
         bxy, xy = self.getSlices(self.mesh, self.B, itime, normal="Z", loc=-100.5)
@@ -376,11 +376,11 @@ class PlotTDEM(object):
         ax2.set_xlabel("Y (m)")
         ax2.set_ylabel("Z (m)")
         ax1.set_xlim(self.xmin, self.xmax)
-        ax1.set_ylim(self.ymin, self.ymax)    
+        ax1.set_ylim(self.ymin, self.ymax)
         ax2.set_xlim(self.xmin, self.xmax)
-        ax2.set_ylim(self.zmin, self.zmax)    
+        ax2.set_ylim(self.zmin, self.zmax)
         ax1.plot(ax1.get_xlim(), np.zeros(2), 'k--', lw=1)
         ax2.plot(ax1.get_xlim(), np.zeros(2)-100., 'k--', lw=1)
         title = ("Time at %.2f ms") % ((self.times[itime])*1e3)
         ax1.set_title(title)
-        plt.tight_layout()    
+        plt.tight_layout()

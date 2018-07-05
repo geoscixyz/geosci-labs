@@ -40,7 +40,7 @@ if sys.version_info[0] > 2:
     from . import MarineCSEM1D
 from . import TDEMGroundedSource
 
-__version__ = '0.0.20'
+__version__ = '0.0.21'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
