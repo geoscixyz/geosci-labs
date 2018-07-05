@@ -30,10 +30,13 @@ use_computed_results = True
 
 def load_or_run_results(
     re_run=False, fname=None, 
-    sigma_block=0.01
+    sigma_block=0.01,
+    sigma_halfspace=0.01
 ):
     if re_run:
-        run_simulation(fname=fname, sigma_block=0.01)
+        run_simulation(
+            fname=fname, sigma_block=sigma_block, sigma_halfspace=sigma_halfspace
+        )
     else:
         downloads, directory = download_and_unzip_data()    
         fname = os.path.sep.join([directory, fname])
@@ -57,9 +60,24 @@ def load_or_run_results(
     }
     return output
 
+def choose_model(model):
+    known_names = [
+    'tdem_gs_half.h5',
+    'tdem_gs_conductor.h5',
+    'tdem_gs_resistor.h5'
+    ]
+    if model == "halfspace":
+        ind = 0
+    elif model == "conductor":
+        ind = 1
+    elif model == "resistor":
+        ind = 2
+    return known_names[ind]
+
 def run_simulation(
     fname='tdem_gs_half.h5',
-    sigma_block=0.01
+    sigma_block=0.01,
+    sigma_halfspace=0.01
 ):
     from SimPEG.EM import TDEM, Analytics, mu_0
     import numpy as np
@@ -72,11 +90,10 @@ def run_simulation(
     hy = [(cs, npad, -1.5), (cs, ncy), (cs, npad, 1.5)]
     hz = [(cs, npad, -1.5), (cs, ncz), (cs, npad, 1.5)]
     mesh = Mesh.TensorMesh([hx, hy, hz], 'CCC')
-    sigma = np.ones(mesh.nC)*0.01
+    sigma = np.ones(mesh.nC)*sigma_halfspace
     blk_ind = Utils.ModelBuilder.getIndicesBlock(np.r_[-40, -40, -160], np.r_[40, 40, -80], mesh.gridCC)
     sigma[mesh.gridCC[:,2]>0.] = 1e-8
     sigma[blk_ind] = sigma_block
-    print (sigma_block)
 
     xmin, xmax = -200., 200.
     ymin, ymax = -200., 200.
@@ -98,6 +115,7 @@ def run_simulation(
     out = EM.Utils.VTEMFun(prb.times, 0.01, t0, 200)
     wavefun = interp1d(prb.times, out)
     waveform = EM.TDEM.Src.RawWaveform(offTime=t0, waveFct=wavefun)
+    input_currents = wavefun(prb.times)
 
     times = np.logspace(-4, -2, 21)
     rx_ex = TDEM.Rx.Point_e(xyz, times+t0,orientation="x")
@@ -126,10 +144,6 @@ def run_simulation(
         E0 = np.r_[Pex*f[src0, "e"], Pey*f[src0, "e"], Pez*f[src0, "e"]]
         J0 = Utils.sdiag(np.r_[sigma_core, sigma_core, sigma_core]) * E0
         return E0, B0, J0
-
-    meshCore.plotSlice(np.log10(sigma_core), normal="X", grid=True, ind=9)
-    plt.xlim(-200, 200)
-    plt.ylim(-200, 200)
 
     E, B, J = getEBJcore(src)
     tdem_gs = { "E": E, "B": B, "J": J,
