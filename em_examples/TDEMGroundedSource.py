@@ -85,7 +85,7 @@ def run_simulation(
     from pymatsolver import Pardiso
     cs = 20
     ncx, ncy, ncz = 20, 20, 20
-    npad = 8
+    npad = 10
     hx = [(cs, npad, -1.5), (cs, ncx), (cs, npad, 1.5)]
     hy = [(cs, npad, -1.5), (cs, ncy), (cs, npad, 1.5)]
     hz = [(cs, npad, -1.5), (cs, ncz), (cs, npad, 1.5)]
