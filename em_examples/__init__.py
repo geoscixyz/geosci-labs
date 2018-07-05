@@ -38,7 +38,7 @@ from . import VolumeWidget
 from . import VolumeWidgetPlane
 if sys.version_info[0] > 2:
     from . import MarineCSEM1D
-
+from . import TDEMGroundedSource
 
 __version__ = '0.0.20'
 __author__ = 'GeoScixyz developers'
