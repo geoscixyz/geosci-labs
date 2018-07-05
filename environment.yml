@@ -8,6 +8,7 @@ dependencies:
   - Pillow
   - ipywidgets>=0.6.0
   - requests
+  - mkl
   - pip:
     - pymatsolver
     - discretize
