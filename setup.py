@@ -43,7 +43,8 @@ setup(
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
-        'mkl'
+        'mkl',
+        'empymod'
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
