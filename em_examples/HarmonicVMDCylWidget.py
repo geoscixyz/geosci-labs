@@ -117,6 +117,36 @@ class HarmonicVMDCylWidget(object):
         self.mu[self.mesh.gridCC[:, 2] < 0.] = (1.+chi)*mu_0
         return self.m
 
+    def setLayerSphereParam(
+        self, d1=6, h=6, d2=16, R=4, sig0=1e-8, sigb=1e-2, sig1=1e-1, sig2=1., chi=0.
+    ):
+        self.z0 = 0.           # Surface elevation
+        self.z1 = self.z0-d1   # Depth to layer
+        self.h = h             # Thickness of layer
+        self.z2 = self.z0-d2   # Depth to center of sphere
+        self.R = R             # Radius of sphere
+        self.sig0 = sig0       # Air conductivity
+        self.sigb = sigb       # Background conductivity
+        self.sig1 = sig1       # Layer conductivity
+        self.sig2 = sig2       # Sphere conductivity
+
+        active = self.mesh.gridCC[:, 2] < self.z0
+        ind1 = (
+            (self.mesh.gridCC[:, 2] < self.z1) & (self.mesh.gridCC[:, 2] >= self.z1-self.h)
+        )
+        ind2 = np.sqrt((self.mesh.gridCC[:, 0])**2 + (self.mesh.gridCC[:, 2]-self.z2)**2) <= self.R
+
+        self.mapping = (
+            Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
+        )
+        model = np.ones(self.mesh.nC) * sigb
+        model[ind1] = sig1
+        model[ind2] = sig2
+        self.m = model[active]
+        self.mu = np.ones(self.mesh.nC)*mu_0
+        self.mu[self.mesh.gridCC[:, 2] < 0.] = (1.+chi)*mu_0
+        return self.m
+
     def simulate(self, srcLoc, rxLoc, freqs):
         bzr = EM.FDEM.Rx.Point_bSecondary(
             rxLoc,
@@ -181,7 +211,7 @@ class HarmonicVMDCylWidget(object):
 
     def plotField(
         self, Field='B', ComplexNumber="real", view="vec", scale="linear",
-        ifreq=0, Geometry=True
+        ifreq=0, Geometry=True, Scenario=None
     ):
         fig = plt.figure(figsize=(10, 6))
         ax = plt.subplot(111)
@@ -294,24 +324,41 @@ class HarmonicVMDCylWidget(object):
         cb.set_label(label)
         xmax = self.mesh2D.gridCC[:, 0].max()
         if Geometry:
-            ax.plot(
-                np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=0.5
-            )
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'k--', lw=0.5)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'k--', lw=0.5)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'k--', lw=0.5)
-            ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-            ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            if Scenario is 'Layer':
+                ax.plot(
+                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
+                )
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
+                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            elif Scenario is 'Sphere':
+                ax.plot(
+                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
+                )
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
+                Phi = np.linspace(0, 2*np.pi, 41)
+                ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
+                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
         plt.show()
 
-    def InteractivePlane(self, scale="log", fieldvalue="B", compvalue="z"):
+######################################################
+# LAYER WIDGET
+######################################################
+
+    def InteractivePlane_Layer(self, scale="log", fieldvalue="B", compvalue="z"):
 
         def foo(
             Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1,
-            Sigma2, Sigma3, Sus, z, h1, h2, Scale, rxOffset, Geometry=True
+            Sigma2, Sigma3, Sus, h1, h2, Scale, rxOffset, z, Geometry=True
         ):
 
             if ComplexNumber == "Re":
@@ -342,7 +389,7 @@ class HarmonicVMDCylWidget(object):
             self.getFields(bType=bType)
             return self.plotField(
                 Field=Field, ComplexNumber=ComplexNumber, view=Component,
-                scale=Scale, Geometry=Geometry
+                scale=Scale, Geometry=Geometry, Scenario='Layer'
             )
 
         out = widgetify(
@@ -381,29 +428,214 @@ class HarmonicVMDCylWidget(object):
             Sus=widgets.FloatText(
                 value=0., continuous_update=False, description='$\chi$'
             ),
-            z=widgets.FloatSlider(
-                min=0., max=48., step=3., value=0., continuous_update=False,
-                description='$z$ (m)'
-            ),
             h1=widgets.FloatSlider(
-                min=3., max=48., step=3., value=6., continuous_update=False,
+                min=2., max=40., step=2., value=10., continuous_update=False,
                 description='$h_1$ (m)'
             ),
             h2=widgets.FloatSlider(
-                min=3., max=48., step=3., value=6., continuous_update=False,
+                min=2., max=40., step=2., value=10., continuous_update=False,
                 description='$h_2$ (m)'
             ),
             Scale=widgets.ToggleButtons(
                 options=['log', 'linear'], value="linear"
             ),
-            rxOffset=widgets.FloatText(
-                value=10., continuous_update=False,
-                description='x (m)'
+            rxOffset=widgets.FloatSlider(
+                min=0., max=50., step=2., value=10., continuous_update=False,
+                description='$\Delta x$(m)'
+            ),
+            z=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$\Delta z$ (m)'
             ),
         )
         return out
 
-    def InteractiveData(self, fieldvalue="B", compvalue="z", z=0.):
+    def InteractiveData_Layer(self, fieldvalue="B", compvalue="z", z=0.):
+        frequency = np.logspace(2, 5, 31)
+        dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
+
+        def foo(Field, Component, Scale):
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            bType = "b"
+            if (Field == "Bsec") or (Field == "B"):
+                if Field == "Bsec":
+                    bType = "bSecondary"
+                Field = "B"
+                self.getData(bType=bType)
+                label = "Magnetic field (T)"
+                if Component == "x":
+                    title = "Bx"
+                    valr = self.Bx.real
+                    vali = self.Bx.imag
+                elif Component == "z":
+                    title = "Bz"
+                    valr = self.Bz.real
+                    vali = self.Bz.imag
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no By for VMD"
+
+            else:
+                self.getData(bType=bType)
+                label = "Electric field (V/m)"
+                title = "Ey"
+                if Component == "y":
+                    valr = self.Ey.real
+                    vali = self.Ey.imag
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... only Ey for VMD"
+
+            if Scale == "log":
+                valr_p, valr_n = DisPosNegvalues(valr)
+                vali_p, vali_n = DisPosNegvalues(vali)
+                ax.plot(frequency, valr_p, 'k-')
+                ax.plot(frequency, valr_n, 'k--')
+                ax.plot(frequency, vali_p, 'r-')
+                ax.plot(frequency, vali_n, 'r--')
+                ax.legend(
+                    ("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4,
+                    fontsize=10
+                )
+            else:
+                ax.plot(frequency, valr, 'k.-')
+                ax.plot(frequency, vali, 'r.-')
+                ax.legend(("Re", "Im"), loc=4, fontsize=10)
+            ax.set_xscale("log")
+            ax.set_yscale(Scale)
+            ax.set_xlabel("Frequency (Hz)")
+            ax.set_ylabel(label)
+            ax.set_title(title)
+            ax.grid(True)
+            plt.show()
+
+        out = widgetify(
+            foo,
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "Bsec"], value=fieldvalue
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue, description='Comp.'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="log"
+            ),
+        )
+        return out
+
+######################################################
+# SPHERE WIDGET
+######################################################
+
+    def InteractivePlane_Sphere(self, scale="log", fieldvalue="B", compvalue="z"):
+
+        def foo(
+            Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigmab,
+            Sigma1, Sigma2, Sus, d1, h, d2, R, Scale, rxOffset, z, Geometry=True
+        ):
+
+            if ComplexNumber == "Re":
+                ComplexNumber = "real"
+            elif ComplexNumber == "Im":
+                ComplexNumber = "imag"
+            elif ComplexNumber == "Amp":
+                ComplexNumber = "amplitude"
+            elif ComplexNumber == "Phase":
+                ComplexNumber = "phase"
+
+            if AmpDir == "Direction":
+                # ComplexNumber = "real"
+                Component = "vec"
+            if Field == "Bsec":
+                bType = "bSecondary"
+                Field = "B"
+            else:
+                bType = "b"
+
+            m = self.setLayerSphereParam(
+                d1=d1, h=h, d2=d2, R=R, sig0=Sigma0, sigb=Sigmab, sig1=Sigma1, sig2=Sigma2, chi=Sus
+            )
+            srcLoc = np.array([0., 0., z])
+            rxLoc = np.array([[rxOffset, 0., z]])
+            dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
+            self.getFields(bType=bType)
+            return self.plotField(
+                Field=Field, ComplexNumber=ComplexNumber, view=Component,
+                scale=Scale, Geometry=Geometry, Scenario='Sphere'
+            )
+
+        out = widgetify(
+            foo,
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "Bsec", "J"], value=fieldvalue
+            ),
+            AmpDir=widgets.ToggleButtons(
+                options=['None', 'Direction'], value="Direction"
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue, description='Comp.'
+            ),
+            ComplexNumber=widgets.ToggleButtons(
+                options=['Re', 'Im', 'Amp', 'Phase'], value="Re"
+            ),
+            Frequency=widgets.FloatText(
+                value=100., continuous_update=False, description='f (Hz)'
+            ),
+            Sigma0=widgets.FloatText(
+                value=1e-8, continuous_update=False,
+                description='$\sigma_0$ (S/m)'
+            ),
+            Sigmab=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_b$ (S/m)'
+            ),
+            Sigma1=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_1$ (S/m)'
+            ),
+            Sigma2=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_2$ (S/m)'
+            ),
+            Sus=widgets.FloatText(
+                value=0., continuous_update=False, description='$\chi$'
+            ),
+            d1=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$d_1$ (m)'
+            ),
+            h=widgets.FloatSlider(
+                min=2., max=20., step=2., value=10., continuous_update=False,
+                description='$h$ (m)'
+            ),
+            d2=widgets.FloatSlider(
+                min=10., max=50., step=2., value=30., continuous_update=False,
+                description='$d_2$ (m)'
+            ),
+            R=widgets.FloatSlider(
+                min=2., max=20., step=2., value=10., continuous_update=False,
+                description='$R$ (m)'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="linear"
+            ),
+            rxOffset=widgets.FloatSlider(
+                min=0., max=50., step=2., value=10., continuous_update=False,
+                description='$\Delta x$(m)'
+            ),
+            z=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$\Delta z$ (m)'
+            ),
+        )
+        return out
+
+    def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z", z=0.):
         frequency = np.logspace(2, 5, 31)
         dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
 

@@ -120,6 +120,36 @@ class TransientVMDCylWidget(object):
         self.mu[self.mesh.gridCC[:, 2] < 0.] = (1.+chi)*mu_0
         return self.m
 
+    def setLayerSphereParam(
+        self, d1=6, h=6, d2=16, R=4, sig0=1e-8, sigb=1e-2, sig1=1e-1, sig2=1., chi=0.
+    ):
+        self.z0 = 0.           # Surface elevation
+        self.z1 = self.z0-d1   # Depth to layer
+        self.h = h             # Thickness of layer
+        self.z2 = self.z0-d2   # Depth to center of sphere
+        self.R = R             # Radius of sphere
+        self.sig0 = sig0       # Air conductivity
+        self.sigb = sigb       # Background conductivity
+        self.sig1 = sig1       # Layer conductivity
+        self.sig2 = sig2       # Sphere conductivity
+
+        active = self.mesh.gridCC[:, 2] < self.z0
+        ind1 = (
+            (self.mesh.gridCC[:, 2] < self.z1) & (self.mesh.gridCC[:, 2] >= self.z1-self.h)
+        )
+        ind2 = np.sqrt((self.mesh.gridCC[:, 0])**2 + (self.mesh.gridCC[:, 2]-self.z2)**2) <= self.R
+
+        self.mapping = (
+            Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
+        )
+        model = np.ones(self.mesh.nC) * sigb
+        model[ind1] = sig1
+        model[ind2] = sig2
+        self.m = model[active]
+        self.mu = np.ones(self.mesh.nC)*mu_0
+        self.mu[self.mesh.gridCC[:, 2] < 0.] = (1.+chi)*mu_0
+        return self.m
+
     def simulate(self, srcLoc, rxLoc, time, radius=1.):
 
         bz = EM.TDEM.Rx.Point_b(rxLoc, time, orientation='z')
@@ -184,7 +214,7 @@ class TransientVMDCylWidget(object):
         self.dBzdt = (-Pfz*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
 
     def plotField(
-        self, Field='B', view="vec", scale="linear", itime=0, Geometry=True
+        self, Field='B', view="vec", scale="linear", itime=0, Geometry=True, Scenario=None
     ):
         fig = plt.figure(figsize=(10, 6))
         ax = plt.subplot(111)
@@ -268,14 +298,27 @@ class TransientVMDCylWidget(object):
         cb.set_label(label)
         xmax = self.mesh2D.gridCC[:, 0].max()
         if Geometry:
-            ax.plot(
-                np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
-            )
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
-            ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
-            ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-            ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            if Scenario is 'Layer':
+                ax.plot(
+                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
+                )
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
+                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            elif Scenario is 'Sphere':
+                ax.plot(
+                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
+                )
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
+                Phi = np.linspace(0, 2*np.pi, 41)
+                ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
+                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+
         ax.set_xlabel("Distance (m)")
         ax.set_ylabel("Depth (m)")
         ax.set_title(title)
@@ -285,16 +328,18 @@ class TransientVMDCylWidget(object):
         )
         plt.show()
 
-    def InteractivePlane(
-        self, scale="log", fieldvalue="E", compvalue="y",
-        sig0=1e-8, sig1=0.01, sig2=0.01, sig3=0.01,
-        radius=1., z0=0., x0=10.
+######################################################
+# LAYER WIDGET
+######################################################
+
+    def InteractivePlane_Layer(
+        self, scale="log", fieldvalue="E", compvalue="y"
     ):
         def foo(
             Update, Field, AmpDir, Component,
             itime, Sigma0, Sigma1, Sigma2, Sigma3,
-            Sus, z, h1, h2, Scale,
-            rxOffset, radius, Geometry=True
+            Sus, h1, h2, Scale,
+            rxOffset, z, radius, Geometry=True
         ):
 
             if AmpDir == "Direction":
@@ -313,7 +358,7 @@ class TransientVMDCylWidget(object):
             self.getFields(itime)
             return self.plotField(
                 Field=Field, view=Component, scale=Scale,
-                Geometry=Geometry, itime=itime
+                Geometry=Geometry, itime=itime, Scenario='Layer'
             )
 
         out = widgetify(
@@ -336,52 +381,238 @@ class TransientVMDCylWidget(object):
                 continuous_update=False, description='Time index'
             ),
             Sigma0=widgets.FloatText(
-                value=sig0, continuous_update=False,
+                value=1e-8, continuous_update=False,
                 description='$\sigma_0$ (S/m)'
             ),
             Sigma1=widgets.FloatText(
-                value=sig1, continuous_update=False,
+                value=0.01, continuous_update=False,
                 description='$\sigma_1$ (S/m)'
             ),
             Sigma2=widgets.FloatText(
-                value=sig2, continuous_update=False,
+                value=0.01, continuous_update=False,
                 description='$\sigma_2$ (S/m)'
             ),
             Sigma3=widgets.FloatText(
-                value=sig3, continuous_update=False,
+                value=0.01, continuous_update=False,
                 description='$\sigma_3$ (S/m)'
             ),
             Sus=widgets.FloatText(
                 value=0., continuous_update=False,
                 description='$\chi$'
             ),
-            z=widgets.FloatSlider(
-                min=0., max=48., step=3., value=z0,
-                continuous_update=False, description='$z$ (m)'
-            ),
             h1=widgets.FloatSlider(
-                min=3., max=48., step=3., value=6.,
+                min=2., max=50., step=2., value=20.,
                 continuous_update=False, description='$h_1$ (m)'
             ),
             h2=widgets.FloatSlider(
-                min=3., max=48., step=3., value=6.,
+                min=2., max=50., step=2., value=20.,
                 continuous_update=False, description='$h_2$ (m)'
             ),
             Scale=widgets.ToggleButtons(
                 options=['log', 'linear'], value="linear"
             ),
-            rxOffset=widgets.FloatText(
-                value=x0, continuous_update=False,
-                description='x (m)'
+            rxOffset=widgets.FloatSlider(
+                min=0., max=50., step=2., value=10., continuous_update=False,
+                description='$\Delta x$(m)'
             ),
-            radius=widgets.FloatText(
-                value=radius, continuous_update=False,
+            z=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$\Delta z$ (m)'
+            ),
+            radius=widgets.FloatSlider(
+                min=2., max=50., step=2., value=2., continuous_update=False,
                 description='Tx radius (m)'
             ),
         )
         return out
 
-    def InteractiveData(self, fieldvalue="B", compvalue="z"):
+    def InteractiveData_Layer(self, fieldvalue="B", compvalue="z"):
+        def foo(Field, Component, Scale):
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            bType = "b"
+            self.getData()
+            if Field == "B":
+                label = "Magnetic field (T)"
+                if Component == "x":
+                    title = "Bx"
+                    val = self.Bx
+                elif Component == "z":
+                    title = "Bz"
+                    val = self.Bz
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    plt.show()
+                    return "Dude, think twice ... no By for VMD"
+
+            elif Field == "dBdt":
+                label = "Time dervative of magnetic field (T/s)"
+                if Component == "x":
+                    title = "dBx/dt"
+                    val = self.dBxdt
+                elif Component == "z":
+                    title = "dBz/dt"
+                    val = self.dBzdt
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    plt.show()
+                    return "Dude, think twice ... no dBydt for VMD"
+
+            else:
+                label = "Electric field (V/m)"
+                title = "Ey"
+                if Component == "y":
+                    val = self.Ey
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    plt.show()
+                    return "Dude, think twice ... only Ey for VMD"
+
+            if Scale == "log":
+                val_p, val_n = DisPosNegvalues(val)
+                ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
+                ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
+                ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
+            else:
+                ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+
+            ax.set_xscale("log")
+            ax.set_yscale(Scale)
+            ax.set_xlabel("Time (ms)")
+            ax.set_ylabel(label)
+            ax.set_title(title)
+            ax.grid(True)
+            plt.show()
+
+        out = widgetify(
+            foo,
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "dBdt"], value=fieldvalue
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue,
+                description='Comp.'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="log"
+            )
+        )
+
+        return out
+
+
+######################################################
+# SPHERE WIDGET
+######################################################
+
+    def InteractivePlane_Sphere(
+        self, scale="log", fieldvalue="E", compvalue="y"
+    ):
+        def foo(
+            Update, Field, AmpDir, Component,
+            itime, Sigma0, Sigmab, Sigma1, Sigma2,
+            Sus, d1, h, d2, R, Scale,
+            rxOffset, z, radius, Geometry=True
+        ):
+
+            if AmpDir == "Direction":
+                Component = "vec"
+            m = self.setLayerSphereParam(
+                d1=d1, h=h, d2=d2, R=R, sig0=Sigma0, sigb=Sigmab, sig1=Sigma1, sig2=Sigma2, chi=Sus
+            )
+            self.srcLoc = np.array([0., 0., z])
+            self.rxLoc = np.array([[rxOffset, 0., z]])
+            self.radius = radius
+            if Update:
+                dpred = self.simulate(
+                    self.srcLoc, self.rxLoc, self.time, self.radius
+                )
+            self.getFields(itime)
+            return self.plotField(
+                Field=Field, view=Component, scale=Scale,
+                Geometry=Geometry, itime=itime, Scenario='Sphere'
+            )
+
+        out = widgetify(
+            foo,
+            Update=widgets.ToggleButtons(
+                options=["True", "False"], value="True"
+            ),
+            Field=widgets.ToggleButtons(
+                options=["E", "B", "dBdt", "J"], value=fieldvalue
+            ),
+            AmpDir=widgets.ToggleButtons(
+                options=['None', 'Direction'], value="None"
+            ),
+            Component=widgets.ToggleButtons(
+                options=['x', 'y', 'z'], value=compvalue,
+                description='Comp.'
+            ),
+            itime=widgets.IntSlider(
+                min=1, max=70, step=1, value=1,
+                continuous_update=False, description='Time index'
+            ),
+            Sigma0=widgets.FloatText(
+                value=1e-8, continuous_update=False,
+                description='$\sigma_0$ (S/m)'
+            ),
+            Sigmab=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_b$ (S/m)'
+            ),
+            Sigma1=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_1$ (S/m)'
+            ),
+            Sigma2=widgets.FloatText(
+                value=0.01, continuous_update=False,
+                description='$\sigma_2$ (S/m)'
+            ),
+            Sus=widgets.FloatText(
+                value=0., continuous_update=False,
+                description='$\chi$'
+            ),
+            d1=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$d_1$ (m)'
+            ),
+            h=widgets.FloatSlider(
+                min=2., max=40., step=2., value=10., continuous_update=False,
+                description='$h$ (m)'
+            ),
+            d2=widgets.FloatSlider(
+                min=20., max=60., step=2., value=40., continuous_update=False,
+                description='$d_2$ (m)'
+            ),
+            R=widgets.FloatSlider(
+                min=2., max=40., step=2., value=20., continuous_update=False,
+                description='$R$ (m)'
+            ),
+            Scale=widgets.ToggleButtons(
+                options=['log', 'linear'], value="linear"
+            ),
+            rxOffset=widgets.FloatSlider(
+                min=0., max=50., step=2., value=10., continuous_update=False,
+                description='$\Delta x$(m)'
+            ),
+            z=widgets.FloatSlider(
+                min=0., max=50., step=2., value=0., continuous_update=False,
+                description='$\Delta z$ (m)'
+            ),
+            radius=widgets.FloatSlider(
+                min=2., max=50., step=2., value=2., continuous_update=False,
+                description='Tx radius (m)'
+            ),
+        )
+        return out
+
+    def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z"):
         def foo(Field, Component, Scale):
             fig = plt.figure()
             ax = plt.subplot(111)
