@@ -9,3 +9,4 @@ git+https://github.com/geoscixyz/em_examples.git@tdem_groundedsource
 empymod
 deepdish
 mkl
+pymatsolver
