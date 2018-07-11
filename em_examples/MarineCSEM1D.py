@@ -356,8 +356,8 @@ def csem_data_app(
     elif Complex == "Amp":
         if Field == "Zxy":
             label = "Apparent Resistivity ($\Omega$m)"
-            val = abs(data)**2 / (2*frequency*mu_0)
-            valBG = abs(dataBG)**2 / (2*frequency*mu_0)
+            val = abs(data)**2 / (2*frequency*np.pi*mu_0)
+            valBG = abs(dataBG)**2 / (2*frequency*np.pi*mu_0)
         else:
             val = data.amp
             valBG = dataBG.amp
