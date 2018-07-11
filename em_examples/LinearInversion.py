@@ -9,7 +9,7 @@ from SimPEG import Regularization
 from SimPEG import InvProblem
 from SimPEG import Inversion
 import matplotlib.pyplot as plt
-from pymatsolver import Pardiso
+# from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import interact, FloatSlider, ToggleButtons, IntSlider, FloatText, IntText
 
@@ -221,7 +221,7 @@ class LinearInversionApp(object):
 
 
     def get_problem_survey(self):
-        prob=Problem.LinearProblem(self.mesh, G=self.G, Solver=Pardiso)
+        prob=Problem.LinearProblem(self.mesh, G=self.G)
         survey=Survey.LinearSurvey()
         survey.pair(prob)
         return survey, prob
