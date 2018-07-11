@@ -45,7 +45,8 @@ setup(
         'jupyter',
         'mkl',
         'empymod',
-        'deepdish'
+        'deepdish',
+        'pymatsolver'
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',
