@@ -22,6 +22,7 @@ from . import DipoleWidgetTD
 from . import EMcircuit
 from . import FDEMDipolarfields
 from . import FDEMPlanewave
+from . import FDEM3loop
 from . import FreqtoTime
 from . import HarmonicVMDCylWidget
 from . import InductionLoop
