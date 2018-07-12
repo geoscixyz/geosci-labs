@@ -11,7 +11,10 @@ from SimPEG import Inversion
 import matplotlib.pyplot as plt
 # from pymatsolver import Pardiso
 import matplotlib
-from ipywidgets import interact, FloatSlider, ToggleButtons, IntSlider, FloatText, IntText
+from ipywidgets import (
+    interact, FloatSlider, ToggleButtons, IntSlider, FloatText, IntText
+)
+import ipywidgets as widgets
 
 class LinearInversionApp(object):
     """docstring for LinearInversionApp"""
@@ -48,6 +51,10 @@ class LinearInversionApp(object):
         return self._G
 
     @property
+    def jk(self):
+        return self._jk
+
+    @property
     def mesh(self):
         return self._mesh
 
@@ -57,6 +64,8 @@ class LinearInversionApp(object):
         M=100,
         p=-0.25,
         q=0.25,
+        k1=1,
+        kn=60,
     ):
         """
         Parameters
@@ -69,7 +78,7 @@ class LinearInversionApp(object):
         self.N=N
         self.M=M
         self._mesh=Mesh.TensorMesh([M])
-        jk=np.arange(N)
+        jk=np.linspace(k1, kn, N)
         self._G=np.zeros((N, self.mesh.nC), dtype=float, order='C')
 
         def g(k):
@@ -79,7 +88,8 @@ class LinearInversionApp(object):
             )
 
         for i in range(N):
-            self._G[i, :]=g(i)
+            self._G[i, :] = g(i) * self.mesh.hx
+        self._jk = jk
 
     def plot_G(
         self,
@@ -87,14 +97,19 @@ class LinearInversionApp(object):
         M=100,
         p=-0.25,
         q=0.25,
-        vmin=-0.1,
-        vmax=1.1
+        k1=1,
+        kn=60,
+        vmin=-0.001,
+        vmax=0.011
     ):
         self.set_G(
             N=N,
             M=M,
             p=p,
             q=q,
+            k1=k1,
+            kn=kn,
+
         )
         matplotlib.rcParams['font.size']=14
         fig=plt.figure()
@@ -146,6 +161,8 @@ class LinearInversionApp(object):
             sigma_2=sigma_2,
         )
 
+        np.random.seed(1)
+
         if add_noise:
             survey, _=self.get_problem_survey()
             data=survey.dpred(m)
@@ -176,18 +193,18 @@ class LinearInversionApp(object):
             axes[0].set_ylim([-2.5, 2.5])
             if add_noise:
                 axes[1].errorbar(
-                    x=np.arange(self.N), y=self.data,
+                    x=self.jk, y=self.data,
                     yerr=self.uncertainty,
                     color='k'
                 )
             else:
-                axes[1].plot(np.arange(self.N), self.data, 'k')
+                axes[1].plot(self.jk, self.data, 'k')
             axes[0].set_title('Model')
             axes[0].set_xlabel("x")
             axes[0].set_ylabel("m(x)")
 
             axes[1].set_title('Data')
-            axes[1].set_xlabel("j")
+            axes[1].set_xlabel("$k_j$")
             axes[1].set_ylabel("$d_j$")
 
         elif option == "kernel":
@@ -202,19 +219,19 @@ class LinearInversionApp(object):
                 # this is just for visualization of uncertainty
                 visualization_factor=1.
                 axes[2].errorbar(
-                    x=np.arange(self.N), y=self.data,
+                    x=self.jk, y=self.data,
                     yerr=self.uncertainty*visualization_factor,
                     color='k'
                 )
             else:
-                axes[2].plot(np.arange(self.N), self.data, 'k')
+                axes[2].plot(self.jk, self.data, 'k')
 
             axes[1].set_title('Model')
             axes[1].set_xlabel("x")
             axes[1].set_ylabel("m(x)")
 
             axes[2].set_title('Data')
-            axes[2].set_xlabel("j")
+            axes[2].set_xlabel("$k_j$")
             axes[1].set_ylabel("$d_j$")
 
         plt.tight_layout()
@@ -233,18 +250,19 @@ class LinearInversionApp(object):
         mref=0.,
         percentage=0.05,
         floor=0.1,
-        rms=1,
+        chifact=1,
         beta0_ratio=1.,
         coolingFactor=1,
         coolingRate=1,
         alpha_s=1.,
         alpha_x=1.,
+        use_target=False
     ):
         survey, prob=self.get_problem_survey()
         survey.eps=percentage
         survey.std=floor
         survey.dobs=self.data.copy()
-
+        self.uncertainty = percentage*abs(survey.dobs) + floor
 
         m0=np.ones(self.M) * m0
         mref=np.ones(self.M) * mref
@@ -270,13 +288,21 @@ class LinearInversionApp(object):
             coolingFactor=coolingFactor,
             coolingRate=coolingRate
         )
-        target=Directives.TargetMisfit(chifact=rms**2)
-        directives=[
-            Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
-            beta_schedule,
-            target,
-            save
-        ]
+        target=Directives.TargetMisfit(chifact=chifact)
+
+        if use_target:
+            directives=[
+                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
+                beta_schedule,
+                target,
+                save
+            ]
+        else:
+            directives=[
+                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
+                beta_schedule,
+                save
+            ]
         inv=Inversion.BaseInversion(invProb, directiveList=directives)
         mopt=inv.run(m0)
         model = opt.recall('xc')
@@ -293,12 +319,13 @@ class LinearInversionApp(object):
         mref=0.,
         percentage=0.05,
         floor=0.1,
-        rms=1,
+        chifact=1,
         beta0_ratio=1.,
         coolingFactor=1,
         coolingRate=1,
         alpha_s=1.,
         alpha_x=1.,
+        use_target=False,
         run=True,
         option ='model',
         i_iteration=1,
@@ -311,25 +338,27 @@ class LinearInversionApp(object):
                 mref=mref,
                 percentage=percentage,
                 floor=floor,
-                rms=rms,
+                chifact=chifact,
                 beta0_ratio=beta0_ratio,
                 coolingFactor=coolingFactor,
                 coolingRate=coolingRate,
                 alpha_s=alpha_s,
-                alpha_x=alpha_x
+                alpha_x=alpha_x,
+                use_target=use_target,
             )
 
         self.save.load_results()
+
         fig, axes=plt.subplots(1, 3, figsize=(14*1.2, 3*1.2))
         axes[0].plot(self.mesh.vectorCCx, self.m)
         axes[0].plot(self.mesh.vectorCCx, self.model[-1])
         axes[0].set_ylim([-2.5, 2.5])
-        axes[1].plot(np.arange(self.N), self.data, 'k')
-        axes[1].plot(np.arange(self.N), self.pred[-1], 'bx')
+        axes[1].plot(self.jk, self.data, 'k')
+        axes[1].plot(self.jk, self.pred[-1], 'bx')
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
         # axes[1].errorbar(
-        #     x=np.arange(self.N), y=self.data,
+        #     x=self.jk, y=self.data,
         #     yerr=self.uncertainty,
         #     color='k'
         # )
@@ -338,7 +367,7 @@ class LinearInversionApp(object):
         axes[0].set_ylabel("m(x)")
 
         axes[1].set_title('Data')
-        axes[1].set_xlabel("j")
+        axes[1].set_xlabel("$k_j$")
         axes[1].set_ylabel("$d_j$")
 
         max_iteration = len(self.model)-1
@@ -349,7 +378,7 @@ class LinearInversionApp(object):
         if option == 'misfit':
             if not run:
                 axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                axes[1].plot(np.arange(self.N), self.pred[i_iteration], 'g')
+                axes[1].plot(self.jk, self.pred[i_iteration], 'g')
                 axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
                 axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
 
@@ -360,9 +389,11 @@ class LinearInversionApp(object):
 
             ax_1 = axes[2].twinx()
             axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d, 'k-', lw=2)
-            axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target], 'k*', ms=10)
+            if self.save.i_target is not None:
+                axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target], 'k*', ms=10)
+                axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit, 'k:')
+
             ax_1.semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_m, 'r', lw=2)
-            axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit, 'k:')
             axes[2].set_xlabel("Iteration")
             axes[2].set_ylabel("$\phi_d$")
             ax_1.set_ylabel("$\phi_m$", color='r')
@@ -373,7 +404,7 @@ class LinearInversionApp(object):
         elif option == 'tikhonov':
             if not run:
                 axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                axes[1].plot(np.arange(self.N), self.pred[i_iteration], 'g')
+                axes[1].plot(self.jk, self.pred[i_iteration], 'g')
                 axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
                 axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
                 if i_iteration == 0:
@@ -384,21 +415,23 @@ class LinearInversionApp(object):
             axes[2].set_xlim(np.hstack(self.save.phi_m).min(), np.hstack(self.save.phi_m).max())
             axes[2].set_xlabel("$\phi_m$", fontsize=14)
             axes[2].set_ylabel("$\phi_d$", fontsize=14)
-            axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
+            if self.save.i_target is not None:
+                axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
             axes[2].set_title('Tikhonov curve')
 
         plt.tight_layout()
-
 
     def interact_plot_G(self):
         Q=interact(
             self.plot_G,
             N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
             M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
-            p =FloatSlider(min=-1, max=0, step=0.05, value=-0.5, continuous_update=False),
-            q=FloatSlider(min=0, max=1, step=0.05, value=0.5, continuous_update=False),
-            vmin=FloatText(value=-0.5),
-            vmax=FloatText(value=1.1)
+            p =FloatSlider(min=-1, max=0, step=0.05, value=-0.25, continuous_update=False),
+            q=FloatSlider(min=0, max=1, step=0.05, value=0.25, continuous_update=False),
+            k1 =FloatText(value=1.),
+            kn=FloatText(value=19.),
+            vmin=FloatText(value=-0.005),
+            vmax=FloatText(value=0.011)
         )
         return Q
 
@@ -429,8 +462,8 @@ class LinearInversionApp(object):
             option=ToggleButtons(
                 options=["model", "data", "kernel"], value="model"
             ),
-            percentage=FloatText(value=0.1),
-            floor=FloatText(value=0.1),
+            percentage=FloatText(value=0.2),
+            floor=FloatText(value=0.001),
         )
         return Q
 
@@ -441,15 +474,16 @@ class LinearInversionApp(object):
                 maxIter=IntText(value=20),
                 m0=FloatSlider(min=-2, max=2, step=0.05, value=0., continuous_update=False),
                 mref=FloatSlider(min=-2, max=2, step=0.05, value=0., continuous_update=False),
-                percentage=FloatSlider(min=0, max=1, step=0.01, value=self.percentage, continuous_update=False),
-                floor=FloatSlider(min=0, max=1, step=0.01, value=self.floor, continuous_update=False),
-                rms=FloatSlider(min=0.01, max=10, step=0.01, value=1., continuous_update=False),
+                percentage=FloatText(value=self.percentage),
+                floor=FloatText(value=self.floor),
+                chifact=FloatText(value=1.),
                 beta0_ratio=FloatText(value=100),
                 coolingFactor=FloatSlider(min=0.1, max=10, step=1, value=2, continuous_update=False),
                 coolingRate=IntSlider(min=1, max=10, step=1, value=1, continuous_update=False),
                 alpha_s=FloatText(value=1),
-                alpha_x=FloatText(value=1),
+                alpha_x=FloatText(value=0),
                 run = True,
+                target = False,
                 option=ToggleButtons(
                     options=["misfit", "tikhonov"], value="misfit"
                 ),
