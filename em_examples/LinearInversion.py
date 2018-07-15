@@ -9,6 +9,7 @@ from SimPEG import Regularization
 from SimPEG import InvProblem
 from SimPEG import Inversion
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 # from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
@@ -100,7 +101,8 @@ class LinearInversionApp(object):
         k1=1,
         kn=60,
         vmin=-0.001,
-        vmax=0.011
+        vmax=0.011,
+        scale='log'
     ):
         self.set_G(
             N=N,
@@ -111,12 +113,38 @@ class LinearInversionApp(object):
             kn=kn,
 
         )
+
+        _, s, _ = np.linalg.svd(self.G, full_matrices=False)
+
         matplotlib.rcParams['font.size']=14
-        fig=plt.figure()
-        plt.plot(self.mesh.vectorCCx, self.G.T)
-        plt.ylim(vmin, vmax)
-        plt.xlabel("x")
-        plt.ylabel("g(x)")
+
+        fig=plt.figure(figsize=(10, 4))
+
+        gs1 = gridspec.GridSpec(1, 4)
+        ax1 = plt.subplot(gs1[0, :3])
+        ax2 = plt.subplot(gs1[0, 3:])
+
+        ax1.plot(self.mesh.vectorCCx, self.G.T)
+        ax1.set_ylim(vmin, vmax)
+        ax1.set_xlabel("x")
+        ax1.set_ylabel("g(x)")
+
+        ax2.plot(np.arange(self.N)+1, s, 'ro')
+        ax2.set_xlabel("")
+        ax2.set_title("singulare values", fontsize=12)
+        ax2.set_xscale(scale)
+        ax2.set_yscale(scale)
+        ax2.xaxis.set_major_locator(plt.NullLocator())
+        ax2.xaxis.set_minor_locator(plt.NullLocator())
+        ax2.xaxis.set_major_formatter(plt.NullFormatter())
+        ax2.xaxis.set_minor_formatter(plt.NullFormatter())
+
+        ax2.yaxis.set_major_locator(plt.NullLocator())
+        ax2.yaxis.set_minor_locator(plt.NullLocator())
+        ax2.yaxis.set_major_formatter(plt.NullFormatter())
+        ax2.yaxis.set_minor_formatter(plt.NullFormatter())
+
+        plt.show()
 
     def set_model(
         self,
@@ -348,20 +376,18 @@ class LinearInversionApp(object):
             )
 
         self.save.load_results()
-
+        if self.save.i_target is None:
+            i_plot = -1
+        else:
+            i_plot = self.save.i_target + 1
         fig, axes=plt.subplots(1, 3, figsize=(14*1.2, 3*1.2))
         axes[0].plot(self.mesh.vectorCCx, self.m)
-        axes[0].plot(self.mesh.vectorCCx, self.model[-1])
+        axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].plot(self.jk, self.data, 'k')
-        axes[1].plot(self.jk, self.pred[-1], 'bx')
+        axes[1].plot(self.jk, self.pred[i_plot], 'bx')
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
-        # axes[1].errorbar(
-        #     x=self.jk, y=self.data,
-        #     yerr=self.uncertainty,
-        #     color='k'
-        # )
         axes[0].set_title('Model')
         axes[0].set_xlabel("x")
         axes[0].set_ylabel("m(x)")
@@ -385,7 +411,6 @@ class LinearInversionApp(object):
                 if i_iteration == 0:
                     i_iteration = 1
                 axes[2].plot(np.arange(len(self.save.phi_d))[i_iteration-1]+1, self.save.phi_d[i_iteration-1], 'go', ms=10)
-
 
             ax_1 = axes[2].twinx()
             axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d, 'k-', lw=2)
@@ -418,7 +443,6 @@ class LinearInversionApp(object):
             if self.save.i_target is not None:
                 axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
             axes[2].set_title('Tikhonov curve')
-
         plt.tight_layout()
 
     def interact_plot_G(self):
@@ -431,7 +455,10 @@ class LinearInversionApp(object):
             k1 =FloatText(value=1.),
             kn=FloatText(value=19.),
             vmin=FloatText(value=-0.005),
-            vmax=FloatText(value=0.011)
+            vmax=FloatText(value=0.011),
+            scale=ToggleButtons(
+                options=["linear", "log"], value="log"
+            ),
         )
         return Q
 
