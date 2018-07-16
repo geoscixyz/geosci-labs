@@ -5,5 +5,8 @@ Pillow
 ipywidgets>=0.6.0
 requests
 SimPEG
-em_examples
+git+https://github.com/geoscixyz/em_examples.git@tdem_groundedsource
 empymod
+deepdish
+mkl
+pymatsolver>=0.1.2
