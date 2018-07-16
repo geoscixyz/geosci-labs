@@ -14,5 +14,5 @@ dependencies:
     - discretize
     - deepdish
     - SimPEG
-    - git+https://github.com/geoscixyz/em_examples.git@master
+    - em_examples
     - empymod
