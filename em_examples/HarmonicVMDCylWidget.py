@@ -376,14 +376,18 @@ class HarmonicVMDCylWidget(object):
                 contourOpts={"cmap": "viridis"}, ncontour=200, scale=scale
             )
             if scale == "linear":
+                # cb = plt.colorbar(
+                #     out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                #     format="%.2e"
                 cb = plt.colorbar(
-                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                    format="%.1e"
+                    out[0], ax=ax, format="%.2e"
                 )
             elif scale == "log":
+                # cb = plt.colorbar(
+                #     out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                #     format="$10^{%.2f}$"
                 cb = plt.colorbar(
-                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                    format="$10^{%.1f}$"
+                    out[0], ax=ax, format="$10^{%.1f}$"
                 )
             else:
                 raise Exception("We consider only linear and log scale!")
@@ -468,13 +472,13 @@ class HarmonicVMDCylWidget(object):
         out = widgetify(
             foo,
             Field=widgets.ToggleButtons(
-                options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
+                options=["E", "B", "Bsec", "J", "Model"], value="E"
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B or Bsec)'], value="Direction (B or Bsec)"
+                options=['None', 'Direction (B or Bsec)'], value="None"
             ),
             Component=widgets.ToggleButtons(
-                options=['x', 'y', 'z'], value=compvalue, description='Comp.'
+                options=['x', 'y', 'z'], value='y', description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
                 options=['Re', 'Im', 'Amp', 'Phase'], value="Re",
@@ -532,7 +536,7 @@ class HarmonicVMDCylWidget(object):
         def foo(Field, Component, Scale):
 
             # Printout for null cases
-            if (Field == "B") & (Component == "y"):
+            if (Field == "B") & (Component == "y") | (Field == "Bsec") & (Component == "y"):
                 print("Think about the problem geometry. There is NO By in this case.")
             elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
                 print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
@@ -660,13 +664,13 @@ class HarmonicVMDCylWidget(object):
         out = widgetify(
             foo,
             Field=widgets.ToggleButtons(
-                options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
+                options=["E", "B", "Bsec", "J", "Model"], value="E"
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B or Bsec)'], value="Direction (B or Bsec)"
+                options=['None', 'Direction (B or Bsec)'], value="None"
             ),
             Component=widgets.ToggleButtons(
-                options=['x', 'y', 'z'], value=compvalue, description='Comp.'
+                options=['x', 'y', 'z'], value='y', description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
                 options=['Re', 'Im', 'Amp', 'Phase'], value="Re",
@@ -731,7 +735,7 @@ class HarmonicVMDCylWidget(object):
 
         def foo(Field, Component, Scale):
             # Printout for null cases
-            if (Field == "B") & (Component == "y"):
+            if (Field == "B") & (Component == "y") | (Field == "Bsec") & (Component == "y"):
                 print("Think about the problem geometry. There is NO By in this case.")
             elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
                 print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")

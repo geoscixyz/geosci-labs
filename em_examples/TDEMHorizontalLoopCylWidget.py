@@ -351,12 +351,12 @@ class TDEMHorizontalLoopCylWidget(object):
             )
             if scale == "linear":
                 cb = plt.colorbar(
-                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                    format="%.1e"
+                    out[0], ax=ax,
+                    format="%.2e"
                 )
             elif scale == "log":
                 cb = plt.colorbar(
-                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                    out[0], ax=ax,
                     format="$10^{%.1f}$"
                 )
             else:
@@ -494,7 +494,7 @@ class TDEMHorizontalLoopCylWidget(object):
 
     def InteractiveData_Layer(self, fieldvalue="B", compvalue="z"):
         def foo(Field, Component, Scale):
-            if (Field == "B") & (Component == "y"):
+            if (Field == "B") & (Component == "y") | (Field == "dBdt") & (Component == "y"):
                 print("Think about the problem geometry. There is NO By in this case.")
             elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
                 print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
@@ -533,7 +533,7 @@ class TDEMHorizontalLoopCylWidget(object):
                         plt.show()
                         print("Think about the problem geometry. There is NO dBy/dt in this case.")
 
-                elif Field == E:
+                elif Field == "E":
                     label = "Electric field (V/m)"
                     title = "Ey"
                     if Component == "y":
@@ -545,7 +545,7 @@ class TDEMHorizontalLoopCylWidget(object):
                         plt.show()
                         print("Think about the problem geometry. There is NO Ex or Ez in this case.")
 
-                elif Field == J:
+                elif Field == "J":
                     print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
                 if Scale == "log":
@@ -633,15 +633,15 @@ class TDEMHorizontalLoopCylWidget(object):
                 description='$\sigma_0$ (S/m)'
             ),
             Sigmab=widgets.FloatText(
-                value=0.01, continuous_update=False,
+                value=0.0001, continuous_update=False,
                 description='$\sigma_b$ (S/m)'
             ),
             Sigma1=widgets.FloatText(
-                value=0.01, continuous_update=False,
+                value=0.0001, continuous_update=False,
                 description='$\sigma_1$ (S/m)'
             ),
             Sigma2=widgets.FloatText(
-                value=0.01, continuous_update=False,
+                value=1, continuous_update=False,
                 description='$\sigma_2$ (S/m)'
             ),
             Sus=widgets.FloatText(
@@ -688,7 +688,7 @@ class TDEMHorizontalLoopCylWidget(object):
 
     def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z"):
         def foo(Field, Component, Scale):
-            if (Field == "B") & (Component == "y"):
+            if (Field == "B") & (Component == "y") | (Field == "dBdt") & (Component == "y"):
                 print("Think about the problem geometry. There is NO By in this case.")
             elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
                 print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
@@ -727,7 +727,7 @@ class TDEMHorizontalLoopCylWidget(object):
                         plt.show()
                         print("Think about the problem geometry. There is NO dBy/dt in this case.")
 
-                elif Field == E:
+                elif Field == "E":
                     label = "Electric field (V/m)"
                     title = "Ey"
                     if Component == "y":
@@ -739,7 +739,7 @@ class TDEMHorizontalLoopCylWidget(object):
                         plt.show()
                         print("Think about the problem geometry. There is NO Ex or Ez in this case.")
 
-                elif Field == J:
+                elif Field == "J":
                     print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
                 if Scale == "log":
