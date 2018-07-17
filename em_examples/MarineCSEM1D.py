@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt         # Matplotlib
 from matplotlib import rcParams         # To adjust some plot settings
 from empymod import bipole, utils       # Load required empymod functions
 from ipywidgets import interactive, FloatText, ToggleButtons, widgets
+from scipy.constants import mu_0
+
 
 def show_canonical_model():
     # Plot-style adjustments
@@ -297,8 +299,8 @@ def csem_data_app(
     verb = 1
 
     # Spatial parameters
-    dx = 50.
-    dy = 50.
+    dx = 100.
+    dy = 100.
     nrx = 200
     x = np.r_[np.arange(nrx)*dx + dx]   # Offsets
     y = np.r_[np.arange(nrx)*dy + dy]   # Offsets
@@ -323,6 +325,28 @@ def csem_data_app(
         label = "Magnetic field (A/m)"
         data = csem_layered_earth(srcloc, rxlocs, depth, res, aniso, frequency, rx_direction=Component, rx_type="magnetic")
         dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, anisoBG, frequency, rx_direction=Component, rx_type="magnetic")
+
+    elif Field == "Zxy":
+        label = "Impedance (V/A)"
+        data_Ex = csem_layered_earth(
+            srcloc, rxlocs, depth, res, aniso, frequency,
+            rx_direction='x'
+        )
+        dataBG_Ex = csem_layered_earth(
+            srcloc, rxlocs, depth, resBG, anisoBG, frequency,
+            rx_direction='x'
+        )
+        data_Hy = csem_layered_earth(
+            srcloc, rxlocs, depth, res, aniso, frequency,
+            rx_direction='y', rx_type="magnetic"
+        )
+        dataBG_Hy = csem_layered_earth(
+            srcloc, rxlocs, depth, resBG, anisoBG, frequency,
+            rx_direction='y', rx_type="magnetic"
+        )
+        data = utils.EMArray(data_Ex/data_Hy)
+        dataBG = utils.EMArray(dataBG_Ex/dataBG_Hy)
+
     if Complex == "Real":
         val = data.real
         valBG = dataBG.real
@@ -330,12 +354,18 @@ def csem_data_app(
         val = data.imag
         valBG = dataBG.imag
     elif Complex == "Amp":
-        val = data.amp
-        valBG = dataBG.amp
+        if Field == "Zxy":
+            label = "Apparent Resistivity ($\Omega$m)"
+            val = abs(data)**2 / (2*frequency*np.pi*mu_0)
+            valBG = abs(dataBG)**2 / (2*frequency*np.pi*mu_0)
+        else:
+            val = data.amp
+            valBG = dataBG.amp
     elif Complex == "Phase":
+        label = "Phase (degree)"
         val = data.pha
         valBG = dataBG.pha
-        label = "Phase (degree)"
+
     fig = plt.figure(figsize = (8, 3))
     ax = plt.subplot(111)
     if scale == "log":
@@ -350,9 +380,15 @@ def csem_data_app(
     ax.set_yscale(scale)
     ax.legend(("Response", "Background"))
     if Complex == "Amp":
-        title = "|"+ Field + Component+"|"
+        if Field == 'Zxy':
+            title = "$\\rho_{xy}$"
+        else:
+            title = "|"+ Field + Component+"|"
     else:
-        title = Complex +"("+ Field + Component+")"
+        if Field == 'Zxy':
+            title = Complex +"("+Field+")"
+        else:
+            title = Complex +"("+ Field + Component+")"
     ax.set_title(title)
     if Fixed:
         ax.set_ylim(vmin, vmax)
@@ -375,7 +411,7 @@ def DataApp():
     dz2=FloatText(value=1000., description="dz2 (m)"),
     dz3=FloatText(value=200., description="dz3 (m)"),
     frequency = FloatText(value=0.5, description='f (Hz)'),
-    Field = ToggleButtons(options =['E','H'],value='E'),
+    Field = ToggleButtons(options =['E','H', 'Zxy'],value='E'),
     Plane = ToggleButtons(options =['XZ','YZ'],value='XZ'),
     Component = ToggleButtons(options =['x','y', 'z'], value='x', description="rx direction"),
     Complex = ToggleButtons(options =['Real','Imag', "Amp", "Phase"],value='Amp'),

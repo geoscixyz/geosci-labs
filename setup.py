@@ -37,14 +37,16 @@ setup(
         'future',
         'numpy>=1.7',
         'scipy>=0.13',
-        'matplotlib',
+        'matplotlib>2.1.',
         'Pillow',
         'requests',
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
+        'mkl',
         'empymod',
-        'deepdish'
+        'deepdish',
+        'pymatsolver>=0.1.2'
     ],
     author = 'Lindsey Heagy',
     author_email = 'lheagy@eos.ubc.ca',

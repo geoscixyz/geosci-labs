@@ -40,6 +40,7 @@ from . import VolumeWidgetPlane
 if sys.version_info[0] > 2:
     from . import MarineCSEM1D
 from . import TDEMGroundedSource
+from . import LinearInversion
 
 __version__ = '0.0.21'
 __author__ = 'GeoScixyz developers'
