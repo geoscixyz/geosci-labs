@@ -408,7 +408,7 @@ class TDEMHorizontalLoopCylWidget(object):
             rxOffset, z, radius, itime, Geometry=True
         ):
 
-            if AmpDir == "Direction (B only)":
+            if AmpDir == "Direction (B or dBdt)":
                 Component = "vec"
             m = self.setThreeLayerParam(
                 h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2,
@@ -436,7 +436,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B only)'], value="None"
+                options=['None', 'Direction (B or dBdt)'], value="None"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue,
@@ -595,7 +595,7 @@ class TDEMHorizontalLoopCylWidget(object):
             rxOffset, z, radius, itime, Geometry=True
         ):
 
-            if AmpDir == "Direction (B only)":
+            if AmpDir == "Direction (B or dBdt)":
                 Component = "vec"
             m = self.setLayerSphereParam(
                 d1=d1, h=h, d2=d2, R=R, sig0=Sigma0, sigb=Sigmab, sig1=Sigma1, sig2=Sigma2, chi=Sus
@@ -622,7 +622,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B only)'], value="None"
+                options=['None', 'Direction (B or dBdt)'], value="None"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue,

@@ -442,7 +442,7 @@ class HarmonicVMDCylWidget(object):
             elif ComplexNumber == "Phase":
                 ComplexNumber = "phase"
 
-            if AmpDir == "Direction (B only)":
+            if AmpDir == "Direction (B or Bsec)":
                 # ComplexNumber = "real"
                 Component = "vec"
             if Field == "Bsec":
@@ -471,13 +471,14 @@ class HarmonicVMDCylWidget(object):
                 options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B only)'], value="Direction (B only)"
+                options=['None', 'Direction (B or Bsec)'], value="Direction (B or Bsec)"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue, description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
-                options=['Re', 'Im', 'Amp', 'Phase'], value="Re"
+                options=['Re', 'Im', 'Amp', 'Phase'], value="Re",
+                description='Re/Im'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
@@ -634,7 +635,7 @@ class HarmonicVMDCylWidget(object):
             elif ComplexNumber == "Phase":
                 ComplexNumber = "phase"
 
-            if AmpDir == "Direction (B only)":
+            if AmpDir == "Direction (B or Bsec)":
                 # ComplexNumber = "real"
                 Component = "vec"
             if Field == "Bsec":
@@ -662,13 +663,14 @@ class HarmonicVMDCylWidget(object):
                 options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction (B only)'], value="Direction (B only)"
+                options=['None', 'Direction (B or Bsec)'], value="Direction (B or Bsec)"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue, description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
-                options=['Re', 'Im', 'Amp', 'Phase'], value="Re"
+                options=['Re', 'Im', 'Amp', 'Phase'], value="Re",
+                description='Re/Im'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
