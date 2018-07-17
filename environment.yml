@@ -8,9 +8,11 @@ dependencies:
   - Pillow
   - ipywidgets>=0.6.0
   - requests
+  - mkl
   - pip:
     - pymatsolver
     - discretize
+    - deepdish
     - SimPEG
-    - em_examples
+    - git+https://github.com/geoscixyz/em_examples.git@master
     - empymod
