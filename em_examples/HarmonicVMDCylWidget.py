@@ -78,6 +78,41 @@ class HarmonicVMDCylWidget(object):
         hz = self.mesh.hz[yind]
         self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
 
+    def getCoreModel(self, Type):
+
+        if Type == 'Layer':
+            active = self.mesh2D.vectorCCy < self.z0
+            ind1 = (
+                (self.mesh2D.vectorCCy < self.z0) & (self.mesh2D.vectorCCy >= self.z1)
+            )
+            ind2 = (
+                (self.mesh2D.vectorCCy < self.z1) & (self.mesh2D.vectorCCy >= self.z2)
+            )
+            mapping2D = (
+                Maps.SurjectVertical1D(self.mesh2D) *
+                Maps.InjectActiveCells(self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy)
+            )
+            model2D = np.ones(self.mesh2D.nCy) * self.sig3
+            model2D[ind1] = self.sig1
+            model2D[ind2] = self.sig2
+            model2D = model2D[active]
+        elif Type == 'Sphere':
+            active = self.mesh2D.gridCC[:,1] < self.z0
+            ind1 = (
+                (self.mesh2D.gridCC[:, 1] < self.z1) & (self.mesh2D.gridCC[:, 1] >= self.z1-self.h)
+            )
+            ind2 = np.sqrt((self.mesh2D.gridCC[:, 0])**2 + (self.mesh2D.gridCC[:, 1]-self.z2)**2) <= self.R
+
+            mapping2D = (
+                Maps.InjectActiveCells(self.mesh2D, active, self.sig0, nC=self.mesh2D.nC)
+            )
+            model2D = np.ones(self.mesh2D.nC) * self.sigb
+            model2D[ind1] = self.sig1
+            model2D[ind2] = self.sig2
+            model2D = model2D[active]
+
+        return model2D, mapping2D
+
     def getBiotSavrt(self, rxLoc):
         """
             Compute Biot-Savart operator: Gz and Gx
@@ -211,144 +246,179 @@ class HarmonicVMDCylWidget(object):
 
     def plotField(
         self, Field='B', ComplexNumber="real", view="vec", scale="linear",
-        ifreq=0, Geometry=True, Scenario=None
+        Frequency=100, Geometry=True, Scenario=None
     ):
-        fig = plt.figure(figsize=(10, 6))
-        ax = plt.subplot(111)
-        vec = False
-        if view == "vec":
-            tname = "Vector "
-            title = tname+Field+"-field"
-        elif view == "amp":
-            tname = "|"
-            title = tname+Field+"|-field"
-        else:
-            if ComplexNumber == "real":
-                tname = "Re("
-            elif ComplexNumber == "imag":
-                tname = "Im("
-            elif ComplexNumber == "amplitude":
-                tname = "Amp("
-            elif ComplexNumber == "phase":
-                tname = "Phase("
-            title = tname + Field + view+")-field"
+        # Printout for null cases
+        if (Field == "B") & (view == "y"):
+            print("Think about the problem geometry. There is NO By in this case.")
+        elif (Field == "E") & (view == "x") | (Field == "E") & (view == "z"):
+            print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
+        elif (Field == "J") & (view == "x") | (Field == "J") & (view == "z"):
+            print("Think about the problem geometry. There is NO Jx or Jz in this case. Only Jy.")
+        elif (Field == "E") & (view == "vec"):
+            print("Think about the problem geometry. E only has components along y. Vector plot not possible")
+        elif (Field == "J") & (view == "vec"):
+            print("Think about the problem geometry. J only has components along y. Vector plot not possible")
+        elif (view == "vec") & (ComplexNumber == "Amp") | (view == "vec") & (ComplexNumber == "Phase"):
+            print("Cannot show amplitude or phase when vector plot selected. Set 'AmpDir=None' to see amplitude or phase.")
+        elif Field == "Model":
+            fig = plt.figure(figsize=(7, 6))
+            ax = plt.subplot(111)
+            if Scenario == 'Sphere':
+                model2D, mapping2D = self.getCoreModel('Sphere')
+            elif Scenario == 'Layer':
+                model2D, mapping2D = self.getCoreModel('Layer')
 
-        if Field == "B":
-            label = "Magnetic field (T)"
+            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax)
+            cb = plt.colorbar(
+                out[0], ax=ax, format="$10^{%.1f}$"
+            )
+            cb.set_label("$\sigma$ (S/m)")
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Depth (m)")
+            ax.set_title("Conductivity Model")
+            plt.show()
+        else:
+            fig = plt.figure(figsize=(10, 6))
+            ax = plt.subplot(111)
+            vec = False
             if view == "vec":
-                vec = True
+                tname = "Vector "
+                title = tname+Field+"-field"
+            elif view == "amp":
+                tname = "|"
+                title = tname+Field+"|-field"
+            else:
                 if ComplexNumber == "real":
-                    val = np.c_[self.Bx.real, self.Bz.real]
+                    tname = "Re("
                 elif ComplexNumber == "imag":
-                    val = np.c_[self.Bx.imag, self.Bz.imag]
+                    tname = "Im("
+                elif ComplexNumber == "amplitude":
+                    tname = "Amp("
+                elif ComplexNumber == "phase":
+                    tname = "Phase("
+                title = tname + Field + view+")-field"
+
+            if Field == "B":
+                label = "Magnetic field (T)"
+                if view == "vec":
+                    vec = True
+                    if ComplexNumber == "real":
+                        val = np.c_[self.Bx.real, self.Bz.real]
+                    elif ComplexNumber == "imag":
+                        val = np.c_[self.Bx.imag, self.Bz.imag]
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        return "Vector plot only supports real and imaginary type!"
+
+                elif view == "x":
+                    if ComplexNumber == "real":
+                        val = self.Bx.real
+                    elif ComplexNumber == "imag":
+                        val = self.Bx.imag
+                    elif ComplexNumber == "amplitude":
+                        val = abs(self.Bx)
+                    elif ComplexNumber == "phase":
+                        val = np.angle(self.Bx)
+                elif view == "z":
+                    if ComplexNumber == "real":
+                        val = self.Bz.real
+                    elif ComplexNumber == "imag":
+                        val = self.Bz.imag
+                    elif ComplexNumber == "amplitude":
+                        val = abs(self.Bz)
+                    elif ComplexNumber == "phase":
+                        val = np.angle(self.Bz)
                 else:
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
-                    return "Vector plot only supports real and imaginary type!"
+                    print("Think about the problem geometry. There is NO By in this case.")
 
-            elif view == "x":
-                if ComplexNumber == "real":
-                    val = self.Bx.real
-                elif ComplexNumber == "imag":
-                    val = self.Bx.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Bx)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Bx)
-            elif view == "z":
-                if ComplexNumber == "real":
-                    val = self.Bz.real
-                elif ComplexNumber == "imag":
-                    val = self.Bz.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Bz)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Bz)
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... no By for VMD"
+            elif Field == "E":
+                label = "Electric field (V/m)"
+                if view == "y":
+                    if ComplexNumber == "real":
+                        val = self.Ey.real
+                    elif ComplexNumber == "imag":
+                        val = self.Ey.imag
+                    elif ComplexNumber == "amplitude":
+                        val = abs(self.Ey)
+                    elif ComplexNumber == "phase":
+                        val = np.angle(self.Ey)
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
 
-        elif Field == "E":
-            label = "Electric field (V/m)"
-            if view == "y":
-                if ComplexNumber == "real":
-                    val = self.Ey.real
-                elif ComplexNumber == "imag":
-                    val = self.Ey.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Ey)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Ey)
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... only Ey for VMD"
+            elif Field == "J":
+                label = "Current density (A/m$^2$)"
+                if view == "y":
+                    if ComplexNumber == "real":
+                        val = self.Jy.real
+                    elif ComplexNumber == "imag":
+                        val = self.Jy.imag
+                    elif ComplexNumber == "amplitude":
+                        val = abs(self.Jy)
+                    elif ComplexNumber == "phase":
+                        val = np.angle(self.Jy)
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    print("Think about the problem geometry. There is NO Jx or Jz in this case.")
 
-        elif Field == "J":
-            label = "Current density (A/m$^2$)"
-            if view == "y":
-                if ComplexNumber == "real":
-                    val = self.Jy.real
-                elif ComplexNumber == "imag":
-                    val = self.Jy.imag
-                elif ComplexNumber == "amplitude":
-                    val = abs(self.Jy)
-                elif ComplexNumber == "phase":
-                    val = np.angle(self.Jy)
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... only Jy for VMD"
-
-        out = Utils.plot2Ddata(
-            self.mesh2D.gridCC, val, vec=vec, ax=ax,
-            contourOpts={"cmap": "viridis"}, ncontour=50, scale=scale
-        )
-        if scale == "linear":
-            cb = plt.colorbar(
-                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                format="%.1e"
+            out = Utils.plot2Ddata(
+                self.mesh2D.gridCC, val, vec=vec, ax=ax,
+                contourOpts={"cmap": "viridis"}, ncontour=200, scale=scale
             )
-        elif scale == "log":
-            cb = plt.colorbar(
-                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                format="$10^{%.1f}$"
-            )
-        else:
-            raise Exception("We consdier only linear and log scale!")
-        cb.set_label(label)
-        xmax = self.mesh2D.gridCC[:, 0].max()
-        if Geometry:
-            if Scenario is 'Layer':
-                ax.plot(
-                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
+            if scale == "linear":
+                cb = plt.colorbar(
+                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                    format="%.1e"
                 )
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
-                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
-            elif Scenario is 'Sphere':
-                ax.plot(
-                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
+            elif scale == "log":
+                cb = plt.colorbar(
+                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                    format="$10^{%.1f}$"
                 )
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
-                Phi = np.linspace(0, 2*np.pi, 41)
-                ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
-                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            else:
+                raise Exception("We consider only linear and log scale!")
+            cb.set_label(label)
+            xmax = self.mesh2D.gridCC[:, 0].max()
+            if Geometry:
+                if Scenario is 'Layer':
+                    ax.plot(
+                        np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
+                    )
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
+                    ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                    ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+                elif Scenario is 'Sphere':
+                    ax.plot(
+                        np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
+                    )
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
+                    Phi = np.linspace(0, 2*np.pi, 41)
+                    ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
+                    ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                    ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
 
-        ax.set_xlabel("Distance (m)")
-        ax.set_ylabel("Depth (m)")
-        ax.set_title(title)
-        plt.show()
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Depth (m)")
+            ax.set_title(title)
+            ax.text(
+                -80, 75, ("Frequency: %.2e Hz") % (Frequency),
+                fontsize=16, fontweight='bold', color='r'
+            )
+            plt.show()
 
 ######################################################
 # LAYER WIDGET
@@ -357,9 +427,11 @@ class HarmonicVMDCylWidget(object):
     def InteractivePlane_Layer(self, scale="log", fieldvalue="B", compvalue="z"):
 
         def foo(
-            Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigma1,
-            Sigma2, Sigma3, Sus, h1, h2, Scale, rxOffset, z, Geometry=True
+            Field, AmpDir, Component, ComplexNumber, Sigma0, Sigma1,
+            Sigma2, Sigma3, Sus, h1, h2, Scale, rxOffset, z, ifreq, Geometry=True
         ):
+
+            Frequency = 10**((ifreq-1.)/3. - 2.)
 
             if ComplexNumber == "Re":
                 ComplexNumber = "real"
@@ -370,7 +442,7 @@ class HarmonicVMDCylWidget(object):
             elif ComplexNumber == "Phase":
                 ComplexNumber = "phase"
 
-            if AmpDir == "Direction":
+            if AmpDir == "Direction (B only)":
                 # ComplexNumber = "real"
                 Component = "vec"
             if Field == "Bsec":
@@ -386,28 +458,26 @@ class HarmonicVMDCylWidget(object):
             srcLoc = np.array([0., 0., z])
             rxLoc = np.array([[rxOffset, 0., z]])
             dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
-            self.getFields(bType=bType)
+            if Field != "Model":
+                self.getFields(bType=bType)
             return self.plotField(
                 Field=Field, ComplexNumber=ComplexNumber, view=Component,
-                scale=Scale, Geometry=Geometry, Scenario='Layer'
+                scale=Scale, Frequency=Frequency, Geometry=Geometry, Scenario='Layer'
             )
 
         out = widgetify(
             foo,
             Field=widgets.ToggleButtons(
-                options=["E", "B", "Bsec", "J"], value=fieldvalue
+                options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction'], value="Direction"
+                options=['None', 'Direction (B only)'], value="Direction (B only)"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue, description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
                 options=['Re', 'Im', 'Amp', 'Phase'], value="Re"
-            ),
-            Frequency=widgets.FloatText(
-                value=100., continuous_update=False, description='f (Hz)'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
@@ -447,6 +517,10 @@ class HarmonicVMDCylWidget(object):
                 min=0., max=50., step=2., value=0., continuous_update=False,
                 description='$\Delta z$ (m)'
             ),
+            ifreq=widgets.IntSlider(
+                min=1, max=31, step=1, value=16,
+                continuous_update=False, description='f index'
+            ),
         )
         return out
 
@@ -476,9 +550,9 @@ class HarmonicVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
-                    return "Dude, think twice ... no By for VMD"
+                    print("Think about the problem geometry. There is NO By in this case.")
 
-            else:
+            elif Field == "E":
                 self.getData(bType=bType)
                 label = "Electric field (V/m)"
                 title = "Ey"
@@ -489,7 +563,10 @@ class HarmonicVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
-                    return "Dude, think twice ... only Ey for VMD"
+                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+            elif Field == "J":
+                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
             if Scale == "log":
                 valr_p, valr_n = DisPosNegvalues(valr)
@@ -535,9 +612,11 @@ class HarmonicVMDCylWidget(object):
     def InteractivePlane_Sphere(self, scale="log", fieldvalue="B", compvalue="z"):
 
         def foo(
-            Field, AmpDir, Component, ComplexNumber, Frequency, Sigma0, Sigmab,
-            Sigma1, Sigma2, Sus, d1, h, d2, R, Scale, rxOffset, z, Geometry=True
+            Field, AmpDir, Component, ComplexNumber, Sigma0, Sigmab,
+            Sigma1, Sigma2, Sus, d1, h, d2, R, Scale, rxOffset, z, ifreq, Geometry=True
         ):
+
+            Frequency = 10**((ifreq-1.)/3. - 2.)
 
             if ComplexNumber == "Re":
                 ComplexNumber = "real"
@@ -548,7 +627,7 @@ class HarmonicVMDCylWidget(object):
             elif ComplexNumber == "Phase":
                 ComplexNumber = "phase"
 
-            if AmpDir == "Direction":
+            if AmpDir == "Direction (B only)":
                 # ComplexNumber = "real"
                 Component = "vec"
             if Field == "Bsec":
@@ -563,28 +642,26 @@ class HarmonicVMDCylWidget(object):
             srcLoc = np.array([0., 0., z])
             rxLoc = np.array([[rxOffset, 0., z]])
             dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
-            self.getFields(bType=bType)
+            if Field != "Model":
+                self.getFields(bType=bType)
             return self.plotField(
-                Field=Field, ComplexNumber=ComplexNumber, view=Component,
+                Field=Field, ComplexNumber=ComplexNumber, Frequency=Frequency, view=Component,
                 scale=Scale, Geometry=Geometry, Scenario='Sphere'
             )
 
         out = widgetify(
             foo,
             Field=widgets.ToggleButtons(
-                options=["E", "B", "Bsec", "J"], value=fieldvalue
+                options=["E", "B", "Bsec", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction'], value="Direction"
+                options=['None', 'Direction (B only)'], value="Direction (B only)"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue, description='Comp.'
             ),
             ComplexNumber=widgets.ToggleButtons(
                 options=['Re', 'Im', 'Amp', 'Phase'], value="Re"
-            ),
-            Frequency=widgets.FloatText(
-                value=100., continuous_update=False, description='f (Hz)'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
@@ -632,6 +709,10 @@ class HarmonicVMDCylWidget(object):
                 min=0., max=50., step=2., value=0., continuous_update=False,
                 description='$\Delta z$ (m)'
             ),
+            ifreq=widgets.IntSlider(
+                min=1, max=31, step=1, value=16,
+                continuous_update=False, description='f index'
+            ),
         )
         return out
 
@@ -661,9 +742,9 @@ class HarmonicVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
-                    return "Dude, think twice ... no By for VMD"
+                    print("Think about the problem geometry. There is NO By in this case.")
 
-            else:
+            elif Field == "E":
                 self.getData(bType=bType)
                 label = "Electric field (V/m)"
                 title = "Ey"
@@ -674,7 +755,10 @@ class HarmonicVMDCylWidget(object):
                     # ax.imshow(self.im)
                     ax.set_xticks([])
                     ax.set_yticks([])
-                    return "Dude, think twice ... only Ey for VMD"
+                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+            elif Field == "J":
+                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
             if Scale == "log":
                 valr_p, valr_n = DisPosNegvalues(valr)

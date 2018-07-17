@@ -33,7 +33,7 @@ from . import MT
 from . import PlanewaveWidgetFD
 from . import Reflection
 from . import sphereElectrostatic_example
-from . import TransientVMDCylWidget
+from . import TDEMHorizontalLoopCylWidget
 from . import View
 from . import VolumeWidget
 from . import VolumeWidgetPlane

@@ -17,8 +17,8 @@ from .DipoleWidgetFD import DisPosNegvalues
 from .BiotSavart import BiotSavartFun
 
 
-class TransientVMDCylWidget(object):
-    """FDEMCylWidgete"""
+class TDEMHorizontalLoopCylWidget(object):
+    """TDEMCylWidgete"""
 
     survey = None
     srcList = None
@@ -80,6 +80,41 @@ class TransientVMDCylWidget(object):
         hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
         hz = self.mesh.hz[yind]
         self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
+
+    def getCoreModel(self, Type):
+
+        if Type == 'Layer':
+            active = self.mesh2D.vectorCCy < self.z0
+            ind1 = (
+                (self.mesh2D.vectorCCy < self.z0) & (self.mesh2D.vectorCCy >= self.z1)
+            )
+            ind2 = (
+                (self.mesh2D.vectorCCy < self.z1) & (self.mesh2D.vectorCCy >= self.z2)
+            )
+            mapping2D = (
+                Maps.SurjectVertical1D(self.mesh2D) *
+                Maps.InjectActiveCells(self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy)
+            )
+            model2D = np.ones(self.mesh2D.nCy) * self.sig3
+            model2D[ind1] = self.sig1
+            model2D[ind2] = self.sig2
+            model2D = model2D[active]
+        elif Type == 'Sphere':
+            active = self.mesh2D.gridCC[:,1] < self.z0
+            ind1 = (
+                (self.mesh2D.gridCC[:, 1] < self.z1) & (self.mesh2D.gridCC[:, 1] >= self.z1-self.h)
+            )
+            ind2 = np.sqrt((self.mesh2D.gridCC[:, 0])**2 + (self.mesh2D.gridCC[:, 1]-self.z2)**2) <= self.R
+
+            mapping2D = (
+                Maps.InjectActiveCells(self.mesh2D, active, self.sig0, nC=self.mesh2D.nC)
+            )
+            model2D = np.ones(self.mesh2D.nC) * self.sigb
+            model2D[ind1] = self.sig1
+            model2D[ind2] = self.sig2
+            model2D = model2D[active]
+
+        return model2D, mapping2D
 
     def getBiotSavrt(self, rxLoc):
         """
@@ -216,117 +251,148 @@ class TransientVMDCylWidget(object):
     def plotField(
         self, Field='B', view="vec", scale="linear", itime=0, Geometry=True, Scenario=None
     ):
-        fig = plt.figure(figsize=(10, 6))
-        ax = plt.subplot(111)
-        vec = False
-        if view == "vec":
-            tname = "Vector "
-            title = tname+Field+"-field"
-        elif view == "amp":
-            tname = "|"
-            title = tname+Field+"|-field"
-        else:
-            title = Field + view+"-field"
+        # Printout for null cases
+        if (Field == "B") & (view == "y"):
+            print("Think about the problem geometry. There is NO By in this case.")
+        elif (Field == "dBdt") & (view == "y"):
+            print("Think about the problem geometry. There is NO dBy/dt in this case.")
+        elif (Field == "E") & (view == "x") | (Field == "E") & (view == "z"):
+            print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
+        elif (Field == "J") & (view == "x") | (Field == "J") & (view == "z"):
+            print("Think about the problem geometry. There is NO Jx or Jz in this case. Only Jy.")
+        elif (Field == "E") & (view == "vec"):
+            print("Think about the problem geometry. E only has components along y. Vector plot not possible")
+        elif (Field == "J") & (view == "vec"):
+            print("Think about the problem geometry. J only has components along y. Vector plot not possible")
+        elif Field == "Model":
+            fig = plt.figure(figsize=(7, 6))
+            ax = plt.subplot(111)
+            if Scenario == 'Sphere':
+                model2D, mapping2D = self.getCoreModel('Sphere')
+            elif Scenario == 'Layer':
+                model2D, mapping2D = self.getCoreModel('Layer')
 
-        if Field == "B":
-            label = "Magnetic field (T)"
-            if view == "vec":
-                vec = True
-                val = np.c_[self.Bx, self.Bz]
-            elif view == "x":
-                val = self.Bx
-            elif view == "z":
-                val = self.Bz
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... no By for VMD"
-
-        elif Field == "dBdt":
-            label = "Time derivative of magnetic field (T/s)"
-            if view == "vec":
-                vec = True
-                val = np.c_[self.dBxdt, self.dBzdt]
-            elif view == "x":
-                val = self.dBxdt
-            elif view == "z":
-                val = self.dBzdt
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... no dBydt for VMD"
-
-        elif Field == "E":
-            label = "Electric field (V/m)"
-            if view == "y":
-                val = self.Ey
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... only Ey for VMD"
-
-        elif Field == "J":
-            label = "Current density (A/m$^2$)"
-            if view == "y":
-                val = self.Jy
-            else:
-                # ax.imshow(self.im)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                return "Dude, think twice ... only Jy for VMD"
-
-        out = Utils.plot2Ddata(
-            self.mesh2D.gridCC, val, vec=vec, ax=ax,
-            contourOpts={"cmap": "viridis"},
-            ncontour=100, scale=scale
-        )
-        if scale == "linear":
+            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax)
             cb = plt.colorbar(
-                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                format="%.1e"
+                out[0], ax=ax, format="$10^{%.1f}$"
             )
-        elif scale == "log":
-            cb = plt.colorbar(
-                out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                format="$10^{%.1f}$"
-            )
+            cb.set_label("$\sigma$ (S/m)")
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Depth (m)")
+            ax.set_title("Conductivity Model")
+            plt.show()
         else:
-            raise Exception("We consdier only linear and log scale!")
-        cb.set_label(label)
-        xmax = self.mesh2D.gridCC[:, 0].max()
-        if Geometry:
-            if Scenario is 'Layer':
-                ax.plot(
-                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
-                )
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
-                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
-            elif Scenario is 'Sphere':
-                ax.plot(
-                    np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
-                )
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
-                ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
-                Phi = np.linspace(0, 2*np.pi, 41)
-                ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
-                ax.plot(0, self.srcLoc[2], 'ko', ms=4)
-                ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+            fig = plt.figure(figsize=(10, 6))
+            ax = plt.subplot(111)
+            vec = False
+            if view == "vec":
+                tname = "Vector "
+                title = tname+Field+"-field"
+            elif view == "amp":
+                tname = "|"
+                title = tname+Field+"|-field"
+            else:
+                title = Field + view+"-field"
 
-        ax.set_xlabel("Distance (m)")
-        ax.set_ylabel("Depth (m)")
-        ax.set_title(title)
-        ax.text(
-            -150, 150, ("Time at %.3f ms") % (self.prb.times[itime]*1e3),
-            fontsize=16, color='w'
-        )
-        plt.show()
+            if Field == "B":
+                label = "Magnetic field (T)"
+                if view == "vec":
+                    vec = True
+                    val = np.c_[self.Bx, self.Bz]
+                elif view == "x":
+                    val = self.Bx
+                elif view == "z":
+                    val = self.Bz
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no By for VMD"
+
+            elif Field == "dBdt":
+                label = "Time derivative of magnetic field (T/s)"
+                if view == "vec":
+                    vec = True
+                    val = np.c_[self.dBxdt, self.dBzdt]
+                elif view == "x":
+                    val = self.dBxdt
+                elif view == "z":
+                    val = self.dBzdt
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... no dBydt for VMD"
+
+            elif Field == "E":
+                label = "Electric field (V/m)"
+                if view == "y":
+                    val = self.Ey
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... only Ey for VMD"
+
+            elif Field == "J":
+                label = "Current density (A/m$^2$)"
+                if view == "y":
+                    val = self.Jy
+                else:
+                    # ax.imshow(self.im)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    return "Dude, think twice ... only Jy for VMD"
+
+            out = Utils.plot2Ddata(
+                self.mesh2D.gridCC, val, vec=vec, ax=ax,
+                contourOpts={"cmap": "viridis"},
+                ncontour=200, scale=scale
+            )
+            if scale == "linear":
+                cb = plt.colorbar(
+                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                    format="%.1e"
+                )
+            elif scale == "log":
+                cb = plt.colorbar(
+                    out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
+                    format="$10^{%.1f}$"
+                )
+            else:
+                raise Exception("We consdier only linear and log scale!")
+            cb.set_label(label)
+            xmax = self.mesh2D.gridCC[:, 0].max()
+            if Geometry:
+                if Scenario is 'Layer':
+                    ax.plot(
+                        np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'w-', lw=1
+                    )
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z2, 'w--', lw=1)
+                    ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                    ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+                elif Scenario is 'Sphere':
+                    ax.plot(
+                        np.r_[-xmax, xmax], np.ones(2)*self.srcLoc[2], 'k-', lw=1
+                    )
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z0, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*self.z1, 'w--', lw=1)
+                    ax.plot(np.r_[-xmax, xmax], np.ones(2)*(self.z1-self.h), 'w--', lw=1)
+                    Phi = np.linspace(0, 2*np.pi, 41)
+                    ax.plot(self.R*np.cos(Phi), self.z2+self.R*np.sin(Phi), 'w--', lw=1)
+                    ax.plot(0, self.srcLoc[2], 'ko', ms=4)
+                    ax.plot(self.rxLoc[0, 0], self.srcLoc[2], 'ro', ms=4)
+
+            ax.set_xlabel("Distance (m)")
+            ax.set_ylabel("Depth (m)")
+            ax.set_title(title)
+            ax.text(
+                -150, 150, ("Time: %.3f ms") % (self.prb.times[itime]*1e3),
+                fontsize=16, fontweight='bold', color='r'
+            )
+            plt.show()
 
 ######################################################
 # LAYER WIDGET
@@ -337,12 +403,12 @@ class TransientVMDCylWidget(object):
     ):
         def foo(
             Update, Field, AmpDir, Component,
-            itime, Sigma0, Sigma1, Sigma2, Sigma3,
+            Sigma0, Sigma1, Sigma2, Sigma3,
             Sus, h1, h2, Scale,
-            rxOffset, z, radius, Geometry=True
+            rxOffset, z, radius, itime, Geometry=True
         ):
 
-            if AmpDir == "Direction":
+            if AmpDir == "Direction (B only)":
                 Component = "vec"
             m = self.setThreeLayerParam(
                 h1=h1, h2=h2, sig0=Sigma0, sig1=Sigma1, sig2=Sigma2,
@@ -367,18 +433,14 @@ class TransientVMDCylWidget(object):
                 options=["True", "False"], value="True"
             ),
             Field=widgets.ToggleButtons(
-                options=["E", "B", "dBdt", "J"], value=fieldvalue
+                options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction'], value="None"
+                options=['None', 'Direction (B only)'], value="None"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue,
                 description='Comp.'
-            ),
-            itime=widgets.IntSlider(
-                min=1, max=70, step=1, value=1,
-                continuous_update=False, description='Time index'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
@@ -419,6 +481,10 @@ class TransientVMDCylWidget(object):
                 min=0., max=50., step=2., value=0., continuous_update=False,
                 description='$\Delta z$ (m)'
             ),
+            itime=widgets.IntSlider(
+                min=1, max=70, step=1, value=1,
+                continuous_update=False, description='Time index'
+            ),
             radius=widgets.FloatSlider(
                 min=2., max=50., step=2., value=2., continuous_update=False,
                 description='Tx radius (m)'
@@ -445,7 +511,7 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... no By for VMD"
+                    print("Think about the problem geometry. There is NO By in this case.")
 
             elif Field == "dBdt":
                 label = "Time dervative of magnetic field (T/s)"
@@ -460,9 +526,9 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... no dBydt for VMD"
+                    print("Think about the problem geometry. There is NO dBy/dt in this case.")
 
-            else:
+            elif Field == E:
                 label = "Electric field (V/m)"
                 title = "Ey"
                 if Component == "y":
@@ -472,7 +538,10 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... only Ey for VMD"
+                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+            elif Field == J:
+                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
             if Scale == "log":
                 val_p, val_n = DisPosNegvalues(val)
@@ -516,12 +585,12 @@ class TransientVMDCylWidget(object):
     ):
         def foo(
             Update, Field, AmpDir, Component,
-            itime, Sigma0, Sigmab, Sigma1, Sigma2,
+            Sigma0, Sigmab, Sigma1, Sigma2,
             Sus, d1, h, d2, R, Scale,
-            rxOffset, z, radius, Geometry=True
+            rxOffset, z, radius, itime, Geometry=True
         ):
 
-            if AmpDir == "Direction":
+            if AmpDir == "Direction (B only)":
                 Component = "vec"
             m = self.setLayerSphereParam(
                 d1=d1, h=h, d2=d2, R=R, sig0=Sigma0, sigb=Sigmab, sig1=Sigma1, sig2=Sigma2, chi=Sus
@@ -545,18 +614,14 @@ class TransientVMDCylWidget(object):
                 options=["True", "False"], value="True"
             ),
             Field=widgets.ToggleButtons(
-                options=["E", "B", "dBdt", "J"], value=fieldvalue
+                options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
             AmpDir=widgets.ToggleButtons(
-                options=['None', 'Direction'], value="None"
+                options=['None', 'Direction (B only)'], value="None"
             ),
             Component=widgets.ToggleButtons(
                 options=['x', 'y', 'z'], value=compvalue,
                 description='Comp.'
-            ),
-            itime=widgets.IntSlider(
-                min=1, max=70, step=1, value=1,
-                continuous_update=False, description='Time index'
             ),
             Sigma0=widgets.FloatText(
                 value=1e-8, continuous_update=False,
@@ -609,6 +674,10 @@ class TransientVMDCylWidget(object):
                 min=2., max=50., step=2., value=2., continuous_update=False,
                 description='Tx radius (m)'
             ),
+            itime=widgets.IntSlider(
+                min=1, max=70, step=1, value=1,
+                continuous_update=False, description='Time index'
+            ),
         )
         return out
 
@@ -631,7 +700,7 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... no By for VMD"
+                    print("Think about the problem geometry. There is NO By in this case.")
 
             elif Field == "dBdt":
                 label = "Time dervative of magnetic field (T/s)"
@@ -646,9 +715,9 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... no dBydt for VMD"
+                    print("Think about the problem geometry. There is NO dBy/dt in this case.")
 
-            else:
+            elif Field == E:
                 label = "Electric field (V/m)"
                 title = "Ey"
                 if Component == "y":
@@ -658,7 +727,10 @@ class TransientVMDCylWidget(object):
                     ax.set_xticks([])
                     ax.set_yticks([])
                     plt.show()
-                    return "Dude, think twice ... only Ey for VMD"
+                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+            elif Field == J:
+                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
 
             if Scale == "log":
                 val_p, val_n = DisPosNegvalues(val)
