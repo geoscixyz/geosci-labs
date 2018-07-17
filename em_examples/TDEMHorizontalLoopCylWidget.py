@@ -494,70 +494,75 @@ class TDEMHorizontalLoopCylWidget(object):
 
     def InteractiveData_Layer(self, fieldvalue="B", compvalue="z"):
         def foo(Field, Component, Scale):
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            bType = "b"
-            self.getData()
-            if Field == "B":
-                label = "Magnetic field (T)"
-                if Component == "x":
-                    title = "Bx"
-                    val = self.Bx
-                elif Component == "z":
-                    title = "Bz"
-                    val = self.Bz
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO By in this case.")
-
-            elif Field == "dBdt":
-                label = "Time dervative of magnetic field (T/s)"
-                if Component == "x":
-                    title = "dBx/dt"
-                    val = self.dBxdt
-                elif Component == "z":
-                    title = "dBz/dt"
-                    val = self.dBzdt
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO dBy/dt in this case.")
-
-            elif Field == E:
-                label = "Electric field (V/m)"
-                title = "Ey"
-                if Component == "y":
-                    val = self.Ey
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
-
-            elif Field == J:
-                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
-
-            if Scale == "log":
-                val_p, val_n = DisPosNegvalues(val)
-                ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
-                ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
-                ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
+            if (Field == "B") & (Component == "y"):
+                print("Think about the problem geometry. There is NO By in this case.")
+            elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
+                print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
             else:
-                ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+                fig = plt.figure()
+                ax = plt.subplot(111)
+                bType = "b"
+                self.getData()
+                if Field == "B":
+                    label = "Magnetic field (T)"
+                    if Component == "x":
+                        title = "Bx"
+                        val = self.Bx
+                    elif Component == "z":
+                        title = "Bz"
+                        val = self.Bz
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO By in this case.")
 
-            ax.set_xscale("log")
-            ax.set_yscale(Scale)
-            ax.set_xlabel("Time (ms)")
-            ax.set_ylabel(label)
-            ax.set_title(title)
-            ax.grid(True)
-            plt.show()
+                elif Field == "dBdt":
+                    label = "Time dervative of magnetic field (T/s)"
+                    if Component == "x":
+                        title = "dBx/dt"
+                        val = self.dBxdt
+                    elif Component == "z":
+                        title = "dBz/dt"
+                        val = self.dBzdt
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO dBy/dt in this case.")
+
+                elif Field == E:
+                    label = "Electric field (V/m)"
+                    title = "Ey"
+                    if Component == "y":
+                        val = self.Ey
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+                elif Field == J:
+                    print("The conductivity at the location is 0. Therefore there is no electrical current here.")
+
+                if Scale == "log":
+                    val_p, val_n = DisPosNegvalues(val)
+                    ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
+                    ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
+                    ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
+                else:
+                    ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+
+                ax.set_xscale("log")
+                ax.set_yscale(Scale)
+                ax.set_xlabel("Time (ms)")
+                ax.set_ylabel(label)
+                ax.set_title(title)
+                ax.grid(True)
+                plt.show()
 
         out = widgetify(
             foo,
@@ -683,70 +688,75 @@ class TDEMHorizontalLoopCylWidget(object):
 
     def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z"):
         def foo(Field, Component, Scale):
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            bType = "b"
-            self.getData()
-            if Field == "B":
-                label = "Magnetic field (T)"
-                if Component == "x":
-                    title = "Bx"
-                    val = self.Bx
-                elif Component == "z":
-                    title = "Bz"
-                    val = self.Bz
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO By in this case.")
-
-            elif Field == "dBdt":
-                label = "Time dervative of magnetic field (T/s)"
-                if Component == "x":
-                    title = "dBx/dt"
-                    val = self.dBxdt
-                elif Component == "z":
-                    title = "dBz/dt"
-                    val = self.dBzdt
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO dBy/dt in this case.")
-
-            elif Field == E:
-                label = "Electric field (V/m)"
-                title = "Ey"
-                if Component == "y":
-                    val = self.Ey
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    plt.show()
-                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
-
-            elif Field == J:
-                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
-
-            if Scale == "log":
-                val_p, val_n = DisPosNegvalues(val)
-                ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
-                ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
-                ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
+            if (Field == "B") & (Component == "y"):
+                print("Think about the problem geometry. There is NO By in this case.")
+            elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
+                print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
             else:
-                ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+                fig = plt.figure()
+                ax = plt.subplot(111)
+                bType = "b"
+                self.getData()
+                if Field == "B":
+                    label = "Magnetic field (T)"
+                    if Component == "x":
+                        title = "Bx"
+                        val = self.Bx
+                    elif Component == "z":
+                        title = "Bz"
+                        val = self.Bz
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO By in this case.")
 
-            ax.set_xscale("log")
-            ax.set_yscale(Scale)
-            ax.set_xlabel("Time (ms)")
-            ax.set_ylabel(label)
-            ax.set_title(title)
-            ax.grid(True)
-            plt.show()
+                elif Field == "dBdt":
+                    label = "Time dervative of magnetic field (T/s)"
+                    if Component == "x":
+                        title = "dBx/dt"
+                        val = self.dBxdt
+                    elif Component == "z":
+                        title = "dBz/dt"
+                        val = self.dBzdt
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO dBy/dt in this case.")
+
+                elif Field == E:
+                    label = "Electric field (V/m)"
+                    title = "Ey"
+                    if Component == "y":
+                        val = self.Ey
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        plt.show()
+                        print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+                elif Field == J:
+                    print("The conductivity at the location is 0. Therefore there is no electrical current here.")
+
+                if Scale == "log":
+                    val_p, val_n = DisPosNegvalues(val)
+                    ax.plot(self.prb.times[10:]*1e3, val_p[10:], 'k-')
+                    ax.plot(self.prb.times[10:]*1e3, val_n[10:], 'k--')
+                    ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
+                else:
+                    ax.plot(self.prb.times[10:]*1e3, val[10:], 'k.-')
+
+                ax.set_xscale("log")
+                ax.set_yscale(Scale)
+                ax.set_xlabel("Time (ms)")
+                ax.set_ylabel(label)
+                ax.set_title(title)
+                ax.grid(True)
+                plt.show()
 
         out = widgetify(
             foo,

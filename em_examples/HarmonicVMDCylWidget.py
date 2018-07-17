@@ -529,67 +529,74 @@ class HarmonicVMDCylWidget(object):
         dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
 
         def foo(Field, Component, Scale):
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            bType = "b"
-            if (Field == "Bsec") or (Field == "B"):
-                if Field == "Bsec":
-                    bType = "bSecondary"
-                Field = "B"
-                self.getData(bType=bType)
-                label = "Magnetic field (T)"
-                if Component == "x":
-                    title = "Bx"
-                    valr = self.Bx.real
-                    vali = self.Bx.imag
-                elif Component == "z":
-                    title = "Bz"
-                    valr = self.Bz.real
-                    vali = self.Bz.imag
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO By in this case.")
 
-            elif Field == "E":
-                self.getData(bType=bType)
-                label = "Electric field (V/m)"
-                title = "Ey"
-                if Component == "y":
-                    valr = self.Ey.real
-                    vali = self.Ey.imag
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
-
-            elif Field == "J":
-                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
-
-            if Scale == "log":
-                valr_p, valr_n = DisPosNegvalues(valr)
-                vali_p, vali_n = DisPosNegvalues(vali)
-                ax.plot(frequency, valr_p, 'k-')
-                ax.plot(frequency, valr_n, 'k--')
-                ax.plot(frequency, vali_p, 'r-')
-                ax.plot(frequency, vali_n, 'r--')
-                ax.legend(
-                    ("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4,
-                    fontsize=10
-                )
+            # Printout for null cases
+            if (Field == "B") & (Component == "y"):
+                print("Think about the problem geometry. There is NO By in this case.")
+            elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
+                print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
             else:
-                ax.plot(frequency, valr, 'k.-')
-                ax.plot(frequency, vali, 'r.-')
-                ax.legend(("Re", "Im"), loc=4, fontsize=10)
-            ax.set_xscale("log")
-            ax.set_yscale(Scale)
-            ax.set_xlabel("Frequency (Hz)")
-            ax.set_ylabel(label)
-            ax.set_title(title)
-            ax.grid(True)
-            plt.show()
+                fig = plt.figure()
+                ax = plt.subplot(111)
+                bType = "b"
+                if (Field == "Bsec") or (Field == "B"):
+                    if Field == "Bsec":
+                        bType = "bSecondary"
+                    Field = "B"
+                    self.getData(bType=bType)
+                    label = "Magnetic field (T)"
+                    if Component == "x":
+                        title = "Bx"
+                        valr = self.Bx.real
+                        vali = self.Bx.imag
+                    elif Component == "z":
+                        title = "Bz"
+                        valr = self.Bz.real
+                        vali = self.Bz.imag
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        print("Think about the problem geometry. There is NO By in this case.")
+
+                elif Field == "E":
+                    self.getData(bType=bType)
+                    label = "Electric field (V/m)"
+                    title = "Ey"
+                    if Component == "y":
+                        valr = self.Ey.real
+                        vali = self.Ey.imag
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+                elif Field == "J":
+                    print("The conductivity at the location is 0. Therefore there is no electrical current here.")
+
+                if Scale == "log":
+                    valr_p, valr_n = DisPosNegvalues(valr)
+                    vali_p, vali_n = DisPosNegvalues(vali)
+                    ax.plot(frequency, valr_p, 'k-')
+                    ax.plot(frequency, valr_n, 'k--')
+                    ax.plot(frequency, vali_p, 'r-')
+                    ax.plot(frequency, vali_n, 'r--')
+                    ax.legend(
+                        ("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4,
+                        fontsize=10
+                    )
+                else:
+                    ax.plot(frequency, valr, 'k.-')
+                    ax.plot(frequency, vali, 'r.-')
+                    ax.legend(("Re", "Im"), loc=4, fontsize=10)
+                ax.set_xscale("log")
+                ax.set_yscale(Scale)
+                ax.set_xlabel("Frequency (Hz)")
+                ax.set_ylabel(label)
+                ax.set_title(title)
+                ax.grid(True)
+                plt.show()
 
         out = widgetify(
             foo,
@@ -721,67 +728,73 @@ class HarmonicVMDCylWidget(object):
         dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
 
         def foo(Field, Component, Scale):
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            bType = "b"
-            if (Field == "Bsec") or (Field == "B"):
-                if Field == "Bsec":
-                    bType = "bSecondary"
-                Field = "B"
-                self.getData(bType=bType)
-                label = "Magnetic field (T)"
-                if Component == "x":
-                    title = "Bx"
-                    valr = self.Bx.real
-                    vali = self.Bx.imag
-                elif Component == "z":
-                    title = "Bz"
-                    valr = self.Bz.real
-                    vali = self.Bz.imag
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO By in this case.")
-
-            elif Field == "E":
-                self.getData(bType=bType)
-                label = "Electric field (V/m)"
-                title = "Ey"
-                if Component == "y":
-                    valr = self.Ey.real
-                    vali = self.Ey.imag
-                else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
-
-            elif Field == "J":
-                print("The conductivity at the location is 0. Therefore there is no electrical current here.")
-
-            if Scale == "log":
-                valr_p, valr_n = DisPosNegvalues(valr)
-                vali_p, vali_n = DisPosNegvalues(vali)
-                ax.plot(frequency, valr_p, 'k-')
-                ax.plot(frequency, valr_n, 'k--')
-                ax.plot(frequency, vali_p, 'r-')
-                ax.plot(frequency, vali_n, 'r--')
-                ax.legend(
-                    ("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4,
-                    fontsize=10
-                )
+            # Printout for null cases
+            if (Field == "B") & (Component == "y"):
+                print("Think about the problem geometry. There is NO By in this case.")
+            elif (Field == "E") & (Component == "x") | (Field == "E") & (Component == "z"):
+                print("Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey.")
             else:
-                ax.plot(frequency, valr, 'k.-')
-                ax.plot(frequency, vali, 'r.-')
-                ax.legend(("Re", "Im"), loc=4, fontsize=10)
-            ax.set_xscale("log")
-            ax.set_yscale(Scale)
-            ax.set_xlabel("Frequency (Hz)")
-            ax.set_ylabel(label)
-            ax.set_title(title)
-            ax.grid(True)
-            plt.show()
+                fig = plt.figure()
+                ax = plt.subplot(111)
+                bType = "b"
+                if (Field == "Bsec") or (Field == "B"):
+                    if Field == "Bsec":
+                        bType = "bSecondary"
+                    Field = "B"
+                    self.getData(bType=bType)
+                    label = "Magnetic field (T)"
+                    if Component == "x":
+                        title = "Bx"
+                        valr = self.Bx.real
+                        vali = self.Bx.imag
+                    elif Component == "z":
+                        title = "Bz"
+                        valr = self.Bz.real
+                        vali = self.Bz.imag
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        print("Think about the problem geometry. There is NO By in this case.")
+
+                elif Field == "E":
+                    self.getData(bType=bType)
+                    label = "Electric field (V/m)"
+                    title = "Ey"
+                    if Component == "y":
+                        valr = self.Ey.real
+                        vali = self.Ey.imag
+                    else:
+                        # ax.imshow(self.im)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+
+                elif Field == "J":
+                    print("The conductivity at the location is 0. Therefore there is no electrical current here.")
+
+                if Scale == "log":
+                    valr_p, valr_n = DisPosNegvalues(valr)
+                    vali_p, vali_n = DisPosNegvalues(vali)
+                    ax.plot(frequency, valr_p, 'k-')
+                    ax.plot(frequency, valr_n, 'k--')
+                    ax.plot(frequency, vali_p, 'r-')
+                    ax.plot(frequency, vali_n, 'r--')
+                    ax.legend(
+                        ("Re (+)", "Re (-)", "Im (+)", "Im (-)"), loc=4,
+                        fontsize=10
+                    )
+                else:
+                    ax.plot(frequency, valr, 'k.-')
+                    ax.plot(frequency, vali, 'r.-')
+                    ax.legend(("Re", "Im"), loc=4, fontsize=10)
+                ax.set_xscale("log")
+                ax.set_yscale(Scale)
+                ax.set_xlabel("Frequency (Hz)")
+                ax.set_ylabel(label)
+                ax.set_title(title)
+                ax.grid(True)
+                plt.show()
 
         out = widgetify(
             foo,
