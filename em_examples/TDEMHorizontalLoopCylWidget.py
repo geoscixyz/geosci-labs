@@ -304,10 +304,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 elif view == "z":
                     val = self.Bz
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    return "Dude, think twice ... no By for VMD"
+                    return
 
             elif Field == "dBdt":
                 label = "Time derivative of magnetic field (T/s)"
@@ -319,30 +316,21 @@ class TDEMHorizontalLoopCylWidget(object):
                 elif view == "z":
                     val = self.dBzdt
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    return "Dude, think twice ... no dBydt for VMD"
+                    return
 
             elif Field == "E":
                 label = "Electric field (V/m)"
                 if view == "y":
                     val = self.Ey
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    return "Dude, think twice ... only Ey for VMD"
+                    return
 
             elif Field == "J":
                 label = "Current density (A/m$^2$)"
                 if view == "y":
                     val = self.Jy
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    return "Dude, think twice ... only Jy for VMD"
+                    return
 
             out = Utils.plot2Ddata(
                 self.mesh2D.gridCC, val, vec=vec, ax=ax,
@@ -387,11 +375,8 @@ class TDEMHorizontalLoopCylWidget(object):
 
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("Depth (m)")
+            title = title + " at t = " + '{:.2e}'.format(self.prb.times[itime]*1e3) + " ms"
             ax.set_title(title)
-            ax.text(
-                -150, 150, ("Time: %.3f ms") % (self.prb.times[itime]*1e3),
-                fontsize=16, fontweight='bold', color='r'
-            )
             plt.show()
 
 ######################################################
@@ -633,15 +618,15 @@ class TDEMHorizontalLoopCylWidget(object):
                 description='$\sigma_0$ (S/m)'
             ),
             Sigmab=widgets.FloatText(
-                value=0.0001, continuous_update=False,
+                value=0.01, continuous_update=False,
                 description='$\sigma_b$ (S/m)'
             ),
             Sigma1=widgets.FloatText(
-                value=0.0001, continuous_update=False,
+                value=0.01, continuous_update=False,
                 description='$\sigma_1$ (S/m)'
             ),
             Sigma2=widgets.FloatText(
-                value=1, continuous_update=False,
+                value=1., continuous_update=False,
                 description='$\sigma_2$ (S/m)'
             ),
             Sus=widgets.FloatText(
@@ -653,15 +638,15 @@ class TDEMHorizontalLoopCylWidget(object):
                 description='$d_1$ (m)'
             ),
             h=widgets.FloatSlider(
-                min=2., max=40., step=2., value=10., continuous_update=False,
+                min=2., max=40., step=2., value=20., continuous_update=False,
                 description='$h$ (m)'
             ),
             d2=widgets.FloatSlider(
-                min=20., max=60., step=2., value=40., continuous_update=False,
+                min=20., max=80., step=2., value=60., continuous_update=False,
                 description='$d_2$ (m)'
             ),
             R=widgets.FloatSlider(
-                min=2., max=40., step=2., value=20., continuous_update=False,
+                min=2., max=40., step=2., value=30., continuous_update=False,
                 description='$R$ (m)'
             ),
             Scale=widgets.ToggleButtons(

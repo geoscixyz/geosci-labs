@@ -308,10 +308,7 @@ class HarmonicVMDCylWidget(object):
                     elif ComplexNumber == "imag":
                         val = np.c_[self.Bx.imag, self.Bz.imag]
                     else:
-                        # ax.imshow(self.im)
-                        ax.set_xticks([])
-                        ax.set_yticks([])
-                        return "Vector plot only supports real and imaginary type!"
+                        return
 
                 elif view == "x":
                     if ComplexNumber == "real":
@@ -332,10 +329,7 @@ class HarmonicVMDCylWidget(object):
                     elif ComplexNumber == "phase":
                         val = np.angle(self.Bz)
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO By in this case.")
+                    return
 
             elif Field == "E":
                 label = "Electric field (V/m)"
@@ -349,10 +343,7 @@ class HarmonicVMDCylWidget(object):
                     elif ComplexNumber == "phase":
                         val = np.angle(self.Ey)
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO Ex or Ez in this case.")
+                    return
 
             elif Field == "J":
                 label = "Current density (A/m$^2$)"
@@ -366,10 +357,7 @@ class HarmonicVMDCylWidget(object):
                     elif ComplexNumber == "phase":
                         val = np.angle(self.Jy)
                 else:
-                    # ax.imshow(self.im)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    print("Think about the problem geometry. There is NO Jx or Jz in this case.")
+                    return
 
             out = Utils.plot2Ddata(
                 self.mesh2D.gridCC, val, vec=vec, ax=ax,
@@ -417,11 +405,8 @@ class HarmonicVMDCylWidget(object):
 
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("Depth (m)")
+            title = title + " at f = " + '{:.2e}'.format(Frequency) + " Hz"
             ax.set_title(title)
-            ax.text(
-                -80, 75, ("Frequency: %.2e Hz") % (Frequency),
-                fontsize=16, fontweight='bold', color='r'
-            )
             plt.show()
 
 ######################################################
