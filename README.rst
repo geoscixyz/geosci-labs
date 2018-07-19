@@ -5,7 +5,7 @@ em_apps
 ..    :target: https://beta.mybinder.org/repo/geoscixyz/em_apps
 ..    :alt: binders
 
-.. image:: https://travis-ci.org/geoscixyz/em_apps.svg?branch=master
+.. image:: https://travis-ci.org/geoscixyz/em-apps.svg?branch=master
     :target: https://travis-ci.org/geoscixyz/em-apps
     :alt: travis
 
