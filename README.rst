@@ -6,7 +6,7 @@ em_apps
 ..    :alt: binders
 
 .. image:: https://travis-ci.org/geoscixyz/em_apps.svg?branch=master
-    :target: https://travis-ci.org/geoscixyz/em_apps
+    :target: https://travis-ci.org/geoscixyz/em-apps
     :alt: travis
 
 This is a repo of notebooks and interactive examples for http://em.geosci.xyz. The examples are based on code available in
