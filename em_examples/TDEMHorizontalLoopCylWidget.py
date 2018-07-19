@@ -205,15 +205,25 @@ class TDEMHorizontalLoopCylWidget(object):
         self.prb = prb
         dpred = survey.dpred(self.m, f=self.f)
         return dpred
+    @property
+    def Pfx(self):
+        if getattr(self, '_Pfx', None) is None:
+            self._Pfx = self.mesh.getInterpolationMat(
+                self.mesh.gridCC[self.activeCC, :], locType="Fx"
+            )
+        return self._Pfx
+
+    @property
+    def Pfz(self):
+        if getattr(self, '_Pfz', None) is None:
+            self._Pfz = self.mesh.getInterpolationMat(
+                self.mesh.gridCC[self.activeCC, :], locType="Fz"
+            )
+        return self._Pfz
 
     def getFields(self, itime):
         src = self.srcList[0]
-        Pfx = self.mesh.getInterpolationMat(
-            self.mesh.gridCC[self.activeCC, :], locType="Fx"
-        )
-        Pfz = self.mesh.getInterpolationMat(
-            self.mesh.gridCC[self.activeCC, :], locType="Fz"
-        )
+
         Ey = self.mesh.aveE2CC*self.f[src, "e", itime]
         Jy = Utils.sdiag(self.prb.sigma) * Ey
 
@@ -224,16 +234,16 @@ class TDEMHorizontalLoopCylWidget(object):
             self.mirrorArray(Jy[self.activeCC], direction="y")
         )
         self.Bx = Utils.mkvc(
-            self.mirrorArray(Pfx*self.f[src, "b", itime], direction="x")
+            self.mirrorArray(self.Pfx*self.f[src, "b", itime], direction="x")
         )
         self.Bz = Utils.mkvc(
-            self.mirrorArray(Pfz*self.f[src, "b", itime], direction="z")
+            self.mirrorArray(self.Pfz*self.f[src, "b", itime], direction="z")
         )
         self.dBxdt = Utils.mkvc(self.mirrorArray(
-            -Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x")
+            -self.Pfx*self.mesh.edgeCurl*self.f[src, "e", itime], direction="x")
         )
         self.dBzdt = Utils.mkvc(self.mirrorArray(
-            -Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z")
+            -self.Pfz*self.mesh.edgeCurl*self.f[src, "e", itime], direction="z")
         )
 
     def getData(self):
@@ -406,7 +416,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
-            self.getFields(itime)
+                self.getFields(itime)
             return self.plotField(
                 Field=Field, view=Component, scale=Scale,
                 Geometry=Geometry, itime=itime, Scenario='Layer'
