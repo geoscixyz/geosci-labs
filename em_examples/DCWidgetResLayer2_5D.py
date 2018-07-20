@@ -36,7 +36,7 @@ dxr = np.diff(xr)
 xmin = -40.
 xmax = 40.
 ymin = -40.
-ymax = 5.
+ymax = 8.
 xylim = np.c_[[xmin,ymin],[xmax,ymax]]
 indCC, meshcore = ExtractCoreMesh(xylim,mesh)
 indx = (mesh.gridFx[:,0]>=xmin) & (mesh.gridFx[:,0]<=xmax) \
@@ -350,8 +350,8 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
 def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field,Type,Scale):
 
-    labelsize = 12.
-    ticksize = 10.
+    labelsize = 16.
+    ticksize = 16.
 
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
@@ -411,15 +411,15 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
     if(survey == "Dipole-Pole" or survey == "Pole-Pole"):
         ax[0].plot(M,VM,'o',color='k')
 
-        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
+        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+1)
         ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
 
     else:
         ax[0].plot(M,VM,'o',color='k')
         ax[0].plot(N,VN,'o',color='k')
 
-        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
-        xytextN = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
+        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+10)
+        xytextN = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+10)
         ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
         ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
 
@@ -641,10 +641,10 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
         ax[1].plot(N,1.,marker = '^',color='green',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextB1 = (B-0.5,2.)
-        xytextM1 = (M-0.5,2.)
-        xytextN1 = (N-0.5,2.)
+        xytextA1 = (A-0.5,2.5)
+        xytextB1 = (B-0.5,2.5)
+        xytextM1 = (M-0.5,2.5)
+        xytextN1 = (N-0.5,2.5)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
@@ -654,9 +654,9 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
         ax[1].plot(N,1.,marker = '^',color='green',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextM1 = (M-0.5,2.)
-        xytextN1 = (N-0.5,2.)
+        xytextA1 = (A-0.5,2.5)
+        xytextM1 = (M-0.5,2.5)
+        xytextN1 = (N-0.5,2.5)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
         ax[1].annotate('N', xy=xytextN1, xytext=xytextN1,fontsize = labelsize)
@@ -665,9 +665,9 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         ax[1].plot(B,1.,marker = 'v',color='blue',markersize= labelsize)
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextB1 = (B-0.5,2.)
-        xytextM1 = (M-0.5,2.)
+        xytextA1 = (A-0.5,2.5)
+        xytextB1 = (B-0.5,2.5)
+        xytextM1 = (M-0.5,2.5)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
@@ -675,8 +675,8 @@ def PLOT(survey,A,B,M,N,zcLayer,dzLayer,xc,zc,r,rhohalf,rholayer,rhoTarget,Field
         ax[1].plot(A,1.,marker = 'v',color='red',markersize= labelsize)
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextM1 = (M-0.5,2.)
+        xytextA1 = (A-0.5,2.5)
+        xytextM1 = (M-0.5,2.5)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
 

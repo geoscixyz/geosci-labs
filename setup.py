@@ -26,12 +26,12 @@ CLASSIFIERS = [
     'Natural Language :: English',
 ]
 
-with open('README.rst') as f:
+with open('README.md') as f:
     LONG_DESCRIPTION = ''.join(f.readlines())
 
 setup(
     name = 'em_examples',
-    version = '0.0.23',
+    version = '0.0.24',
     packages = find_packages(),
     install_requires = [
         'future',
