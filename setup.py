@@ -43,7 +43,6 @@ setup(
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
-        'mkl',
         'empymod',
         'deepdish',
         'pymatsolver>=0.1.2'
