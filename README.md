@@ -66,7 +66,7 @@ git clone https://github.com/geoscixyz/em-apps.git
 Then `cd` into `em-apps`
 
 ```
-cd heagy_2018_emcyl
+cd em-apps
 ```
 
 To setup your software environment, we recommend you use the provided conda environment
