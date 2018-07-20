@@ -18,7 +18,7 @@ Interactive visualizations are a powerful way to interrogate mathematical equati
 
 ## Scope
 
-The repository contains the python code to run the ipython-widget style apps in http://github.com/geoscixyz/em-apps. These are mainly plotting code and some simple analytics. More complex numerical simulations depend on `SimPEG <http://simpeg.xyz>`_
+The repository contains the python code to run the ipython-widget style apps in http://github.com/geoscixyz/em-apps. These are mainly plotting code and some simple analytics. More complex numerical simulations depend on [SimPEG](http://simpeg.xyz)
 
 Installing
 ----------
