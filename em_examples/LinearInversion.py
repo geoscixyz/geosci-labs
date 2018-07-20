@@ -131,7 +131,7 @@ class LinearInversionApp(object):
 
         ax2.plot(np.arange(self.N)+1, s, 'ro')
         ax2.set_xlabel("")
-        ax2.set_title("singulare values", fontsize=12)
+        ax2.set_title("singular values", fontsize=12)
         ax2.set_xscale(scale)
         ax2.set_yscale(scale)
         ax2.xaxis.set_major_locator(plt.NullLocator())

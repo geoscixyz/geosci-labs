@@ -229,7 +229,7 @@ def plotAnomalyXYplane(Ax,f,X,Y,Z,H,Comp,Phase):
     Sign[H<0] = 0.
     H[H<0] = 0.
 
-    Cmap = 'RdYlBu'
+    Cmap = 'viridis'
     #Cmap = 'seismic_r'
 
     if Comp == 'abs':
