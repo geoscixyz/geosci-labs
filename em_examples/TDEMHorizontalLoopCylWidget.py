@@ -385,7 +385,7 @@ class TDEMHorizontalLoopCylWidget(object):
 
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("Depth (m)")
-            title = title + " at t = " + '{:.2e}'.format(self.prb.times[itime]*1e3) + " ms"
+            title = title + "\nt = " + '{:.2e}'.format(self.prb.times[itime]*1e3) + " ms"
             ax.set_title(title)
             plt.show()
 
