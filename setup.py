@@ -26,7 +26,7 @@ CLASSIFIERS = [
     'Natural Language :: English',
 ]
 
-with open('README.rst') as f:
+with open('README.md') as f:
     LONG_DESCRIPTION = ''.join(f.readlines())
 
 setup(
@@ -43,7 +43,6 @@ setup(
         'ipywidgets',
         'SimPEG>=0.4.1',
         'jupyter',
-        'mkl',
         'empymod',
         'deepdish',
         'pymatsolver>=0.1.2'

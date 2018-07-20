@@ -9,6 +9,10 @@ from scipy.constants import epsilon_0
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+
+from matplotlib import rcParams
+rcParams['font.size'] = 16
+
 from ipywidgets import (
     IntSlider, FloatSlider, FloatText, ToggleButtons
 )
@@ -191,8 +195,8 @@ def solve_2D_J(rho1, rho2, h, A, B):
 
 def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
 
-    markersize = 6.
-    fontsize = 10.
+    markersize = 8.
+    fontsize = 16.
     ylim = np.r_[-1., 1.]*rhomax/(5*2*np.pi)*1.5
 
     fig, ax = plt.subplots(2, 1, figsize=(9, 7))
@@ -222,8 +226,8 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     ax[0].grid(which='both', linestyle='-', linewidth=0.5, color=[0.2, 0.2, 0.2], alpha=0.5)
     ax[0].plot(A, 0, '+', markersize = 12, markeredgewidth = 3, color=[1., 0., 0])
     ax[0].plot(B, 0, '_', markersize = 12, markeredgewidth = 3, color=[0., 0., 1.])
-    ax[0].set_ylabel('Potential, (V)', fontsize = 14)
-    ax[0].set_xlabel('x (m)', fontsize = 14)
+    ax[0].set_ylabel('Potential, (V)')
+    ax[0].set_xlabel('x (m)')
     ax[0].set_xlim([x.min(), x.max()])
     ax[0].set_ylim(ylim)
 
@@ -240,16 +244,16 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
 
-    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM, fontsize = 14)
-    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN, fontsize = 14)
+    ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM)
+    ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN)
 
     # ax[0].plot(np.r_[M, N], np.ones(2)*VN, color='k')
     # ax[0].plot(np.r_[M, M], np.r_[VM, VN], color='k')
-    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M, (VM+VN)/2), xytext=(M-9, (VM+VN)/2.), fontsize = 14)
+    # ax[0].annotate('%2.1e'%(VM-VN) , xy=(M, (VM+VN)/2), xytext=(M-9, (VM+VN)/2.))
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
     ax[0].text(x.max()+1, ylim.max()-0.1*ylim.max(), '$\\rho_a$ = %2.2f'%(rho_a(VM, VN, A, B, M, N)),
-                verticalalignment='bottom', bbox=props, fontsize = 14)
+                verticalalignment='bottom', bbox=props)
 
     if imgplt == 'Model':
         model = rho2*np.ones(pltgrid.shape[0])
@@ -266,7 +270,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
     #     Vplt = Vplt.reshape(x.size, z.size, order='F')
     #     cb = ax[1].pcolor(xplt, zplt, Vplt)
     #     ax[1].contour(xplt, zplt, np.abs(Vplt), np.logspace(-2., 1., 10), colors='k', alpha=0.5)
-    #     ax[1].set_ylabel('z (m)', fontsize=14)
+    #     ax[1].set_ylabel('z (m)', fontsize=16)
     #     clim = ylim
     #     clabel = 'Potential (V)'
 
@@ -289,7 +293,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
         cb = ax[1].pcolor(xplt, zplt, Vplt * fudgeFactor, cmap="viridis")
         ax[1].plot([xplt.min(), xplt.max()], -h*np.r_[1., 1], color=[0.5, 0.5, 0.5], linewidth = 1.5 )
         ax[1].contour(xplt, zplt, np.abs(Vplt), colors='k', alpha=0.5)
-        ax[1].set_ylabel('z (m)', fontsize=14)
+        ax[1].set_ylabel('z (m)', fontsize=16)
         clim = np.r_[-15., 15.]
         clabel = 'Potential (V)'
 
@@ -339,24 +343,24 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt='Model'):
         cb = ax[1].pcolor(xplt, zplt, J, cmap="viridis", norm=LogNorm())
         ax[1].plot([xplt.min(), xplt.max()], -h*np.r_[1., 1], color=[0.5, 0.5, 0.5], linewidth = 1.5 )
         ax[1].streamplot(x, z, Jx.T, Jz.T, color = 'k', linewidth = 2*(np.log(J.T)-np.log(J).min())/(np.log(J).max() - np.log(J).min()) )
-        ax[1].set_ylabel('z (m)', fontsize=14)
+        ax[1].set_ylabel('z (m)', fontsize=16)
 
         clim = np.r_[3e-5, 3e-2]
         clabel = 'Current Density (A/m$^2$)'
 
     ax[1].set_xlim([x.min(), x.max()])
-    ax[1].set_ylim([z.min(), 5.])
-    ax[1].set_ylabel('z (m)', fontsize=14)
+    ax[1].set_ylim([z.min(), 6.])
+    ax[1].set_ylabel('z (m)', fontsize=16)
     cbar_ax = fig.add_axes([1., 0.08, 0.04, 0.4])
     plt.colorbar(cb, cax=cbar_ax, label=clabel)
     if 'clim' in locals():
         cb.set_clim(clim)
-    ax[1].set_xlabel('x(m)', fontsize=14)
+    ax[1].set_xlabel('x(m)', fontsize=16)
 
-    xytextA1 = (A-0.5,2)
-    xytextB1 = (B-0.5,2)
-    xytextM1 = (M-0.5,2)
-    xytextN1 = (N-0.5,2)
+    xytextA1 = (A-0.75,2.5)
+    xytextB1 = (B-0.75,2.5)
+    xytextM1 = (M-0.75,2.5)
+    xytextN1 = (N-0.75,2.5)
 
     ax[1].plot(A,1.,marker = 'v',color='red', markersize=markersize)
     ax[1].plot(B,1.,marker = 'v',color='blue', markersize=markersize)

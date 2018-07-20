@@ -36,7 +36,7 @@ dxr = np.diff(xr)
 xmin = -40.
 xmax = 40.
 ymin = -40.
-ymax = 5.
+ymax = 8.
 xylim = np.c_[[xmin,ymin],[xmax,ymax]]
 indCC, meshcore = ExtractCoreMesh(xylim,mesh)
 indx = (mesh.gridFx[:,0]>=xmin) & (mesh.gridFx[:,0]<=xmax) \
@@ -289,8 +289,8 @@ def calculateRhoA(survey,VM,VN,A,B,M,N):
 
 def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
 
-    labelsize = 12.
-    ticksize = 10.
+    labelsize = 16.
+    ticksize = 16.
 
     sigplate = 1./rhoplate
     sighalf = 1./rhohalf
@@ -349,15 +349,15 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
     if(survey == "Dipole-Pole" or survey == "Pole-Pole"):
         ax[0].plot(M,VM,'o',color='k')
 
-        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
+        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+10)
         ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
 
     else:
         ax[0].plot(M,VM,'o',color='k')
         ax[0].plot(N,VN,'o',color='k')
 
-        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+0.5)
-        xytextN = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+0.5)
+        xytextM = (M+0.5,np.max([np.min([VM,ylim.max()]),ylim.min()])+10)
+        xytextN = (N+0.5,np.max([np.min([VN,ylim.max()]),ylim.min()])+10)
         ax[0].annotate('%2.1e'%(VM), xy=xytextM, xytext=xytextM,fontsize = labelsize)
         ax[0].annotate('%2.1e'%(VN), xy=xytextN, xytext=xytextN,fontsize = labelsize)
 
@@ -598,11 +598,11 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
         ax[1].plot(qPosAvgLoc[0],qPosAvgLoc[1], marker = '.', color='black', markersize= labelsize)
         ax[1].plot(qNegAvgLoc[0],qNegAvgLoc[1], marker = '.',  color='black', markersize= labelsize)
         if(qPosAvgLoc[0] > qNegAvgLoc[0]):
-            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 0.5)
-            xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 0.5)
+            xytext_qPos = (qPosAvgLoc[0] + 1., qPosAvgLoc[1] - 1)
+            xytext_qNeg = (qNegAvgLoc[0] - 15., qNegAvgLoc[1] - 1)
         else:
-            xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 0.5)
-            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 0.5)
+            xytext_qPos = (qPosAvgLoc[0] - 15., qPosAvgLoc[1] - 1)
+            xytext_qNeg = (qNegAvgLoc[0] + 1., qNegAvgLoc[1] - 1)
         ax[1].annotate('+Q = %2.1e'%(qPosSum), xy=xytext_qPos, xytext=xytext_qPos ,fontsize = labelsize)
         ax[1].annotate('-Q = %2.1e'%(qNegSum), xy=xytext_qNeg, xytext=xytext_qNeg ,fontsize = labelsize)
 
@@ -617,10 +617,10 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
         ax[1].plot(N,1.,marker = '^',color='green',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextB1 = (B-0.5,2.)
-        xytextM1 = (M-0.5,2.)
-        xytextN1 = (N-0.5,2.)
+        xytextA1 = (A-0.5,3)
+        xytextB1 = (B-0.5,3)
+        xytextM1 = (M-0.5,3)
+        xytextN1 = (N-0.5,3)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
@@ -630,9 +630,9 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
         ax[1].plot(N,1.,marker = '^',color='green',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextM1 = (M-0.5,2.)
-        xytextN1 = (N-0.5,2.)
+        xytextA1 = (A-0.5,3)
+        xytextM1 = (M-0.5,3)
+        xytextN1 = (N-0.5,3)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
         ax[1].annotate('N', xy=xytextN1, xytext=xytextN1,fontsize = labelsize)
@@ -641,9 +641,9 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
         ax[1].plot(B,1.,marker = 'v',color='blue',markersize= labelsize)
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextB1 = (B-0.5,2.)
-        xytextM1 = (M-0.5,2.)
+        xytextA1 = (A-0.5,3)
+        xytextB1 = (B-0.5,3)
+        xytextM1 = (M-0.5,3)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
@@ -651,8 +651,8 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
         ax[1].plot(A,1.,marker = 'v',color='red',markersize= labelsize)
         ax[1].plot(M,1.,marker = '^',color='yellow',markersize= labelsize)
 
-        xytextA1 = (A-0.5,2.)
-        xytextM1 = (M-0.5,2.)
+        xytextA1 = (A-0.5,3)
+        xytextM1 = (M-0.5,3)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1,fontsize = labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1,fontsize = labelsize)
 
@@ -683,7 +683,7 @@ def PLOT(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,Field,Type,Scale):
     cb.set_label(label, fontsize=labelsize)
 
     ax[1].set_xlim([-40.,40.])
-    ax[1].set_ylim([-40.,5.])
+    ax[1].set_ylim([-40.,8.])
     # ax[1].set_aspect('equal')
     plt.show()
     # return fig, ax
