@@ -8,5 +8,4 @@ SimPEG
 em_examples
 empymod
 deepdish
-mkl
 pymatsolver>=0.1.2
