@@ -42,7 +42,7 @@ if sys.version_info[0] > 2:
 from . import TDEMGroundedSource
 from . import LinearInversion
 
-__version__ = '0.0.24'
+__version__ = '0.0.25'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
