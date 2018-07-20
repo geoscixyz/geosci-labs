@@ -1,3 +1,5 @@
+name: em-apps-environment
+
 channels:
   - conda-forge
   - defaults
