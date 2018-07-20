@@ -13,7 +13,7 @@ This is a repo of notebooks and interactive examples for http://em.geosci.xyz. T
 
 The notebooks are available on
 - [Binder](https://mybinder.org/v2/gh/geoscixyz/em-apps/master?filepath=index.ipynb)
-- [Azure Notebooks](https://notebooks.azure.com/lheagy/libraries/em_apps)
+- [Azure Notebooks](https://notebooks.azure.com/import/gh/geoscixyz/em-apps)
 
 <img src="https://em.geosci.xyz/_images/DC_LayeredEarth_notebook.png" width=60% align="center">
 
