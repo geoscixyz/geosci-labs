@@ -100,8 +100,8 @@ class LinearInversionApp(object):
         q=0.25,
         k1=1,
         kn=60,
-        vmin=-0.001,
-        vmax=0.011,
+        ymin=-0.001,
+        ymax=0.011,
         scale='log'
     ):
         self.set_G(
@@ -125,7 +125,7 @@ class LinearInversionApp(object):
         ax2 = plt.subplot(gs1[0, 3:])
 
         ax1.plot(self.mesh.vectorCCx, self.G.T)
-        ax1.set_ylim(vmin, vmax)
+        ax1.set_ylim(ymin, ymax)
         ax1.set_xlabel("x")
         ax1.set_ylabel("g(x)")
 
@@ -139,11 +139,11 @@ class LinearInversionApp(object):
         ax2.xaxis.set_major_formatter(plt.NullFormatter())
         ax2.xaxis.set_minor_formatter(plt.NullFormatter())
 
-        ax2.yaxis.set_major_locator(plt.NullLocator())
-        ax2.yaxis.set_minor_locator(plt.NullLocator())
-        ax2.yaxis.set_major_formatter(plt.NullFormatter())
-        ax2.yaxis.set_minor_formatter(plt.NullFormatter())
-
+        # ax2.yaxis.set_major_locator(plt.NullLocator())
+        # ax2.yaxis.set_minor_locator(plt.NullLocator())
+        # ax2.yaxis.set_major_formatter(plt.NullFormatter())
+        # ax2.yaxis.set_minor_formatter(plt.NullFormatter())
+        plt.tight_layout()
         plt.show()
 
     def set_model(
@@ -175,7 +175,7 @@ class LinearInversionApp(object):
         sigma_2=1.,
         option="model",
         add_noise=False,
-        percentage =0.1,
+        percentage =10,
         floor=1e-1,
         ):
 
@@ -194,7 +194,7 @@ class LinearInversionApp(object):
         if add_noise:
             survey, _=self.get_problem_survey()
             data=survey.dpred(m)
-            noise=abs(data)*percentage*np.random.randn(self.N) + np.random.randn(self.N)*floor
+            noise=abs(data)*percentage * 0.01 *np.random.randn(self.N) + np.random.randn(self.N)*floor
         else:
             survey, _=self.get_problem_survey()
             data=survey.dpred(m)
@@ -203,7 +203,7 @@ class LinearInversionApp(object):
         data += noise
         self.data=data.copy()
         self.m=m.copy()
-        self.uncertainty=abs(self.data) * percentage + floor
+        self.uncertainty=abs(self.data) * percentage* 0.01 + floor
         self.percentage = percentage
         self.floor = floor
 
@@ -276,7 +276,7 @@ class LinearInversionApp(object):
         maxIter=60,
         m0=0.,
         mref=0.,
-        percentage=0.05,
+        percentage=5,
         floor=0.1,
         chifact=1,
         beta0_ratio=1.,
@@ -290,7 +290,7 @@ class LinearInversionApp(object):
         survey.eps=percentage
         survey.std=floor
         survey.dobs=self.data.copy()
-        self.uncertainty = percentage*abs(survey.dobs) + floor
+        self.uncertainty = percentage*abs(survey.dobs)*0.01 + floor
 
         m0=np.ones(self.M) * m0
         mref=np.ones(self.M) * mref
@@ -345,7 +345,7 @@ class LinearInversionApp(object):
         maxIter=60,
         m0=0.,
         mref=0.,
-        percentage=0.05,
+        percentage=5,
         floor=0.1,
         chifact=1,
         beta0_ratio=1.,
@@ -374,18 +374,24 @@ class LinearInversionApp(object):
                 alpha_x=alpha_x,
                 use_target=use_target,
             )
-
-        self.save.load_results()
-        if self.save.i_target is None:
+        if len(self.model) == 2:
+            fig, axes=plt.subplots(1, 2, figsize=(14*1.2 *2/3, 3*1.2))
             i_plot = -1
         else:
-            i_plot = self.save.i_target + 1
-        fig, axes=plt.subplots(1, 3, figsize=(14*1.2, 3*1.2))
+            self.save.load_results()
+            if self.save.i_target is None:
+                i_plot = -1
+            else:
+                i_plot = self.save.i_target + 1
+            fig, axes=plt.subplots(1, 3, figsize=(14*1.2, 3*1.2))
+
         axes[0].plot(self.mesh.vectorCCx, self.m)
-        axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
+        if run:
+            axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].plot(self.jk, self.data, 'k')
-        axes[1].plot(self.jk, self.pred[i_plot], 'bx')
+        if run:
+            axes[1].plot(self.jk, self.pred[i_plot], 'bx')
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
         axes[0].set_title('Model')
@@ -396,53 +402,59 @@ class LinearInversionApp(object):
         axes[1].set_xlabel("$k_j$")
         axes[1].set_ylabel("$d_j$")
 
-        max_iteration = len(self.model)-1
-        if i_iteration > max_iteration:
-            print ((">> Warning: input iteration (%i) is greater than maximum iteration (%i)") % (i_iteration, len(self.model)-1))
-            i_iteration = max_iteration
+        if len(self.model) > 2:
+            max_iteration = len(self.model)-1
+            if i_iteration > max_iteration:
+                print ((">> Warning: input iteration (%i) is greater than maximum iteration (%i)") % (i_iteration, len(self.model)-1))
+                i_iteration = max_iteration
 
-        if option == 'misfit':
-            if not run:
-                axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                axes[1].plot(self.jk, self.pred[i_iteration], 'g')
-                axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
-                axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
+            if option == 'misfit':
+                if not run:
+                    axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
+                    axes[1].plot(self.jk, self.pred[i_iteration], 'bx')
+                    # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
+                    # axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
+                    axes[0].legend(("True", "Pred"))
+                    axes[1].legend(("Observed", "Predicted"))
 
-                if i_iteration == 0:
-                    i_iteration = 1
-                axes[2].plot(np.arange(len(self.save.phi_d))[i_iteration-1]+1, self.save.phi_d[i_iteration-1], 'go', ms=10)
+                    if i_iteration == 0:
+                        i_iteration = 1
+                    axes[2].plot(np.arange(len(self.save.phi_d))[i_iteration-1]+1, self.save.phi_d[i_iteration-1], 'go', ms=10)
 
-            ax_1 = axes[2].twinx()
-            axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d, 'k-', lw=2)
-            if self.save.i_target is not None:
-                axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target], 'k*', ms=10)
-                axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit, 'k:')
+                ax_1 = axes[2].twinx()
+                axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d, 'k-', lw=2)
+                if self.save.i_target is not None:
+                    axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target], 'k*', ms=10)
+                    axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit, 'k:')
 
-            ax_1.semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_m, 'r', lw=2)
-            axes[2].set_xlabel("Iteration")
-            axes[2].set_ylabel("$\phi_d$")
-            ax_1.set_ylabel("$\phi_m$", color='r')
-            for tl in ax_1.get_yticklabels():
-                tl.set_color('r')
-            axes[2].set_title('Misfit curves')
+                ax_1.semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_m, 'r', lw=2)
+                axes[2].set_xlabel("Iteration")
+                axes[2].set_ylabel("$\phi_d$")
+                ax_1.set_ylabel("$\phi_m$", color='r')
+                for tl in ax_1.get_yticklabels():
+                    tl.set_color('r')
+                axes[2].set_title('Misfit curves')
 
-        elif option == 'tikhonov':
-            if not run:
-                axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                axes[1].plot(self.jk, self.pred[i_iteration], 'g')
-                axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
-                axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
-                if i_iteration == 0:
-                    i_iteration = 1
-                axes[2].plot(self.save.phi_m[i_iteration-1], self.save.phi_d[i_iteration-1], 'go', ms=10)
+            elif option == 'tikhonov':
+                if not run:
+                    axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
+                    axes[1].plot(self.jk, self.pred[i_iteration], 'bx')
+                    # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
+                    # axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
+                    axes[0].legend(("True", "Pred"))
+                    axes[1].legend(("Observed", "Predicted"))
 
-            axes[2].plot(self.save.phi_m, self.save.phi_d, 'k-', lw=2)
-            axes[2].set_xlim(np.hstack(self.save.phi_m).min(), np.hstack(self.save.phi_m).max())
-            axes[2].set_xlabel("$\phi_m$", fontsize=14)
-            axes[2].set_ylabel("$\phi_d$", fontsize=14)
-            if self.save.i_target is not None:
-                axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
-            axes[2].set_title('Tikhonov curve')
+                    if i_iteration == 0:
+                        i_iteration = 1
+                    axes[2].plot(self.save.phi_m[i_iteration-1], self.save.phi_d[i_iteration-1], 'go', ms=10)
+
+                axes[2].plot(self.save.phi_m, self.save.phi_d, 'k-', lw=2)
+                axes[2].set_xlim(np.hstack(self.save.phi_m).min(), np.hstack(self.save.phi_m).max())
+                axes[2].set_xlabel("$\phi_m$", fontsize=14)
+                axes[2].set_ylabel("$\phi_d$", fontsize=14)
+                if self.save.i_target is not None:
+                    axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
+                axes[2].set_title('Tikhonov curve')
         plt.tight_layout()
 
     def interact_plot_G(self):
@@ -454,8 +466,8 @@ class LinearInversionApp(object):
             q=FloatSlider(min=0, max=1, step=0.05, value=0.25, continuous_update=False),
             k1 =FloatText(value=1.),
             kn=FloatText(value=19.),
-            vmin=FloatText(value=-0.005),
-            vmax=FloatText(value=0.011),
+            ymin=FloatText(value=-0.005),
+            ymax=FloatText(value=0.011),
             scale=ToggleButtons(
                 options=["linear", "log"], value="log"
             ),
@@ -489,16 +501,15 @@ class LinearInversionApp(object):
             option=ToggleButtons(
                 options=["model", "data", "kernel"], value="model"
             ),
-            percentage=FloatText(value=0.2),
+            percentage=FloatText(value=20),
             floor=FloatText(value=0.001),
         )
         return Q
 
-    def interact_plot_inversion(self):
-        maxIter = 20
+    def interact_plot_inversion(self, maxIter=20):
         Q = interact(
             self.plot_inversion,
-                maxIter=IntText(value=20),
+                maxIter=IntText(value=maxIter),
                 m0=FloatSlider(min=-2, max=2, step=0.05, value=0., continuous_update=False),
                 mref=FloatSlider(min=-2, max=2, step=0.05, value=0., continuous_update=False),
                 percentage=FloatText(value=self.percentage),
