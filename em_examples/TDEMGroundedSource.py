@@ -357,7 +357,7 @@ class PlotTDEM(object):
     def plot_magnetic_flux(self, itime):
         bxy, xy = self.getSlices(self.mesh, self.B, itime, normal="Z", loc=-100.5)
         byz, yz = self.getSlices(self.mesh, self.B, itime, normal="X", loc= 0.)
-        label = "Current density (A/m$^2$)"
+        label = "Magnetic flux density (T)"
         fig = plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)

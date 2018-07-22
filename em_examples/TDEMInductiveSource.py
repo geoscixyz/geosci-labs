@@ -211,6 +211,7 @@ class PlotTDEM(object):
         ax.set_zlabel('Depth (m)')
         ax.set_aspect("equal")
         ax.view_init(elev=elev, azim=azim)
+        plt.tight_layout()
         plt.show()
 
 
@@ -271,12 +272,12 @@ class PlotTDEM(object):
         fig = plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
-        out_xz = Utils.plot2Ddata(xz, exz, vec=False, ncontour=200, contourOpts={"cmap":"viridis"}, ax=ax2)
-        vmin_xz, vmax_xz = out_xz[0].get_clim()                
-        out_xy = Utils.plot2Ddata(xy, exy, vec=True, ncontour=200, contourOpts={"cmap":"viridis"}, ax=ax1)        
+        out_xz = Utils.plot2Ddata(xz, exz, vec=False, ncontour=300, contourOpts={"cmap":"viridis"}, ax=ax2)
+        vmin_xz, vmax_xz = out_xz[0].get_clim()
+        out_xy = Utils.plot2Ddata(xy, exy, vec=True, ncontour=300, contourOpts={"cmap":"viridis"}, ax=ax1)
         vmin_xy, vmax_xy = out_xy[0].get_clim()
         ax1.set_aspect('equal', adjustable='box')
-        ax2.set_aspect('equal', adjustable='box')        
+        ax2.set_aspect('equal', adjustable='box')
 
         plt.colorbar(out_xy[0], ax=ax1, format="%.1e", ticks=np.linspace(vmin_xy, vmax_xy, 5), fraction=0.02)
         cb = plt.colorbar(out_xz[0], ax=ax2, format="%.1e", ticks=np.linspace(vmin_xz, vmax_xz, 5), fraction=0.02)
@@ -303,24 +304,24 @@ class PlotTDEM(object):
     def plot_magnetic_flux(self, itime):
         bxy, xy = self.getSlices(self.mesh, self.B, itime, normal="Z", loc=-100.5, isz=True)
         bxz, xz = self.getSlices(self.mesh, self.B, itime, normal="Y", loc= 0.)
-        label = "Current density (A/m$^2$)"
+        label = "Magnetic flux density (T)"
         fig = plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
-        
-        out_xy = Utils.plot2Ddata(xy, bxy, vec=False, ncontour=200, contourOpts={"cmap":"viridis"}, ax=ax1)        
-        vmin_xy, vmax_xy = out_xy[0].get_clim()                
-        out_xz = Utils.plot2Ddata(xz, bxz, vec=True, ncontour=200, contourOpts={"cmap":"viridis"}, ax=ax2)
-        vmin_xz, vmax_xz = out_xz[0].get_clim()        
+
+        out_xy = Utils.plot2Ddata(xy, bxy, vec=False, ncontour=300, contourOpts={"cmap":"viridis"}, ax=ax1)
+        vmin_xy, vmax_xy = out_xy[0].get_clim()
+        out_xz = Utils.plot2Ddata(xz, bxz, vec=True, ncontour=300, contourOpts={"cmap":"viridis"}, ax=ax2)
+        vmin_xz, vmax_xz = out_xz[0].get_clim()
         ax1.set_aspect('equal', adjustable='box')
         ax2.set_aspect('equal', adjustable='box')
-        
+
         plt.colorbar(out_xy[0], ax=ax1, format="%.1e", ticks=np.linspace(vmin_xy, vmax_xy, 5), fraction=0.02)
         cb = plt.colorbar(out_xz[0], ax=ax2, format="%.1e", ticks=np.linspace(vmin_xz, vmax_xz, 5), fraction=0.02)
         cb.set_label(label)
         ax1.set_title("")
         ax1.set_xlabel("X (m)")
-        ax1.set_ylabel("X (m)")
+        ax1.set_ylabel("Y (m)")
         ax2.set_xlabel("X (m)")
         ax2.set_ylabel("Z (m)")
         ax1.set_xlim(self.xmin, self.xmax)
