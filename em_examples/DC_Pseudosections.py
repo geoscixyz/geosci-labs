@@ -47,10 +47,10 @@ indy = (mesh.gridFy[:, 0] >= xmin) & (mesh.gridFy[:, 0] <= xmax) \
 indF = np.concatenate((indx, indy))
 
 
-def DC2Dsurvey(flag="PoleDipole"):
+def DC2Dsurvey(flag="PolePole"):
     """
     Function that define a surface DC survey
-    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
+    :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole', 'PolePole'
     """
     if flag == "PoleDipole":
         ntx, nmax = xr.size-2, 8
@@ -58,6 +58,8 @@ def DC2Dsurvey(flag="PoleDipole"):
         ntx, nmax = xr.size-2, 8
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size-3, 8
+    elif flag == "PolePole":
+        ntx, nmax = xr.size-2, 8
     else:
         raise Exception('Not Implemented')
     xzlocs = getPseudoLocs(xr, ntx, nmax, flag)
@@ -97,6 +99,18 @@ def DC2Dsurvey(flag="PoleDipole"):
                 M = np.c_[xr[i+2:len(xr)-1],
                           np.ones(len(xr[i+2:len(xr)-1]))*zloc]
                 N = np.c_[xr[i+3:len(xr)], np.ones(len(xr[i+3:len(xr)]))*zloc]
+        elif flag == "PolePole":
+            A = np.r_[xr[i], zloc]
+            B = np.r_[mesh.vectorCCx.min(), zloc]
+
+            if i < ntx-nmax+1:
+                M = np.c_[xr[i+2:i+2+nmax], np.ones(nmax)*zloc]
+                N = np.c_[np.ones(nmax)*mesh.vectorCCx.max(),
+                          np.ones(nmax)*zloc]
+            else:
+                M = np.c_[xr[i+2:ntx+2], np.ones(ntx-i)*zloc]
+                N = np.c_[np.ones(ntx-i)*mesh.vectorCCx.max(),
+                          np.ones(ntx-i)*zloc]
 
         rx = DC.Rx.Dipole(M, N)
         src = DC.Src.Dipole([rx], A, B)
@@ -146,6 +160,10 @@ def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
                 txmid = xr[i]+dxr[i]*0.5
                 rxmid = xr[i+1:i+1+nmax]
 
+            elif flag == 'PolePole':
+                txmid = xr[i]
+                rxmid = xr[i+1:i+1+nmax]
+
             mid = (txmid+rxmid)*0.5
             xloc.append(mid)
             yloc.append(np.arange(nmax)+1.)
@@ -160,6 +178,10 @@ def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
 
             elif flag == 'DipolePole':
                 txmid = xr[i]+dxr[i]*0.5
+                rxmid = xr[i+1:ntx+1]
+
+            elif flag == 'PolePole':
+                txmid = xr[i]
                 rxmid = xr[i+1:ntx+1]
 
             mid = (txmid+rxmid)*0.5
@@ -205,7 +227,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
 
     if i < ntx-nmax+1:
 
-        if flag == "PoleDipole":
+        if flag in ["PoleDipole", "PolePole"]:
             txmid = TxLoc[0][0]
         else:
             txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
@@ -213,7 +235,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
 
-        if flag == "DipolePole":
+        if flag in ["DipolePole", "PolePole"]:
             plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
             ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data',
                         xytext=(-4.25, 7.5), textcoords='offset points')
@@ -235,7 +257,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
         plt.plot(np.r_[rxmid, mid], np.r_[0, midSep/2.], 'k:')
 
     else:
-        if flag == "PoleDipole":
+        if flag in ["PoleDipole", "PolePole"]:
             txmid = TxLoc[0][0]
         else:
             txmid = (TxLoc[0][0] + TxLoc[1][0])*0.5
@@ -243,7 +265,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
         MLoc = RxLoc[0][j]
         NLoc = RxLoc[1][j]
 
-        if flag == "DipolePole":
+        if flag in ["DipolePole", "PolePole"]:
             plt.plot(MLoc[0], np.zeros(1), 'bv', markersize=10)
             ax.annotate('M', xy=(MLoc[0], np.zeros(1)), xycoords='data',
                         xytext=(-4.25, 7.5), textcoords='offset points')
@@ -332,6 +354,9 @@ def PseudoSectionWidget(survey, flag):
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size-3, 8
         dxr = np.diff(xr)
+    elif flag == "PolePole":
+        ntx, nmax = xr.size-2, 8
+        dxr = xr
     xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
     PseudoSectionPlot = lambda i, j: PseudoSectionPlotfnc(i, j, survey, flag)
     return widgetify(
@@ -488,22 +513,30 @@ def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
 
 
 def DC2DPseudoWidget():
-    return widgetify(
-        DC2DPseudoWidgetWrapper, manual = True,
-        rhohalf=FloatText(min=10, max=1000, value=1000,
-                            continuous_update=False,
-                            description='$\\rho_1$'),
-        rhosph=FloatText(min=10, max=1000, value=50,
-                           continuous_update=False,
-                           description='$\\rho_2$'),
-        xc=FloatSlider(min=-40, max=40, step=1, value=0,
-                       continuous_update=False),
-        zc=FloatSlider(min=-20, max=0, step=1, value=-10,
-                       continuous_update=False),
-        r=FloatSlider(min=0, max=15, step=0.5, value=5,
-                      continuous_update=False),
-        surveyType=ToggleButtons(options=['DipoleDipole', 'PoleDipole',
-                                          'DipolePole'])
+    return interactive(
+        DC2DPseudoWidgetWrapper,
+        rhohalf=FloatText(
+            min=10, max=1000, value=1000,
+            continuous_update=False, description='$\\rho_1$'
+        ),
+        rhosph=FloatText(
+            min=10, max=1000, value=50,
+            continuous_update=False, description='$\\rho_2$'
+        ),
+        xc=FloatText(
+            min=-40, max=40, step=1, value=0,
+            continuous_update=False
+        ),
+        zc=FloatText(
+            min=-20, max=0, step=1, value=-10,
+           continuous_update=False
+        ),
+        r=FloatText(
+            min=0, max=15, step=0.5, value=5,
+            continuous_update=False
+        ),
+        surveyType=ToggleButtons(options=['PolePole',  'PoleDipole',
+                                          'DipolePole', 'DipoleDipole'])
     )
 
 
@@ -516,7 +549,7 @@ def DC2DfwdWrapper(rhohalf, rhosph, xc, zc, r, predmis, surveyType):
 
 def DC2DfwdWidget():
     return widgetify(
-        DC2DfwdWrapper, manual = True,
+        DC2DfwdWrapper, manual = False,
         rhohalf=FloatText(min=10, max=1000, value=1000,
                             continuous_update=False,
                             description='$\\rho_1$'),
@@ -530,6 +563,6 @@ def DC2DfwdWidget():
         r=FloatSlider(min=0, max=15, step=0.5, value=5,
                       continuous_update=False),
         predmis=ToggleButtons(options=['pred', 'mis']),
-        surveyType=ToggleButtons(options=['DipoleDipole', 'PoleDipole',
-                                          'DipolePole'])
+        surveyType=ToggleButtons(options=['PolePole',  'PoleDipole',
+                                          'DipolePole', 'DipoleDipole'])
     )
