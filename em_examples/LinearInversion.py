@@ -13,7 +13,7 @@ import matplotlib.gridspec as gridspec
 # from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
-    interact, FloatSlider, ToggleButtons, IntSlider, FloatText, IntText
+    interact, FloatSlider, ToggleButtons, IntSlider, FloatText, IntText, SelectMultiple
 )
 import ipywidgets as widgets
 
@@ -207,61 +207,55 @@ class LinearInversionApp(object):
         self.percentage = percentage
         self.floor = floor
 
-        if option == "model":
-            fig, axes=plt.subplots(1, 1, figsize=(4*1.2, 3*1.2))
-            axes.plot(self.mesh.vectorCCx, m)
-            axes.set_ylim(-2.5, 2.5)
-            axes.set_title('Model')
-            axes.set_xlabel("x")
-            axes.set_ylabel("m(x)")
+        option_bools = [False, False, False]
+        for item in option:
+            if item == 'kernel':
+                option_bools[0] = True
+            elif item == 'model':
+                option_bools[1] = True
+            elif item == 'data':
+                option_bools[2] = True
 
-        elif option == "data":
-            fig, axes=plt.subplots(1, 2, figsize=(8*1.2, 3*1.2))
-            axes[0].plot(self.mesh.vectorCCx, m)
-            axes[0].set_ylim([-2.5, 2.5])
-            if add_noise:
-                axes[1].errorbar(
-                    x=self.jk, y=self.data,
-                    yerr=self.uncertainty,
-                    color='k'
-                )
-            else:
-                axes[1].plot(self.jk, self.data, 'k')
-            axes[0].set_title('Model')
-            axes[0].set_xlabel("x")
-            axes[0].set_ylabel("m(x)")
+        fig, axes = plt.subplots(1, 3, figsize=(12*1.2, 3*1.2))
+        for i, ax in enumerate(axes):
+            if option_bools[i]:
+                if i == 0:
+                    ax.plot(self.mesh.vectorCCx, self.G.T)
+                    ax.set_title('Rows of matrix G')
+                    ax.set_xlabel("x")
+                    ax.set_ylabel("g(x)")
+                elif i == 1:
+                    ax.plot(self.mesh.vectorCCx, m)
+                    ax.set_ylim([-2.5, 2.5])
+                    ax.set_title('Model')
+                    ax.set_xlabel("x")
+                    ax.set_ylabel("m(x)")
+                    ax.set_ylabel("$d_j$")
+                elif i == 2:
+                    if add_noise:
+                        # this is just for visualization of uncertainty
+                        visualization_factor = 1.
+                        ax.errorbar(
+                            x=self.jk, y=self.data,
+                            yerr=self.uncertainty*visualization_factor,
+                            color='k'
+                        )
+                    else:
+                        ax.plot(self.jk, self.data, 'k')
 
-            axes[1].set_title('Data')
-            axes[1].set_xlabel("$k_j$")
-            axes[1].set_ylabel("$d_j$")
+                    ax.set_title('Data')
+                    ax.set_xlabel("$k_j$")
 
-        elif option == "kernel":
-            fig, axes=plt.subplots(1, 3, figsize=(12*1.2, 3*1.2))
-            axes[0].plot(self.mesh.vectorCCx, self.G.T)
-            axes[0].set_title('Rows of matrix G')
-            axes[0].set_xlabel("x")
-            axes[0].set_ylabel("g(x)")
-            axes[1].plot(self.mesh.vectorCCx, m)
-            axes[1].set_ylim([-2.5, 2.5])
-            if add_noise:
-                # this is just for visualization of uncertainty
-                visualization_factor=1.
-                axes[2].errorbar(
-                    x=self.jk, y=self.data,
-                    yerr=self.uncertainty*visualization_factor,
-                    color='k'
-                )
-            else:
-                axes[2].plot(self.jk, self.data, 'k')
-
-            axes[1].set_title('Model')
-            axes[1].set_xlabel("x")
-            axes[1].set_ylabel("m(x)")
-
-            axes[2].set_title('Data')
-            axes[2].set_xlabel("$k_j$")
-            axes[1].set_ylabel("$d_j$")
-
+        for i, ax in enumerate(axes):
+            if not option_bools[i]:
+                ax.axis('off')
+                # ax.xaxis.set_minor_locator(plt.NullLocator())
+                # ax.xaxis.set_major_formatter(plt.NullFormatter())
+                # ax.xaxis.set_minor_formatter(plt.NullFormatter())
+                # ax.yaxis.set_major_locator(plt.NullLocator())
+                # ax.yaxis.set_minor_locator(plt.NullLocator())
+                # ax.yaxis.set_major_formatter(plt.NullFormatter())
+                # ax.yaxis.set_minor_formatter(plt.NullFormatter())
         plt.tight_layout()
 
 
@@ -498,8 +492,10 @@ class LinearInversionApp(object):
             sigma_2=FloatSlider(
                 min=0.01, max=0.1, step=0.01, value=0.07, continuous_update=False
             ),
-            option=ToggleButtons(
-                options=["model", "data", "kernel"], value="model"
+            option=SelectMultiple(
+                options=["kernel", "model", "data"],
+                value=["model"],
+                description='option'
             ),
             percentage=FloatText(value=20),
             floor=FloatText(value=0.001),
