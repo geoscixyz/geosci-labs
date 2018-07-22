@@ -562,6 +562,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
     dat = meshcore.plotImage(u[ind]+eps, vType = xtype, ax=ax[1], grid=False,view=view, streamOpts=streamOpts, pcolorOpts = pcolorOpts) #gridOpts={'color':'k', 'alpha':0.5}
 
     # Get plate corners
+    if dx >= 80.:
+        dx = 1000.
     plateCorners = getPlateCorners(xc,zc,dx,dz,rotAng)
 
     if(rhoplate != rhohalf):
@@ -674,8 +676,8 @@ def plot_Surface_Potentials(survey,A,B,M,N,dx,dz,xc,zc,rotAng,rhohalf,rhoplate,F
 def plate_app():
     app = widgetify(plot_Surface_Potentials,
         survey = ToggleButtons(options =['Dipole-Dipole','Dipole-Pole','Pole-Dipole','Pole-Pole'],value='Dipole-Dipole'),
-        dx = FloatSlider(min=1.,max=1000.,step=1.,value=10., continuous_update=False),
-        dz = FloatSlider(min=1.,max=200.,step=1.,value=10., continuous_update=False),
+        dx = FloatSlider(min=1.,max=80.,step=1.,value=10., continuous_update=False),
+        dz = FloatSlider(min=1.,max=40.,step=1.,value=10., continuous_update=False),
         xc = FloatSlider(min=-30.,max=30.,step=1.,value=0., continuous_update=False),
         zc = FloatSlider(min=-30.,max=0.,step=1.,value=-10., continuous_update=False),
         rotAng = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False,description='$\\theta$'),
