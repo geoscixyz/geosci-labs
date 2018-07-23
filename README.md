@@ -5,6 +5,7 @@
 [![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/em-apps/master?filepath=index.ipynb)
 [![azure](https://notebooks.azure.com/launch.png)](https://notebooks.azure.com/import/gh/geoscixyz/em-apps)
 [![travis](https://travis-ci.org/geoscixyz/em-apps.svg?branch=master)](https://travis-ci.org/geoscixyz/em-apps)
+[![SimPEG](https://img.shields.io/badge/powered%20by-SimPEG-blue.svg)](http://simpeg.xyz)
 
 ## Overview
 
