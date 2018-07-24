@@ -412,7 +412,7 @@ class TDEMHorizontalLoopCylWidget(object):
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
-            if Update:
+            if Update == "True":
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
@@ -598,7 +598,7 @@ class TDEMHorizontalLoopCylWidget(object):
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
-            if Update:
+            if Update == "True":
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
