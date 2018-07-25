@@ -46,7 +46,7 @@ from . import LinearInversion
 from matplotlib import rcParams
 rcParams['font.size'] = 16
 
-__version__ = '0.0.28'
+__version__ = '0.0.29'
 __author__ = 'GeoScixyz developers'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 GeoScixyz developers'
