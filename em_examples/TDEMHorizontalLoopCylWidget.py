@@ -259,7 +259,8 @@ class TDEMHorizontalLoopCylWidget(object):
         self.dBzdt = (-Pfz*self.mesh.edgeCurl*self.f[src, "e", :]).flatten()
 
     def plotField(
-        self, Field='B', view="vec", scale="linear", itime=0, Geometry=True, Scenario=None
+        self, Field='B', view="vec", scale="linear", itime=0, Geometry=True, Scenario=None,
+        Fixed=False, vmin=None, vmax=None
     ):
         # Printout for null cases
         if (Field == "B") & (view == "y"):
@@ -282,7 +283,11 @@ class TDEMHorizontalLoopCylWidget(object):
             elif Scenario == 'Layer':
                 model2D, mapping2D = self.getCoreModel('Layer')
 
-            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax)
+            if Fixed:
+                clim=(np.log10(vmin), np.log10(vmax))
+            else:
+                clim=None
+            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax, clim=clim)
             cb = plt.colorbar(
                 out[0], ax=ax, format="$10^{%.1f}$"
             )
@@ -342,19 +347,31 @@ class TDEMHorizontalLoopCylWidget(object):
                 else:
                     return
 
-            out = Utils.plot2Ddata(
-                self.mesh2D.gridCC, val, vec=vec, ax=ax,
-                contourOpts={"cmap": "viridis"},
-                ncontour=200, scale=scale
-            )
+            if Fixed:
+                if scale == "log":
+                    vmin, vmax = (np.log10(vmin), np.log10(vmax))
+                out=ax.scatter(np.zeros(3)-1000, np.zeros(3), c=np.linspace(vmin, vmax, 3))
+                Utils.plot2Ddata(
+                    self.mesh2D.gridCC, val, vec=vec, ax=ax,
+                    contourOpts={"cmap": "viridis", "vmin":vmin, "vmax":vmax},
+                    ncontour=200, scale=scale
+                )
+
+            else:
+                out = Utils.plot2Ddata(
+                    self.mesh2D.gridCC, val, vec=vec, ax=ax,
+                    contourOpts={"cmap": "viridis"},
+                    ncontour=200, scale=scale
+                )[0]
+
             if scale == "linear":
                 cb = plt.colorbar(
-                    out[0], ax=ax,
+                    out, ax=ax,
                     format="%.2e"
                 )
             elif scale == "log":
                 cb = plt.colorbar(
-                    out[0], ax=ax,
+                    out, ax=ax,
                     format="$10^{%.1f}$"
                 )
             else:
@@ -387,6 +404,8 @@ class TDEMHorizontalLoopCylWidget(object):
             ax.set_ylabel("Depth (m)")
             title = title + "\nt = " + '{:.2e}'.format(self.prb.times[itime]*1e3) + " ms"
             ax.set_title(title)
+            ax.set_xlim(-190, 190)
+            ax.set_ylim(-190, 190)
             plt.show()
 
 ######################################################
@@ -400,7 +419,7 @@ class TDEMHorizontalLoopCylWidget(object):
             Update, Field, AmpDir, Component,
             Sigma0, Sigma1, Sigma2, Sigma3,
             Sus, h1, h2, Scale,
-            rxOffset, z, radius, itime, Geometry=True
+            rxOffset, z, radius, itime, Geometry=True, Fixed=False, vmin=None, vmax=None
         ):
 
             if AmpDir == "Direction (B or dBdt)":
@@ -412,21 +431,19 @@ class TDEMHorizontalLoopCylWidget(object):
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
-            if Update == "True":
+            if Update:
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
-                self.getFields(itime)
+            self.getFields(itime)
             return self.plotField(
                 Field=Field, view=Component, scale=Scale,
-                Geometry=Geometry, itime=itime, Scenario='Layer'
+                Geometry=Geometry, itime=itime, Scenario='Layer', Fixed=Fixed, vmin=vmin, vmax=vmax
             )
 
         out = widgetify(
             foo,
-            Update=widgets.ToggleButtons(
-                options=["True", "False"], value="True"
-            ),
+            Update=widgets.widget_bool.Checkbox(value=True, description="Update"),
             Field=widgets.ToggleButtons(
                 options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
@@ -484,6 +501,10 @@ class TDEMHorizontalLoopCylWidget(object):
                 min=2., max=50., step=2., value=2., continuous_update=False,
                 description='Tx radius (m)'
             ),
+            Fixed=widgets.widget_bool.Checkbox(value=False, description="Fixed"),
+            vmin=FloatText(value=None, description='vmin'),
+            vmax=FloatText(value=None, description='vmax')
+
         )
         return out
 
@@ -587,7 +608,7 @@ class TDEMHorizontalLoopCylWidget(object):
             Update, Field, AmpDir, Component,
             Sigma0, Sigmab, Sigma1, Sigma2,
             Sus, d1, h, d2, R, Scale,
-            rxOffset, z, radius, itime, Geometry=True
+            rxOffset, z, radius, itime, Geometry=True, Fixed=False, vmin=None, vmax=None
         ):
 
             if AmpDir == "Direction (B or dBdt)":
@@ -598,21 +619,19 @@ class TDEMHorizontalLoopCylWidget(object):
             self.srcLoc = np.array([0., 0., z])
             self.rxLoc = np.array([[rxOffset, 0., z]])
             self.radius = radius
-            if Update == "True":
+            if Update:
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
-                self.getFields(itime)
+            self.getFields(itime)
             return self.plotField(
                 Field=Field, view=Component, scale=Scale,
-                Geometry=Geometry, itime=itime, Scenario='Sphere'
+                Geometry=Geometry, itime=itime, Scenario='Sphere', Fixed=Fixed, vmin=vmin, vmax=vmax
             )
 
         out = widgetify(
             foo,
-            Update=widgets.ToggleButtons(
-                options=["True", "False"], value="True"
-            ),
+            Update=widgets.widget_bool.Checkbox(value=True, description="Update"),
             Field=widgets.ToggleButtons(
                 options=["E", "B", "dBdt", "J", "Model"], value=fieldvalue
             ),
@@ -678,6 +697,9 @@ class TDEMHorizontalLoopCylWidget(object):
                 min=1, max=70, step=1, value=1,
                 continuous_update=False, description='Time index'
             ),
+            Fixed=widgets.widget_bool.Checkbox(value=False, description="Fixed"),
+            vmin=FloatText(value=None, description='vmin'),
+            vmax=FloatText(value=None, description='vmax')
         )
         return out
 
