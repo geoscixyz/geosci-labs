@@ -602,7 +602,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 dpred = self.simulate(
                     self.srcLoc, self.rxLoc, self.time, self.radius
                 )
-            self.getFields(itime)
+                self.getFields(itime)
             return self.plotField(
                 Field=Field, view=Component, scale=Scale,
                 Geometry=Geometry, itime=itime, Scenario='Sphere'
