@@ -4,6 +4,7 @@ from matplotlib import rcParams         # To adjust some plot settings
 from empymod import bipole, utils       # Load required empymod functions
 from ipywidgets import interactive, FloatText, ToggleButtons, widgets
 from scipy.constants import mu_0
+from ipywidgets.widgets import HBox, VBox
 
 
 def show_canonical_model():
@@ -217,7 +218,8 @@ def csem_fields_app(
             label="Electric field (V/m)"
             val0, val1=-ex.real, ez.real
         elif Field == "H":
-            raise Exception("Only Hy exists, so that you cannot make vector plot")
+            return print("Only Hy exists, so that you cannot make vector plot")
+
         elif Field == "P":
             label="Poynting vector (W/A-m$^2$)"
             sx=0.5 * (ez * hy.conj()).real
@@ -233,7 +235,7 @@ def csem_fields_app(
         x0, x1=y.copy(), z.copy()
         xlabel="Y (m)"
         if Field == "E":
-            raise Exception("Only ex exists, so that you cannot make vector plot")
+            return print("Only ex exists, so that you cannot make vector plot")
         elif Field == "H":
             label="Magnetic field (A/m)"
             val0, val1=-hy.imag, hz.imag
@@ -280,20 +282,23 @@ def FieldsApp():
 
 def csem_data_app(
     frequency, zsrc, zrx,
-    rho0, rho1, rho2, rho3, rho4, rv_rh, rv_rh_bg,
-    rho2BG, rho3BG,
-    dz1, dz2, dz3,
+    rho0, rho1, rho2, rho3, rho4, rv_rh, dz1, dz2, dz3,
+    frequency_bg, zsrc_bg, zrx_bg,
+    rho0_bg, rho1_bg, rho2_bg, rho3_bg, rho4_bg, rv_rh_bg, dz1_bg, dz2_bg, dz3_bg,
     Field, Plane, Component, Complex, scale,
     Fixed, vmin, vmax
     ):
-
+    rcParams['font.size']=16
     lamda0, lamda1, lamda2, lamda3, lamda4 = 1., 1., 1., 1., 1.
     d = np.r_[0., np.cumsum(np.r_[dz1, dz2, dz3])]
     depth = [d[0], d[1], d[2], d[3]]       # Layer boundaries
+    d_bg = np.r_[0., np.cumsum(np.r_[dz1_bg, dz2_bg, dz3_bg])]
+    depth_bg = [d_bg[0], d_bg[1], d_bg[2], d_bg[3]]       # Layer boundaries
+
     res =   [rho0,  rho1,  rho2,  rho3, rho4]  # Anomaly resistivities
-    resBG =   [rho0,  rho1,  rho2BG,  rho3BG, rho4]  # Anomaly resistivities
+    res_bg =   [rho0_bg,  rho1_bg,  rho2_bg,  rho3_bg, rho4_bg]  # Anomaly resistivities
     aniso = [1., 1., np.sqrt(rv_rh), 1., 1.]  # Layer anisotropies (same for anomaly and background)
-    anisoBG = [1., 1., np.sqrt(rv_rh_bg), 1., 1.]  # Layer anisotropies (same for anomaly and background)
+    aniso_bg = [1., 1., np.sqrt(rv_rh_bg), 1., 1.]  # Layer anisotropies (same for anomaly and background)
 
     # Modelling parameters
     verb = 1
@@ -305,6 +310,7 @@ def csem_data_app(
     x = np.r_[np.arange(nrx)*dx + dx]   # Offsets
     y = np.r_[np.arange(nrx)*dy + dy]   # Offsets
     z = np.ones_like(x) * -zrx
+    srcloc = np.r_[0., 0., -zsrc]
     srcloc = np.r_[0., 0., -zsrc]
 
     if Plane =="XZ":
@@ -320,60 +326,61 @@ def csem_data_app(
     if Field == "E":
         label = "Electric field (V/m)"
         data = csem_layered_earth(srcloc, rxlocs, depth, res, aniso, frequency, rx_direction=Component)
-        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, anisoBG, frequency, rx_direction=Component)
+        data_bg = csem_layered_earth(srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg, rx_direction=Component)
+
     elif Field == "H":
         label = "Magnetic field (A/m)"
         data = csem_layered_earth(srcloc, rxlocs, depth, res, aniso, frequency, rx_direction=Component, rx_type="magnetic")
-        dataBG = csem_layered_earth(srcloc, rxlocs, depth, resBG, anisoBG, frequency, rx_direction=Component, rx_type="magnetic")
+        data_bg = csem_layered_earth(srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg, rx_direction=Component, rx_type="magnetic")
 
     elif Field == "Zxy":
         label = "Impedance (V/A)"
-        data_Ex = csem_layered_earth(
+        data_ex = csem_layered_earth(
             srcloc, rxlocs, depth, res, aniso, frequency,
             rx_direction='x'
         )
-        dataBG_Ex = csem_layered_earth(
-            srcloc, rxlocs, depth, resBG, anisoBG, frequency,
+        data_ex = csem_layered_earth(
+            srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='x'
         )
-        data_Hy = csem_layered_earth(
-            srcloc, rxlocs, depth, res, aniso, frequency,
+        data_hy = csem_layered_earth(
+            srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='y', rx_type="magnetic"
         )
-        dataBG_Hy = csem_layered_earth(
-            srcloc, rxlocs, depth, resBG, anisoBG, frequency,
+        data_hy = csem_layered_earth(
+            srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='y', rx_type="magnetic"
         )
-        data = utils.EMArray(data_Ex/data_Hy)
-        dataBG = utils.EMArray(dataBG_Ex/dataBG_Hy)
+        data = utils.EMArray(data_ex/data_hy)
+        data_bg = utils.EMArray(data_ex_bg/data_hy_bg)
 
     if Complex == "Real":
         val = data.real
-        valBG = dataBG.real
+        val_bg = data_bg.real
     elif Complex == "Imag":
         val = data.imag
-        valBG = dataBG.imag
+        val_bg = data_bg.imag
     elif Complex == "Amp":
         if Field == "Zxy":
             label = "Apparent Resistivity ($\Omega$m)"
             val = abs(data)**2 / (2*frequency*np.pi*mu_0)
-            valBG = abs(dataBG)**2 / (2*frequency*np.pi*mu_0)
+            val_bg = abs(data_bg)**2 / (2*frequency_bg*np.pi*mu_0)
         else:
             val = data.amp
-            valBG = dataBG.amp
+            val_bg = data_bg.amp
     elif Complex == "Phase":
         label = "Phase (degree)"
         val = data.pha
-        valBG = dataBG.pha
+        val_bg = data_bg.pha
 
-    fig = plt.figure(figsize = (8, 3))
+    fig = plt.figure(figsize = (8*1.4, 3*1.4))
     ax = plt.subplot(111)
     if scale == "log":
         ax.plot(x, abs(val), 'r')
-        ax.plot(x, abs(valBG), 'k')
+        ax.plot(x, abs(val_bg), 'k')
     elif scale == "linear":
         ax.plot(x, val, 'r')
-        ax.plot(x, valBG, 'k')
+        ax.plot(x, val_bg, 'k')
     ax.grid(True)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(label)
@@ -392,33 +399,95 @@ def csem_data_app(
     ax.set_title(title)
     if Fixed:
         ax.set_ylim(vmin, vmax)
+    plt.show()
 
 def DataApp():
-    Q2 = interactive(
-    csem_data_app,
-    rho0=FloatText(value=1e8, description='$\\rho_{0} \ (\Omega m)$'),
-    rho1=FloatText(value=0.3, description='$\\rho_{1} \ (\Omega m)$'),
-    rho2=FloatText(value=1., description='$\\rho_{2} \ (\Omega m)$'),
-    rho3=FloatText(value=100., description='$\\rho_{3} \ (\Omega m)$'),
-    rho2BG=FloatText(value=1., description='$\\rho_{2}^{BG} \ (\Omega m)$'),
-    rho3BG=FloatText(value=1., description='$\\rho_{3}^{BG} \ (\Omega m)$'),
-    rho4=FloatText(value=1., description='$\\rho_{4} \ (\Omega m)$'),
-    zsrc=FloatText(value=-950., description='src height (m)'),
-    zrx=FloatText(value=-1000., description='rx height (m)'),
-    rv_rh=FloatText(value=1., description='$\\rho_{2 \ v} / \\rho_{2 \ h}$'),
-    rv_rh_bg=FloatText(value=1., description='$\\rho_{2 \ v}^{BG} / \\rho_{2 \ h}^{BG}$'),
-    dz1=FloatText(value=1000., description="dz1 (m)"),
-    dz2=FloatText(value=1000., description="dz2 (m)"),
-    dz3=FloatText(value=200., description="dz3 (m)"),
-    frequency = FloatText(value=0.5, description='f (Hz)'),
-    Field = ToggleButtons(options =['E','H', 'Zxy'],value='E'),
-    Plane = ToggleButtons(options =['XZ','YZ'],value='XZ'),
-    Component = ToggleButtons(options =['x','y', 'z'], value='x', description="rx direction"),
-    Complex = ToggleButtons(options =['Real','Imag', "Amp", "Phase"],value='Amp'),
-    scale = ToggleButtons(options =['log','linear'], value='log'),
-    Fixed=widgets.widget_bool.Checkbox(value=False),
-    vmin=FloatText(value=None),
-    vmax=FloatText(value=None),
+
+    frequency=FloatText(value=0.5, description='f (Hz)')
+    zsrc=FloatText(value=-950., description='src height (m)')
+    zrx=FloatText(value=-1000., description='rx height (m)')
+    rho0=FloatText(value=1e8, description='$\\rho_{0} \ (\Omega m)$')
+    rho1=FloatText(value=0.3, description='$\\rho_{1} \ (\Omega m)$')
+    rho2=FloatText(value=1., description='$\\rho_{2} \ (\Omega m)$')
+    rho3=FloatText(value=100., description='$\\rho_{3} \ (\Omega m)$')
+    rho4=FloatText(value=1., description='$\\rho_{4} \ (\Omega m)$')
+    rv_rh=FloatText(value=1., description='$\\rho_{2 \ v} / \\rho_{2 \ h}$')
+    dz1=FloatText(value=1000., description="dz1 (m)")
+    dz2=FloatText(value=1000., description="dz2 (m)")
+    dz3=FloatText(value=200., description="dz3 (m)")
+    frequency_bg=FloatText(value=0.5, description='f$^{BG}$ (Hz)')
+    zsrc_bg=FloatText(value=-950., description='src height$^{BG}$ (m)')
+    zrx_bg=FloatText(value=-1000., description='rx height$^{BG}$ (m)')
+    rho0_bg=FloatText(value=1e8, description='$\\rho_{0}^{BG} \ (\Omega m)$')
+    rho1_bg=FloatText(value=0.3, description='$\\rho_{1}^{BG} \ (\Omega m)$')
+    rho2_bg=FloatText(value=1., description='$\\rho_{2}^{BG} \ (\Omega m)$')
+    rho3_bg=FloatText(value=1., description='$\\rho_{3}^{BG} \ (\Omega m)$')
+    rho4_bg=FloatText(value=1., description='$\\rho_{4}^{BG} \ (\Omega m)$')
+    rv_rh_bg=FloatText(value=1., description='$\\rho_{2 \ v}^{BG} / \\rho_{2 \ h}^{BG}$')
+    dz1_bg=FloatText(value=1000., description="dz1$^{BG}$ (m)")
+    dz2_bg=FloatText(value=1000., description="dz2$^{BG}$ (m)")
+    dz3_bg=FloatText(value=200., description="dz3$^{BG}$ (m)")
+    Field=ToggleButtons(options =['E','H', 'Zxy'],value='E', description="Field")
+    Plane=ToggleButtons(options =['XZ','YZ'],value='XZ', description="Plane")
+    Component=ToggleButtons(options =['x','y', 'z'], value='x', description="rx direction")
+    Complex=ToggleButtons(options =['Real','Imag', "Amp", "Phase"],value='Amp', description="Complex")
+    scale=ToggleButtons(options =['log','linear'], value='log', description="Scale")
+    Fixed=widgets.widget_bool.Checkbox(value=False, description="Fixed")
+    vmin=FloatText(value=None, description='vmin')
+    vmax=FloatText(value=None, description='vmax')
     __manual = True
-        )
-    return Q2
+
+    out = widgets.interactive_output(
+        csem_data_app,
+        {
+            "frequency":frequency,
+            "zsrc":zsrc,
+            "zrx":zrx,
+            "rho0":rho0,
+            "rho1":rho1,
+            "rho2":rho2,
+            "rho3":rho3,
+            "rho4":rho4,
+            "rv_rh":rv_rh,
+            "dz1":dz1,
+            "dz2":dz2,
+            "dz3":dz3,
+            "frequency_bg":frequency_bg,
+            "zsrc_bg":zsrc_bg,
+            "zrx_bg":zrx_bg,
+            "rho0_bg":rho0_bg,
+            "rho1_bg":rho1_bg,
+            "rho2_bg":rho2_bg,
+            "rho3_bg":rho3_bg,
+            "rho4_bg":rho4_bg,
+            "rv_rh_bg":rv_rh_bg,
+            "dz1_bg":dz1_bg,
+            "dz2_bg":dz2_bg,
+            "dz3_bg":dz3_bg,
+            "Field":Field,
+            "Plane":Plane,
+            "Component":Component,
+            "Complex":Complex,
+            "scale":scale,
+            "Fixed":Fixed,
+            "vmin":vmin,
+            "vmax":vmax,
+        }
+    )
+
+    panel = VBox(
+        [
+            frequency, zsrc, zrx,
+            rho0, rho1, rho2, rho3, rho4, rv_rh,
+            dz1, dz2, dz3
+        ]
+    )
+    panel_bg = VBox(
+        [
+            frequency_bg, zsrc_bg, zrx_bg,
+            rho0_bg, rho1_bg, rho2_bg, rho3_bg, rho4_bg, rv_rh_bg,
+            dz1_bg, dz2_bg, dz3_bg
+        ]
+    )
+    panel_type = VBox([Field, Plane, Component, Complex, scale,Fixed, vmin, vmax])
+    return VBox([HBox([panel,panel_bg]), panel_type, out])
