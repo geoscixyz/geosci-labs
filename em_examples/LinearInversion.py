@@ -166,9 +166,9 @@ class LinearInversionApp(object):
         self,
         m_background=0.,
         m1=1.,
-        m2=-1.,
         m1_center=0.2,
         dm1=0.2,
+        m2=-1.,
         m2_center=0.5,
         sigma_2=1.,
         option="model",
@@ -473,25 +473,25 @@ class LinearInversionApp(object):
         Q=interact(
             self.plot_model,
             m_background=FloatSlider(
-                min=-2, max=2, step=0.05, value=0., continuous_update=False
+                min=-2, max=2, step=0.05, value=0., continuous_update=False, description="m$_{background}$",
             ),
             m1=FloatSlider(
-                min=-2, max=2, step=0.05, value=1., continuous_update=False
+                min=-2, max=2, step=0.05, value=1., continuous_update=False, description="m1",
             ),
             m2=FloatSlider(
-                min=-2, max=2, step=0.05, value=2., continuous_update=False
+                min=-2, max=2, step=0.05, value=2., continuous_update=False, description="m2",
             ),
             m1_center=FloatSlider(
-                min=-2, max=2, step=0.05, value=0.2, continuous_update=False
+                min=-2, max=2, step=0.05, value=0.2, continuous_update=False, description="m1$_{center}$",
             ),
             dm1 =FloatSlider(
-                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False
+                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False, description="m1_{width}",
             ),
             m2_center=FloatSlider(
-                min=-2, max=2, step=0.05, value=0.75, continuous_update=False
+                min=-2, max=2, step=0.05, value=0.75, continuous_update=False, description="m2$_{center}$",
             ),
             sigma_2=FloatSlider(
-                min=0.01, max=0.1, step=0.01, value=0.07, continuous_update=False
+                min=0.01, max=0.1, step=0.01, value=0.07, continuous_update=False, description="m2$_{sigma}$",
             ),
             option=SelectMultiple(
                 options=["kernel", "model", "data"],
