@@ -232,11 +232,10 @@ class LinearInversionApp(object):
                 elif i == 2:
                     if add_noise:
                         # this is just for visualization of uncertainty
-                        visualization_factor = 1.
                         ax.errorbar(
                             x=self.jk, y=self.data,
-                            yerr=self.uncertainty*visualization_factor,
-                            color='k'
+                            yerr=self.uncertainty,
+                            color='k', lw=1
                         )
                         ax.plot(self.jk, self.data, 'ko')
                     else:
@@ -382,6 +381,11 @@ class LinearInversionApp(object):
         if run:
             axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
+        axes[1].errorbar(
+            x=self.jk, y=self.data,
+            yerr=self.uncertainty,
+            color='k', lw=1
+        )
         axes[1].plot(self.jk, self.data, 'ko')
         if run:
             axes[1].plot(self.jk, self.pred[i_plot], 'bx')
@@ -407,7 +411,6 @@ class LinearInversionApp(object):
                     axes[1].plot(self.jk, self.pred[i_iteration], 'bx')
                     # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
                     # axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
-                    axes[0].legend(("True", "Pred"))
                     axes[1].legend(("Observed", "Predicted"))
 
                     if i_iteration == 0:
@@ -485,7 +488,7 @@ class LinearInversionApp(object):
                 min=-2, max=2, step=0.05, value=0.2, continuous_update=False, description="m1$_{center}$",
             ),
             dm1 =FloatSlider(
-                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False, description="m1_{width}",
+                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False, description="m1$_{width}$",
             ),
             m2_center=FloatSlider(
                 min=-2, max=2, step=0.05, value=0.75, continuous_update=False, description="m2$_{center}$",
