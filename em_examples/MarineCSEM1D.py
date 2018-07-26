@@ -339,7 +339,7 @@ def csem_data_app(
             srcloc, rxlocs, depth, res, aniso, frequency,
             rx_direction='x'
         )
-        data_ex = csem_layered_earth(
+        data_ex_bg = csem_layered_earth(
             srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='x'
         )
@@ -347,7 +347,7 @@ def csem_data_app(
             srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='y', rx_type="magnetic"
         )
-        data_hy = csem_layered_earth(
+        data_hy_bg = csem_layered_earth(
             srcloc, rxlocs, depth_bg, res_bg, aniso_bg, frequency_bg,
             rx_direction='y', rx_type="magnetic"
         )
