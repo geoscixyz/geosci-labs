@@ -26,8 +26,8 @@ CLASSIFIERS = [
     'Natural Language :: English',
 ]
 
-with open('README.md') as f:
-    LONG_DESCRIPTION = ''.join(f.readlines())
+with open('README.md', 'r') as f:
+    LONG_DESCRIPTION = f.read()
 
 setup(
     name = 'em_examples',
