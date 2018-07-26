@@ -65,8 +65,8 @@ class LinearInversionApp(object):
         M=100,
         p=-0.25,
         q=0.25,
-        k1=1,
-        kn=60,
+        j1=1,
+        jn=60,
     ):
         """
         Parameters
@@ -79,7 +79,7 @@ class LinearInversionApp(object):
         self.N=N
         self.M=M
         self._mesh=Mesh.TensorMesh([M])
-        jk=np.linspace(k1, kn, N)
+        jk=np.linspace(j1, jn, N)
         self._G=np.zeros((N, self.mesh.nC), dtype=float, order='C')
 
         def g(k):
@@ -98,19 +98,20 @@ class LinearInversionApp(object):
         M=100,
         p=-0.25,
         q=0.25,
-        k1=1,
-        kn=60,
+        j1=1,
+        jn=60,
+        scale='log',
+        fixed=False,
         ymin=-0.001,
-        ymax=0.011,
-        scale='log'
+        ymax=0.011
     ):
         self.set_G(
             N=N,
             M=M,
             p=p,
             q=q,
-            k1=k1,
-            kn=kn,
+            j1=j1,
+            jn=jn,
 
         )
 
@@ -125,7 +126,8 @@ class LinearInversionApp(object):
         ax2 = plt.subplot(gs1[0, 3:])
 
         ax1.plot(self.mesh.vectorCCx, self.G.T)
-        ax1.set_ylim(ymin, ymax)
+        if fixed:
+            ax1.set_ylim(ymin, ymax)
         ax1.set_xlabel("x")
         ax1.set_ylabel("g(x)")
 
@@ -139,10 +141,6 @@ class LinearInversionApp(object):
         ax2.xaxis.set_major_formatter(plt.NullFormatter())
         ax2.xaxis.set_minor_formatter(plt.NullFormatter())
 
-        # ax2.yaxis.set_major_locator(plt.NullLocator())
-        # ax2.yaxis.set_minor_locator(plt.NullLocator())
-        # ax2.yaxis.set_major_formatter(plt.NullFormatter())
-        # ax2.yaxis.set_minor_formatter(plt.NullFormatter())
         plt.tight_layout()
         plt.show()
 
@@ -168,13 +166,13 @@ class LinearInversionApp(object):
         self,
         m_background=0.,
         m1=1.,
-        m2=-1.,
         m1_center=0.2,
         dm1=0.2,
+        m2=-1.,
         m2_center=0.5,
         sigma_2=1.,
         option="model",
-        add_noise=False,
+        add_noise=True,
         percentage =10,
         floor=1e-1,
         ):
@@ -240,8 +238,9 @@ class LinearInversionApp(object):
                             yerr=self.uncertainty*visualization_factor,
                             color='k'
                         )
+                        ax.plot(self.jk, self.data, 'ko')
                     else:
-                        ax.plot(self.jk, self.data, 'k')
+                        ax.plot(self.jk, self.data, 'ko-')
 
                     ax.set_title('Data')
                     ax.set_xlabel("$k_j$")
@@ -383,7 +382,7 @@ class LinearInversionApp(object):
         if run:
             axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
-        axes[1].plot(self.jk, self.data, 'k')
+        axes[1].plot(self.jk, self.data, 'ko')
         if run:
             axes[1].plot(self.jk, self.pred[i_plot], 'bx')
         axes[1].legend(("Observed", "Predicted"))
@@ -413,13 +412,13 @@ class LinearInversionApp(object):
 
                     if i_iteration == 0:
                         i_iteration = 1
-                    axes[2].plot(np.arange(len(self.save.phi_d))[i_iteration-1]+1, self.save.phi_d[i_iteration-1], 'go', ms=10)
+                    axes[2].plot(np.arange(len(self.save.phi_d))[i_iteration-1]+1, self.save.phi_d[i_iteration-1]*2, 'go', ms=10)
 
                 ax_1 = axes[2].twinx()
-                axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d, 'k-', lw=2)
+                axes[2].semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_d*2, 'k-', lw=2)
                 if self.save.i_target is not None:
-                    axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target], 'k*', ms=10)
-                    axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit, 'k:')
+                    axes[2].plot(np.arange(len(self.save.phi_d))[self.save.i_target]+1, self.save.phi_d[self.save.i_target]*2, 'k*', ms=10)
+                    axes[2].plot(np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]], np.ones(2)*self.save.target_misfit*2, 'k:')
 
                 ax_1.semilogy(np.arange(len(self.save.phi_d))+1, self.save.phi_m, 'r', lw=2)
                 axes[2].set_xlabel("Iteration")
@@ -440,14 +439,14 @@ class LinearInversionApp(object):
 
                     if i_iteration == 0:
                         i_iteration = 1
-                    axes[2].plot(self.save.phi_m[i_iteration-1], self.save.phi_d[i_iteration-1], 'go', ms=10)
+                    axes[2].plot(self.save.phi_m[i_iteration-1], self.save.phi_d[i_iteration-1]*2, 'go', ms=10)
 
-                axes[2].plot(self.save.phi_m, self.save.phi_d, 'k-', lw=2)
+                axes[2].plot(self.save.phi_m, self.save.phi_d*2, 'k-', lw=2)
                 axes[2].set_xlim(np.hstack(self.save.phi_m).min(), np.hstack(self.save.phi_m).max())
                 axes[2].set_xlabel("$\phi_m$", fontsize=14)
                 axes[2].set_ylabel("$\phi_d$", fontsize=14)
                 if self.save.i_target is not None:
-                    axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target], 'k*', ms=10)
+                    axes[2].plot(self.save.phi_m[self.save.i_target], self.save.phi_d[self.save.i_target]*2., 'k*', ms=10)
                 axes[2].set_title('Tikhonov curve')
         plt.tight_layout()
 
@@ -456,15 +455,17 @@ class LinearInversionApp(object):
             self.plot_G,
             N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
             M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
-            p =FloatSlider(min=-1, max=0, step=0.05, value=-0.25, continuous_update=False),
+            p =FloatSlider(min=-1, max=0, step=0.05, value=-0.15, continuous_update=False),
             q=FloatSlider(min=0, max=1, step=0.05, value=0.25, continuous_update=False),
-            k1 =FloatText(value=1.),
-            kn=FloatText(value=19.),
-            ymin=FloatText(value=-0.005),
-            ymax=FloatText(value=0.011),
+            j1 =FloatText(value=1.),
+            jn=FloatText(value=19.),
             scale=ToggleButtons(
                 options=["linear", "log"], value="log"
             ),
+            fixed=False,
+            ymin=FloatText(value=-0.005),
+            ymax=FloatText(value=0.011),
+
         )
         return Q
 
@@ -472,37 +473,37 @@ class LinearInversionApp(object):
         Q=interact(
             self.plot_model,
             m_background=FloatSlider(
-                min=-2, max=2, step=0.05, value=0., continuous_update=False
+                min=-2, max=2, step=0.05, value=0., continuous_update=False, description="m$_{background}$",
             ),
             m1=FloatSlider(
-                min=-2, max=2, step=0.05, value=1., continuous_update=False
+                min=-2, max=2, step=0.05, value=1., continuous_update=False, description="m1",
             ),
             m2=FloatSlider(
-                min=-2, max=2, step=0.05, value=2., continuous_update=False
+                min=-2, max=2, step=0.05, value=2., continuous_update=False, description="m2",
             ),
             m1_center=FloatSlider(
-                min=-2, max=2, step=0.05, value=0.2, continuous_update=False
+                min=-2, max=2, step=0.05, value=0.2, continuous_update=False, description="m1$_{center}$",
             ),
             dm1 =FloatSlider(
-                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False
+                min=0, max=0.5, step=0.05, value=0.2, continuous_update=False, description="m1_{width}",
             ),
             m2_center=FloatSlider(
-                min=-2, max=2, step=0.05, value=0.75, continuous_update=False
+                min=-2, max=2, step=0.05, value=0.75, continuous_update=False, description="m2$_{center}$",
             ),
             sigma_2=FloatSlider(
-                min=0.01, max=0.1, step=0.01, value=0.07, continuous_update=False
+                min=0.01, max=0.1, step=0.01, value=0.07, continuous_update=False, description="m2$_{sigma}$",
             ),
             option=SelectMultiple(
                 options=["kernel", "model", "data"],
                 value=["model"],
                 description='option'
             ),
-            percentage=FloatText(value=20),
-            floor=FloatText(value=0.001),
+            percentage=FloatText(value=5),
+            floor=FloatText(value=0.02),
         )
         return Q
 
-    def interact_plot_inversion(self, maxIter=20):
+    def interact_plot_inversion(self, maxIter=30):
         Q = interact(
             self.plot_inversion,
                 maxIter=IntText(value=maxIter),
@@ -514,7 +515,7 @@ class LinearInversionApp(object):
                 beta0_ratio=FloatText(value=100),
                 coolingFactor=FloatSlider(min=0.1, max=10, step=1, value=2, continuous_update=False),
                 coolingRate=IntSlider(min=1, max=10, step=1, value=1, continuous_update=False),
-                alpha_s=FloatText(value=1),
+                alpha_s=FloatText(value=1e-10),
                 alpha_x=FloatText(value=0),
                 run = True,
                 target = False,
