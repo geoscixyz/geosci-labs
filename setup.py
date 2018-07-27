@@ -31,7 +31,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name = 'em_examples',
-    version = '0.0.30',
+    version = '0.0.31',
     packages = find_packages(),
     install_requires = [
         'future',
