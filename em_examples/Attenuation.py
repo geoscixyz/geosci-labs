@@ -9,7 +9,7 @@ from scipy.constants import mu_0, epsilon_0
 from ipywidgets import (
     interact, interactive, IntSlider, widget, FloatText, FloatSlider
 )
-
+import matplotlib
 
 def WaveVelSkind(frequency, epsr, sigma):
     omega = np.pi*np.complex128(frequency)
@@ -38,41 +38,37 @@ def WaveVelandSkindWidget(epsr, sigma):
     return
 
 
-def WaveVelandSkindWidgetTBL(epsr, sigma):
+def WaveVelandSkindWidgetTBL(epsr, log_sigma, log_frequency):
+    matplotlib.rcParams['font.size'] = 14
     frequency = np.logspace(5, 10, 31)
-    vel, skind = WaveVelSkind(frequency, epsr, 10**sigma)
-    velsm, skindsm = WaveVelSkind(np.r_[25, 100, 1000]*1e6, epsr, 10**sigma)
+    vel, skind = WaveVelSkind(frequency, epsr, 10**log_sigma)
+    velocity_point, skindepth_point = WaveVelSkind(10**log_frequency, epsr, 10**log_sigma)
     figure, ax = plt.subplots(1, 2, figsize=(10, 4))
     ax[0].loglog(frequency, vel, 'b-', lw=2)
     ax[1].loglog(frequency, skind, 'r-', lw=2)
-    ax[0].loglog(np.r_[25., 25.]*1e6, np.r_[1e5, 1e8], 'k--', lw=1)
-    ax[0].loglog(np.r_[100., 100.]*1e6, np.r_[1e5, 1e8], 'k--', lw=1)
-    ax[0].loglog(np.r_[1000., 1000.]*1e6, np.r_[1e5, 1e8], 'k--', lw=1 )
 
-    ax[1].loglog(np.r_[25., 25.]*1e6, np.r_[1e-1, 1e1], 'k--', lw=1)
-    ax[1].loglog(np.r_[100., 100.]*1e6, np.r_[1e-1, 1e1], 'k--', lw=1)
-    ax[1].loglog(np.r_[1000., 1000.]*1e6, np.r_[1e-1, 1e1], 'k--', lw=1 )
-
-    ax[0].loglog(np.r_[25, 100, 1000]*1e6, velsm, 'ko', ms=5)
-    # ax[0].text(25*1e6,   11*1e8, ("%3.1f m/s")%(velsm[0])   ,fontsize=10)
-    # ax[0].text(100*1e6,  11*1e8, ("%3.1f m/s")%(velsm[1])  ,fontsize=10)
-    # ax[0].text(1000*1e6, 11*1e8, ("%3.1f m/s")%(velsm[2]) ,fontsize=10)
-
-    ax[1].loglog(np.r_[25, 100, 1000]*1e6, skindsm, 'ko', ms=5)
-    ax[1].text(25*1e6, 11, ("%3.1f m")%(skindsm[0]), fontsize=10)
-    ax[1].text(100*1e6, 11, ("%3.1f m")%(skindsm[1]), fontsize=10)
-    ax[1].text(1000*1e6, 11, ("%3.1f m")%(skindsm[2]), fontsize=10)
     ax[0].set_xlim(10**5, 10**10)
     ax[1].set_xlim(10**5, 10**10)
-    ax[0].set_ylim(1e5, 1e8)
-    ax[1].set_ylim(1e-1, 1e1)
+    velocity_ylim = ax[0].get_ylim()
+    skindepth_ylim = ax[1].get_ylim()
+
+    ax[0].loglog(10**log_frequency, velocity_point, 'ko', ms=5)
+    ax[1].loglog(10**log_frequency, skindepth_point, 'ko', ms=5)
+    ax[0].loglog(10**log_frequency*np.ones(2), velocity_ylim, 'k--', lw=1)
+    ax[1].loglog(10**log_frequency*np.ones(2), skindepth_ylim, 'k--', lw=1)
+
+    ax[0].text(10**log_frequency, 1.1*velocity_ylim[1], ("%.1e m/s")%(velocity_point), fontsize=14)
+    ax[1].text(10**log_frequency, 1.1*skindepth_ylim[1], ("%.1e m")%(skindepth_point), fontsize=14)
+
+    ax[0].set_ylim(velocity_ylim)
+    ax[1].set_ylim(skindepth_ylim)
     ax[0].set_xlabel('Frequency (Hz)')
     ax[0].set_ylabel('Velocity (m/s)')
     ax[1].set_xlabel('Frequency (Hz)')
     ax[1].set_ylabel('Skin Depth (m)')
     ax[0].grid(True)
     ax[1].grid(True)
-
+    plt.tight_layout()
     plt.show()
     return
 
@@ -80,7 +76,8 @@ def WaveVelandSkindWidgetTBL(epsr, sigma):
 def AttenuationWidgetTBL():
     i = interact(
         WaveVelandSkindWidgetTBL,
-        epsr = FloatText(value=9.),
-        sigma= FloatSlider(min=-4., max=1., step=0.5, value=-1.5)
+        epsr = FloatText(value=9., description="$\epsilon_r$"),
+        log_sigma= FloatSlider(min=-4., max=1., step=0.5, value=-1.5, description="log$(\sigma)$"),
+        log_frequency= FloatSlider(min=5., max=10., step=0.5, value=5.5, description="log$(f)$")
     )
     return i
