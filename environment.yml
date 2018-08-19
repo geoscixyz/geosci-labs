@@ -1,0 +1,9 @@
+name: gpgLabs-environment
+
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip:
+    - git+https://github.com/simpeg/geoana@magnetic_pole
+    - git+https://github.com/geoscixyz/gpgLabs@magnetic_applet
