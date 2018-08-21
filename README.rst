@@ -3,13 +3,13 @@ gpgLabs
 
 Tutorials and examples for applied geophysics!
 
-.. image:: https://travis-ci.org/ubcgif/gpgLabs.svg?branch=master
+.. image:: https://travis-ci.org/geoscixyz/gpgLabs.svg?branch=master
     :alt: Build Status
-    :target: https://travis-ci.org/ubcgif/gpgLabs
+    :target: https://travis-ci.org/geoscixyz/gpgLabs
 
 .. image:: http://mybinder.org/badge.svg
     :alt: Binder
-    :target: http://mybinder.org:/repo/ubcgif/gpgLabs
+    :target: https://mybinder.org/v2/gh/geoscixyz/gpgLabs/master?filepath=Notebooks%2Findex.ipynb
 
 These notebooks supplement material in the `gpg <http://gpg.geosci.xyz>`_
 and are used in the applied geophysics course `EOSC 350 <http://eosc350.geosci.xyz>`_ at UBC.
