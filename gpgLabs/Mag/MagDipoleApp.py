@@ -205,7 +205,7 @@ class MagneticDipoleApp(object):
 
     def interact_plot_model(self):
         component = widgets.RadioButtons(
-            options=["Bt", "Bg", "Bx", "By", "Bz"],
+            options=["Bt", "Bx", "By", "Bz", "Bg"],
             value='Bt',
             description='field',
             disabled=False
