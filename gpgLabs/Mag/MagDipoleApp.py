@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.interpolate import interp1d
 from SimPEG import Mesh, Utils
 from geoana import em
 from ipywidgets import widgets
@@ -40,7 +41,7 @@ class MagneticDipoleApp(object):
         self,
         component, target, inclination, declination,
         length, dx, moment, depth, profile,
-        refresh
+        fixed_scale, show_halfwidth
     ):
         self.component = component
         self.target = target
@@ -51,7 +52,8 @@ class MagneticDipoleApp(object):
         self.moment = moment
         self.depth = depth
         self.profile = profile
-        self.refresh = refresh
+        self.fixed_scale = fixed_scale
+        self.show_halfwidth = show_halfwidth
 
         nT = 1e9
         nx = ny = int(length/dx)
@@ -111,20 +113,18 @@ class MagneticDipoleApp(object):
         data = self.data
         profile = self.profile
 
-        fig = plt.figure(figsize=(5, 5))
-        ax1 = plt.subplot2grid((7, 4), (0, 0), rowspan=5, colspan=3)
-        ax2 = plt.subplot2grid((7, 4), (5, 0), rowspan=2, colspan=3)
+        fig = plt.figure(figsize=(5, 6))
+        ax1 = plt.subplot2grid((8, 4), (0, 0), rowspan=5, colspan=3)
+        ax2 = plt.subplot2grid((8, 4), (6, 0), rowspan=2, colspan=3)
 
-        if self.clim is None:
+        if (self.clim is None) or (not self.fixed_scale):
             self.clim = data.min(), data.max()
 
-        if self.refresh:
-            self.clim = data.min(), data.max()
         out = self.mesh.plotImage(
             self.data, pcolorOpts={'cmap': 'jet'}, ax=ax1,
             clim=self.clim
         )
-        cax = fig.add_axes([0.8, 0.35, 0.02, 0.5])
+        cax = fig.add_axes([0.75, 0.45, 0.02, 0.5])
         ratio = abs(self.clim[0]/self.clim[1])
         if ratio < 0.05:
             ticks = [self.clim[0], self.clim[1]]
@@ -157,32 +157,49 @@ class MagneticDipoleApp(object):
             self.mesh.vectorCCx, np.zeros(self.mesh.nCx),
             'k--', color='grey', lw=1
         )
+
         ax2.set_xlim(-self.length/2., self.length/2.)
         ymin, ymax = ax2.get_ylim()
         ax2.text(-self.length/2., ymax, "A")
         ax2.text(self.length/2.-self.length/2*0.05, ymax, "B")
         ax2.set_yticks([self.clim[0], self.clim[1]])
-        ax2.set_xticks([])
+        if self.show_halfwidth:
+            x_half, data_half = self.get_half_width()
+            ax2.plot(x_half, data_half, 'bo--')
+            ax2.set_xlabel(("Halfwidth: %.1fm")%(abs(np.diff(x_half))))
+            # ax2.set_xticks([])
+        else:
+            ax2.set_xlabel(" ")
         plt.tight_layout()
 
-    # def get_half_width(self):
-    #     A_half = abs(mag.data_profile.max()-mag.data_profile.min()) / 2.
-    #     if self.profile == "North":
-    #         x = mag.xy_profile[:, 1]
-    #     else:
-    #         x = mag.xy_profile[:, 0]
-    #     left_inds = x > 0.
-    #     half_ind = np.argmin(abs(mag.data_profile[left_inds])-A_half)
-    #     x_left = x[left_inds][half_ind]
-    #     return np.r_[x_left, -x_right]
+    def get_half_width(self, n_points=200):
+        ind_max = np.argmax(abs(self.data_profile))
+        A_half = self.data_profile[ind_max] / 2.
+        if self.profile == "North":
+            x = self.xy_profile[:, 1]
+        else:
+            x = self.xy_profile[:, 0]
+        f = interp1d(x, self.data_profile)
+        x_int = np.linspace(x.min(), x.max(), n_points)
+        data_profile_int = f(x_int)
+        inds = np.argsort(abs(data_profile_int-A_half))
+        ind_first = inds[0]
+        for ind in inds:
+            dx = abs(x_int[ind_first] - x_int[ind])
+            if dx > self.dx:
+                ind_second = ind
+                break
+        inds = [ind_first, ind_second]
+        return x_int[inds], data_profile_int[inds]
 
     def magnetic_dipole_applet(
             self, component, target, inclination, declination,
-            length, dx, moment, depth, profile, refresh
+            length, dx, moment, depth, profile, fixed_scale,
+            show_halfwidth
     ):
         self.simulate(
             component, target, inclination, declination,
-            length, dx, moment, depth, profile, refresh
+            length, dx, moment, depth, profile, fixed_scale, show_halfwidth
         )
         self.plot_map()
 
@@ -199,10 +216,10 @@ class MagneticDipoleApp(object):
             description='target',
             disabled=False,
         )
-        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=0, max=180, step=1, value=0)
+        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=0)
         declination = widgets.FloatSlider(description='D', continuous_update=False, min=0, max=180, step=1, value=0)
         length = widgets.FloatSlider(description='length', continuous_update=False, min=50, max=200, step=1, value=72)
-        dx = widgets.FloatSlider(description='data spacing', continuous_update=False, min=1, max=15, step=1, value=2)
+        dx = widgets.FloatSlider(description='data spacing', continuous_update=False, min=0.5, max=15, step=0.5, value=2)
         moment = widgets.FloatSlider(description='M', continuous_update=False, min=1, max=100, step=1, value=30)
         depth = widgets.FloatSlider(description='depth', continuous_update=False, min=1, max=50, step=1, value=10)
         profile = widgets.RadioButtons(
@@ -211,13 +228,15 @@ class MagneticDipoleApp(object):
             description='profile',
             disabled=False
         )
-        refresh = widgets.ToggleButton(
+        fixed_scale = widgets.Checkbox(
             value=False,
-            description='refresh',
+            description='fixed scale',
             disabled=False,
-            button_style='',
-            tooltip='Description',
-            icon='check'
+        )
+        show_halfwidth = widgets.Checkbox(
+            value=False,
+            description='half width',
+            disabled=False,
         )
         out = widgets.interactive_output(
             self.magnetic_dipole_applet,
@@ -231,7 +250,8 @@ class MagneticDipoleApp(object):
                 'moment': moment,
                 'depth': depth,
                 'profile': profile,
-                'refresh': refresh,
+                'fixed_scale': fixed_scale,
+                'show_halfwidth': show_halfwidth,
             }
         )
         left = widgets.VBox(
@@ -243,7 +263,7 @@ class MagneticDipoleApp(object):
         right = widgets.VBox(
             [
                 target, inclination, declination,
-                length, dx, moment, depth, refresh
+                length, dx, moment, depth, fixed_scale, show_halfwidth
             ],
             layout=Layout(
                 width='50%', height='350px', margin='20px 0px 0px 0px'
