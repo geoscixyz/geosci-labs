@@ -7,5 +7,5 @@ dependencies:
   - numpy
   - scipy
   - pip:
-    - git+https://github.com/simpeg/geoana@magnetic_pole
-    - git+https://github.com/geoscixyz/gpgLabs@magnetic_applet
+    - git+https://github.com/simpeg/geoana
+    - git+https://github.com/geoscixyz/gpgLabs
