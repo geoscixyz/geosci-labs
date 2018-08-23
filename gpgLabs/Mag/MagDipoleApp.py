@@ -136,8 +136,8 @@ class MagneticDipoleApp(object):
         )
         cb.set_label("nT", labelpad=-40, y=-.05, rotation=0)
         ax1.set_aspect(1)
-        ax1.set_ylabel("X (N)")
-        ax1.set_xlabel("Y (E)")
+        ax1.set_ylabel("X (North)")
+        ax1.set_xlabel("Y (East)")
         if profile == "North":
             xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
             ax1.text(1, length/2-length/2*0.1, 'B', color='w')
