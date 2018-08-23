@@ -59,3 +59,5 @@ target/
 # Html
 *.html
 
+*.sublime-project
+*.sublime-workspace
