@@ -383,7 +383,7 @@ def plotObj3D(prism, survey, View_dip, View_azm, View_lim, fig=None, axs=None, t
     if title is not None:
         axs.set_title(title)
 
-    plt.rcParams.update({'font.size': 13})
+    # plt.rcParams.update({'font.size': 13})
 
     cntr = [prism.x0, prism.y0]
     axs.set_xlim3d(-View_lim + cntr[0], View_lim + cntr[0])
