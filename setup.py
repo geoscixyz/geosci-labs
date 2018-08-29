@@ -26,7 +26,7 @@ CLASSIFIERS = [
     'Natural Language :: English',
 ]
 
-with open('README.rst') as f:
+with open('README.md') as f:
     LONG_DESCRIPTION = ''.join(f.readlines())
 
 setup(

@@ -22,6 +22,7 @@ def PFSimulator(prism, survey):
         prob = Mag.problem()
         prob.prism = prism.result
         prob.survey = survey.result
+        print (survey.result)
 
         return PlotFwrSim(prob, susc, comp, irt, Q, RemInc, RemDec,
                           Profile_azm, Profile_len, Profile_npt,
@@ -357,8 +358,6 @@ def ViewPrism(survey):
                               View_lim=widgets.FloatSlider(min=1, max=2*lim, step=1, value=lim, continuous_update=False),
                               )
 
-
-
     return out
 
 
@@ -384,7 +383,7 @@ def plotObj3D(prism, survey, View_dip, View_azm, View_lim, fig=None, axs=None, t
     if title is not None:
         axs.set_title(title)
 
-    plt.rcParams.update({'font.size': 13})
+    # plt.rcParams.update({'font.size': 13})
 
     cntr = [prism.x0, prism.y0]
     axs.set_xlim3d(-View_lim + cntr[0], View_lim + cntr[0])
@@ -437,10 +436,10 @@ def plotObj3D(prism, survey, View_dip, View_azm, View_lim, fig=None, axs=None, t
                                                xyz[[1, 5, 6, 2], 1] + offy,
                                                xyz[[1, 5, 6, 2], 2] + offz))]))
 
-    axs.set_xlabel('Easting (X; m)')
-    axs.set_ylabel('Northing (Y; m)')
+    axs.set_xlabel('East (Y; m)')
+    axs.set_ylabel('North (X; m)')
     axs.set_zlabel('Depth (Z; m)')
-    axs.scatter(rxLoc[:, 0], rxLoc[:, 1], zs=rxLoc[:, 2], s=20)
+    axs.scatter(rxLoc[:, 0], rxLoc[:, 1], zs=rxLoc[:, 2], s=1, alpha=0.5)
     axs.view_init(View_dip, View_azm)
     plt.show()
 
