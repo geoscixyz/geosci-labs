@@ -318,32 +318,33 @@ class MagneticDipoleApp(object):
 
         ax1.set_xticks([])
         ax1.set_yticks([])
+
+
+        ax2.yaxis.tick_right()
+        ax2.plot(self.mesh.vectorCCx, self.data_profile, 'k', lw=2)
+        ax2.plot(
+            self.mesh.vectorCCx, np.zeros(self.mesh.nCx),
+            'k--', color='grey', lw=1
+        )
+
+        ax2.set_xlim(-self.length/2., self.length/2.)
+        ymin, ymax = ax2.get_ylim()
+        ax2.text(-self.length/2., ymax, "A")
+        ax2.text(self.length/2.-self.length/2*0.05, ymax, "B")
+        ax2.set_yticks([self.clim[0], self.clim[1]])
+        if self.show_halfwidth:
+            x_half, data_half = self.get_half_width()
+            ax2.plot(x_half, data_half, 'bo--')
+            ax2.set_xlabel(
+                ("Halfwidth: %.1fm")%(abs(np.diff(x_half)))
+            )
+        else:
+            ax2.set_xlabel(" ")
+        plt.tight_layout()
         if profile == "None":
             ax2.remove()
         else:
             ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], 'w')
-            ax2.yaxis.tick_right()
-            ax2.plot(self.mesh.vectorCCx, self.data_profile, 'k', lw=2)
-            ax2.plot(
-                self.mesh.vectorCCx, np.zeros(self.mesh.nCx),
-                'k--', color='grey', lw=1
-            )
-
-            ax2.set_xlim(-self.length/2., self.length/2.)
-            ymin, ymax = ax2.get_ylim()
-            ax2.text(-self.length/2., ymax, "A")
-            ax2.text(self.length/2.-self.length/2*0.05, ymax, "B")
-            ax2.set_yticks([self.clim[0], self.clim[1]])
-            if self.show_halfwidth:
-                x_half, data_half = self.get_half_width()
-                ax2.plot(x_half, data_half, 'bo--')
-                ax2.set_xlabel(
-                    ("Halfwidth: %.1fm")%(abs(np.diff(x_half)))
-                )
-            else:
-                ax2.set_xlabel(" ")
-        plt.tight_layout()
-
     def get_half_width(self, n_points=200):
         ind_max = np.argmax(abs(self.data_profile))
         A_half = self.data_profile[ind_max] / 2.
@@ -431,8 +432,8 @@ class MagneticDipoleApp(object):
         depth = widgets.FloatSlider(description='depth', continuous_update=False, min=0, max=50, step=1, value=10)
 
         profile = widgets.RadioButtons(
-            options=["None", "East", "North"],
-            value="North",
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
@@ -505,8 +506,8 @@ class MagneticDipoleApp(object):
         depth_n = widgets.FloatSlider(description='depth$_{-Q}$', continuous_update=False, min=0, max=200, step=1, value=0)
         depth_p = widgets.FloatSlider(description='depth$_{+Q}$', continuous_update=False, min=0, max=200, step=1, value=1)
         profile = widgets.RadioButtons(
-            options=["None", "East", "North"],
-            value="North",
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
@@ -582,8 +583,8 @@ class MagneticDipoleApp(object):
         B0 = widgets.FloatText(description='B$_0$', value=56000)
         depth = widgets.FloatSlider(description='depth', continuous_update=False, min=0, max=50, step=1, value=10)
         profile = widgets.RadioButtons(
-            options=["None", "East", "North"],
-            value="North",
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
