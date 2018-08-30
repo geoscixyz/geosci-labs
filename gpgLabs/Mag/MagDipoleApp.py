@@ -7,6 +7,8 @@ from ipywidgets import Layout
 import matplotlib.pyplot as plt
 from .Simulator import definePrism, plotObj3D
 from .Mag import problem, createMagSurvey
+
+
 class MagneticDipoleApp(object):
     """docstring for MagneticDipoleApp"""
 
@@ -71,7 +73,16 @@ class MagneticDipoleApp(object):
             xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
             b_vec = md.magnetic_flux_density(xyz)
 
-        elif self.target =='Monopole':
+        elif self.target == 'Monopole (+)':
+            md = em.static.MagneticPoleWholeSpace(
+                location=np.r_[0, 0, -depth],
+                orientation=orientation,
+                moment=moment
+            )
+            xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            b_vec = md.magnetic_flux_density(xyz)
+
+        elif self.target == 'Monopole (-)':
             md = em.static.MagneticPoleWholeSpace(
                 location=np.r_[0, 0, -depth],
                 orientation=orientation,
@@ -100,7 +111,7 @@ class MagneticDipoleApp(object):
         self.data = self.dot_product(b_vec, rx_orientation) * nT
 
         # Compute profile
-        if profile == "North":
+        if (profile == "North") or (profile == "None"):
             self.xy_profile = np.c_[
                 np.zeros(self.mesh.nCx), self.mesh.vectorCCx
             ]
@@ -171,7 +182,7 @@ class MagneticDipoleApp(object):
         self.data = self.dot_product(b_vec, rx_orientation) * nT
 
         # Compute profile
-        if profile == "North":
+        if (profile == "North") or (profile == "None"):
             self.xy_profile = np.c_[
                 np.zeros(self.mesh.nCx), self.mesh.vectorCCx
             ]
@@ -180,6 +191,7 @@ class MagneticDipoleApp(object):
             self.xy_profile = np.c_[
                 self.mesh.vectorCCx, np.zeros(self.mesh.nCx)
             ]
+
         self.inds_profile = Utils.closestPoints(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
@@ -193,7 +205,9 @@ class MagneticDipoleApp(object):
         return prism
 
     def plot_prism(self, prism, dip=30, azim=310):
-        return plotObj3D(prism, self.survey, dip, azim, self.mesh.vectorCCx.max())
+        return plotObj3D(
+            prism, self.survey, dip, azim, self.mesh.vectorCCx.max()
+        )
 
     def simulate_prism(
         self,
@@ -251,7 +265,7 @@ class MagneticDipoleApp(object):
         self.data = self.prob.fields()[0]
 
         # Compute profile
-        if profile == "North":
+        if (profile == "North") or (profile == "None"):
             self.xy_profile = np.c_[
                 np.zeros(self.mesh.nCx), self.mesh.vectorCCx
             ]
@@ -302,9 +316,9 @@ class MagneticDipoleApp(object):
             ax1.text(length/2-length/2*0.1, 1, 'B', color='w')
             ax1.text(-length/2, 1, 'A', color='w')
 
-        ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], 'w')
         ax1.set_xticks([])
         ax1.set_yticks([])
+
 
         ax2.yaxis.tick_right()
         ax2.plot(self.mesh.vectorCCx, self.data_profile, 'k', lw=2)
@@ -321,12 +335,16 @@ class MagneticDipoleApp(object):
         if self.show_halfwidth:
             x_half, data_half = self.get_half_width()
             ax2.plot(x_half, data_half, 'bo--')
-            ax2.set_xlabel(("Halfwidth: %.1fm")%(abs(np.diff(x_half))))
-            # ax2.set_xticks([])
+            ax2.set_xlabel(
+                ("Halfwidth: %.1fm")%(abs(np.diff(x_half)))
+            )
         else:
             ax2.set_xlabel(" ")
         plt.tight_layout()
-
+        if profile == "None":
+            ax2.remove()
+        else:
+            ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], 'w')
     def get_half_width(self, n_points=200):
         ind_max = np.argmax(abs(self.data_profile))
         A_half = self.data_profile[ind_max] / 2.
@@ -400,21 +418,22 @@ class MagneticDipoleApp(object):
             disabled=False
         )
         target = widgets.RadioButtons(
-            options=["Dipole", "Monopole"],
+            options=["Dipole", "Monopole (+)", "Monopole (-)"],
             value='Dipole',
             description='target',
             disabled=False,
         )
 
-        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=0)
+        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=90)
         declination = widgets.FloatSlider(description='D', continuous_update=False, min=0, max=180, step=1, value=0)
-        length = widgets.FloatSlider(description='length', continuous_update=False, min=5, max=200, step=1, value=72)
+        length = widgets.FloatSlider(description='length', continuous_update=False, min=2, max=200, step=1, value=72)
         dx = widgets.FloatSlider(description='data spacing', continuous_update=False, min=0.1, max=15, step=0.1, value=2)
         moment = widgets.FloatText(description='M', value=30)
         depth = widgets.FloatSlider(description='depth', continuous_update=False, min=0, max=50, step=1, value=10)
+
         profile = widgets.RadioButtons(
-            options=["East", "North"],
-            value='North',
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
@@ -450,7 +469,7 @@ class MagneticDipoleApp(object):
         left = widgets.VBox(
             [component, profile],
             layout=Layout(
-                width='20%', height='400px', margin='20px 0px 0px 0px'
+                width='20%', height='400px', margin='60px 0px 0px 0px'
             )
         )
         right = widgets.VBox(
@@ -481,14 +500,14 @@ class MagneticDipoleApp(object):
 
         inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=90)
         declination = widgets.FloatSlider(description='D', continuous_update=False, min=0, max=180, step=1, value=0)
-        length = widgets.FloatSlider(description='length', continuous_update=False, min=5, max=200, step=1, value=10)
+        length = widgets.FloatSlider(description='length', continuous_update=False, min=2, max=200, step=1, value=10)
         dx = widgets.FloatSlider(description='data spacing', continuous_update=False, min=0.1, max=15, step=0.1, value=0.1)
         moment = widgets.FloatText(description='M', value=30)
         depth_n = widgets.FloatSlider(description='depth$_{-Q}$', continuous_update=False, min=0, max=200, step=1, value=0)
         depth_p = widgets.FloatSlider(description='depth$_{+Q}$', continuous_update=False, min=0, max=200, step=1, value=1)
         profile = widgets.RadioButtons(
-            options=["East", "North"],
-            value='North',
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
@@ -556,16 +575,16 @@ class MagneticDipoleApp(object):
             disabled=False
         )
 
-        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=0)
+        inclination = widgets.FloatSlider(description='I', continuous_update=False, min=-90, max=90, step=1, value=90)
         declination = widgets.FloatSlider(description='D', continuous_update=False, min=0, max=180, step=1, value=0)
-        length = widgets.FloatSlider(description='length', continuous_update=False, min=5, max=200, step=1, value=72)
+        length = widgets.FloatSlider(description='length', continuous_update=False, min=2, max=200, step=1, value=72)
         dx = widgets.FloatSlider(description='data spacing', continuous_update=False, min=0.1, max=15, step=0.1, value=2)
         kappa = widgets.FloatText(description="$\kappa$", value=0.1)
         B0 = widgets.FloatText(description='B$_0$', value=56000)
         depth = widgets.FloatSlider(description='depth', continuous_update=False, min=0, max=50, step=1, value=10)
         profile = widgets.RadioButtons(
-            options=["East", "North"],
-            value='North',
+            options=["East", "North", "None"],
+            value="East",
             description='profile',
             disabled=False
         )
