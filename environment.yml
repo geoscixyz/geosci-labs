@@ -6,6 +6,7 @@ channels:
 dependencies:
   - numpy
   - scipy
+  - 'matplotlib < 3.0.0'
   - pip:
     - git+https://github.com/simpeg/geoana
     - git+https://github.com/geoscixyz/gpgLabs
