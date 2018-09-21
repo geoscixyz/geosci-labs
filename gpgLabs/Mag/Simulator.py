@@ -326,8 +326,12 @@ def ViewPrism(survey):
     def Prism(update, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec, View_dip, View_azm, View_lim):
 
         prism = definePrism()
-        prism.dx, prism.dy, prism.dz, prism.z0 = dx, dy, dz, elev
-        prism.x0, prism.y0 = x0, y0
+
+        # TODO: this is a temporary fix for
+        # X-North, Y-East...
+
+        prism.dx, prism.dy, prism.dz, prism.z0 = dy, dx, dz, elev
+        prism.x0, prism.y0 = y0, x0
         prism.pinc, prism.pdec = prism_inc, prism_dec
 
         # Display the prism and survey points
@@ -348,8 +352,8 @@ def ViewPrism(survey):
                               dx=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
                               dy=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
                               dz=widgets.FloatSlider(min=.01, max=1000., step=.01, value=lim/4, continuous_update=False),
-                              x0=widgets.FloatSlider(min=cntr[0]-1000, max=cntr[0]+1000, step=1., value=cntr[0], continuous_update=False),
-                              y0=widgets.FloatSlider(min=cntr[1]-1000, max=cntr[1]+1000, step=1., value=cntr[1], continuous_update=False),
+                              x0=widgets.FloatSlider(min=cntr[1]-1000, max=cntr[1]+1000, step=1., value=cntr[1], continuous_update=False),
+                              y0=widgets.FloatSlider(min=cntr[0]-1000, max=cntr[0]+1000, step=1., value=cntr[0], continuous_update=False),
                               elev=widgets.FloatSlider(min=-1000., max=1000., step=1., value=0., continuous_update=False),
                               prism_inc=(-90., 90., 5.),
                               prism_dec=(-90., 90., 5.),
