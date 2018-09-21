@@ -257,7 +257,7 @@ def plotProfile(xyz, dobs, a, b, npts, data=None,
     """
 
     if fig is None:
-        fig = plt.figure(figsize=(6, 9))
+        fig = plt.figure(figsize=(6, 4))
 
         plt.rcParams.update({'font.size': 14})
 
@@ -271,7 +271,7 @@ def plotProfile(xyz, dobs, a, b, npts, data=None,
     distance = np.sqrt((x-a[0])**2.+(y-a[1])**2.)
 
     if dType == '2D':
-        distance = rxLoc[:, 0]
+        distance = rxLoc[:, 1]
         dline = dobs
 
     else:
@@ -282,7 +282,7 @@ def plotProfile(xyz, dobs, a, b, npts, data=None,
     if data is not None:
 
         if dType == '2D':
-            distance = rxLoc[:, 0]
+            distance = rxLoc[:, 1]
             dline = data
 
         else:
@@ -297,7 +297,7 @@ def plotProfile(xyz, dobs, a, b, npts, data=None,
 
     #ax.text(distance.min(), dline.max()*0.8, 'A', fontsize = 16)
     # ax.text(distance.max()*0.97, out_linei.max()*0.8, 'B', fontsize = 16)
-    ax.legend(("survey", "simulated"), bbox_to_anchor=(0.5, -0.3))
+    ax.legend(("survey", "simulated"), bbox_to_anchor=(1,1))
     ax.grid(True)
     plt.show()
 
@@ -537,7 +537,7 @@ def fitline(prism, survey):
     Q = widgets.interactive(profiledata, Binc=widgets.FloatSlider(min=-90., max=90, step=5, value=90, continuous_update=False),
              Bdec=widgets.FloatSlider(min=-90., max=90, step=5, value=0, continuous_update=False),
              Bigrf=widgets.FloatSlider(min=54000., max=55000, step=10, value=54500, continuous_update=False),
-             depth=widgets.FloatSlider(min=0., max=2., step=0.05, value=0.5),
+             depth=widgets.FloatSlider(min=0., max=5., step=0.05, value=0.5),
              susc=widgets.FloatSlider(min=0.,  max=800., step=5.,  value=1.),
              comp=widgets.ToggleButtons(options=['tf', 'bx', 'by', 'bz']),
              irt=widgets.ToggleButtons(options=['induced', 'remanent', 'total']),
