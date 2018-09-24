@@ -14,6 +14,15 @@ def direct_time_to_space(t, v1):
     """
     return t*v1
 
+
+def reflection1_time_to_space(t, v1, z1):
+    t0 = 2.*z1/v1
+    x = np.sqrt((t**2-t0**2) * v1**2)
+
+    refl1 = np.sqrt(t0**2+x**2/v1**2)
+    return x
+
+
 def refraction1_time_to_space(t, v1, v2, z1):
     """
     refraction off of first interface
@@ -68,6 +77,12 @@ def direct_path(x_loc):
     return x, y
 
 
+def reflection_path_1(x_loc,  z1):
+    x = [0, x_loc/2., x_loc]
+    y = [0, z1, 0]
+    return x, y
+
+
 def refraction_path_1(x_loc, v1, v2, z1):
     theta = np.arcsin(v1/v2)
     d = np.tan(theta) * z1
@@ -116,6 +131,16 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
         ax1.plot(x_int[x_int<=x_star], y_direct, 'r-', lw=3)
         ax2.plot(x_int, direct(x_int, v1), '-r',linewidth =2.)
 
+    if (show == "reflection") or (show=="all"):
+        # reflection
+        x, y = reflection_path_1(x_loc, z1)
+        ax1.plot(x, y, 'k--', lw=1)
+        f_reflection1 = interp1d(x, y, bounds_error=False)
+        x_star = reflection1_time_to_space(t_star, v1, z1)
+        y_reflection1 = f_reflection1(x_int[x_int<=x_star])
+        ax1.plot(x_int[x_int<=x_star], y_reflection1, 'k-', lw=3)
+        ax2.plot(x_int, reflection1(x_int, v1, z1), '-k',linewidth =2.)
+
     if (show == "refraction1") or (show=="all"):
         if (v1<v2):
             # refraction 1
@@ -141,7 +166,7 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
                 ax1.plot(x_int[x_int<=x_star], y_refraction2, 'g-', lw=3)
             ax2.plot(x_int, refraction2(x_int, v1, v2, v3, z1, z2), '-g',linewidth =2.)
             ax2.plot(x_int, refraction2_space_to_time(x_int, v1, v2, v3, z1, z2), '--g',linewidth =1)
-            # ax2.plot(x_int, reflection1(x_int, v1, z1), '-k',linewidth =2.)
+
     ax1.plot(np.r_[x_loc, x_loc], np.r_[z3, 0], 'k--o', lw=1, alpha=0.5)
     ax2.plot(np.r_[x_loc, x_loc], np.r_[0, 0.25], 'k--o', lw=1, alpha=0.5)
     ax2.plot(np.r_[0, 100], np.r_[t_star, t_star], 'k--o', lw=1, alpha=0.5)
@@ -178,7 +203,7 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
     ax2.set_xlim(0, 100)
 
 
-def seismic_refraction_app():
+def seismic_app():
     v1 = widgets.FloatSlider(
         description="v1",
         min=300, max=2000, step=1, continuous_update=False, value=500
@@ -211,7 +236,7 @@ def seismic_refraction_app():
     )
     show = widgets.RadioButtons(
         description='plot',
-        options=['direct', 'refraction1', 'refraction2', 'all'],
+        options=['direct', 'reflection', 'refraction1', 'refraction2', 'all'],
         value='all',
         disabled=False
     )
