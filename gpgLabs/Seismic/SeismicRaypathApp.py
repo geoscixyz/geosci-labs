@@ -203,7 +203,7 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
     ax2.set_xlim(0, 100)
 
 
-def seismic_refraction_app():
+def seismic_app():
     v1 = widgets.FloatSlider(
         description="v1",
         min=300, max=2000, step=1, continuous_update=False, value=500
