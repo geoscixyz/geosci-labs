@@ -72,7 +72,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     ax2.invert_yaxis()
     wiggle(syndata, ax = ax1, **kwargs)
     toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
-    wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
+    wiggle(syndata, ax = ax2, manthifts=toffset+t0-t_reflector, **kwargs)
 
     ax1.axis(extent)
     ax2.axis(extent)
