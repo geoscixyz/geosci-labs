@@ -14,7 +14,7 @@ try:
     from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
     pass
 # except Exception, e:
-except Exception as e:    
+except Exception as e:
     from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
 
 
@@ -74,7 +74,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
 
     ax1.axis(extent)
-    ax2.axis(extent)    
+    ax2.axis(extent)
     ax1.plot(xorig, time, 'r', lw=2)
 
     ax1.set_xlabel("Offset (m)")
@@ -83,9 +83,10 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     ax2.set_ylabel("Time (s)")
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
-    
-    singletrace = NMOstack(syndata, xorig, time_data, v) 
-    # singletrace = singletrace 
+
+    singletrace = NMOstack(syndata, xorig, time_data, v)
+    # singletrace = singletrace
+    t_reflector = 0.49
 
     kwargs = {
     'skipt':1,
@@ -94,6 +95,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     'sampr': 0.004,
     'ax': ax3,
     'clip' : 10,
+    'manthifts': np.r_[t_reflector-t0]
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
@@ -134,11 +136,11 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax1.invert_yaxis()
     ax2.invert_yaxis()
     wiggle(syndata, ax = ax1, **kwargs)
-    toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
+    toffset = np.sqrt(xorig**2/v**2+t0**2) - t0
     wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
 
     ax1.axis(extent)
-    ax2.axis(extent)    
+    ax2.axis(extent)
     ax1.plot(xorig, time, 'r', lw=2)
 
     ax1.set_xlabel("Offset (m)")
@@ -147,10 +149,10 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax2.set_ylabel("Time (s)")
     ax1.set_title("CMP gather")
     ax2.set_title("NMO corrected CMP gather")
-    
-    singletrace = NMOstack(syndata, xorig, time_data, v) 
-    # singletrace = singletrace 
 
+    singletrace = NMOstack(syndata, xorig, time_data, v)
+    # singletrace = singletrace
+    t_reflector = 0.39
     kwargs = {
     'skipt':1,
     'scale': 2.,
@@ -158,6 +160,7 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     'sampr': 0.004,
     'ax': ax3,
     'clip' : 10,
+    'manthifts': np.r_[t_reflector-t0]
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
@@ -168,7 +171,6 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax3.set_xlim(-4.5, 4.5)
     ax3.set_xticks([-4.5, 0., 4.5])
     ax3.set_title("Stacked trace")
-
     plt.show();
 
 def HyperbolicFun(t0, x, velocity):
@@ -186,12 +188,14 @@ def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
         traces[itry,:] = NMOstack(data, xorig, time, vtemp[itry])
 
     fig, ax = plt.subplots(1, 3, figsize=(10, 8))
+    t_reflector = 0.49
     kwargs = {
     'skipt':1,
     'scale': 2.,
     'lwidth': 1.,
     'sampr': 0.004,
     'clip' : 10,
+    'manthifts': np.r_[t_reflector-tintercept]
     }
     for i in range(3):
         extent = [traces[i,:].min(), traces[i,:].max(), time.max(), time.min()]
@@ -334,7 +338,7 @@ def mkvc(x, numDims=1):
 
 def InteractClean(cleanDataFile, cleanTimeFile):
     clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.), syndat = fixed(cleanDataFile), timdat = fixed(cleanTimeFile))
-    return clean 
+    return clean
 
 def InteractNosiy(noisyDataFile, noisyTimeFile):
     noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.), syndat = fixed(noisyDataFile), timdat = fixed(noisyTimeFile))
