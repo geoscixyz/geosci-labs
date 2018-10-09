@@ -71,6 +71,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     ax1.invert_yaxis()
     ax2.invert_yaxis()
     wiggle(syndata, ax = ax1, **kwargs)
+    t_reflector = 0.49
     toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
     wiggle(syndata, ax = ax2, manthifts=toffset+t0-t_reflector, **kwargs)
 
@@ -87,7 +88,6 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
 
     singletrace = NMOstack(syndata, xorig, time_data, v)
     # singletrace = singletrace
-    t_reflector = 0.49
 
     kwargs = {
     'skipt':1,
