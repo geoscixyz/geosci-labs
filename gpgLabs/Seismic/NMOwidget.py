@@ -44,6 +44,7 @@ def ViewWiggle(syndat, obsdat):
     ax[1].set_ylabel("Time (s)")
     ax[1].set_title("Noisy CMP gather")
 
+
 def NoisyNMOWidget(t0, v, syndat, timdat):
     syndata = np.load(syndat)
     time_data = np.load(timdat)
@@ -95,7 +96,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     'sampr': 0.004,
     'ax': ax3,
     'clip' : 10,
-    'manthifts': np.r_[t_reflector-t0]
+    'manthifts': np.r_[t0-t_reflector]
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
@@ -108,6 +109,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     ax3.set_title("Stacked trace")
 
     plt.show()
+
 
 def CleanNMOWidget(t0, v, syndat, timdat):
     syndata = np.load(syndat)
@@ -137,7 +139,8 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax2.invert_yaxis()
     wiggle(syndata, ax = ax1, **kwargs)
     toffset = np.sqrt(xorig**2/v**2+t0**2) - t0
-    wiggle(syndata, ax = ax2, manthifts=toffset, **kwargs)
+    t_reflector = 0.39
+    wiggle(syndata, ax = ax2, manthifts=toffset+t0-t_reflector, **kwargs)
 
     ax1.axis(extent)
     ax2.axis(extent)
@@ -152,7 +155,6 @@ def CleanNMOWidget(t0, v, syndat, timdat):
 
     singletrace = NMOstack(syndata, xorig, time_data, v)
     # singletrace = singletrace
-    t_reflector = 0.39
     kwargs = {
     'skipt':1,
     'scale': 2.,
@@ -160,7 +162,7 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     'sampr': 0.004,
     'ax': ax3,
     'clip' : 10,
-    'manthifts': np.r_[t_reflector-t0]
+    'manthifts': np.r_[t0-t_reflector]
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
@@ -171,11 +173,13 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax3.set_xlim(-4.5, 4.5)
     ax3.set_xticks([-4.5, 0., 4.5])
     ax3.set_title("Stacked trace")
-    plt.show();
+    plt.show()
+
 
 def HyperbolicFun(t0, x, velocity):
     time = np.sqrt(x**2/velocity**2+t0**2)
     return time
+
 
 def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
     data = np.load(dat)
@@ -207,6 +211,7 @@ def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
             ax[i].set_ylabel("Time (s)")
         ax[i].set_title(("Velocity = %6.1f")%(vtemp[i]))
 
+
 def NMOstack(data, xorig, time, v):
     if np.isscalar(v):
         v = np.ones_like(time)*v
@@ -219,6 +224,7 @@ def NMOstack(data, xorig, time, v):
         indmin = np.argmin(abs(Time-Toffset), axis=1)
         singletrace[i] = (mkvc(data)[sub2ind(data.shape, np.c_[np.arange(data.shape[0]), indmin])]).sum()
     return singletrace
+
 
 def NMOstackSingle(data, tintercept, v, timeFile):
     dx = 20.
@@ -244,11 +250,12 @@ def NMOstackSingle(data, tintercept, v, timeFile):
     ax.set_ylabel("Time (s)")
 
 
-def clipsign (value, clip):
+def clipsign(value, clip):
   clipthese = abs(value) > clip
   return value * ~clipthese + np.sign(value)*clip*clipthese
 
-def wiggle (traces, skipt=1,scale=1.,lwidth=.1,offsets=None,redvel=0., manthifts=None, tshift=0.,sampr=1.,clip=10., dx=1., color='black',fill=True,line=True, ax=None):
+
+def wiggle(traces, skipt=1,scale=1.,lwidth=.1,offsets=None,redvel=0., manthifts=None, tshift=0.,sampr=1.,clip=10., dx=1., color='black',fill=True,line=True, ax=None):
 
   ns = traces.shape[1]
   ntr = traces.shape[0]
@@ -284,6 +291,7 @@ def wiggle (traces, skipt=1,scale=1.,lwidth=.1,offsets=None,redvel=0., manthifts
             trace[j] = 0
         ax.fill(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=0)
 
+
 def sub2ind(shape, subs):
     """
     Extracted from SimPEG for temporary use (https://github.com/simpeg)
@@ -300,6 +308,7 @@ def sub2ind(shape, subs):
     assert subs.shape[1] == len(shape), 'Indexing must be done as a column vectors. e.g. [[3,6],[6,2],...]'
     inds = np.ravel_multi_index(subs.T, shape, order='F')
     return mkvc(inds)
+
 
 def mkvc(x, numDims=1):
     """
@@ -336,10 +345,25 @@ def mkvc(x, numDims=1):
     elif numDims == 3:
         return x.flatten(order='F')[:, np.newaxis, np.newaxis]
 
+
 def InteractClean(cleanDataFile, cleanTimeFile):
-    clean = interactive(CleanNMOWidget, t0 = (0.2, 0.8, 0.01), v = (1000., 5000., 100.), syndat = fixed(cleanDataFile), timdat = fixed(cleanTimeFile))
+    clean = interactive(
+        CleanNMOWidget,
+        t0=FloatSlider(min=0.2, max=0.8, step=0.01, continuous_update=False),
+        v=FloatSlider(
+            min=1000., max=5000., step=100., continuous_update=False
+        ),
+        syndat=fixed(cleanDataFile),
+        timdat=fixed(cleanTimeFile)
+    )
     return clean
 
+
 def InteractNosiy(noisyDataFile, noisyTimeFile):
-    noisy = interactive(NoisyNMOWidget, t0 = (0.1, 0.6, 0.01),  v = (800., 2500., 100.), syndat = fixed(noisyDataFile), timdat = fixed(noisyTimeFile))
+    noisy = interactive(
+        NoisyNMOWidget,
+        t0=FloatSlider(min=0.1, max=0.6, step=0.01, continuous_update=False),
+        v=FloatSlider(min=800., max=2500., step=100., continuous_update=False),
+        syndat=fixed(noisyDataFile),
+        timdat=fixed(noisyTimeFile))
     return noisy
