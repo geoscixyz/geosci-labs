@@ -206,7 +206,7 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
 def seismic_app():
     v1 = widgets.FloatSlider(
         description="v1",
-        min=300, max=2000, step=1, continuous_update=False, value=500
+        min=300, max=2000, step=1, continuous_update=False, value=400
     )
     v2 = widgets.FloatSlider(
         description="v2",
@@ -214,15 +214,15 @@ def seismic_app():
     )
     v3 = widgets.FloatSlider(
         description="v3",
-        min=300, max=5000, step=1, continuous_update=False, value=2000
+        min=300, max=5000, step=1, continuous_update=False, value=1500
     )
     z1 = widgets.FloatSlider(
         description="z1",
-        min=5, max=50, step=1, continuous_update=False, value=10
+        min=5, max=50, step=1, continuous_update=False, value=5
     )
     z2 = widgets.FloatSlider(
         description="z2",
-        min=5, max=50, step=1, continuous_update=False, value=20
+        min=5, max=50, step=1, continuous_update=False, value=10
     )
     x_loc = widgets.FloatSlider(
         description="offset",
