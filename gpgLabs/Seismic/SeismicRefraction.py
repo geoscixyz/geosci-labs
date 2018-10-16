@@ -57,14 +57,15 @@ def plotWavelet(f=wavf, t=None, t0=t0, ax=None):
     ax.set_ylabel('time (s)', fontsize=fontsize)
     plt.show()
     return ax
-
     # ax.fill(t[i] + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=0)
+
 
 def direct(x, v1):
     """
     direct ray
     """
     return x/v1
+
 
 def refraction1(x, v1, v2, z1):
     """
@@ -74,21 +75,27 @@ def refraction1(x, v1, v2, z1):
     theta1 = np.arcsin(v1/v2)
     ti1 = 2*z1*np.cos(theta1)/v1
     xc1 = 2*z1*np.tan(theta1)
-    act1 = x > xc1
-    ref1 = np.ones_like(x)*np.nan
-    ref1[act1] = 1./v2*x[act1] + ti1
+    if np.isscalar(x):
+        ref1 = 1./v2*x + ti1
+    else:
+        act1 = x > xc1
+        ref1 = np.ones_like(x)*np.nan
+        ref1[act1] = 1./v2*x[act1] + ti1
     return ref1
 
+
 def refraction2(x, v1, v2, v3, z1, z2):
-    theta1 = np.arcsin(v1/v2)
+    theta1 = np.arcsin(v1/v3)
     theta2 = np.arcsin(v2/v3)
     ti1 = 2*z1*np.cos(theta1)/v1
     ti2 = 2*z2*np.cos(theta2)/v2
-    xc2 = 2*z2*np.tan(theta2)
-    act2 = x > xc2
-    ref2 = np.ones_like(x)*np.nan
-    ref2[act2] = 1./v3*x[act2] + ti2 + ti1
-
+    xc2 = 2*(z2)*np.tan(theta2) + 2*(z1)*np.tan(theta1)
+    if np.isscalar(x):
+        ref2 = 1./v3*x + ti2 + ti1
+    else:
+        act2 = x > xc2
+        ref2 = np.ones_like(x)*np.nan
+        ref2[act2] = 1./v3*x[act2] + ti2 + ti1
     return ref2
 
 
@@ -135,8 +142,7 @@ def plotWiggleTX(x0, dx, v1, v2, v3, z1, z2, tI=None, v=None, Fit=False, ax=None
     wavs = np.c_[direct(x, v1),
                  refraction1(x, v1, v2, z1),
                  refraction2(x, v1, v2, v3, z1, z2),
-                 reflection1(x, v1, z1)
-                ]
+                 reflection1(x, v1, z1)]
     dt = 1e-3
     ntime = 241
     time = np.arange(ntime)*dt
@@ -273,7 +279,6 @@ def wiggleVarx(traces, x, skipt=1, scale=1., lwidth=.1, offsets=None, redvel=0.,
 def clipsign (value, clip):
     clipthese = abs(value) > clip
     return value * ~clipthese + np.sign(value)*clip*clipthese
-
 
 if __name__ == '__main__':
     plotWavelet(wavf)
