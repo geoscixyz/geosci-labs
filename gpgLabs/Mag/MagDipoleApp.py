@@ -345,6 +345,7 @@ class MagneticDipoleApp(object):
             ax2.remove()
         else:
             ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], 'w')
+
     def get_half_width(self, n_points=200):
         ind_max = np.argmax(abs(self.data_profile))
         A_half = self.data_profile[ind_max] / 2.
