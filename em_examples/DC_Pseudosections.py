@@ -24,9 +24,9 @@ warnings.filterwarnings('ignore')
 
 # Mesh, mapping can be globals
 npad = 8
-cs = 0.5
-hx = [(cs, npad, -1.3), (cs, 200), (cs, npad, 1.3)]
-hy = [(cs, npad, -1.3), (cs, 100)]
+cs = 1.25
+hx = [(cs, npad, -1.3), (cs, 100), (cs, npad, 1.3)]
+hy = [(cs, npad, -1.3), (cs, 50)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
 circmap = Maps.ParametricCircleMap(mesh)
 circmap.slope = 1e5
