@@ -17,18 +17,47 @@ from ipywidgets import (
     )
 
 from .Base import widgetify
-
+from SimPEG.Maps import IdentityMap
 # only use this if you are sure things are working
 warnings.filterwarnings('ignore')
 
 
+class ParametricCircleLayerMap(IdentityMap):
+
+    slope = 1e-1
+
+    def __init__(self, mesh, logSigma=True):
+        assert mesh.dim == 2, (
+            "Working for a 2D mesh only right now. "
+            "But it isn't that hard to change.. :)"
+        )
+        IdentityMap.__init__(self, mesh)
+        # TODO: this should be done through a composition with and ExpMap
+        self.logSigma = logSigma
+
+    @property
+    def nP(self):
+        return 7
+
+    def _transform(self, m):
+        a = self.slope
+        sig1, sig2, sig3, x, zc, r, zh = m[0], m[1], m[2], m[3], m[4], m[5], m[6]
+        if self.logSigma:
+            sig1, sig2, sig3 = np.exp(sig1), np.exp(sig2), np.exp(sig3)
+        sigma = np.ones(mesh.nC) * sig1
+        sigma[mesh.gridCC[:,1]<zh] = sig2
+        blkind = Utils.ModelBuilder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
+        sigma[blkind]=sig3
+        return sigma
+
+
 # Mesh, mapping can be globals
 npad = 8
-cs = 0.5
-hx = [(cs, npad, -1.3), (cs, 200), (cs, npad, 1.3)]
-hy = [(cs, npad, -1.3), (cs, 100)]
+cs = 1.25
+hx = [(cs, npad, -1.3), (cs, 100), (cs, npad, 1.3)]
+hy = [(cs, npad, -1.3), (cs, 50)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-circmap = Maps.ParametricCircleMap(mesh)
+circmap = ParametricCircleLayerMap(mesh)
 circmap.slope = 1e5
 mapping = circmap
 dx = 5
@@ -120,9 +149,9 @@ def DC2Dsurvey(flag="PolePole"):
     problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
     problem.pair(survey)
 
-    sigblk, sighalf = 2e-2, 2e-3
-    xc, yc, r = -15, -8, 4
-    mtrue = np.r_[np.log(sigblk), np.log(sighalf), xc, yc, r]
+    sigblk, sighalf, siglayer = 2e-2, 2e-3, 1e-3
+    xc, yc, r, zh = -15, -8, 4, -5
+    mtrue = np.r_[np.log(sighalf), np.log(siglayer), np.log(sigblk), xc, yc, r, zh]
     dtrue = survey.dpred(mtrue)
     perc = 0.1
     floor = np.linalg.norm(dtrue)*1e-3
@@ -404,9 +433,11 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
     """
     matplotlib.rcParams['font.size'] = 14
     sighalf, sigblk = 1./rhohalf, 1./rhoblk
-    m0 = np.r_[np.log(sighalf), np.log(sighalf), xc, yc, r]
+    siglayer = 1e-3
+    zh = -5
+    m0 = np.r_[np.log(sighalf), np.log(sighalf), np.log(sighalf), xc, yc, r, zh]
     dini = survey.dpred(m0)
-    mtrue = np.r_[np.log(sigblk), np.log(sighalf), xc, yc, r]
+    mtrue = np.r_[np.log(sighalf), np.log(siglayer), np.log(sigblk), xc, yc, r, zh]
     dpred = survey.dpred(mtrue)
     xi, yi = np.meshgrid(np.linspace(xr.min(), xr.max(), 120),
                          np.linspace(1., nmax, 100))
@@ -516,7 +547,7 @@ def DC2DPseudoWidget():
     return interactive(
         DC2DPseudoWidgetWrapper,
         rhohalf=FloatText(
-            min=10, max=1000, value=1000,
+            min=10, max=1000, value=500,
             continuous_update=False, description='$\\rho_1$'
         ),
         rhosph=FloatText(
