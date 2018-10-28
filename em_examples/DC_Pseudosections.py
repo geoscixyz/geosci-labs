@@ -463,11 +463,12 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
         cb1 = plt.colorbar(dat1[0], ax=ax1, ticks=cb1ticks)
         cb1.ax.set_yticklabels(['{:.0f}'.format(10.**x) for x in cb1ticks])
         cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(-20, 0.)
+        ax1.set_ylim(-20, 1.)
         ax1.set_xlim(-40, 40)
         ax1.set_xlabel("")
         ax1.set_ylabel("Depth (m)")
         ax1.set_aspect('equal')
+        ax1.plot(xr, np.zeros_like(xr), 'ko')
         if std < 1.:
             dat2 = ax2.pcolormesh(xi, yi, pred)
         else:
@@ -528,7 +529,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
             cb3.set_label("Apparent Resistivity \n (ohm-m)")
             ax3.text(-38, 7, "Predicted")
         elif predmis == "mis":
-            mis = (appresobs-appres)/(0.1*appresobs)
+            mis = (appresobs-appres)/(appresobs) * 100
             Mis = griddata(xzlocs, mis, (xi, yi),
                            method='linear')
             dat3 = ax3.contourf(xi, yi, Mis, 10)
@@ -537,7 +538,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
             cb3 = plt.colorbar(dat3, ax=ax3,
                                ticks=np.linspace(mis.min(), mis.max(), 5),
                                format="%4.2f")
-            cb3.set_label("Normalized misfit")
+            cb3.set_label("Normalized misfit (%)")
             ax3.text(-38, 7, "Misifit")
         ax3.set_ylim(nmax+1, 0.)
         ax3.set_ylabel("N-spacing")
@@ -576,8 +577,10 @@ def DC2DPseudoWidget():
             min=0, max=15, step=0.5, value=5,
             continuous_update=False
         ),
-        surveyType=ToggleButtons(options=['PolePole',  'PoleDipole',
-                                          'DipolePole', 'DipoleDipole'])
+        surveyType=ToggleButtons(
+            options=['PolePole',  'PoleDipole', 'DipolePole', 'DipoleDipole'],
+            value='DipoleDipole'
+        )
     )
 
 
@@ -594,7 +597,7 @@ def DC2DfwdWidget():
         rhohalf=FloatText(min=10, max=1000, value=1000,
                             continuous_update=False,
                             description='$\\rho_1$'),
-        rhosph=FloatText(min=10, max=1000, value=50,
+        rhosph=FloatText(min=10, max=1000, value=1000,
                            continuous_update=False,
                            description='$\\rho_2$'),
         xc=FloatSlider(min=-40, max=40, step=1, value=0,
