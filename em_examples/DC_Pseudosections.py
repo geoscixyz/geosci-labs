@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
-from scipy.interpolate import griddata
+from scipy.interpolate import griddata, LinearNDInterpolator
 import warnings
 from ipywidgets import (
     interactive, IntSlider, FloatSlider, FloatText, ToggleButtons, VBox
@@ -52,7 +52,7 @@ class ParametricCircleLayerMap(IdentityMap):
 
 
 # Mesh, mapping can be globals
-npad = 8
+npad = 15
 cs = 1.25
 hx = [(cs, npad, -1.3), (cs, 100), (cs, npad, 1.3)]
 hy = [(cs, npad, -1.3), (cs, 50)]
@@ -441,13 +441,15 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
     dpred = survey.dpred(mtrue)
     xi, yi = np.meshgrid(np.linspace(xr.min(), xr.max(), 120),
                          np.linspace(1., nmax, 100))
-
+    extent = (xi.min(), xi.max(), yi.min(), yi.max())
     # Cheat to compute a geometric factor
     # define as G = dV_halfspace / rho_halfspace
     appres = dpred/dini/sighalf
     appresobs = dobs/dini/sighalf
-    pred = griddata(xzlocs, appres, (xi, yi),
-                    method='linear')
+    std = np.std(appres)
+    pred = griddata(
+        xzlocs, appres, (xi, yi), method='linear'
+    )
 
     if plotFlag is not None:
         fig = plt.figure(figsize=(12, 6))
@@ -461,16 +463,22 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
         cb1 = plt.colorbar(dat1[0], ax=ax1, ticks=cb1ticks)
         cb1.ax.set_yticklabels(['{:.0f}'.format(10.**x) for x in cb1ticks])
         cb1.set_label("Resistivity (ohm-m)")
-        ax1.set_ylim(-20, 0.)
+        ax1.set_ylim(-20, 1.)
         ax1.set_xlim(-40, 40)
         ax1.set_xlabel("")
         ax1.set_ylabel("Depth (m)")
         ax1.set_aspect('equal')
-
-        dat2 = ax2.contourf(xi, yi, pred, 10)
-        ax2.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
+        ax1.plot(xr, np.zeros_like(xr), 'ko')
+        if std < 1.:
+            dat2 = ax2.pcolormesh(xi, yi, pred)
+        else:
+            dat2 = ax2.contourf(xi, yi, pred, 10)
+            ax2.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
         ax2.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
-        cb2 = plt.colorbar(dat2, ax=ax2)
+        cb2 = plt.colorbar(
+            dat2, ax=ax2, ticks=np.linspace(appres.min(), appres.max(), 3),
+            format="%.0f"
+        )
         cb2.set_label("Apparent Resistivity \n (ohm-m)")
         ax2.text(-38, 7, "Predicted")
 
@@ -509,8 +517,11 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
 
         ax3 = plt.subplot(313)
         if predmis == "pred":
-            dat3 = ax3.contourf(xi, yi, pred, 10)
-            ax3.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
+            if std < 1.:
+                dat3 = ax3.pcolormesh(xi, yi, pred)
+            else:
+                dat3 = ax3.contourf(xi, yi, pred, 10)
+                ax3.contour(xi, yi, pred, 10, colors='k', alpha=0.5)
             ax3.plot(xzlocs[:, 0], xzlocs[:, 1], 'k.', ms=3)
             cb3 = plt.colorbar(dat3, ax=ax3,
                                ticks=np.linspace(appres.min(), appres.max(), 5),
@@ -518,7 +529,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
             cb3.set_label("Apparent Resistivity \n (ohm-m)")
             ax3.text(-38, 7, "Predicted")
         elif predmis == "mis":
-            mis = (appresobs-appres)/(0.1*appresobs)
+            mis = (appresobs-appres)/(appresobs) * 100
             Mis = griddata(xzlocs, mis, (xi, yi),
                            method='linear')
             dat3 = ax3.contourf(xi, yi, Mis, 10)
@@ -527,7 +538,7 @@ def DC2Dfwdfun(mesh, survey, mapping, xr, xzlocs, rhohalf, rhoblk, xc, yc, r,
             cb3 = plt.colorbar(dat3, ax=ax3,
                                ticks=np.linspace(mis.min(), mis.max(), 5),
                                format="%4.2f")
-            cb3.set_label("Normalized misfit")
+            cb3.set_label("Normalized misfit (%)")
             ax3.text(-38, 7, "Misifit")
         ax3.set_ylim(nmax+1, 0.)
         ax3.set_ylabel("N-spacing")
@@ -547,11 +558,11 @@ def DC2DPseudoWidget():
     return interactive(
         DC2DPseudoWidgetWrapper,
         rhohalf=FloatText(
-            min=10, max=1000, value=500,
+            min=10, max=1000, value=1000,
             continuous_update=False, description='$\\rho_1$'
         ),
         rhosph=FloatText(
-            min=10, max=1000, value=50,
+            min=10, max=1000, value=1000,
             continuous_update=False, description='$\\rho_2$'
         ),
         xc=FloatText(
@@ -566,8 +577,10 @@ def DC2DPseudoWidget():
             min=0, max=15, step=0.5, value=5,
             continuous_update=False
         ),
-        surveyType=ToggleButtons(options=['PolePole',  'PoleDipole',
-                                          'DipolePole', 'DipoleDipole'])
+        surveyType=ToggleButtons(
+            options=['PolePole',  'PoleDipole', 'DipolePole', 'DipoleDipole'],
+            value='DipoleDipole'
+        )
     )
 
 
@@ -584,7 +597,7 @@ def DC2DfwdWidget():
         rhohalf=FloatText(min=10, max=1000, value=1000,
                             continuous_update=False,
                             description='$\\rho_1$'),
-        rhosph=FloatText(min=10, max=1000, value=50,
+        rhosph=FloatText(min=10, max=1000, value=1000,
                            continuous_update=False,
                            description='$\\rho_2$'),
         xc=FloatSlider(min=-40, max=40, step=1, value=0,

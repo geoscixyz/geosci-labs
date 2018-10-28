@@ -386,16 +386,16 @@ def plot_layer_potentials_app():
     app = widgetify(
         plot_layer_potentials_interact,
         A = FloatSlider(
-            min=-30., max=30., step=1., value=-30., continuous_update=False
+            min=-40., max=40., step=1., value=-30., continuous_update=False
         ),
         B = FloatSlider(
-            min=-30., max=30., step=1., value=30., continuous_update=False
+            min=-40., max=40., step=1., value=30., continuous_update=False
         ),
         M = FloatSlider(
-            min=-30., max=30., step=1., value=-10., continuous_update=False
+            min=-40., max=40., step=1., value=-10., continuous_update=False
         ),
         N = FloatSlider(
-            min=-30., max=30., step=1., value=10., continuous_update=False
+            min=-40., max=40., step=1., value=10., continuous_update=False
         ),
         rho1 = FloatText(
             min=rhomin, max=rhomax, value = 500.,
