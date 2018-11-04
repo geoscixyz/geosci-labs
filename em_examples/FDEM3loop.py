@@ -198,8 +198,14 @@ def interactfem3loop():
         xc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0, continuous_update=False),
         yc = FloatSlider(min=-10.,max=10.,step=1.,value=0.0, continuous_update=False),
         zc = FloatSlider(min=0.,max=zmax,step=0.5,value=1., continuous_update=False),
-        dincl = FloatSlider(min=-90.,max=90.,step=1.,value=0., continuous_update=False),
-        ddecl = FloatSlider(min=0.,max=180.,step=1.,value=90., continuous_update=False),
+        dincl = FloatSlider(
+            min=-90.,max=90.,step=1.,value=0., continuous_update=False,
+            description="I",
+        ),
+        ddecl = FloatSlider(
+            min=0.,max=180.,step=1.,value=90., continuous_update=False,
+            description="D",
+        ),
         f = FloatSlider(min=10.,max=19990.,step=10.,value=10000., continuous_update=False),
         dx = FloatSlider(min=0.25,max=5.,step=0.25,value=0.25, continuous_update=False),
         showDataPts = Checkbox(value=False)

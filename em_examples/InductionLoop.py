@@ -194,7 +194,7 @@ class IndEx():
         Bpx = mu0*np.sign(x)*(z*I/(2*np.pi*s + eps))*(1/np.sqrt(z**2 + (a1+s)**2))*(-sp.ellipk(k) + ((a1**2 + z**2 + s**2)/(z**2 + (s-a1)**2))*sp.ellipe(k))
         Bpz = mu0*           (  I/(2*np.pi           ))*(1/np.sqrt(z**2 + (a1+s)**2))*( sp.ellipk(k) + ((a1**2 - z**2 - s**2)/(z**2 + (s-a1)**2))*sp.ellipe(k))
         Bpabs = np.sqrt(Bpx**2 + Bpz**2)
-        Bpn = np.sin(azm)*Bpx + np.cos(azm)*Bpz
+        Bpn = np.sin(np.deg2rad(azm))*Bpx + np.cos(np.deg2rad(azm))*Bpz
         Area = np.pi*a2**2
 
         self.Bpx = Bpx
