@@ -27,16 +27,16 @@ sigma_av = lambda h_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_v(h_boom)) + sigm
 sigma_ah = lambda h_boom, h_1, sigma_1, sigma_2: sigma_0*(1.-R_h(h_boom)) + sigma_1*(R_h(h_boom) - R_h(h_1+h_boom)) + sigma_2*R_h(h_1+h_boom)
 
 
-def plot_ResponseFct(h_boom,h_1,sigma_1,sigma_2,orientation='vertical'):
+def plot_ResponseFct(h_boom,h_1,sigma_1,sigma_2,orientation='HCP'):
 
     sigvec = sigma_1*np.ones(z.shape)
     sigvec[z > h_1] = sigma_2
 
-    if orientation is 'vertical':
+    if orientation is 'HCP':
         phi = phi_v(z + h_boom)
         sig_a = sigma_av(h_boom,h_1,sigma_1,sigma_2)
         phi_title = '$\phi_V$'
-    elif orientation is 'horizontal':
+    elif orientation is 'VCP':
         phi = phi_h(z + h_boom)
         sig_a = sigma_ah(h_boom,h_1,sigma_1,sigma_2)
         phi_title = '$\phi_H$'
@@ -83,13 +83,35 @@ def plot_ResponseFct(h_boom,h_1,sigma_1,sigma_2,orientation='vertical'):
 
     return None
 
+
 def interactive_responseFct():
-	app = interactive(plot_ResponseFct,h_boom = FloatSlider(min=h_boom, max = h_boom_max, step = 0.1, value = h_boom, continuous_update=False),
-                  h_1 = FloatSlider(min=0., max=zmax,value=0.1, step = 0.1, continuous_update=False),
-                  sigma_1 = FloatSlider(min=sigmin, max = sigmax,value=sigmin, step = sigmin, continuous_update=False),
-                  sigma_2 = FloatSlider(min=sigmin, max = sigmax,value=sigmin, step = sigmin, continuous_update=False),
-                  orientation=ToggleButtons(options=['vertical','horizontal']))
-	return app
+    app = interactive(
+        plot_ResponseFct,
+        h_boom=FloatSlider(
+            min=h_boom, max=h_boom_max, step=0.1, value=h_boom,
+            continuous_update=False,
+            description="$h_{boom}$"
+        ),
+        h_1=FloatSlider(
+            min=0., max=zmax, value=0.1, step=0.1, continuous_update=False,
+            description="$h_{1}$"
+        ),
+        sigma_1=FloatSlider(
+            min=sigmin, max=sigmax, value=sigmin, step=sigmin,
+            continuous_update=False,
+            description="$\sigma_{1}$"
+        ),
+        sigma_2=FloatSlider(
+            min=sigmin, max=sigmax, value=sigmin, step=sigmin,
+            continuous_update=False,
+            description="$\sigma_{2}$"
+        ),
+        orientation=ToggleButtons(
+            options=['HCP', 'VCP'],
+            description="configuration"
+        )
+    )
+    return app
 
 if __name__ == '__main__':
-	plot_ResponseFct(1., sigmin, sigmax)
+    plot_ResponseFct(1., sigmin, sigmax)
