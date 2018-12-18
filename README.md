@@ -53,7 +53,7 @@ To setup your software environment, we recommend you use the provided conda envi
 
 ```
 conda env create -f environment.yml
-source activate gpgLabs-environment
+conda activate gpgLabs-environment
 ```
 
 alternatively, you can install dependencies through pypi
