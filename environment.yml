@@ -1,0 +1,20 @@
+name: em-apps-environment
+
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - scipy
+  - matplotlib
+  - Pillow
+  - ipywidgets>=0.6.0
+  - requests
+  - mkl
+  - pip:
+    - pymatsolver
+    - discretize
+    - deepdish
+    - SimPEG
+    - em_examples
+    - empymod
