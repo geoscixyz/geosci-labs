@@ -26,10 +26,11 @@ CLASSIFIERS = [
     'Natural Language :: English',
 ]
 
-with open('README.md') as f:
-    LONG_DESCRIPTION = ''.join(f.readlines())
+with open('README.md', 'r') as f:
+    LONG_DESCRIPTION = f.read()
 
 setup(
+<<<<<<< HEAD:gpgLabs-repo/setup.py
     name = 'gpgLabs',
     version = '0.0.12',
     packages = find_packages(),
@@ -42,12 +43,37 @@ setup(
         'em_examples'
     ],
     author = 'GeoSci Developers',
+=======
+    name = 'em_examples',
+    version = '0.0.35',
+    packages = find_packages(),
+    install_requires = [
+        'future',
+        'numpy>=1.7',
+        'scipy>=0.13',
+        'matplotlib>2.1.',
+        'Pillow',
+        'requests',
+        'ipywidgets',
+        'SimPEG>=0.4.1',
+        'jupyter',
+        'empymod',
+        'deepdish',
+        'pymatsolver>=0.1.2'
+    ],
+    author = 'Lindsey Heagy',
+>>>>>>> em_examples-old/master:setup.py
     author_email = 'lheagy@eos.ubc.ca',
     description = 'gpgLabs',
     long_description = LONG_DESCRIPTION,
     keywords = 'geophysics, electromagnetics',
+<<<<<<< HEAD:gpgLabs-repo/setup.py
     url = 'http://gpg.geosci.xyz',
     download_url = 'https://github.com/geoscixyz/gpgLabs',
+=======
+    url = 'http://em.geosci.xyz',
+    download_url = 'https://github.com/geoscixyz/em_examples',
+>>>>>>> em_examples-old/master:setup.py
     classifiers=CLASSIFIERS,
     platforms = ['Windows', 'Linux', 'Solaris', 'Mac OS-X', 'Unix'],
     license='MIT License',

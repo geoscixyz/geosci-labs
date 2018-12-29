@@ -2,6 +2,7 @@ language: python
 python:
   - 2.7
   - 3.6
+
 sudo: false
 
 env:
@@ -36,6 +37,7 @@ script:
 #         travis_wait 20 twine upload -r pypi --skip-existing dist/* ;
 #       fi
 #     fi
+
 
 # notify slack
 notifications:
