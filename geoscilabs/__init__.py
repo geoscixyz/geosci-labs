@@ -1,4 +1,4 @@
-from . import dc
+from . import dcip
 # from . import em
 # from . import gpr
 # from . import mag
