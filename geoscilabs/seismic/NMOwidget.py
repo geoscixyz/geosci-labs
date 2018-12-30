@@ -1,21 +1,43 @@
 import warnings
-warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
+
+warnings.filterwarnings(
+    "ignore"
+)  # ignore warnings: only use this once you are sure things are working
 from IPython.display import set_matplotlib_formats
 import matplotlib
 from SimPEG.Utils import download
-set_matplotlib_formats('png')
-matplotlib.rcParams['savefig.dpi'] = 70 # Change this to adjust figure size
+
+set_matplotlib_formats("png")
+matplotlib.rcParams["savefig.dpi"] = 70  # Change this to adjust figure size
 import numpy as np
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+
 try:
-    from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
+    from IPython.html.widgets import (
+        interact,
+        interactive,
+        IntSlider,
+        widget,
+        FloatText,
+        FloatSlider,
+        fixed,
+    )
+
     pass
 # except Exception, e:
 except Exception as e:
-    from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider, fixed
+    from ipywidgets import (
+        interact,
+        interactive,
+        IntSlider,
+        widget,
+        FloatText,
+        FloatSlider,
+        fixed,
+    )
 
 
 def ViewWiggle(syndat, obsdat):
@@ -24,19 +46,19 @@ def ViewWiggle(syndat, obsdat):
     dx = 20
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
-    'skipt':1,
-    'scale': 0.05,
-    'lwidth': 1.,
-    'dx': dx,
-    'sampr': 0.004,
-    'clip' : dx*10.,
+        "skipt": 1,
+        "scale": 0.05,
+        "lwidth": 1.0,
+        "dx": dx,
+        "sampr": 0.004,
+        "clip": dx * 10.0,
     }
-    extent = [0., 38*dx, 1.0, 0.]
+    extent = [0.0, 38 * dx, 1.0, 0.0]
 
     ax[0].invert_yaxis()
     ax[1].invert_yaxis()
-    wiggle(syndata, ax = ax[0], **kwargs)
-    wiggle(obsdata, ax = ax[1], **kwargs)
+    wiggle(syndata, ax=ax[0], **kwargs)
+    wiggle(obsdata, ax=ax[1], **kwargs)
     ax[0].set_xlabel("Offset (m)")
     ax[0].set_ylabel("Time (s)")
     ax[0].set_title("Clean CMP gather")
@@ -49,17 +71,17 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     syndata = np.load(syndat)
     time_data = np.load(timdat)
     dx = 20
-    xorig = np.arange(38)*dx
+    xorig = np.arange(38) * dx
     time = HyperbolicFun(t0, xorig, v)
     # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     fig = plt.figure(figsize=(20, 8))
     kwargs = {
-    'skipt':1,
-    'scale': 0.05,
-    'lwidth': 1.,
-    'dx': dx,
-    'sampr': 0.004,
-    'clip' : dx*10.,
+        "skipt": 1,
+        "scale": 0.05,
+        "lwidth": 1.0,
+        "dx": dx,
+        "sampr": 0.004,
+        "clip": dx * 10.0,
     }
     gs1 = gridspec.GridSpec(1, 9)
     gs1.update(left=0.05, right=0.48, wspace=0.05)
@@ -67,17 +89,17 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     ax2 = plt.subplot(gs1[:, 4:7])
     ax3 = plt.subplot(gs1[:, 8])
 
-    extent = [0., 38*dx, 1.0, 0.]
+    extent = [0.0, 38 * dx, 1.0, 0.0]
     ax1.invert_yaxis()
     ax2.invert_yaxis()
-    wiggle(syndata, ax = ax1, **kwargs)
+    wiggle(syndata, ax=ax1, **kwargs)
     t_reflector = 0.49
-    toffset = np.sqrt(xorig**2/v**2+t0**2)-t0
-    wiggle(syndata, ax = ax2, manthifts=toffset+t0-t_reflector, **kwargs)
+    toffset = np.sqrt(xorig ** 2 / v ** 2 + t0 ** 2) - t0
+    wiggle(syndata, ax=ax2, manthifts=toffset + t0 - t_reflector, **kwargs)
 
     ax1.axis(extent)
     ax2.axis(extent)
-    ax1.plot(xorig, time, 'r', lw=2)
+    ax1.plot(xorig, time, "r", lw=2)
 
     ax1.set_xlabel("Offset (m)")
     ax2.set_xlabel("Offset (m)")
@@ -90,22 +112,22 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     # singletrace = singletrace
 
     kwargs = {
-    'skipt':1,
-    'scale': 2.,
-    'lwidth': 1.,
-    'sampr': 0.004,
-    'ax': ax3,
-    'clip' : 10,
-    'manthifts': np.r_[t0-t_reflector]
+        "skipt": 1,
+        "scale": 2.0,
+        "lwidth": 1.0,
+        "sampr": 0.004,
+        "ax": ax3,
+        "clip": 10,
+        "manthifts": np.r_[t0 - t_reflector],
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
     ax3.axis(extent)
-    wiggle(singletrace.reshape([1,-1]), **kwargs)
+    wiggle(singletrace.reshape([1, -1]), **kwargs)
     ax3.set_xlabel("Amplitude")
     ax3.set_ylabel("Time (s)")
     ax3.set_xlim(-4.5, 4.5)
-    ax3.set_xticks([-4.5, 0., 4.5])
+    ax3.set_xticks([-4.5, 0.0, 4.5])
     ax3.set_title("Stacked trace")
 
     plt.show()
@@ -116,17 +138,17 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     time_data = np.load(timdat)
     np.random.randn()
     dx = 20
-    xorig = np.arange(38)*dx
+    xorig = np.arange(38) * dx
     time = HyperbolicFun(t0, xorig, v)
     # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     fig = plt.figure(figsize=(20, 8))
     kwargs = {
-    'skipt':1,
-    'scale': 0.05,
-    'lwidth': 1.,
-    'dx': dx,
-    'sampr': 0.004,
-    'clip' : dx*10.,
+        "skipt": 1,
+        "scale": 0.05,
+        "lwidth": 1.0,
+        "dx": dx,
+        "sampr": 0.004,
+        "clip": dx * 10.0,
     }
     gs1 = gridspec.GridSpec(1, 9)
     gs1.update(left=0.05, right=0.48, wspace=0.05)
@@ -134,17 +156,17 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     ax2 = plt.subplot(gs1[:, 4:7])
     ax3 = plt.subplot(gs1[:, 8])
 
-    extent = [0., 38*dx, 1.0, 0.]
+    extent = [0.0, 38 * dx, 1.0, 0.0]
     ax1.invert_yaxis()
     ax2.invert_yaxis()
-    wiggle(syndata, ax = ax1, **kwargs)
-    toffset = np.sqrt(xorig**2/v**2+t0**2) - t0
+    wiggle(syndata, ax=ax1, **kwargs)
+    toffset = np.sqrt(xorig ** 2 / v ** 2 + t0 ** 2) - t0
     t_reflector = 0.39
-    wiggle(syndata, ax = ax2, manthifts=toffset+t0-t_reflector, **kwargs)
+    wiggle(syndata, ax=ax2, manthifts=toffset + t0 - t_reflector, **kwargs)
 
     ax1.axis(extent)
     ax2.axis(extent)
-    ax1.plot(xorig, time, 'r', lw=2)
+    ax1.plot(xorig, time, "r", lw=2)
 
     ax1.set_xlabel("Offset (m)")
     ax2.set_xlabel("Offset (m)")
@@ -156,140 +178,180 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     singletrace = NMOstack(syndata, xorig, time_data, v)
     # singletrace = singletrace
     kwargs = {
-    'skipt':1,
-    'scale': 2.,
-    'lwidth': 1.,
-    'sampr': 0.004,
-    'ax': ax3,
-    'clip' : 10,
-    'manthifts': np.r_[t0-t_reflector]
+        "skipt": 1,
+        "scale": 2.0,
+        "lwidth": 1.0,
+        "sampr": 0.004,
+        "ax": ax3,
+        "clip": 10,
+        "manthifts": np.r_[t0 - t_reflector],
     }
     extent = [singletrace.min(), singletrace.max(), time_data.max(), time_data.min()]
     ax3.invert_yaxis()
     ax3.axis(extent)
-    wiggle(singletrace.reshape([1,-1]), **kwargs)
+    wiggle(singletrace.reshape([1, -1]), **kwargs)
     ax3.set_xlabel("Amplitude")
     ax3.set_ylabel("Time (s)")
     ax3.set_xlim(-4.5, 4.5)
-    ax3.set_xticks([-4.5, 0., 4.5])
+    ax3.set_xticks([-4.5, 0.0, 4.5])
     ax3.set_title("Stacked trace")
     plt.show()
 
 
 def HyperbolicFun(t0, x, velocity):
-    time = np.sqrt(x**2/velocity**2+t0**2)
+    time = np.sqrt(x ** 2 / velocity ** 2 + t0 ** 2)
     return time
 
 
 def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
     data = np.load(dat)
     time = np.load(timdat)
-    dx = 20.
-    xorig = np.arange(38)*dx
-    traces = np.zeros((3,time.size))
+    dx = 20.0
+    xorig = np.arange(38) * dx
+    traces = np.zeros((3, time.size))
     vtemp = np.r_[v1, v2, v3]
     for itry in range(3):
-        traces[itry,:] = NMOstack(data, xorig, time, vtemp[itry])
+        traces[itry, :] = NMOstack(data, xorig, time, vtemp[itry])
 
     fig, ax = plt.subplots(1, 3, figsize=(10, 8))
     t_reflector = 0.49
     kwargs = {
-    'skipt':1,
-    'scale': 2.,
-    'lwidth': 1.,
-    'sampr': 0.004,
-    'clip' : 10,
-    'manthifts': np.r_[t_reflector-tintercept]
+        "skipt": 1,
+        "scale": 2.0,
+        "lwidth": 1.0,
+        "sampr": 0.004,
+        "clip": 10,
+        "manthifts": np.r_[t_reflector - tintercept],
     }
     for i in range(3):
-        extent = [traces[i,:].min(), traces[i,:].max(), time.max(), time.min()]
+        extent = [traces[i, :].min(), traces[i, :].max(), time.max(), time.min()]
         ax[i].invert_yaxis()
         ax[i].axis(extent)
-        wiggle(traces[i,:].reshape([1,-1]), ax=ax[i], **kwargs)
+        wiggle(traces[i, :].reshape([1, -1]), ax=ax[i], **kwargs)
         ax[i].set_xlabel("Amplitude")
-        if i==0:
+        if i == 0:
             ax[i].set_ylabel("Time (s)")
-        ax[i].set_title(("Velocity = %6.1f")%(vtemp[i]))
+        ax[i].set_title(("Velocity = %6.1f") % (vtemp[i]))
 
 
 def NMOstack(data, xorig, time, v):
     if np.isscalar(v):
-        v = np.ones_like(time)*v
-    Time = (time.reshape([1,-1])).repeat(data.shape[0], axis=0)
+        v = np.ones_like(time) * v
+    Time = (time.reshape([1, -1])).repeat(data.shape[0], axis=0)
     singletrace = np.zeros(data.shape[1])
     for i in range(time.size):
-        toffset = np.sqrt(xorig**2/v[i]**2+time[i]**2)
-        Time = (time.reshape([1,-1])).repeat(data.shape[0], axis=0)
-        Toffset = (toffset.reshape([-1,1])).repeat(data.shape[1], axis=1)
-        indmin = np.argmin(abs(Time-Toffset), axis=1)
-        singletrace[i] = (mkvc(data)[sub2ind(data.shape, np.c_[np.arange(data.shape[0]), indmin])]).sum()
+        toffset = np.sqrt(xorig ** 2 / v[i] ** 2 + time[i] ** 2)
+        Time = (time.reshape([1, -1])).repeat(data.shape[0], axis=0)
+        Toffset = (toffset.reshape([-1, 1])).repeat(data.shape[1], axis=1)
+        indmin = np.argmin(abs(Time - Toffset), axis=1)
+        singletrace[i] = (
+            mkvc(data)[sub2ind(data.shape, np.c_[np.arange(data.shape[0]), indmin])]
+        ).sum()
     return singletrace
 
 
 def NMOstackSingle(data, tintercept, v, timeFile):
-    dx = 20.
-    xorig = np.arange(38)*dx
-    timdat = download(timeFile,verbose=False)
+    dx = 20.0
+    xorig = np.arange(38) * dx
+    timdat = download(timeFile, verbose=False)
     time = np.load(timdat)
     singletrace = NMOstack(data, xorig, time, v)
 
     fig, ax = plt.subplots(1, 1, figsize=(7, 8))
     kwargs = {
-    'skipt':1,
-    'scale': 2.,
-    'lwidth': 1.,
-    'sampr': 0.004,
-    'ax': ax,
-    'clip' : 10,
+        "skipt": 1,
+        "scale": 2.0,
+        "lwidth": 1.0,
+        "sampr": 0.004,
+        "ax": ax,
+        "clip": 10,
     }
     extent = [singletrace.min(), singletrace.max(), time.max(), time.min()]
     ax.invert_yaxis()
     ax.axis(extent)
-    wiggle(singletrace.reshape([1,-1]), **kwargs)
+    wiggle(singletrace.reshape([1, -1]), **kwargs)
     ax.set_xlabel("Amplitude")
     ax.set_ylabel("Time (s)")
 
 
 def clipsign(value, clip):
-  clipthese = abs(value) > clip
-  return value * ~clipthese + np.sign(value)*clip*clipthese
+    clipthese = abs(value) > clip
+    return value * ~clipthese + np.sign(value) * clip * clipthese
 
 
-def wiggle(traces, skipt=1,scale=1.,lwidth=.1,offsets=None,redvel=0., manthifts=None, tshift=0.,sampr=1.,clip=10., dx=1., color='black',fill=True,line=True, ax=None):
+def wiggle(
+    traces,
+    skipt=1,
+    scale=1.0,
+    lwidth=0.1,
+    offsets=None,
+    redvel=0.0,
+    manthifts=None,
+    tshift=0.0,
+    sampr=1.0,
+    clip=10.0,
+    dx=1.0,
+    color="black",
+    fill=True,
+    line=True,
+    ax=None,
+):
 
-  ns = traces.shape[1]
-  ntr = traces.shape[0]
-  t = np.arange(ns)*sampr
-  timereduce = lambda offsets, redvel, shift: [float(offset) / redvel + shift for offset in offsets]
+    ns = traces.shape[1]
+    ntr = traces.shape[0]
+    t = np.arange(ns) * sampr
+    timereduce = lambda offsets, redvel, shift: [
+        float(offset) / redvel + shift for offset in offsets
+    ]
 
-  if (offsets is not None):
-    shifts = timereduce(offsets, redvel, tshift)
-  elif (manthifts is not None):
-    shifts = manthifts
-  else:
-    shifts = np.zeros((ntr,))
-
-  for i in range(0, ntr, skipt):
-    trace = traces[i].copy()
-    trace[0] = 0
-    trace[-1] = 0
-
-    if ax == None:
-      if (line):
-        plt.plot(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=lwidth)
-      if (fill):
-        for j in range(ns):
-          if (trace[j] < 0):
-            trace[j] = 0
-        plt.fill(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=0)
+    if offsets is not None:
+        shifts = timereduce(offsets, redvel, tshift)
+    elif manthifts is not None:
+        shifts = manthifts
     else:
-      if (line):
-        ax.plot(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=lwidth)
-      if (fill):
-        for j in range(ns):
-          if (trace[j] < 0):
-            trace[j] = 0
-        ax.fill(i*dx + clipsign(trace / scale, clip), t - shifts[i], color=color, linewidth=0)
+        shifts = np.zeros((ntr,))
+
+    for i in range(0, ntr, skipt):
+        trace = traces[i].copy()
+        trace[0] = 0
+        trace[-1] = 0
+
+        if ax == None:
+            if line:
+                plt.plot(
+                    i * dx + clipsign(trace / scale, clip),
+                    t - shifts[i],
+                    color=color,
+                    linewidth=lwidth,
+                )
+            if fill:
+                for j in range(ns):
+                    if trace[j] < 0:
+                        trace[j] = 0
+                plt.fill(
+                    i * dx + clipsign(trace / scale, clip),
+                    t - shifts[i],
+                    color=color,
+                    linewidth=0,
+                )
+        else:
+            if line:
+                ax.plot(
+                    i * dx + clipsign(trace / scale, clip),
+                    t - shifts[i],
+                    color=color,
+                    linewidth=lwidth,
+                )
+            if fill:
+                for j in range(ns):
+                    if trace[j] < 0:
+                        trace[j] = 0
+                ax.fill(
+                    i * dx + clipsign(trace / scale, clip),
+                    t - shifts[i],
+                    color=color,
+                    linewidth=0,
+                )
 
 
 def sub2ind(shape, subs):
@@ -304,9 +366,11 @@ def sub2ind(shape, subs):
     if type(subs) is not np.ndarray:
         subs = np.array(subs)
     if len(subs.shape) == 1:
-        subs = subs[np.newaxis,:]
-    assert subs.shape[1] == len(shape), 'Indexing must be done as a column vectors. e.g. [[3,6],[6,2],...]'
-    inds = np.ravel_multi_index(subs.T, shape, order='F')
+        subs = subs[np.newaxis, :]
+    assert subs.shape[1] == len(
+        shape
+    ), "Indexing must be done as a column vectors. e.g. [[3,6],[6,2],...]"
+    inds = np.ravel_multi_index(subs.T, shape, order="F")
     return mkvc(inds)
 
 
@@ -333,28 +397,26 @@ def mkvc(x, numDims=1):
     if type(x) == np.matrix:
         x = np.array(x)
 
-    if hasattr(x, 'tovec'):
+    if hasattr(x, "tovec"):
         x = x.tovec()
 
     assert isinstance(x, np.ndarray), "Vector must be a numpy array"
 
     if numDims == 1:
-        return x.flatten(order='F')
+        return x.flatten(order="F")
     elif numDims == 2:
-        return x.flatten(order='F')[:, np.newaxis]
+        return x.flatten(order="F")[:, np.newaxis]
     elif numDims == 3:
-        return x.flatten(order='F')[:, np.newaxis, np.newaxis]
+        return x.flatten(order="F")[:, np.newaxis, np.newaxis]
 
 
 def InteractClean(cleanDataFile, cleanTimeFile):
     clean = interactive(
         CleanNMOWidget,
         t0=FloatSlider(min=0.2, max=0.8, step=0.01, continuous_update=False),
-        v=FloatSlider(
-            min=1000., max=5000., step=100., continuous_update=False
-        ),
+        v=FloatSlider(min=1000.0, max=5000.0, step=100.0, continuous_update=False),
         syndat=fixed(cleanDataFile),
-        timdat=fixed(cleanTimeFile)
+        timdat=fixed(cleanTimeFile),
     )
     return clean
 
@@ -363,7 +425,8 @@ def InteractNosiy(noisyDataFile, noisyTimeFile):
     noisy = interactive(
         NoisyNMOWidget,
         t0=FloatSlider(min=0.1, max=0.6, step=0.01, continuous_update=False),
-        v=FloatSlider(min=800., max=2500., step=100., continuous_update=False),
+        v=FloatSlider(min=800.0, max=2500.0, step=100.0, continuous_update=False),
         syndat=fixed(noisyDataFile),
-        timdat=fixed(noisyTimeFile))
+        timdat=fixed(noisyTimeFile),
+    )
     return noisy
