@@ -43,6 +43,7 @@ setup(
         'ipywidgets',
         'deepdish',
         'Pillow',
+        'requests',
     ],
     author = 'GeoSci Developers',
     author_email = 'lindseyheagy@gmail.com',
