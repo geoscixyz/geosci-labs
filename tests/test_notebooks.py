@@ -6,17 +6,13 @@ import nbformat
 from nbconvert.preprocessors import ClearOutputPreprocessor, ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
 
+# add names of notebooks to ignore here.
+py2Ignore = ["MarineCSEM_LayeredEarth"]
 
 # Testing for the notebooks - use nbconvert to execute all cells of the
 # notebook
-
-# add names of notebooks to ignore here.
-py2Ignore = ['MarineCSEM_LayeredEarth']
-
 TESTDIR = os.path.abspath(__file__)
-NBDIR = os.path.sep.join(
-    TESTDIR.split(os.path.sep)[:-3] + ['em_apps/']
-) # where are the notebooks?
+NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + ['notebooks/']) # where are the notebooks?
 
 
 def setUp():
@@ -62,7 +58,7 @@ def get(nbname, nbpath):
             for cell in out[0]['cells']:
                 if 'outputs' in cell.keys():
                     for output in cell['outputs']:
-                        if output['output_type'] == 'error':
+                        if output['output_type'] == 'error':  #in output.keys():
                             passing = False
 
                             err_msg = []
@@ -85,6 +81,7 @@ def get(nbname, nbpath):
                             assert passing, msg
 
             print("\n ..... {0} Passed ..... \n".format(nbname))
+
     return test_func
 
 
