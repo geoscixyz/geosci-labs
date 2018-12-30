@@ -14,6 +14,7 @@ env:
   - TEST=test_gpr.py
   - TEST=test_inversion.py
   - TEST=test_mag.py
+  - TEST=test_seismic.py
 
 install:
   - pip install -e .
