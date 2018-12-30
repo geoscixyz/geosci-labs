@@ -13,6 +13,7 @@ env:
   - TEST=test_em.py
   - TEST=test_gpr.py
   - TEST=test_inversion.py
+  - TEST=test_mag.py
 
 install:
   - pip install -e .
