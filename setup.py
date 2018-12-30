@@ -42,7 +42,7 @@ setup(
         'jupyter',
         'ipywidgets',
         'deepdish',
-        'PIL',
+        'Pillow',
     ],
     author = 'GeoSci Developers',
     author_email = 'lindseyheagy@gmail.com',
