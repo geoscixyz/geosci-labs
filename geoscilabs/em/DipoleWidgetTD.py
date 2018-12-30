@@ -15,8 +15,8 @@ warnings.filterwarnings("ignore")
 
 from ipywidgets import *
 
-from .Base import widgetify
-from .View import DataView
+from ..base import widgetify
+from .view import DataView
 from .TDEMDipolarfields import *
 
 

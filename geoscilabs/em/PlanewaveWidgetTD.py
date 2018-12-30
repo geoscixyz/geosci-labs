@@ -13,7 +13,7 @@ from ipywidgets import *
 from scipy.constants import mu_0, epsilon_0
 
 from .DipoleWidgetTD import DipoleWidgetTD, linefun, DisPosNegvalues
-from .View import DataView
+from .view import DataView
 from .VolumeWidget import polyplane
 from .TDEMPlanewave import *
 

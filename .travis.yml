@@ -10,6 +10,7 @@ env:
 
 env:
     - TEST=test_dcip.py
+    - TEST=test_em.py
 
 install:
   - pip install -e .

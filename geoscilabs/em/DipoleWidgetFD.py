@@ -13,8 +13,8 @@ import warnings
 warnings.filterwarnings("ignore")
 from ipywidgets import *
 
-from .View import DataView
-from .Base import widgetify
+from .view import DataView
+from ..base import widgetify
 from .FDEMDipolarfields import *
 
 

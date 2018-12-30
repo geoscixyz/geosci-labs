@@ -6,8 +6,6 @@ notebooks = "notebooks/dcip"
 TESTDIR = os.path.abspath(__file__)
 NBDIR = os.path.sep.join(TESTDIR.split(os.path.sep)[:-2] + [notebooks])
 
-print(NBDIR)
-
 # test the DC notebooks
 Test = testipynb.TestNotebooks(directory=NBDIR, timeout=2100)
 TestNotebooks = Test.get_tests()

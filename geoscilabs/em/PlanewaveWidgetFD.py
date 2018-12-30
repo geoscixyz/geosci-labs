@@ -14,7 +14,7 @@ from scipy.constants import mu_0, epsilon_0
 from .DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from .VolumeWidget import polyplane
 from .FDEMPlanewave import *
-from .View import DataView
+from .view import DataView
 
 matplotlib.rcParams['font.size'] = 12
 

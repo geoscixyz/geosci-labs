@@ -8,7 +8,7 @@ import numpy as np
 from ipywidgets import *
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings: only use this once you are sure things are working
-from .Base import widgetify
+from ..base import widgetify
 
 
 """

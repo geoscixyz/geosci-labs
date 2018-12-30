@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
-from .Base import widgetify
+from ..base import widgetify
 
 
 class Arrow3D(FancyArrowPatch):

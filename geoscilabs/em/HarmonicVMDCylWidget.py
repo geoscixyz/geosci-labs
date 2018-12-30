@@ -12,7 +12,7 @@ from scipy.constants import mu_0
 import requests
 from io import StringIO
 
-from .Base import widgetify
+from ..base import widgetify
 from .DipoleWidgetFD import DisPosNegvalues
 from .BiotSavart import BiotSavartFun
 

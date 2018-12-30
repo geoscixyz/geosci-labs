@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore")
 
 from ipywidgets import *
 
-from .Base import widgetify
-from .View import DataView
+from ..base import widgetify
+from .view import DataView
 
 def linefun(x1, x2, y1, y2, nx,tol=1e-3):
     dx = x2-x1

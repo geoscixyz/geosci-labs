@@ -11,7 +11,7 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
 from .VolumeWidget import Arrow3D, polyplane
-from .Base import widgetify
+from ..base import widgetify
 
 
 def plotObj3D(
