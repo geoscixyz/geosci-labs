@@ -188,7 +188,6 @@ def PlotFwrSim(
         return plotProfile(xyz, dobs, a, b, Profile_npt, data=data, fig=fig, ax=ax)
 
     survey = prob.survey
-    rxLoc = survey.srcField.rxList[0].locs
     prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
     prob.uType, prob.mType = comp, irt
     prob.susc = susc
@@ -199,9 +198,6 @@ def PlotFwrSim(
     dpred = np.zeros_like(fields[0])
     for b in fields:
         dpred += b
-
-    vmin = survey.dobs.min()
-    vmax = survey.dobs.max()
 
     f = plt.figure(figsize=(8, 8))
 
@@ -216,8 +212,6 @@ def PlotFwrSim(
         fig=f,
         ax=ax0,
         pred=dpred,
-        vmin=survey.dobs.min(),
-        vmax=survey.dobs.max(),
     )
 
     f = plt.figure(figsize=(12, 5))
@@ -559,7 +553,6 @@ def plotObj3D(
     Plot the prism in 3D
     """
 
-    depth = prism.z0
     x1, x2 = prism.xn[0] - prism.xc, prism.xn[1] - prism.xc
     y1, y2 = prism.yn[0] - prism.yc, prism.yn[1] - prism.yc
     z1, z2 = prism.zn[0] - prism.zc, prism.zn[1] - prism.zc
@@ -580,7 +573,6 @@ def plotObj3D(
     cntr = [prism.x0, prism.y0]
     axs.set_xlim3d(-View_lim + cntr[0], View_lim + cntr[0])
     axs.set_ylim3d(-View_lim + cntr[1], View_lim + cntr[1])
-    #     axs.set_zlim3d(depth+np.array(surveyArea[:2]))
     axs.set_zlim3d(rxLoc[:, 2].max() * 1.1 - View_lim * 2, rxLoc[:, 2].max() * 1.1)
 
     # Create a rectangular prism, rotate and plot

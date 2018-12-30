@@ -1,10 +1,16 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import deepdish as dd
 from SimPEG import Utils, Mesh
 import tarfile
 import os
+
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib import cm
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
 
 
 def download_and_unzip_data(
@@ -83,10 +89,6 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     xmin, xmax = -600.0, 600.0
     ymin, ymax = -600.0, 600.0
     zmin, zmax = -600, 100.0
-    px = np.r_[-200.0, 200.0]
-    py = np.r_[0.0, 0.0]
-    pz = np.r_[0.0, 0.0]
-    srcLoc = np.c_[px, py, pz]
 
     times = np.logspace(-5, -2, 21)
     rxList = EM.TDEM.Rx.Point_dbdt(np.r_[10.0, 0.0, 30.0], times, orientation="z")
@@ -153,17 +155,9 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     dd.io.save(fname, tdem_is)
 
 
-##-------------------------------------------------------------------##
-## For visualizations
-##-------------------------------------------------------------------##
-
-from mpl_toolkits.mplot3d import axes3d
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
-from mpl_toolkits.mplot3d import proj3d
+# ------------------------------------------------------------------- #
+# For visualizations
+# ------------------------------------------------------------------- #
 
 
 class PlotTDEM(object):
@@ -195,7 +189,6 @@ class PlotTDEM(object):
             poly.set_facecolor(color)
             return poly
 
-        z1 = -100.0
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.ones(5) * 0.0
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
@@ -209,7 +202,7 @@ class PlotTDEM(object):
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.r_[Y1, Y1, Y2, Y2, Y1]
 
-        fig = plt.figure(figsize=(8, 8))
+        plt.figure(figsize=(8, 8))
         ax = fig.gca(projection="3d")
         ax.plot3D(np.r_[0, 0], np.r_[0, 0], np.r_[1, 1] * 30.0, "ro", ms=5)
         ax.legend(("Tx",), loc=1)
@@ -230,7 +223,7 @@ class PlotTDEM(object):
         plt.show()
 
     def plot_input_currents(self, itime, scale):
-        fig = plt.figure()
+        plt.figure()
 
         plt.plot(self.times * 1e3, np.zeros_like(self.times), "k|-")
         plt.plot(self.times[itime] * 1e3, np.zeros_like(self.times)[itime], "ro")
@@ -283,7 +276,7 @@ class PlotTDEM(object):
             self.mesh, self.J, itime, normal="Y", loc=0.0, isy=True
         )
         label = "Current density (A/m$^2$)"
-        fig = plt.figure(figsize=(12, 5))
+        plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
         out_xz = Utils.plot2Ddata(
@@ -336,7 +329,7 @@ class PlotTDEM(object):
         )
         bxz, xz = self.getSlices(self.mesh, self.B, itime, normal="Y", loc=0.0)
         label = "Magnetic flux density (T)"
-        fig = plt.figure(figsize=(12, 5))
+        plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
 

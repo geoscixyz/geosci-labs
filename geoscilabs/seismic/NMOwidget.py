@@ -1,50 +1,32 @@
-import warnings
-
-warnings.filterwarnings(
-    "ignore"
-)  # ignore warnings: only use this once you are sure things are working
 from IPython.display import set_matplotlib_formats
 import matplotlib
-from SimPEG.Utils import download
-
-set_matplotlib_formats("png")
-matplotlib.rcParams["savefig.dpi"] = 70  # Change this to adjust figure size
+from SimPEG.Utils import download, mkvc, sub2ind
 import numpy as np
 import scipy.io
-import numpy as np
+from ipywidgets import (
+    interact,
+    interactive,
+    IntSlider,
+    widget,
+    FloatText,
+    FloatSlider,
+    fixed,
+)
+
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-try:
-    from IPython.html.widgets import (
-        interact,
-        interactive,
-        IntSlider,
-        widget,
-        FloatText,
-        FloatSlider,
-        fixed,
-    )
+from ..base import wiggle
 
-    pass
-# except Exception, e:
-except Exception as e:
-    from ipywidgets import (
-        interact,
-        interactive,
-        IntSlider,
-        widget,
-        FloatText,
-        FloatSlider,
-        fixed,
-    )
+set_matplotlib_formats("png")
+matplotlib.rcParams["savefig.dpi"] = 70  # Change this to adjust figure size
 
 
 def ViewWiggle(syndat, obsdat):
     syndata = np.load(syndat)
     obsdata = np.load(obsdat)
     dx = 20
-    fig, ax = plt.subplots(1, 2, figsize=(14, 8))
+    _, ax = plt.subplots(1, 2, figsize=(14, 8))
     kwargs = {
         "skipt": 1,
         "scale": 0.05,
@@ -53,7 +35,6 @@ def ViewWiggle(syndat, obsdat):
         "sampr": 0.004,
         "clip": dx * 10.0,
     }
-    extent = [0.0, 38 * dx, 1.0, 0.0]
 
     ax[0].invert_yaxis()
     ax[1].invert_yaxis()
@@ -73,8 +54,7 @@ def NoisyNMOWidget(t0, v, syndat, timdat):
     dx = 20
     xorig = np.arange(38) * dx
     time = HyperbolicFun(t0, xorig, v)
-    # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
-    fig = plt.figure(figsize=(20, 8))
+    plt.figure(figsize=(20, 8))
     kwargs = {
         "skipt": 1,
         "scale": 0.05,
@@ -213,7 +193,7 @@ def NMOstackthree(dat, tintercept, v1, v2, v3, timdat):
     for itry in range(3):
         traces[itry, :] = NMOstack(data, xorig, time, vtemp[itry])
 
-    fig, ax = plt.subplots(1, 3, figsize=(10, 8))
+    _, ax = plt.subplots(1, 3, figsize=(10, 8))
     t_reflector = 0.49
     kwargs = {
         "skipt": 1,
@@ -257,7 +237,7 @@ def NMOstackSingle(data, tintercept, v, timeFile):
     time = np.load(timdat)
     singletrace = NMOstack(data, xorig, time, v)
 
-    fig, ax = plt.subplots(1, 1, figsize=(7, 8))
+    _, ax = plt.subplots(1, 1, figsize=(7, 8))
     kwargs = {
         "skipt": 1,
         "scale": 2.0,
@@ -272,142 +252,6 @@ def NMOstackSingle(data, tintercept, v, timeFile):
     wiggle(singletrace.reshape([1, -1]), **kwargs)
     ax.set_xlabel("Amplitude")
     ax.set_ylabel("Time (s)")
-
-
-def clipsign(value, clip):
-    clipthese = abs(value) > clip
-    return value * ~clipthese + np.sign(value) * clip * clipthese
-
-
-def wiggle(
-    traces,
-    skipt=1,
-    scale=1.0,
-    lwidth=0.1,
-    offsets=None,
-    redvel=0.0,
-    manthifts=None,
-    tshift=0.0,
-    sampr=1.0,
-    clip=10.0,
-    dx=1.0,
-    color="black",
-    fill=True,
-    line=True,
-    ax=None,
-):
-
-    ns = traces.shape[1]
-    ntr = traces.shape[0]
-    t = np.arange(ns) * sampr
-    timereduce = lambda offsets, redvel, shift: [
-        float(offset) / redvel + shift for offset in offsets
-    ]
-
-    if offsets is not None:
-        shifts = timereduce(offsets, redvel, tshift)
-    elif manthifts is not None:
-        shifts = manthifts
-    else:
-        shifts = np.zeros((ntr,))
-
-    for i in range(0, ntr, skipt):
-        trace = traces[i].copy()
-        trace[0] = 0
-        trace[-1] = 0
-
-        if ax == None:
-            if line:
-                plt.plot(
-                    i * dx + clipsign(trace / scale, clip),
-                    t - shifts[i],
-                    color=color,
-                    linewidth=lwidth,
-                )
-            if fill:
-                for j in range(ns):
-                    if trace[j] < 0:
-                        trace[j] = 0
-                plt.fill(
-                    i * dx + clipsign(trace / scale, clip),
-                    t - shifts[i],
-                    color=color,
-                    linewidth=0,
-                )
-        else:
-            if line:
-                ax.plot(
-                    i * dx + clipsign(trace / scale, clip),
-                    t - shifts[i],
-                    color=color,
-                    linewidth=lwidth,
-                )
-            if fill:
-                for j in range(ns):
-                    if trace[j] < 0:
-                        trace[j] = 0
-                ax.fill(
-                    i * dx + clipsign(trace / scale, clip),
-                    t - shifts[i],
-                    color=color,
-                    linewidth=0,
-                )
-
-
-def sub2ind(shape, subs):
-    """
-    Extracted from SimPEG for temporary use (https://github.com/simpeg)
-
-    From the given shape, returns the index of the given subscript
-
-    """
-    if len(shape) == 1:
-        return subs
-    if type(subs) is not np.ndarray:
-        subs = np.array(subs)
-    if len(subs.shape) == 1:
-        subs = subs[np.newaxis, :]
-    assert subs.shape[1] == len(
-        shape
-    ), "Indexing must be done as a column vectors. e.g. [[3,6],[6,2],...]"
-    inds = np.ravel_multi_index(subs.T, shape, order="F")
-    return mkvc(inds)
-
-
-def mkvc(x, numDims=1):
-    """
-    Extracted from SimPEG for temporary use (https://github.com/simpeg)
-
-    Creates a vector with the number of dimension specified
-
-    e.g.::
-
-        a = np.array([1, 2, 3])
-
-        mkvc(a, 1).shape
-            > (3, )
-
-        mkvc(a, 2).shape
-            > (3, 1)
-
-        mkvc(a, 3).shape
-            > (3, 1, 1)
-
-    """
-    if type(x) == np.matrix:
-        x = np.array(x)
-
-    if hasattr(x, "tovec"):
-        x = x.tovec()
-
-    assert isinstance(x, np.ndarray), "Vector must be a numpy array"
-
-    if numDims == 1:
-        return x.flatten(order="F")
-    elif numDims == 2:
-        return x.flatten(order="F")[:, np.newaxis]
-    elif numDims == 3:
-        return x.flatten(order="F")[:, np.newaxis, np.newaxis]
 
 
 def InteractClean(cleanDataFile, cleanTimeFile):

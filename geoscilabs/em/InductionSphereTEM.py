@@ -319,7 +319,7 @@ def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
                 chi = -(9 * mur) * np.sum(
                     eta ** 2
                     * np.exp(-t * (eta / beta) ** 2)
-                    / (beta ** 2 * ((mur + 2) * (mu - 1) + eta ** 2))
+                    / (beta ** 2 * ((mur + 2) * (mur - 1) + eta ** 2))
                 )
 
             else:
@@ -327,7 +327,7 @@ def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
                     chi[tt] = -(9 * mur) * np.sum(
                         eta ** 2
                         * np.exp(-t[tt] * (eta / beta) ** 2)
-                        / (beta ** 2 * ((mur + 2) * (mu - 1) + eta ** 2))
+                        / (beta ** 2 * ((mur + 2) * (mur - 1) + eta ** 2))
                     )
 
     return chi
@@ -459,7 +459,6 @@ def plotResponseTEM(Ax, ti, t, B, Comp, Type):
 
     B[B < Ylim[0]] = 0.1 * Ylim[0]
 
-    xTicks = np.logspace(np.log(np.min(t)), np.log(np.max(t)), 7)
     Ax.grid("both", linestyle="-", linewidth=0.8, color=[0.8, 0.8, 0.8])
     Ax.loglog(t, 0 * t, color="k", linewidth=2)
     Ax.loglog(t, B, color="k", linewidth=4)
@@ -491,7 +490,7 @@ def plotProfileTxRxSphere(Ax, xtx, ztx, x0, z0, a, xrx, zrx, X, Z, orient):
     FS = 22
 
     phi = np.linspace(0, 2 * np.pi, 41)
-    psi = np.linspace(0, np.pi, 21)
+    # psi = np.linspace(0, np.pi, 21)
 
     if orient == "x":
         Xtx = xtx + 0.5 * np.cos(phi)

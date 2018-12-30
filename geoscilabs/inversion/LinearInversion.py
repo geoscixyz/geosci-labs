@@ -110,7 +110,7 @@ class LinearInversionApp(object):
 
         matplotlib.rcParams["font.size"] = 14
 
-        fig = plt.figure(figsize=(10, 4))
+        plt.figure(figsize=(10, 4))
 
         gs1 = gridspec.GridSpec(1, 4)
         ax1 = plt.subplot(gs1[0, :3])
@@ -565,7 +565,7 @@ class LinearInversionApp(object):
         return Q
 
     def interact_plot_inversion(self, maxIter=30):
-        Q = interact(
+        interact(
             self.plot_inversion,
             maxIter=IntText(value=maxIter),
             m0=FloatSlider(

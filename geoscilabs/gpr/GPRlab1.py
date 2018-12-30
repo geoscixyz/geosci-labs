@@ -3,8 +3,6 @@ from scipy.constants import mu_0, epsilon_0
 import matplotlib.pyplot as plt
 from PIL import Image
 import warnings
-
-warnings.filterwarnings("ignore")
 from ipywidgets import (
     interact,
     interactive,
@@ -15,7 +13,8 @@ from ipywidgets import (
     fixed,
 )
 
-from .Wiggle import wiggle, PrimaryWave, ReflectedWave
+from ..base import wiggle
+from .Wiggle import PrimaryWave, ReflectedWave
 
 import requests
 from io import BytesIO
@@ -114,7 +113,7 @@ def PrimaryWidgetFcn(tinterpL, epsrL, tinterpH, epsrH, dFile, tFile):
     kwargs = {"skipt": 1, "scale": 0.5, "lwidth": 0.1, "dx": dx, "sampr": dt * nano}
 
     extent = [0.0, 30, 300, 0]
-    fig, ax1 = plt.subplots(1, 1, figsize=(8, 5))
+    _, ax1 = plt.subplots(1, 1, figsize=(8, 5))
     ax1.invert_yaxis()
     ax1.axis(extent)
     ax1.set_xlabel("Offset (m)")
@@ -129,8 +128,7 @@ def PrimaryWidgetFcn(tinterpL, epsrL, tinterpH, epsrH, dFile, tFile):
 
 def PrimaryFieldWidgetFcn(tinterp, epsr, radgramImg):
     imgcmp = Image.open(radgramImg)
-    fig = plt.figure(figsize=(6, 7))
-    ax = plt.subplot(111)
+    plt.figure(figsize=(6, 7))
     plt.imshow(imgcmp, extent=[0, 150, 150, 0])
     x = np.arange(81) * 0.1
     xconvert = x * 150.0 / 8.0
@@ -154,8 +152,7 @@ def PipeWidgetFcn(epsr, h, xc, r, imgcmp):
 
     # imgcmp = Image.open(dataImage)
     imgcmp = imgcmp.resize((600, 800))
-    fig = plt.figure(figsize=(9, 11))
-    ax = plt.subplot(111)
+    plt.figure(figsize=(9, 11))
 
     plt.imshow(imgcmp, extent=[0, 400, 250, 0])
     x = np.arange(41) * 1.0
@@ -177,14 +174,12 @@ def WallWidgetFcn(epsr, h, x1, x2, imgcmp):
 
     # imgcmp = Image.open(dataImage)
     imgcmp = imgcmp.resize((600, 800))
-    fig = plt.figure(figsize=(9, 11))
-    ax = plt.subplot(111)
+    plt.figure(figsize=(9, 11))
 
     plt.imshow(imgcmp, extent=[0, 400, 250, 0])
     x = np.arange(41) * 1.0
     ind1 = x <= x1
     ind2 = x >= x2
-    ind3 = np.logical_not(np.logical_or(ind1, ind2))
     scale = 10.0
     xconvert = x * scale
     v = 1.0 / np.sqrt(mu_0 * epsilon_0 * epsr)
@@ -202,7 +197,6 @@ def WallWidgetFcn(epsr, h, x1, x2, imgcmp):
         lw=2,
     )
 
-    #     plt.plot(xconvert[ind3], arrival(x[ind3], xc?, h, v)*nano, 'r--',lw = 2)
     plt.xticks(np.arange(11) * 40, np.arange(11) * 4.0)
     plt.xlim(0.0, 400)
     plt.ylim(240.0, 0.0)

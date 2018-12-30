@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from IPython.html.widgets import (
+from ipywidgets import (
     interactive,
     IntSlider,
     widget,
@@ -25,23 +25,31 @@ zmax = 4.0
 z = np.linspace(0.0, zmax, 1000)
 
 
-phi_v = lambda z: (4.0 * z) / (4.0 * z ** 2 + 1.0) ** (3.0 / 2.0)
-phi_h = lambda z: 2 - (4.0 * z) / (4.0 * z ** 2 + 1.0) ** (1.0 / 2.0)
+def phi_v(z):
+    return (4.0 * z) / (4.0 * z ** 2 + 1.0) ** (3.0 / 2.0)
 
-R_v = lambda z: 1.0 / (4.0 * z ** 2.0 + 1.0) ** (1.0 / 2.0)
-R_h = lambda z: (4.0 * z ** 2 + 1.0) ** (1.0 / 2.0) - 2.0 * z
+def phi_h(z):
+    return 2 - (4.0 * z) / (4.0 * z ** 2 + 1.0) ** (1.0 / 2.0)
 
-sigma_av = (
-    lambda h_boom, h_1, sigma_1, sigma_2: sigma_0 * (1.0 - R_v(h_boom))
-    + sigma_1 * (R_v(h_boom) - R_v(h_1 + h_boom))
-    + sigma_2 * R_v(h_1 + h_boom)
-)
-sigma_ah = (
-    lambda h_boom, h_1, sigma_1, sigma_2: sigma_0 * (1.0 - R_h(h_boom))
-    + sigma_1 * (R_h(h_boom) - R_h(h_1 + h_boom))
-    + sigma_2 * R_h(h_1 + h_boom)
-)
+def R_v(z):
+    return 1.0 / (4.0 * z ** 2.0 + 1.0) ** (1.0 / 2.0)
 
+def R_h(z):
+    return (4.0 * z ** 2 + 1.0) ** (1.0 / 2.0) - 2.0 * z
+
+def sigma_av(h_boom, h_1, sigma_1, sigma_2):
+    return (
+        sigma_0 * (1.0 - R_v(h_boom))
+        + sigma_1 * (R_v(h_boom) - R_v(h_1 + h_boom))
+        + sigma_2 * R_v(h_1 + h_boom)
+    )
+
+def sigma_ah(h_boom, h_1, sigma_1, sigma_2):
+    return (
+        sigma_0 * (1.0 - R_h(h_boom))
+        + sigma_1 * (R_h(h_boom) - R_h(h_1 + h_boom))
+        + sigma_2 * R_h(h_1 + h_boom)
+    )
 
 def plot_ResponseFct(h_boom, h_1, sigma_1, sigma_2, orientation="HCP"):
 

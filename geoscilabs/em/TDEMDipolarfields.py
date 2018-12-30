@@ -34,7 +34,7 @@ def E_from_ElectricDipoleWholeSpace(
     """
 
     mu = mu_0 * (1 + kappa)
-    epsilon = epsilon_0 * epsr
+    # epsilon = epsilon_0 * epsr
 
     XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
     # Check
@@ -141,7 +141,7 @@ def H_from_ElectricDipoleWholeSpace(
     """
 
     mu = mu_0 * (1 + kappa)
-    epsilon = epsilon_0 * epsr
+    # epsilon = epsilon_0 * epsr
     XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
@@ -280,171 +280,171 @@ def B_from_ElectricDipoleWholeSpace(
     return Bx, By, Bz
 
 
-def E_from_MagneticDipoleWholeSpace(
-    XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=0.0, epsr=1.0
-):
+# def E_from_MagneticDipoleWholeSpace(
+#     XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=0.0, epsr=1.0
+# ):
 
-    """
-        Computing the analytic electric fields (E) from an magnetic dipole in a wholespace
-        - You have the option of computing E for multiple times at a single reciever location
-          or a single time at multiple locations
+#     """
+#         Computing the analytic electric fields (E) from an magnetic dipole in a wholespace
+#         - You have the option of computing E for multiple times at a single reciever location
+#           or a single time at multiple locations
 
-        :param numpy.array XYZ: reciever locations at which to evaluate E
-        :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
-        :param float sig: value specifying the conductivity (S/m) of the wholespace
-        :param numpy.array t: array of times at which to measure
-        :param float current: size of the injected current (A), default is 1.0 A
-        :param float length: length of the dipole (m), default is 1.0 m
-        :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
-        :param float kappa: magnetic susceptiblity value (unitless), default is 0.
-        :param float epsr: relative permitivitty value (unitless),  default is 1.0
-        :rtype: numpy.array
-        :return: Ex, Ey, Ez: arrays containing all 3 components of E evaluated at the specified locations and times.
-    """
+#         :param numpy.array XYZ: reciever locations at which to evaluate E
+#         :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
+#         :param float sig: value specifying the conductivity (S/m) of the wholespace
+#         :param numpy.array t: array of times at which to measure
+#         :param float current: size of the injected current (A), default is 1.0 A
+#         :param float length: length of the dipole (m), default is 1.0 m
+#         :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
+#         :param float kappa: magnetic susceptiblity value (unitless), default is 0.
+#         :param float epsr: relative permitivitty value (unitless),  default is 1.0
+#         :rtype: numpy.array
+#         :return: Ex, Ey, Ez: arrays containing all 3 components of E evaluated at the specified locations and times.
+#     """
 
-    mu = mu_0 * (1 + kappa)
-    epsilon = epsilon_0 * epsr
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
-    # Check
-    if XYZ.shape[0] > 1 & t.shape[0] > 1:
-        raise Exception(
-            "I/O type error: For multiple field locations only a single time can be specified."
-        )
+#     mu = mu_0 * (1 + kappa)
+#     # epsilon = epsilon_0 * epsr
+#     XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+#     # Check
+#     if XYZ.shape[0] > 1 & t.shape[0] > 1:
+#         raise Exception(
+#             "I/O type error: For multiple field locations only a single time can be specified."
+#         )
 
-    dx = XYZ[:, 0] - srcLoc[0]
-    dy = XYZ[:, 1] - srcLoc[1]
-    dz = XYZ[:, 2] - srcLoc[2]
+#     dx = XYZ[:, 0] - srcLoc[0]
+#     dy = XYZ[:, 1] - srcLoc[1]
+#     dz = XYZ[:, 2] - srcLoc[2]
 
-    r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
-    theta = np.sqrt((mu * sig) / (4 * t))
+#     r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
+#     theta = np.sqrt((mu * sig) / (4 * t))
 
-    front = 2.0 * (current * length) * theta ** 5 * np.exp(-(theta) ** 2 * (r) ** 2)
-    mid = 1.0 / (np.pi ** 1.5 * sig)
+#     front = 2.0 * (current * length) * theta ** 5 * np.exp(-(theta) ** 2 * (r) ** 2)
+#     mid = 1.0 / (np.pi ** 1.5 * sig)
 
-    if orientation.upper() == "X":
-        Ey = front * mid * -dz
-        Ez = front * mid * dy
-        Ex = np.zeros_like(Ey)
-        return Hx, Hy, Hz
+#     if orientation.upper() == "X":
+#         Ey = front * mid * -dz
+#         Ez = front * mid * dy
+#         Ex = np.zeros_like(Ey)
+#         return Hx, Hy, Hz
 
-    elif orientation.upper() == "Y":
-        Ex = front * mid * dz
-        Ez = front * mid * -dx
-        Ey = np.zeros_like(Ex)
-        return Hx, Hy, Hz
+#     elif orientation.upper() == "Y":
+#         Ex = front * mid * dz
+#         Ez = front * mid * -dx
+#         Ey = np.zeros_like(Ex)
+#         return Ex, Ey, Ez
 
-    elif orientation.upper() == "Z":
-        Ex = front * mid * -dy
-        Ey = front * mid * dx
-        Ez = np.zeros_like(Ex)
-        return Ex, Ey, Ez
-
-
-def J_from_MagneticDipoleWholeSpace(
-    XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=1.0, epsr=1.0
-):
-
-    """
-        Computing the analytic current density (J) from an magnetic dipole in a wholespace
-        - You have the option of computing J for multiple times at a single reciever location
-          or a single time at multiple locations
-
-        :param numpy.array XYZ: reciever locations at which to evaluate J
-        :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
-        :param float sig: value specifying the conductivity (S/m) of the wholespace
-        :param numpy.array t: array of times at which to measure
-        :param float current: size of the injected current (A), default is 1.0 A
-        :param float length: length of the dipole (m), default is 1.0 m
-        :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
-        :param float kappa: magnetic susceptiblity value (unitless), default is 0.
-        :param float epsr: relative permitivitty value (unitless),  default is 1.0
-        :rtype: numpy.array
-        :return: Jx, Jy, Jz: arrays containing all 3 components of J evaluated at the specified locations and times.
-    """
-
-    Ex, Ey, Ez = E_from_MagneticDipoleWholeSpace(
-        XYZ,
-        srcLoc,
-        sig,
-        t,
-        current=current,
-        length=length,
-        orientation=orientation,
-        kappa=kappa,
-        epsr=epsr,
-    )
-    Jx = sig * Ex
-    Jy = sig * Ey
-    Jz = sig * Ez
-    return Jx, Jy, Jz
+#     elif orientation.upper() == "Z":
+#         Ex = front * mid * -dy
+#         Ey = front * mid * dx
+#         Ez = np.zeros_like(Ex)
+#         return Ex, Ey, Ez
 
 
-def H_from_MagneticDipoleWholeSpace(
-    XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=0.0, epsr=1.0
-):
+# def J_from_MagneticDipoleWholeSpace(
+#     XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=1.0, epsr=1.0
+# ):
 
-    """
-        Computing the analytic magnetic fields (H) from an magnetic dipole in a wholespace
-        - You have the option of computing E for multiple times at a single reciever location
-          or a single time at multiple locations
+#     """
+#         Computing the analytic current density (J) from an magnetic dipole in a wholespace
+#         - You have the option of computing J for multiple times at a single reciever location
+#           or a single time at multiple locations
 
-        :param numpy.array XYZ: reciever locations at which to evaluate E
-        :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
-        :param float sig: value specifying the conductivity (S/m) of the wholespace
-        :param numpy.array t: array of times at which to measure
-        :param float current: size of the injected current (A), default is 1.0 A
-        :param float length: length of the dipole (m), default is 1.0 m
-        :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
-        :param float kappa: magnetic susceptiblity value (unitless), default is 0.
-        :param float epsr: relative permitivitty value (unitless),  default is 1.0
-        :rtype: numpy.array
-        :return: Hx, Hy, Hz: arrays containing all 3 components of E evaluated at the specified locations and times.
-    """
+#         :param numpy.array XYZ: reciever locations at which to evaluate J
+#         :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
+#         :param float sig: value specifying the conductivity (S/m) of the wholespace
+#         :param numpy.array t: array of times at which to measure
+#         :param float current: size of the injected current (A), default is 1.0 A
+#         :param float length: length of the dipole (m), default is 1.0 m
+#         :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
+#         :param float kappa: magnetic susceptiblity value (unitless), default is 0.
+#         :param float epsr: relative permitivitty value (unitless),  default is 1.0
+#         :rtype: numpy.array
+#         :return: Jx, Jy, Jz: arrays containing all 3 components of J evaluated at the specified locations and times.
+#     """
 
-    mu = mu_0 * (1 + kappa)
-    epsilon = epsilon_0 * epsr
+#     Ex, Ey, Ez = E_from_MagneticDipoleWholeSpace(
+#         XYZ,
+#         srcLoc,
+#         sig,
+#         t,
+#         current=current,
+#         length=length,
+#         orientation=orientation,
+#         kappa=kappa,
+#         epsr=epsr,
+#     )
+#     Jx = sig * Ex
+#     Jy = sig * Ey
+#     Jz = sig * Ez
+#     return Jx, Jy, Jz
 
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
-    # Check
-    if XYZ.shape[0] > 1 & t.shape[0] > 1:
-        raise Exception(
-            "I/O type error: For multiple field locations only a single time can be specified."
-        )
 
-    dx = XYZ[:, 0] - srcLoc[0]
-    dy = XYZ[:, 1] - srcLoc[1]
-    dz = XYZ[:, 2] - srcLoc[2]
+# def H_from_MagneticDipoleWholeSpace(
+#     XYZ, srcLoc, sig, t, current=1.0, length=1.0, orientation="X", kappa=0.0, epsr=1.0
+# ):
 
-    r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
-    theta = np.sqrt((mu * sig) / (4 * t))
+#     """
+#         Computing the analytic magnetic fields (H) from an magnetic dipole in a wholespace
+#         - You have the option of computing E for multiple times at a single reciever location
+#           or a single time at multiple locations
 
-    front = current * length / (4.0 * pi * r ** 3)
-    mid = 3 * erf(theta * r) - (
-        4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 6 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
-    extra = erf(theta * r) - (
-        4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 2 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
+#         :param numpy.array XYZ: reciever locations at which to evaluate E
+#         :param numpy.array srcLoc: [x,y,z] triplet defining the location of the electric dipole source
+#         :param float sig: value specifying the conductivity (S/m) of the wholespace
+#         :param numpy.array t: array of times at which to measure
+#         :param float current: size of the injected current (A), default is 1.0 A
+#         :param float length: length of the dipole (m), default is 1.0 m
+#         :param str orientation: orientation of dipole: 'X', 'Y', or 'Z'
+#         :param float kappa: magnetic susceptiblity value (unitless), default is 0.
+#         :param float epsr: relative permitivitty value (unitless),  default is 1.0
+#         :rtype: numpy.array
+#         :return: Hx, Hy, Hz: arrays containing all 3 components of E evaluated at the specified locations and times.
+#     """
 
-    if orientation.upper() == "X":
-        Hx = front * (dx ** 2 / r ** 2) * mid - front * extra
-        Hy = front * (dx * dy / r ** 2) * mid
-        Hz = front * (dx * dz / r ** 2) * mid
-        return Ex, Ey, Ez
+#     mu = mu_0 * (1 + kappa)
+#     epsilon = epsilon_0 * epsr
 
-    elif orientation.upper() == "Y":
-        #  x--> y, y--> z, z-->x
-        Hy = front * (dy ** 2 / r ** 2) * mid - front * extra
-        Hz = front * (dy * dz / r ** 2) * mid
-        Hx = front * (dy * dx / r ** 2) * mid
-        return Ex, Ey, Ez
+#     XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+#     # Check
+#     if XYZ.shape[0] > 1 & t.shape[0] > 1:
+#         raise Exception(
+#             "I/O type error: For multiple field locations only a single time can be specified."
+#         )
 
-    elif orientation.upper() == "Z":
-        # x --> z, y --> x, z --> y
-        Hz = front * (dz ** 2 / r ** 2) * mid - front * extra
-        Hx = front * (dz * dx / r ** 2) * mid
-        Hy = front * (dz * dy / r ** 2) * mid
-        return Hx, Hy, Hz
+#     dx = XYZ[:, 0] - srcLoc[0]
+#     dy = XYZ[:, 1] - srcLoc[1]
+#     dz = XYZ[:, 2] - srcLoc[2]
+
+#     r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
+#     theta = np.sqrt((mu * sig) / (4 * t))
+
+#     front = current * length / (4.0 * pi * r ** 3)
+#     mid = 3 * erf(theta * r) - (
+#         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 6 / np.sqrt(pi) * theta * r
+#     ) * np.exp(-(theta) ** 2 * (r) ** 2)
+#     extra = erf(theta * r) - (
+#         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 2 / np.sqrt(pi) * theta * r
+#     ) * np.exp(-(theta) ** 2 * (r) ** 2)
+
+#     if orientation.upper() == "X":
+#         Hx = front * (dx ** 2 / r ** 2) * mid - front * extra
+#         Hy = front * (dx * dy / r ** 2) * mid
+#         Hz = front * (dx * dz / r ** 2) * mid
+#         return Hx, Hy, Hz
+
+#     elif orientation.upper() == "Y":
+#         #  x--> y, y--> z, z-->x
+#         Hy = front * (dy ** 2 / r ** 2) * mid - front * extra
+#         Hz = front * (dy * dz / r ** 2) * mid
+#         Hx = front * (dy * dx / r ** 2) * mid
+#         return Hx, Hy, Hz
+
+#     elif orientation.upper() == "Z":
+#         # x --> z, y --> x, z --> y
+#         Hz = front * (dz ** 2 / r ** 2) * mid - front * extra
+#         Hx = front * (dz * dx / r ** 2) * mid
+#         Hy = front * (dz * dy / r ** 2) * mid
+#         return Hx, Hy, Hz
 
 
 def dHdt_from_MagneticDipoleWholeSpace(
@@ -470,7 +470,7 @@ def dHdt_from_MagneticDipoleWholeSpace(
     """
 
     mu = mu_0 * (1 + kappa)
-    epsilon = epsilon_0 * epsr
+    # epsilon = epsilon_0 * epsr
 
     XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
     # Check

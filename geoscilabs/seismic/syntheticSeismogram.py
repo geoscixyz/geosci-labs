@@ -1,11 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
-
-# try:
-#   from IPython.html.widgets import  interact, interactive, IntSlider, widget, FloatText, FloatSlider
-#  pass
-# except Exception, e:
 from ipywidgets import interact, interactive, IntSlider, widget, FloatText, FloatSlider
 
 
@@ -270,7 +265,7 @@ def plotLogs(d, rho, v, usingT=True):
     plt.hlines(d[1:], np.zeros(len(d) - 1), rseries, linewidth=2)
     plt.plot(np.zeros(nd), dpth, linewidth=2, color="black")
     plt.xlim((-1.0, 1.0))
-    if usingT == True:
+    if usingT is True:
         plt.title("Reflectivity", fontsize=8.0)
         plt.gca().set_xlabel("Reflectivity", fontsize=8.0)
     else:
@@ -378,7 +373,7 @@ def plotSeismogram(d, rho, v, wavf, wavA=1.0, noise=0.0, usingT=True, wavtyp="RI
     plt.hlines(
         tref, np.zeros(len(rseriesconv)), rseriesconv, linewidth=2
     )  # ,'marker','none'
-    if usingT == True:
+    if usingT is True:
         plt.title("Reflectivity")
     else:
         plt.title("Reflection Coeff.")
@@ -436,7 +431,6 @@ def plotSeismogramV2(
 
     xlimrho = (1.95, 5.05)
     xlimv = (0.25, 4.05)
-    xlimz = (xlimrho[0] * xlimv[0], xlimrho[1] * xlimv[1])
 
     seis = seis + noise
 
@@ -519,7 +513,6 @@ def plotSeismogramV3(
 
     xlimrho = (1.95, 5.05)
     xlimv = (0.25, 4.05)
-    xlimz = (xlimrho[0] * xlimv[0], xlimrho[1] * xlimv[1])
 
     seis = seis + noise
 
@@ -664,7 +657,6 @@ def plotSeismogramInteractRes(h2, wavf, AddNoise=False):
     v = [500.0, 1000.0, 1500.0]  # Velocity of each layer (m/s)
     rho = [2000.0, 2300.0, 2500.0]  # Density of each layer (kg/m^3)
     wavf = np.array(wavf, dtype=float)
-    usingT = True
 
     if AddNoise:
         noise = 0.02
@@ -701,11 +693,12 @@ def InteractDtoT(Model):
     rho2 = Model.kwargs["rho2"]
     rho3 = Model.kwargs["rho3"]
     # rho = np.r_[rho1, rho2, rho3]
-    func = lambda d2, d3, rho1, rho2, rho3, v1, v2, v3: plotTimeDepthInteract(
-        d2, d3, rho1, rho2, rho3, v1, v2, v3
-    )
+
+    def interact_fct(d2, d3, rho1, rho2, rho3, v1, v2, v3):
+        return plotTimeDepthInteract(d2, d3, rho1, rho2, rho3, v1, v2, v3)
+
     DtoT = interactive(
-        func,
+        interact_fct,
         d2=FloatSlider(min=0.0, max=100.0, step=5, value=d20),
         d3=FloatSlider(min=100.0, max=200.0, step=5, value=d30),
         rho1=FloatSlider(min=2000.0, max=5000.0, step=50.0, value=rho1),

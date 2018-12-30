@@ -11,7 +11,7 @@ from SimPEG import Utils
 omega = lambda f: 2.0 * np.pi * f
 
 
-def E_field_from_SheetCurruent(
+def e_field_from_sheet_current(
     XYZ, srcLoc, sig, f, E0=1.0, orientation="X", kappa=0.0, epsr=1.0, t=0.0
 ):
     """
@@ -71,7 +71,7 @@ def J_field_from_SheetCurruent(
         raise NotImplementedError()
 
 
-def H_field_from_SheetCurruent(
+def h_field_from_sheet_current(
     XYZ, srcLoc, sig, f, E0=1.0, orientation="X", kappa=0.0, epsr=1.0, t=0.0
 ):
     """

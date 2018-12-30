@@ -9,14 +9,18 @@ import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
 
-matplotlib.rcParams["font.size"] = 12
-from ipywidgets import *
+from ipywidgets import widgets
 from scipy.constants import mu_0, epsilon_0
 
 from .DipoleWidgetTD import DipoleWidgetTD, linefun, DisPosNegvalues
 from .view import DataView
 from .VolumeWidget import polyplane
-from .TDEMPlanewave import *
+from .TDEMPlanewave import (
+    e_field_from_sheet_current, h_field_from_sheet_current, j_field_from_sheet_current
+)
+
+matplotlib.rcParams["font.size"] = 12
+
 
 
 def PlaneEHfield(z, t=0.0, sig=1.0, mu=mu_0, epsilon=epsilon_0, E0=1.0):
@@ -61,11 +65,11 @@ class PlanewaveWidget(DipoleWidgetTD):
         )  # set plane and locations ...
 
         if self.functype == "E_from_SheetCurrent":
-            self.func = E_field_from_SheetCurruent
+            self.func = e_field_from_sheet_current
         elif self.functype == "H_from_SheetCurrent":
-            self.func = H_field_from_SheetCurruent
+            self.func = h_field_from_sheet_current
         elif self.functype == "J_from_SheetCurrent":
-            self.func = J_field_from_SheetCurruent
+            self.func = j_field_from_sheet_current
         else:
             raise NotImplementedError()
 
@@ -112,7 +116,7 @@ class PlanewaveWidget(DipoleWidgetTD):
             xyz_line = np.c_[x, y, np.ones_like(x) * self.z]
             self.dataview.xyz_line = xyz_line
 
-        fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+        plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
         gs1 = gridspec.GridSpec(2, 7)
         gs1.update(left=0.05, right=0.48, wspace=0.05)
         ax1 = plt.subplot(gs1[:2, :3])
@@ -277,7 +281,7 @@ def InteractivePlaneProfile():
 
     def foo(Field, Sigma, Scale, Time):
 
-        fig = plt.figure(figsize=(8, 4))
+        plt.figure(figsize=(8, 4))
         ax1 = plt.subplot(111)
 
         r = np.linspace(-1000.0, 0.0, nRx)

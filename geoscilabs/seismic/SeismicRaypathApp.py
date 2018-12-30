@@ -25,7 +25,6 @@ def reflection1_time_to_space(t, v1, z1):
     t0 = 2.0 * z1 / v1
     x = np.sqrt((t ** 2 - t0 ** 2) * v1 ** 2)
 
-    refl1 = np.sqrt(t0 ** 2 + x ** 2 / v1 ** 2)
     return x
 
 
@@ -36,7 +35,6 @@ def refraction1_time_to_space(t, v1, v2, z1):
 
     theta1 = np.arcsin(v1 / v2)
     ti1 = 2 * z1 * np.cos(theta1) / v1
-    xc1 = 2 * z1 * np.tan(theta1)
     x = (t - ti1) * v2
     return x
 
@@ -46,7 +44,6 @@ def refraction2_time_to_space(t, v1, v2, v3, z1, z2):
     theta2 = np.arcsin(v2 / v3)
     ti1 = 2 * z1 * np.cos(theta1) / v1
     ti2 = 2 * z2 * np.cos(theta2) / v2
-    xc2 = 2 * z2 * np.tan(theta2)
     x = (t - (ti2 + ti1)) * v3
     return x
 
@@ -58,7 +55,6 @@ def refraction1_space_to_time(x, v1, v2, z1):
 
     theta1 = np.arcsin(v1 / v2)
     ti1 = 2 * z1 * np.cos(theta1) / v1
-    xc1 = 2 * z1 * np.tan(theta1)
     ref1 = 1.0 / v2 * x + ti1
     return ref1
 
@@ -68,7 +64,6 @@ def refraction2_space_to_time(x, v1, v2, v3, z1, z2):
     theta2 = np.arcsin(v2 / v3)
     ti1 = 2 * z1 * np.cos(theta1) / v1
     ti2 = 2 * z2 * np.cos(theta2) / v2
-    xc2 = 2 * z2 * np.tan(theta2)
     ref2 = 1.0 / v3 * x + ti2 + ti1
     return ref2
 
@@ -116,7 +111,7 @@ def refraction_path_2(x_loc, v1, v2, v3, z1, z2):
 
 def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
     z3 = 50
-    fig = plt.figure(figsize=(8 * 0.9, 10 * 0.9))
+    plt.figure(figsize=(8 * 0.9, 10 * 0.9))
     ax1 = plt.subplot(211)
     ax2 = plt.subplot(212)
     xlim = [0, 100]

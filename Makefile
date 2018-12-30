@@ -1,7 +1,7 @@
 # Build, package, test, and clean
 PROJECT=geoscilabs
 TESTDIR=tmp-test-dir
-PYTEST_ARGS=--cov-config=../.coveragerc --cov-report=term-missing --cov=$(PROJECT) --doctest-modules -v --pyargs
+PYTEST_ARGS=./tests -v
 LINT_FILES=setup.py $(PROJECT)
 BLACK_FILES=setup.py $(PROJECT)
 FLAKE8_FILES=setup.py $(PROJECT)

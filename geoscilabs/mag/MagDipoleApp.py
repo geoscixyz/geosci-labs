@@ -567,7 +567,7 @@ class MagneticDipoleApp(object):
             ],
             layout=Layout(width="50%", height="400px", margin="20px 0px 0px 0px"),
         )
-        image = widgets.VBox(
+        widgets.VBox(
             [out], layout=Layout(width="70%", height="400px", margin="0px 0px 0px 0px")
         )
         return widgets.HBox([left, out, right])
@@ -666,7 +666,7 @@ class MagneticDipoleApp(object):
             ],
             layout=Layout(width="50%", height="400px", margin="20px 0px 0px 0px"),
         )
-        image = widgets.VBox(
+        widgets.VBox(
             [out], layout=Layout(width="70%", height="400px", margin="0px 0px 0px 0px")
         )
         return widgets.HBox([left, out, right])
@@ -795,7 +795,7 @@ class MagneticDipoleApp(object):
             ],
             layout=Layout(width="50%", height="400px", margin="20px 0px 0px 0px"),
         )
-        image = widgets.VBox(
+        widgets.VBox(
             [out], layout=Layout(width="70%", height="400px", margin="0px 0px 0px 0px")
         )
         return widgets.HBox([left, out, right])

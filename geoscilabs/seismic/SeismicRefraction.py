@@ -1,31 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
-mpl.rcParams["font.size"] = 16
-import numpy as np
-import warnings
-
-warnings.filterwarnings("ignore")
-try:
-    from IPython.html.widgets import (
-        interactive,
-        IntSlider,
-        widget,
-        FloatText,
-        FloatSlider,
-    )
-
-    pass
-# except Exception, e:
-except Exception as e:
-    from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
+from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider
 
 fontsize = 16
-mpl.rcParams["font.size"] = 16
+mpl.rcParams["font.size"] = fontsize
+
 pi = np.pi
 
 v1 = 600.0
@@ -298,9 +278,9 @@ def wiggleVarx(
     ns = traces.shape[1]
     ntr = traces.shape[0]
     t = np.arange(ns) * sampr
-    timereduce = lambda offsets, redvel, shift: [
-        float(offset) / redvel + shift for offset in offsets
-    ]
+
+    def timereduce(offsets, redvel, shift):
+        return [float(offset) / redvel + shift for offset in offsets]
 
     if offsets is not None:
         shifts = timereduce(offsets, redvel, tshift)

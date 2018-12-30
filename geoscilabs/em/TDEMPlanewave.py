@@ -8,7 +8,7 @@ import numpy as np
 from SimPEG import Utils
 
 
-def E_field_from_SheetCurruent(
+def e_field_from_sheet_current(
     XYZ, srcLoc, sig, t, E0=1.0, orientation="X", kappa=0.0, epsr=1.0
 ):
     """
@@ -38,7 +38,7 @@ def E_field_from_SheetCurruent(
         raise NotImplementedError()
 
 
-def H_field_from_SheetCurruent(
+def h_field_from_sheet_current(
     XYZ, srcLoc, sig, t, E0=1.0, orientation="X", kappa=0.0, epsr=1.0
 ):
     """
