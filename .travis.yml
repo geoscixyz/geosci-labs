@@ -9,8 +9,9 @@ env:
     - PYPI_PY=3.6  # deploy to pypi from python 3.6
 
 env:
-    - TEST=test_dcip.py
-    - TEST=test_em.py
+  - TEST=test_dcip.py
+  - TEST=test_em.py
+  - TEST=test_gpr.py
 
 install:
   - pip install -e .
