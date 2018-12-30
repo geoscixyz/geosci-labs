@@ -12,6 +12,7 @@ env:
   - TEST=test_dcip.py
   - TEST=test_em.py
   - TEST=test_gpr.py
+  - TEST=test_inversion.py
 
 install:
   - pip install -e .
