@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from SimPEG import Mesh, Maps, SolverLU, Utils
+import SimPEG.Utils as Utils
 from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
 from SimPEG.EM.Static import DC
@@ -12,12 +13,14 @@ import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
-from scipy.constants import epsilon_0
-import copy
+import warnings
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
-from .Base import widgetify
+from ..base import widgetify
+
+# ignore warnings: only use this once you are sure things are working
+warnings.filterwarnings('ignore')
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -26,10 +29,10 @@ cs = 0.5
 hx = [(cs, npad, -growrate), (cs, 200), (cs, npad, growrate)]
 hy = [(cs, npad, -growrate), (cs, 100)]
 mesh = Mesh.TensorMesh([hx, hy], "CN")
-expmap = Maps.ExpMap(mesh)
-# actmap = Maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
-mapping = expmap
-# mapping = Maps.IdentityMap(mesh)
+circmap = Maps.ParametricCircleMap(mesh)
+idmap = Maps.IdentityMap(mesh)
+circmap.slope = 1e16
+sigmaMap = idmap
 dx = 5
 xr = np.arange(-40, 41, dx)
 dxr = np.diff(xr)
@@ -46,83 +49,46 @@ indy = (mesh.gridFy[:, 0] >= xmin) & (mesh.gridFy[:, 0] <= xmax) \
 indF = np.concatenate((indx, indy))
 
 
-def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf):
-    # Create halfspace model
-    halfspaceMod = sigHalf * np.ones([mesh.nC, ])
-    mhalf = np.log(halfspaceMod)
-    # Add layer to model
-    LayerMod = addLayer2Mod(zcLayer, dzLayer, halfspaceMod, sigLayer)
-    mLayer = np.log(LayerMod)
+def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0., zc=-20.):
 
-    # Add plate or cylinder
-    # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
-    fullMod = addCylinder2Mod(xc, zc, r, LayerMod, sigTarget)
-    mtrue = np.log(fullMod)
+    circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, zc, r]
+    circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, zc, r]
 
-    Mx = mesh.gridCC
-    # Nx = np.empty(shape=(mesh.nC, 2))
-    rx = DC.Rx.Pole_ky(Mx)
-    # rx = DC.Rx.Dipole(Mx,Nx)
+    mhalf = circmap * circhalf
+    mtrue = circmap * circtrue
+
+    Mx = np.empty(shape=(0, 2))
+    Nx = np.empty(shape=(0, 2))
+    #rx = DC.Rx.Dipole_ky(Mx,Nx)
+    rx = DC.Rx.Dipole(Mx, Nx)
     if(B == []):
         src = DC.Src.Pole([rx], np.r_[A, 0.])
     else:
         src = DC.Src.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
-    # src = DC.Src.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
-    survey = DC.Survey_ky([src])
-    # survey = DC.Survey([src])
-    # survey_prim = DC.Survey([src])
-    survey_prim = DC.Survey_ky([src])
-    #problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem2D_CC(mesh, sigmaMap=mapping)
-    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem2D_CC(mesh, sigmaMap=mapping)
+    #survey = DC.Survey_ky([src])
+    survey = DC.Survey([src])
+    survey_prim = DC.Survey([src])
+    #problem = DC.Problem2D_CC(mesh, sigmaMap = sigmaMap)
+    problem = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
+    problem_prim = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem.pair(survey)
     problem_prim.pair(survey_prim)
 
-    mesh.setCellGradBC("neumann")
-    cellGrad = mesh.cellGrad
-    faceDiv = mesh.faceDiv
+    primary_field = problem_prim.fields(mhalf)
+    #phihalf = f[src, 'phi', 15]
+    #ehalf = f[src, 'e']
+    #jhalf = f[src, 'j']
+    #charge = f[src, 'charge']
 
-    phi_primary = survey_prim.dpred(mhalf)
-    e_primary = -cellGrad * phi_primary
-    j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
-    q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
-    primary_field = {'phi': phi_primary,
-                     'e': e_primary, 'j': j_primary, 'q': q_primary}
+    total_field = problem.fields(mtrue)
+    #phi = f[src, 'phi', 15]
+    #e = f[src, 'e']
+    #j = f[src, 'j']
+    #charge = f[src, 'charge']
 
-    phi_total = survey.dpred(mtrue)
-    e_total = -cellGrad * phi_total
-    j_total = problem.MfRhoI * problem.Grad * phi_total
-    q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)
-    total_field = {'phi': phi_total, 'e': e_total, 'j': j_total, 'q': q_total}
-
-    return mtrue, mhalf, src, primary_field, total_field
-
-
-def addLayer2Mod(zcLayer, dzLayer, mod, sigLayer):
-
-    CCLocs = mesh.gridCC
-
-    zmax = zcLayer + dzLayer / 2.
-    zmin = zcLayer - dzLayer / 2.
-
-    belowInd = np.where(CCLocs[:, 1] <= zmax)[0]
-    aboveInd = np.where(CCLocs[:, 1] >= zmin)[0]
-    layerInds = list(set(belowInd).intersection(aboveInd))
-
-    # # Check selected cell centers by plotting
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # plt.scatter(CCLocs[layerInds,0],CCLocs[layerInds,1])
-    # ax.set_xlim(-40,40)
-    # ax.set_ylim(-35,0)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
-
-    mod[layerInds] = sigLayer
-    return mod
+    return mtrue, mhalf, src, total_field, primary_field
 
 
 def getCylinderPoints(xc, zc, r):
@@ -136,107 +102,19 @@ def getCylinderPoints(xc, zc, r):
     xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
     xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
 
-    cylinderPoints = np.vstack(
-        [np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
+    topHalf = np.vstack([xLoc1, zLoc1]).T
+    topHalf = topHalf[0:-1, :]
+    bottomHalf = np.vstack([xLoc2, zLoc2]).T
+    bottomHalf = bottomHalf[0:-1, :]
+
+    cylinderPoints = np.vstack([topHalf, bottomHalf])
+    cylinderPoints = np.vstack([cylinderPoints, topHalf[0, :]])
     return cylinderPoints
-
-
-def addCylinder2Mod(xc, zc, r, modd, sigCylinder):
-
-    # Get points for cylinder outline
-    cylinderPoints = getCylinderPoints(xc, zc, r)
-    mod = copy.copy(modd)
-
-    verts = []
-    codes = []
-    for ii in range(0, cylinderPoints.shape[0]):
-        verts.append(cylinderPoints[ii, :])
-
-        if(ii == 0):
-            codes.append(Path.MOVETO)
-        elif(ii == cylinderPoints.shape[0] - 1):
-            codes.append(Path.CLOSEPOLY)
-        else:
-            codes.append(Path.LINETO)
-
-    path = Path(verts, codes)
-    CCLocs = mesh.gridCC
-    insideInd = np.where(path.contains_points(CCLocs))
-
-    # #Check selected cell centers by plotting
-    # # print insideInd
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # patch = patches.PathPatch(path, facecolor='none', lw=2)
-    # ax.add_patch(patch)
-    # plt.scatter(CCLocs[insideInd,0],CCLocs[insideInd,1])
-    # ax.set_xlim(-40,40)
-    # ax.set_ylim(-35,0)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
-
-    mod[insideInd] = sigCylinder
-    return mod
-
-
-def getPlateCorners(xc, zc, dx, dz, rotAng):
-
-    # Form rotation matix
-    rotMat = np.array([[np.cos(rotAng * (np.pi / 180.)), -np.sin(rotAng * (np.pi / 180.))],
-                       [np.sin(rotAng * (np.pi / 180.)), np.cos(rotAng * (np.pi / 180.))]])
-    originCorners = np.array([[-0.5 * dx, 0.5 * dz], [0.5 * dx,
-                                                      0.5 * dz], [-0.5 * dx, -0.5 * dz], [0.5 * dx, -0.5 * dz]])
-
-    rotPlateCorners = np.dot(originCorners, rotMat)
-    plateCorners = rotPlateCorners + \
-        np.hstack([np.repeat(xc, 4).reshape([4, 1]),
-                   np.repeat(zc, 4).reshape([4, 1])])
-    return plateCorners
-
-
-def addPlate2Mod(xc, zc, dx, dz, rotAng, modd, sigPlate):
-    # use matplotlib paths to find CC inside of polygon
-    plateCorners = getPlateCorners(xc, zc, dx, dz, rotAng)
-    mod = copy.copy(modd)
-
-    verts = [
-        (plateCorners[0, :]),  # left, top
-        (plateCorners[1, :]),  # right, top
-        (plateCorners[3, :]),  # right, bottom
-        (plateCorners[2, :]),  # left, bottom
-        (plateCorners[0, :]),  # left, top (closes polygon)
-    ]
-
-    codes = [Path.MOVETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.CLOSEPOLY,
-             ]
-
-    path = Path(verts, codes)
-    CCLocs = mesh.gridCC
-    insideInd = np.where(path.contains_points(CCLocs))
-
-    # Check selected cell centers by plotting
-    # print insideInd
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # patch = patches.PathPatch(path, facecolor='none', lw=2)
-    # ax.add_patch(patch)
-    # plt.scatter(CCLocs[insideInd,0],CCLocs[insideInd,1])
-    # ax.set_xlim(-10,10)
-    # ax.set_ylim(-20,0)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
-
-    mod[insideInd] = sigPlate
-    return mod
 
 
 def get_Surface_Potentials(survey, src, field_obj):
 
-    phi = field_obj['phi']
+    phi = field_obj[src, 'phi']
     CCLoc = mesh.gridCC
     zsurfaceLoc = np.max(CCLoc[:, 1])
     surfaceInd = np.where(CCLoc[:, 1] == zsurfaceLoc)
@@ -254,11 +132,6 @@ def get_Surface_Potentials(survey, src, field_obj):
 
     return xSurface, phiSurface, phiScale
 
-
-# Inline functions for computing apparent resistivity
-# eps = 1e-9 #to stabilize division
-#G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
-#rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 def sumCylinderCharges(xc, zc, r, qSecondary):
     chargeRegionVerts = getCylinderPoints(xc, zc, r + 0.5)
@@ -310,28 +183,31 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
-# The only thing we need to make it work is a 2.5D field object in SimPEG
 
+# Inline functions for computing apparent resistivity
+# eps = 1e-9 #to stabilize division
+# G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
+# rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
 
 def getSensitivity(survey, A, B, M, N, model):
 
     if(survey == "Dipole-Dipole"):
-        rx = DC.Rx.Dipole_ky(np.r_[M, 0.], np.r_[N, 0.])
+        rx = DC.Rx.Dipole(np.r_[M, 0.], np.r_[N, 0.])
         src = DC.Src.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
     elif(survey == "Pole-Dipole"):
-        rx = DC.Rx.Dipole_ky(np.r_[M, 0.], np.r_[N, 0.])
+        rx = DC.Rx.Dipole(np.r_[M, 0.], np.r_[N, 0.])
         src = DC.Src.Pole([rx], np.r_[A, 0.])
     elif(survey == "Dipole-Pole"):
-        rx = DC.Rx.Pole_ky(np.r_[M, 0.])
+        rx = DC.Rx.Pole(np.r_[M, 0.])
         src = DC.Src.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
     elif(survey == "Pole-Pole"):
-        rx = DC.Rx.Pole_ky(np.r_[M, 0.])
+        rx = DC.Rx.Pole(np.r_[M, 0.])
         src = DC.Src.Pole([rx], np.r_[A, 0.])
 
-    survey = DC.Survey_ky([src])
-    problem = DC.Problem2D_CC(mesh, sigmaMap=mapping)
+    Srv = DC.Survey([src])
+    problem = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
     problem.Solver = SolverLU
-    problem.pair(survey)
+    problem.pair(Srv)
     fieldObj = problem.fields(model)
 
     J = problem.Jtvec(model, np.array([1.]), f=fieldObj)
@@ -360,20 +236,19 @@ def calculateRhoA(survey, VM, VN, A, B, M, N):
     return rho_a
 
 
-def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rhoTarget, Field, Type, Scale):
+def plot_Surface_Potentials(survey, A, B, M, N, r, xc, zc, rhohalf, rhocyl, Field, Type, Scale):
 
     labelsize = 16.
     ticksize = 16.
 
+    sigcyl = 1. / rhocyl
+    sighalf = 1. / rhohalf
+
     if(survey == "Pole-Dipole" or survey == "Pole-Pole"):
         B = []
 
-    sigTarget = 1. / rhoTarget
-    sigLayer = 1. / rholayer
-    sigHalf = 1. / rhohalf
-
-    mtrue, mhalf, src, primary_field, total_field = model_fields(
-        A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf)
+    mtrue, mhalf, src, total_field, primary_field = cylinder_fields(
+        A, B, r, sigcyl, sighalf, xc, zc)
 
     fig, ax = plt.subplots(2, 1, figsize=(9 * 1.5, 9 * 1.8), sharex=True)
     fig.subplots_adjust(right=0.8, wspace=0.05, hspace=0.05)
@@ -431,7 +306,8 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
     if(survey == "Dipole-Pole" or survey == "Pole-Pole"):
         ax[0].plot(M, VM, 'o', color='k')
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 1)
+        xytextM = (
+            M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
         ax[0].annotate('%2.1e' % (VM), xy=xytextM,
                        xytext=xytextM, fontsize=labelsize)
 
@@ -440,9 +316,9 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         ax[0].plot(N, VN, 'o', color='k')
 
         xytextM = (
-            M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 10)
+            M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
         xytextN = (
-            N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 10)
+            N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 0.5)
         ax[0].annotate('%2.1e' % (VM), xy=xytextM,
                        xytext=xytextM, fontsize=labelsize)
         ax[0].annotate('%2.1e' % (VN), xy=xytextN,
@@ -452,10 +328,14 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
 
     props = dict(boxstyle='round', facecolor='grey', alpha=0.4)
     ax[0].text(xlim.max() + 1, ylim.max() - 0.1 * ylim.max(), '$\\rho_a$ = %2.2f' % (G2D * calculateRhoA(survey, VM, VN, A, B, M, N)),
-               verticalalignment='bottom', bbox=props, fontsize=14)
+               verticalalignment='bottom', bbox=props, fontsize=labelsize)
 
     ax[0].legend(['Model Potential', 'Half-Space Potential'],
                  loc=3, fontsize=labelsize)
+
+    # Subplot 2: Fields
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+zc,linestyle = 'dashed',color='k')
+    # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,-np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+zc,linestyle = 'dashed',color='k')
 
     if Field == 'Model':
 
@@ -471,11 +351,11 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
             pcolorOpts = {'norm': matplotlib.colors.LogNorm(), "cmap": "jet_r"}
 
         if Type == 'Total':
-            u = 1. / (mapping * mtrue)
+            u = 1. / (mtrue)
         elif Type == 'Primary':
-            u = 1. / (mapping * mhalf)
+            u = 1. / (mhalf)
         elif Type == 'Secondary':
-            u = 1. / (mapping * mtrue) - 1. / (mapping * mhalf)
+            u = 1. / (mtrue) - 1. / (mhalf)
             if Scale == 'Log':
                 linthresh = 10.
                 pcolorOpts = {'norm': matplotlib.colors.SymLogNorm(
@@ -497,23 +377,22 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
                 linthresh=linthresh, linscale=0.2), "cmap": "viridis"}
 
         if Type == 'Total':
-            # formatter = LogFormatter(10, labelOnlyBase=False)
-            # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
+            #formatter = LogFormatter(10, labelOnlyBase=False)
 
-            u = total_field['phi'] - phiScaleTotal
+            u = total_field[src, 'phi'] - phiScaleTotal
 
         elif Type == 'Primary':
             # formatter = LogFormatter(10, labelOnlyBase=False)
             # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
 
-            u = primary_field['phi'] - phiScalePrim
+            u = primary_field[src, 'phi'] - phiScalePrim
 
         elif Type == 'Secondary':
             # formatter = None
             # pcolorOpts = {"cmap":"viridis"}
 
-            uTotal = total_field['phi'] - phiScaleTotal
-            uPrim = primary_field['phi'] - phiScalePrim
+            uTotal = total_field[src, 'phi'] - phiScaleTotal
+            uPrim = primary_field[src, 'phi'] - phiScalePrim
             u = uTotal - uPrim
 
     elif Field == 'E':
@@ -532,14 +411,14 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         formatter = "%.1e"
 
         if Type == 'Total':
-            u = total_field['e']
+            u = total_field[src, 'e']
 
         elif Type == 'Primary':
-            u = primary_field['e']
+            u = primary_field[src, 'e']
 
         elif Type == 'Secondary':
-            uTotal = total_field['e']
-            uPrim = primary_field['e']
+            uTotal = total_field[src, 'e']
+            uPrim = primary_field[src, 'e']
             u = uTotal - uPrim
 
     elif Field == 'J':
@@ -558,14 +437,14 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         formatter = "%.1e"
 
         if Type == 'Total':
-            u = total_field['j']
+            u = total_field[src, 'j']
 
         elif Type == 'Primary':
-            u = primary_field['j']
+            u = primary_field[src, 'j']
 
         elif Type == 'Secondary':
-            uTotal = total_field['j']
-            uPrim = primary_field['j']
+            uTotal = total_field[src, 'j']
+            uPrim = primary_field[src, 'j']
             u = uTotal - uPrim
 
     elif Field == 'Charge':
@@ -576,7 +455,7 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         streamOpts = None
         ind = indCC
 
-        # formatter = LogFormatter(10, labelOnlyBase=False)
+       # formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap": "RdBu_r"}
         if Scale == 'Log':
             linthresh = 1e-12
@@ -585,14 +464,14 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         formatter = "%.1e"
 
         if Type == 'Total':
-            u = total_field['q']
+            u = total_field[src, 'charge']
 
         elif Type == 'Primary':
-            u = primary_field['q']
+            u = primary_field[src, 'charge']
 
         elif Type == 'Secondary':
-            uTotal = total_field['q']
-            uPrim = primary_field['q']
+            uTotal = total_field[src, 'charge']
+            uPrim = primary_field[src, 'charge']
             u = uTotal - uPrim
 
     elif Field == 'Sensitivity':
@@ -608,7 +487,7 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         # formatter = LogFormatter(10, labelOnlyBase=False)
         pcolorOpts = {"cmap": "viridis"}
         if Scale == 'Log':
-            linthresh = 1e-4
+            linthresh = 1.
             pcolorOpts = {'norm': matplotlib.colors.SymLogNorm(
                 linthresh=linthresh, linscale=0.2), "cmap": "viridis"}
         # formatter = formatter = "$10^{%.1f}$"
@@ -625,7 +504,6 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
             uPrim = getSensitivity(survey, A, B, M, N, mhalf)
             u = uTotal - uPrim
         # u = np.log10(abs(u))
-
     if Scale == 'Log':
         eps = 1e-16
     else:
@@ -636,20 +514,13 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc, zc, r)
 
-    if(rhoTarget != rhohalf):
+    if(rhocyl != rhohalf):
         ax[1].plot(cylinderPoints[:, 0], cylinderPoints[
                    :, 1], linestyle='dashed', color='k')
 
-    if(rholayer != rhohalf):
-        layerX = np.arange(xmin, xmax + 1)
-        layerTopY = (zcLayer + dzLayer / 2.) * np.ones_like(layerX)
-        layerBottomY = (zcLayer - dzLayer / 2.) * np.ones_like(layerX)
-        ax[1].plot(layerX, layerTopY, linestyle='dashed', color='k')
-        ax[1].plot(layerX, layerBottomY, linestyle='dashed', color='k')
-
     if (Field == 'Charge') and (Type != 'Primary') and (Type != 'Total'):
-        qTotal = total_field['q']
-        qPrim = primary_field['q']
+        qTotal = total_field[src, 'charge']
+        qPrim = primary_field[src, 'charge']
         qSecondary = qTotal - qPrim
         qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(
             xc, zc, r, qSecondary)
@@ -672,47 +543,47 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
     ax[1].set_ylabel('z (m)', fontsize=labelsize)
 
     if(survey == "Dipole-Dipole"):
-        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize)
-        ax[1].plot(B, 1., marker='v', color='blue', markersize=labelsize)
-        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize)
-        ax[1].plot(N, 1., marker='^', color='green', markersize=labelsize)
+        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize - 2)
+        ax[1].plot(B, 1., marker='v', color='blue', markersize=labelsize - 2)
+        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize - 2)
+        ax[1].plot(N, 1., marker='^', color='green', markersize=labelsize - 2)
 
-        xytextA1 = (A - 0.5, 2.5)
-        xytextB1 = (B - 0.5, 2.5)
-        xytextM1 = (M - 0.5, 2.5)
-        xytextN1 = (N - 0.5, 2.5)
+        xytextA1 = (A, 2.)
+        xytextB1 = (B, 2.)
+        xytextM1 = (M, 2.)
+        xytextN1 = (N, 2.)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1, fontsize=labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1, fontsize=labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1, fontsize=labelsize)
         ax[1].annotate('N', xy=xytextN1, xytext=xytextN1, fontsize=labelsize)
     elif(survey == "Pole-Dipole"):
-        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize)
-        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize)
-        ax[1].plot(N, 1., marker='^', color='green', markersize=labelsize)
+        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize - 2)
+        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize - 2)
+        ax[1].plot(N, 1., marker='^', color='green', markersize=labelsize - 2)
 
-        xytextA1 = (A - 0.5, 2.5)
-        xytextM1 = (M - 0.5, 2.5)
-        xytextN1 = (N - 0.5, 2.5)
+        xytextA1 = (A, 2.)
+        xytextM1 = (M, 2.)
+        xytextN1 = (N, 2.)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1, fontsize=labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1, fontsize=labelsize)
         ax[1].annotate('N', xy=xytextN1, xytext=xytextN1, fontsize=labelsize)
     elif(survey == "Dipole-Pole"):
-        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize)
-        ax[1].plot(B, 1., marker='v', color='blue', markersize=labelsize)
-        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize)
+        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize - 2)
+        ax[1].plot(B, 1., marker='v', color='blue', markersize=labelsize - 2)
+        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize - 2)
 
-        xytextA1 = (A - 0.5, 2.5)
-        xytextB1 = (B - 0.5, 2.5)
-        xytextM1 = (M - 0.5, 2.5)
+        xytextA1 = (A, 2.)
+        xytextB1 = (B, 2.)
+        xytextM1 = (M, 2.)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1, fontsize=labelsize)
         ax[1].annotate('B', xy=xytextB1, xytext=xytextB1, fontsize=labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1, fontsize=labelsize)
     elif(survey == "Pole-Pole"):
-        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize)
-        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize)
+        ax[1].plot(A, 1., marker='v', color='red', markersize=labelsize - 2)
+        ax[1].plot(M, 1., marker='^', color='yellow', markersize=labelsize - 2)
 
-        xytextA1 = (A - 0.5, 2.5)
-        xytextM1 = (M - 0.5, 2.5)
+        xytextA1 = (A, 2.)
+        xytextM1 = (M, 2.)
         ax[1].annotate('A', xy=xytextA1, xytext=xytextA1, fontsize=labelsize)
         ax[1].annotate('M', xy=xytextM1, xytext=xytextM1, fontsize=labelsize)
 
@@ -745,6 +616,7 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
         else:
             cb = plt.colorbar(
                 dat[0], ax=cbar_ax, format=formatter, ticks=np.linspace(vmin, vmax, 5))
+
     #t_logloc = matplotlib.ticker.LogLocator(base=10.0, subs=[1.0,2.], numdecs=4, numticks=8)
     #tick_locator = matplotlib.ticker.SymmetricalLogLocator(t_logloc)
     #cb.locator = tick_locator
@@ -757,28 +629,23 @@ def PLOT(survey, A, B, M, N, zcLayer, dzLayer, xc, zc, r, rhohalf, rholayer, rho
     ax[1].set_aspect('equal')
 
     plt.show()
+    # return fig, ax
 
 
-def ResLayer_app():
-    app = widgetify(PLOT, manual=True,
+def cylinder_app():
+    app = widgetify(plot_Surface_Potentials,
                     survey=ToggleButtons(options=[
                                          'Dipole-Dipole', 'Dipole-Pole', 'Pole-Dipole', 'Pole-Pole'], value='Dipole-Dipole'),
-                    zcLayer=FloatSlider(min=-10., max=0., step=1., value=-10.,
-                                        continuous_update=False, description='$zc_{layer}$'),
-                    dzLayer=FloatSlider(min=0.5, max=5., step=0.5, value=1.,
-                                        continuous_update=False, description='$dz_{layer}$'),
-                    rholayer=FloatText(
-                        min=1e-8, max=1e8, value=5000., continuous_update=False, description='$\\rho_{2}$'),
-                    xc=FloatSlider(min=-30., max=30., step=1.,
-                                   value=0., continuous_update=False),
-                    zc=FloatSlider(min=-30., max=-15., step=0.5,
-                                   value=-25., continuous_update=False),
-                    r=FloatSlider(min=1., max=10., step=0.5,
-                                  value=5., continuous_update=False),
-                    rhoTarget=FloatText(
-                        min=1e-8, max=1e8, value=500., continuous_update=False, description='$\\rho_{3}$'),
+                    rhocyl=FloatText(min=1e-8, max=1e8, value=500.,
+                                     continuous_update=False, description='$\\rho_2$'),
                     rhohalf=FloatText(
-                        min=1e-8, max=1e8, value=500., continuous_update=False, description='$\\rho_{1}$'),
+                        min=1e-8, max=1e8, value=500., continuous_update=False, description='$\\rho_1$'),
+                    r=FloatSlider(min=1., max=20., step=1.,
+                                  value=10., continuous_update=False),
+                    xc=FloatSlider(min=-20., max=20., step=1.,
+                                   value=0., continuous_update=False),
+                    zc=FloatSlider(min=-20., max=0., step=1.,
+                                   value=-30., continuous_update=False),
                     A=FloatSlider(min=-30.25, max=30.25, step=0.5,
                                   value=-30.25, continuous_update=False),
                     B=FloatSlider(min=-30.25, max=30.25, step=0.5,
@@ -792,6 +659,6 @@ def ResLayer_app():
                     Type=ToggleButtons(
                         options=['Total', 'Primary', 'Secondary'], value='Total'),
                     Scale=ToggleButtons(
-                        options=['Linear', 'Log'], value='Linear'),
+                        options=['Linear', 'Log'], value='Linear')
                     )
     return app

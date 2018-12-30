@@ -17,7 +17,7 @@ import copy
 
 from ipywidgets import interact, interact_manual, IntSlider, FloatSlider, FloatText, ToggleButtons, fixed, Widget
 
-from .Base import widgetify
+from ..base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 12

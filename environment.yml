@@ -1,4 +1,4 @@
-name: em-apps-environment
+name: geosci-labs
 
 channels:
   - conda-forge
@@ -16,5 +16,4 @@ dependencies:
     - discretize
     - deepdish
     - SimPEG
-    - em_examples
     - empymod

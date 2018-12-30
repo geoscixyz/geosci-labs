@@ -22,7 +22,7 @@ from ipywidgets import (
     FloatText, ToggleButtons, fixed, Widget
     )
 
-from .Base import widgetify
+from ..base import widgetify
 
 # Mesh, sigmaMap can be globals global
 npad = 12

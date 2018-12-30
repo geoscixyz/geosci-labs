@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
-"""gpgLabs
+"""geosci-labs
 
 gpgLabs are the codes that support the interactive labs provided through
-http://gpg.geosci.xyz.
+https://gpg.geosci.xyz and https://em.geosci.xyz
 """
 
 from distutils.core import setup
 from setuptools import find_packages
-
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
@@ -30,50 +29,27 @@ with open('README.md', 'r') as f:
     LONG_DESCRIPTION = f.read()
 
 setup(
-<<<<<<< HEAD:gpgLabs-repo/setup.py
-    name = 'gpgLabs',
-    version = '0.0.12',
+    name = 'geoscilabs',
+    version = '0.0.1',
     packages = find_packages(),
     install_requires = [
         'numpy>=1.7',
-        'scipy>=0.13',
-        'matplotlib',
+        'scipy>=1.0',
+        'matplotlib>2.1',
         'ipywidgets',
         'SimPEG>=0.4.1',
-        'em_examples'
+        'empymod',
+        'jupyter',
+        'ipywidgets',
+        'deepdish',
     ],
     author = 'GeoSci Developers',
-=======
-    name = 'em_examples',
-    version = '0.0.35',
-    packages = find_packages(),
-    install_requires = [
-        'future',
-        'numpy>=1.7',
-        'scipy>=0.13',
-        'matplotlib>2.1.',
-        'Pillow',
-        'requests',
-        'ipywidgets',
-        'SimPEG>=0.4.1',
-        'jupyter',
-        'empymod',
-        'deepdish',
-        'pymatsolver>=0.1.2'
-    ],
-    author = 'Lindsey Heagy',
->>>>>>> em_examples-old/master:setup.py
-    author_email = 'lheagy@eos.ubc.ca',
-    description = 'gpgLabs',
+    author_email = 'lindseyheagy@gmail.com',
+    description = 'geoscilabs',
     long_description = LONG_DESCRIPTION,
     keywords = 'geophysics, electromagnetics',
-<<<<<<< HEAD:gpgLabs-repo/setup.py
-    url = 'http://gpg.geosci.xyz',
-    download_url = 'https://github.com/geoscixyz/gpgLabs',
-=======
-    url = 'http://em.geosci.xyz',
-    download_url = 'https://github.com/geoscixyz/em_examples',
->>>>>>> em_examples-old/master:setup.py
+    url = 'https://geosci.xyz',
+    download_url = 'https://github.com/lheagy/geoscilabs',
     classifiers=CLASSIFIERS,
     platforms = ['Windows', 'Linux', 'Solaris', 'Mac OS-X', 'Unix'],
     license='MIT License',

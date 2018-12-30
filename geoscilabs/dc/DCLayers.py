@@ -17,7 +17,7 @@ from ipywidgets import (
     IntSlider, FloatSlider, FloatText, ToggleButtons
 )
 
-from .Base import widgetify
+from ..base import widgetify
 
 # Mesh parameters
 npad = 20

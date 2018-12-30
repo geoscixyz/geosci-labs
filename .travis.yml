@@ -10,20 +10,16 @@ env:
     - PYPI_PY=3.6  # deploy to pypi from python 3.6
 
 env:
-    - TEST_DIR="tests"
-
-# Setup anaconda
-before_install:
-  - pip install --upgrade pip;
-  - pip install -r requirements.txt
+    - TEST=test_dcip.py
 
 install:
-  # - conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib ipywidgets
-  - export PATH=$PWD/simpeg:$PATH
+  - pip install -e .
+  - pip install -r requirements-dev.txt
+
 
 # Run test
 script:
-  - travis_wait 30 nosetests $TEST_DIR -v -s
+  - pytest tests/$TEST -v -s
 
 # upload to pypi on success
 # after_success:

@@ -16,7 +16,7 @@ from ipywidgets import (
     interactive, IntSlider, FloatSlider, FloatText, ToggleButtons, VBox
     )
 
-from .Base import widgetify
+from ..base import widgetify
 from SimPEG.Maps import IdentityMap
 # only use this if you are sure things are working
 warnings.filterwarnings('ignore')
