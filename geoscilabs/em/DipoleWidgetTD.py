@@ -9,16 +9,24 @@ import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
 
-matplotlib.rcParams["font.size"] = 12
-import warnings
-
-warnings.filterwarnings("ignore")
-
-from ipywidgets import *
+from ipywidgets import widgets, fixed
 
 from ..base import widgetify
 from .view import DataView
-from .TDEMDipolarfields import *
+from .TDEMDipolarfields import (
+    E_from_ElectricDipoleWholeSpace,
+    H_from_ElectricDipoleWholeSpace,
+    dHdt_from_ElectricDipoleWholeSpace,
+    J_from_ElectricDipoleWholeSpace,
+    B_from_ElectricDipoleWholeSpace,
+    dBdt_from_ElectricDipoleWholeSpace,
+    E_from_MagneticDipoleWholeSpace,
+    H_from_MagneticDipoleWholeSpace,
+    dHdt_from_MagneticDipoleWholeSpace,
+    J_from_MagneticDipoleWholeSpace,
+)
+
+matplotlib.rcParams["font.size"] = 12
 
 
 def linefun(x1, x2, y1, y2, nx, tol=1e-3):
@@ -153,7 +161,7 @@ class DipoleWidgetTD(object):
             xyz_line = np.c_[x, y, np.ones_like(x) * self.z]
             self.dataview.xyz_line = xyz_line
 
-        fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+        plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
         gs1 = gridspec.GridSpec(2, 7)
         gs1.update(left=0.05, right=0.48, wspace=0.05)
         ax1 = plt.subplot(gs1[:2, :3])
@@ -202,7 +210,7 @@ class DipoleWidgetTD(object):
             raise NotImplementedError()
 
         label = fieldname + unit
-        label_cb = tempstr[0] + view + "-field from " + tempstr[2]
+        # label_cb = tempstr[0] + view + "-field from " + tempstr[2]
         cb.set_label(label)
         ax1.set_title(title)
 
@@ -222,7 +230,10 @@ class DipoleWidgetTD(object):
             elif view == "Z" or view == "z":
                 val_line = val_line_z
             elif view == "vec" or "amp":
-                vecamp = lambda a, b, c: np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
+                def vecamp(a, b, c):
+                    return np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
                 val_line = vecamp(val_line_x, val_line_y, val_line_z)
 
             distance = np.sqrt((x - x1) ** 2 + (y - y1) ** 2) - dx  # specific purpose
@@ -320,7 +331,7 @@ class DipoleWidgetTD(object):
             SigLog,
             SrcType=SrcType,
         ):
-            if Slider == True:
+            if Slider is True:
                 t = np.r_[10 ** TimeLog]
                 sig = np.r_[10 ** SigLog]
             else:
@@ -406,7 +417,7 @@ def DisPosNegvalues(val):
 
 def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
     srcLoc = np.r_[0.0, 0.0, 0.0]
-    orientation = "z"
+    # orientation = "z"
     nRx = 100
 
     # def foo(Component, Profile, Scale, F1, F2, F3):
@@ -439,7 +450,7 @@ def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
                 np.linspace(-20.0, 80.0, nRx), np.zeros(nRx), np.zeros(nRx)
             ]
             r = xyz_line[:, 0]
-            fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+            plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])
@@ -453,13 +464,12 @@ def InteractiveDipoleProfileTD(self, Sigma, Field, compvalue, Scale):
             else:
                 raise NotImplementedError()
             r = xyz_line[:, 2]
-            fig = plt.figure(figsize=(18 * 1.0, 3.4 * 1.5))
+            plt.figure(figsize=(18 * 1.0, 3.4 * 1.5))
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])
 
         for ifreq, t in enumerate(T):
-            Time = t
             vals.append(
                 self.dataview.eval_TD(
                     xyz_line,
@@ -566,11 +576,11 @@ def InteractiveDipoleDecay(
 ):
     ntime = 200
     srcLoc = np.r_[0.0, 0.0, 0.0]
-    orientation = "z"
+    # orientation = "z"
 
     def foo(Component, Sigma, Scale):  # , Waveform="stepoff"):
         orientation = "z"
-        vals = []
+        # vals = []
 
         if Field == "E":
             unit = " (V/m)"
@@ -593,7 +603,7 @@ def InteractiveDipoleDecay(
         elif Component == "z" or Component == "Z":
             val = valz.copy()
 
-        fig = plt.figure(figsize=(7, 5))
+        plt.figure(figsize=(7, 5))
         ax = plt.subplot(111)
         if Scale == "log":
             valp, valn = DisPosNegvalues(val)

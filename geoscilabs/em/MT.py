@@ -5,12 +5,14 @@ from __future__ import unicode_literals
 from scipy.constants import epsilon_0, mu_0
 import matplotlib.pyplot as plt
 import numpy as np
-from ipywidgets import *
-import warnings
+from ipywidgets import (
+    FloatText,
+    IntSlider,
+    FloatSlider,
+    ToggleButton,
+    FloatText,
+)
 
-warnings.filterwarnings(
-    "ignore"
-)  # ignore warnings: only use this once you are sure things are working
 from ..base import widgetify
 
 
@@ -49,56 +51,71 @@ The layer 0 is assumed to be the air layer.
 """
 
 # Frequency conversion
-omega = lambda f: 2.0 * np.pi * f
+def omega(f):
+    return 2.0 * np.pi * f
+
 
 # Evaluate k wavenumber
-k = lambda mu, sig, eps, f: np.sqrt(
-    mu * mu_0 * eps * epsilon_0 * (2.0 * np.pi * f) ** 2.0
-    - 1.0j * mu * mu_0 * sig * omega(f)
-)
+def k(mu, sig, eps, f):
+    return np.sqrt(
+        mu * mu_0 * eps * epsilon_0 * (2.0 * np.pi * f) ** 2.0
+        - 1.0j * mu * mu_0 * sig * omega(f)
+    )
+
 
 # Define a frquency range for a survey
-frange = lambda minfreq, maxfreq, step: np.logspace(
-    minfreq, maxfreq, num=int(step), base=10.0
-)
+def frange(minfreq, maxfreq, step):
+    return np.logspace(minfreq, maxfreq, num=int(step), base=10.0)
+
 
 # Functions to create random physical Perties for a n-layered earth
-thick = lambda minthick, maxthick, nlayer: np.append(
-    np.array([1.2 * 10.0 ** 5]),
-    np.ndarray.round(
-        minthick + (maxthick - minthick) * np.random.rand(int(nlayer) - 1, 1),
-        decimals=1,
-    ),
-)
+def thick(minthick, maxthick, nlayer):
+    return np.append(
+        np.array([1.2 * 10.0 ** 5]),
+        np.ndarray.round(
+            minthick + (maxthick - minthick) * np.random.rand(int(nlayer) - 1, 1),
+            decimals=1,
+        ),
+    )
 
-sig = lambda minsig, maxsig, nlayer: np.append(
-    np.array([0.0]),
-    np.ndarray.round(
-        10.0 ** minsig
-        + (10.0 ** maxsig - 10.0 ** minsig) * np.random.rand(int(nlayer), 1),
-        decimals=3,
-    ),
-)
 
-mu = lambda minmu, maxmu, nlayer: np.append(
-    np.array([1.0]),
-    np.ndarray.round(
-        minmu + (maxmu - minmu) * np.random.rand(int(nlayer), 1), decimals=1
-    ),
-)
+def sig(minsig, maxsig, nlayer):
+    return np.append(
+        np.array([0.0]),
+        np.ndarray.round(
+            10.0 ** minsig
+            + (10.0 ** maxsig - 10.0 ** minsig) * np.random.rand(int(nlayer), 1),
+            decimals=3,
+        ),
+    )
 
-eps = lambda mineps, maxeps, nlayer: np.append(
-    np.array([1.0]),
-    np.ndarray.round(
-        mineps + (maxeps - mineps) * np.random.rand(int(nlayer), 1), decimals=1
-    ),
-)
+
+def mu(minmu, maxmu, nlayer):
+    return np.append(
+        np.array([1.0]),
+        np.ndarray.round(
+            minmu + (maxmu - minmu) * np.random.rand(int(nlayer), 1), decimals=1
+        ),
+    )
+
+
+def eps(mineps, maxeps, nlayer):
+    return np.append(
+        np.array([1.0]),
+        np.ndarray.round(
+            mineps + (maxeps - mineps) * np.random.rand(int(nlayer), 1), decimals=1
+        ),
+    )
+
 
 # Evaluate Impedance Z of a layer
-ImpZ = lambda f, mu, k: omega(f) * mu * mu_0 / k
+def ImpZ(f, mu, k):
+    return omega(f) * mu * mu_0 / k
+
 
 # Complex Cole-Cole Conductivity - EM utils
-PCC = lambda siginf, m, t, c, f: siginf * (1.0 - (m / (1.0 + (1j * omega(f) * t) ** c)))
+def PCC(siginf, m, t, c, f):
+    return siginf * (1.0 - (m / (1.0 + (1j * omega(f) * t) ** c)))
 
 
 # Converted thickness array into top of layer array
@@ -116,27 +133,40 @@ def top(thick):
 # Propagation Matrix and theirs inverses
 
 # matrix T for transition of Up and Down components accross a layer
-T = lambda h, k: np.matrix(
-    [[np.exp(1j * k * h), 0.0], [0.0, np.exp(-1j * k * h)]], dtype="complex_"
-)
+def T(h, k):
+    return np.matrix(
+        [[np.exp(1j * k * h), 0.0], [0.0, np.exp(-1j * k * h)]], dtype="complex_"
+    )
 
-Tinv = lambda h, k: np.matrix(
-    [[np.exp(-1j * k * h), 0.0], [0.0, np.exp(1j * k * h)]], dtype="complex_"
-)
+
+def Tinv(h, k):
+    return np.matrix(
+        [[np.exp(-1j * k * h), 0.0], [0.0, np.exp(1j * k * h)]], dtype="complex_"
+    )
+
 
 # transition of Up and Down components accross a layer
-UD_Z = lambda UD, z, zj, k: T((z - zj), k) * UD
+def UD_Z(UD, z, zj, k):
+    return T((z - zj), k) * UD
 
 
 # matrix P relating Up and Down components with E and H fields
-P = lambda z: np.matrix([[1.0, 1], [-1.0 / z, 1.0 / z]], dtype="complex_")
+def P(z):
+    return np.matrix([[1.0, 1], [-1.0 / z, 1.0 / z]], dtype="complex_")
 
-Pinv = lambda z: np.matrix([[1.0, -z], [1.0, z]], dtype="complex_") / 2.0
+
+def Pinv(z):
+    return np.matrix([[1.0, -z], [1.0, z]], dtype="complex_") / 2.0
 
 
 # Time Variation of E and H
-E_ZT = lambda U, D, f, t: np.exp(1j * omega(f) * t) * (U + D)
-H_ZT = lambda U, D, Z, f, t: (1.0 / Z) * np.exp(1j * omega(f) * t) * (D - U)
+def E_ZT(U, D, f, t):
+    return np.exp(1j * omega(f) * t) * (U + D)
+
+
+def H_ZT(U, D, Z, f, t):
+    return (1.0 / Z) * np.exp(1j * omega(f) * t) * (D - U)
+
 
 # Plot the configuration of the problem
 def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
@@ -493,7 +523,7 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
 
     figwdith = 18
     figheight = 12
-    fig = plt.figure(figsize=(figwdith, figheight))
+    plt.figure(figsize=(figwdith, figheight))
     ax0 = plt.subplot2grid(
         (figheight, figwdith),
         (0, 0),
@@ -625,7 +655,7 @@ def PlotAppRes3Layers_wrapper(
     thick3 = np.array([120000.0, 50.0, 50.0])
     eps3 = np.array([1.0, 1.0, 1.0, 1])
     mu3 = np.array([1.0, 1.0, 1.0, 1])
-    chg3 = np.array([0.0, 0.1, 0.0, 0.2])
+    # chg3 = np.array([0.0, 0.1, 0.0, 0.2])
     chg3_0 = np.array([0.0, 0.1, 0.0, 0.0])
     taux3 = np.array([0.0, 0.1, 0.0, 0.1])
     c3 = np.array([1.0, 1.0, 1.0, 1.0])

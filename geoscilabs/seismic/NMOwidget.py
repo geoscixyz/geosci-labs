@@ -121,7 +121,7 @@ def CleanNMOWidget(t0, v, syndat, timdat):
     xorig = np.arange(38) * dx
     time = HyperbolicFun(t0, xorig, v)
     # fig, ax = plt.subplots(1, 2, figsize=(14, 8))
-    fig = plt.figure(figsize=(20, 8))
+    plt.figure(figsize=(20, 8))
     kwargs = {
         "skipt": 1,
         "scale": 0.05,

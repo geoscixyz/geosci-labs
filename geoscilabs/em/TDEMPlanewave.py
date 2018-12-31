@@ -38,6 +38,15 @@ def e_field_from_sheet_current(
         raise NotImplementedError()
 
 
+def j_field_from_sheet_current(
+    XYZ, srcLoc, sig, t, E0=1.0, orientation="X", kappa=0.0, epsr=1.0
+):
+    ex, ey, ez = e_field_from_sheet_current(
+        XYZ, srcLoc, sig, t, E0, orientation, kappa, epsr
+    )
+    return sig * ex, sig * ey, sig * ez
+
+
 def h_field_from_sheet_current(
     XYZ, srcLoc, sig, t, E0=1.0, orientation="X", kappa=0.0, epsr=1.0
 ):
@@ -65,7 +74,3 @@ def h_field_from_sheet_current(
         return Hx, Hy, Hz
     else:
         raise NotImplementedError()
-
-
-if __name__ == "__main__":
-    pass

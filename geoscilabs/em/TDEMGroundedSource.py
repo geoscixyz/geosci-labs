@@ -6,6 +6,12 @@ from SimPEG import Utils, Mesh
 import tarfile
 import os
 
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib import cm
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
+
 
 def download_and_unzip_data(
     url="https://storage.googleapis.com/simpeg/em_examples/tdem_groundedsource/tdem_groundedsource.tar"
@@ -160,17 +166,9 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     dd.io.save(fname, tdem_gs)
 
 
-##-------------------------------------------------------------------##
-## For visualizations
-##-------------------------------------------------------------------##
-
-from mpl_toolkits.mplot3d import axes3d
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
-from mpl_toolkits.mplot3d import proj3d
+# ------------------------------------------------------------------- #
+# For visualizations
+# ------------------------------------------------------------------- #
 
 
 class PlotTDEM(object):
@@ -207,17 +205,17 @@ class PlotTDEM(object):
         y = np.ones(5) * 0.0
         z = np.r_[Z1, Z1, Z2, Z2, Z1]
         verts = [list(zip(x, y, z))]
-        polya = polyplane(verts, color="green")
+        polyplane(verts, color="green")
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.r_[Y1, Y1, Y2, Y2, Y1]
         z = np.ones(5) * 0.0
         verts = [list(zip(x, y, z))]
-        polyb = polyplane(verts, color="grey")
+        polyplane(verts, color="grey")
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.r_[Y1, Y1, Y2, Y2, Y1]
         z = np.ones(5) * z1
         verts = [list(zip(x, y, z))]
-        polyc = polyplane(verts, color="grey")
+        polyplane(verts, color="grey")
 
         fig = plt.figure(figsize=(8, 8))
         ax = fig.gca(projection="3d")
@@ -350,7 +348,7 @@ class PlotTDEM(object):
         plt.show()
 
     def plot_input_currents(self, itime, scale):
-        fig = plt.figure()
+        plt.figure()
 
         plt.plot(self.times * 1e3, self.input_currents, "k|-")
         plt.plot(self.times[itime] * 1e3, self.input_currents[itime], "ro")
@@ -397,7 +395,7 @@ class PlotTDEM(object):
         exy, xy = self.getSlices(self.mesh, self.J, itime, normal="Z", loc=-100.5)
         exz, xz = self.getSlices(self.mesh, self.J, itime, normal="Y", loc=0.0)
         label = "Current density (A/m$^2$)"
-        fig = plt.figure(figsize=(12, 5))
+        plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
         vmin, vmax = abs(np.r_[exz]).min(), abs(np.r_[exz]).max()
@@ -405,7 +403,7 @@ class PlotTDEM(object):
             xz, exz, vec=True, ncontour=20, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin, vmax = out_xz[0].get_clim()
-        out_xy = Utils.plot2Ddata(
+        Utils.plot2Ddata(
             xy,
             exy,
             vec=True,
@@ -450,7 +448,7 @@ class PlotTDEM(object):
         bxy, xy = self.getSlices(self.mesh, self.B, itime, normal="Z", loc=-100.5)
         byz, yz = self.getSlices(self.mesh, self.B, itime, normal="X", loc=0.0)
         label = "Magnetic flux density (T)"
-        fig = plt.figure(figsize=(12, 5))
+        plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
         vmin, vmax = abs(np.r_[byz]).min(), abs(np.r_[byz]).max()
@@ -458,7 +456,7 @@ class PlotTDEM(object):
             yz, byz, vec=True, ncontour=20, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin, vmax = out_yz[0].get_clim()
-        out_xy = Utils.plot2Ddata(
+        Utils.plot2Ddata(
             xy,
             bxy,
             vec=True,

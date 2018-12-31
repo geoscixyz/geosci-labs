@@ -9,15 +9,22 @@ import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
 
-matplotlib.rcParams["font.size"] = 12
-import warnings
-
-warnings.filterwarnings("ignore")
-from ipywidgets import *
+from ipywidgets import widgets, fixed
 
 from .view import DataView
 from ..base import widgetify
-from .FDEMDipolarfields import *
+from .FDEMDipolarfields import (
+    E_from_ElectricDipoleWholeSpace,
+    E_galvanic_from_ElectricDipoleWholeSpace,
+    E_inductive_from_ElectricDipoleWholeSpace,
+    H_from_ElectricDipoleWholeSpace,
+    J_from_ElectricDipoleWholeSpace,
+    E_from_MagneticDipoleWholeSpace,
+    H_from_MagneticDipoleWholeSpace,
+    J_from_MagneticDipoleWholeSpace,
+)
+
+matplotlib.rcParams["font.size"] = 12
 
 
 def linefun(x1, x2, y1, y2, nx, tol=1e-3):
@@ -154,7 +161,7 @@ class DipoleWidgetFD(object):
             xyz_line = np.c_[x, y, np.ones_like(x) * self.z]
             self.dataview.xyz_line = xyz_line
 
-        fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+        plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
         gs1 = gridspec.GridSpec(2, 7)
         gs1.update(left=0.05, right=0.48, wspace=0.05)
         ax1 = plt.subplot(gs1[:2, :3])
@@ -208,7 +215,7 @@ class DipoleWidgetFD(object):
         if component == "phase":
             unit = " (rad)"
         label = fieldname + unit
-        label_cb = tempstr[0] + view + "-field from " + tempstr[2]
+        # label_cb = tempstr[0] + view + "-field from " + tempstr[2]
         cb.set_label(label)
         ax1.set_title(title)
 
@@ -508,7 +515,7 @@ def DisPosNegvalues(val):
 
 def InteractiveDipoleProfile(self, sig, Field, Scale):
     srcLoc = np.r_[0.0, 0.0, 0.0]
-    orientation = "z"
+    # orientation = "z"
     nRx = int(100)
 
     # def foo(Component, Profile, Scale, F1, F2, F3):

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
-from ipywidgets import *
+from ipywidgets import widgets
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
@@ -41,8 +41,8 @@ def plotObj3D(
         ax = fig.add_subplot(111, projection="3d")
 
     # fixed
-    xoffset_rx = offset_rx
-    yoffset_rx = 0.0
+    # xoffset_rx = offset_rx
+    # yoffset_rx = 0.0
 
     # XZ plane
     x = np.r_[X1, X2, X2, X1, X1]

@@ -2,7 +2,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from ipywidgets import *
+from ipywidgets import widgets
 from SimPEG import Mesh, Maps, EM, Utils
 
 # from pymatsolver import PardisoSolver
@@ -260,7 +260,7 @@ class HarmonicVMDCylWidget(object):
                 "Cannot show amplitude or phase when vector plot selected. Set 'AmpDir=None' to see amplitude or phase."
             )
         elif Field == "Model":
-            fig = plt.figure(figsize=(7, 6))
+            plt.figure(figsize=(7, 6))
             ax = plt.subplot(111)
             if Scenario == "Sphere":
                 model2D, mapping2D = self.getCoreModel("Sphere")
@@ -275,7 +275,7 @@ class HarmonicVMDCylWidget(object):
             ax.set_title("Conductivity Model")
             plt.show()
         else:
-            fig = plt.figure(figsize=(10, 6))
+            plt.figure(figsize=(10, 6))
             ax = plt.subplot(111)
             vec = False
             if view == "vec":
@@ -453,7 +453,7 @@ class HarmonicVMDCylWidget(object):
             else:
                 bType = "b"
 
-            m = self.setThreeLayerParam(
+            self.setThreeLayerParam(
                 h1=h1,
                 h2=h2,
                 sig0=Sigma0,
@@ -464,7 +464,7 @@ class HarmonicVMDCylWidget(object):
             )
             srcLoc = np.array([0.0, 0.0, z])
             rxLoc = np.array([[rxOffset, 0.0, z]])
-            dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
+            self.simulate(srcLoc, rxLoc, np.r_[Frequency])
             if Field != "Model":
                 self.getFields(bType=bType)
             return self.plotField(
@@ -552,7 +552,7 @@ class HarmonicVMDCylWidget(object):
 
     def InteractiveData_Layer(self, fieldvalue="B", compvalue="z", z=0.0):
         frequency = np.logspace(2, 5, 31)
-        dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
+        self.simulate(self.srcLoc, self.rxLoc, frequency)
 
         def foo(Field, Component, Scale):
 
@@ -568,7 +568,7 @@ class HarmonicVMDCylWidget(object):
                     "Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey."
                 )
             else:
-                fig = plt.figure()
+                plt.figure()
                 ax = plt.subplot(111)
                 bType = "b"
                 if (Field == "Bsec") or (Field == "B"):
@@ -691,7 +691,7 @@ class HarmonicVMDCylWidget(object):
             else:
                 bType = "b"
 
-            m = self.setLayerSphereParam(
+            self.setLayerSphereParam(
                 d1=d1,
                 h=h,
                 d2=d2,
@@ -704,7 +704,7 @@ class HarmonicVMDCylWidget(object):
             )
             srcLoc = np.array([0.0, 0.0, z])
             rxLoc = np.array([[rxOffset, 0.0, z]])
-            dpred = self.simulate(srcLoc, rxLoc, np.r_[Frequency])
+            self.simulate(srcLoc, rxLoc, np.r_[Frequency])
             if Field != "Model":
                 self.getFields(bType=bType)
             return self.plotField(
@@ -808,7 +808,7 @@ class HarmonicVMDCylWidget(object):
 
     def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z", z=0.0):
         frequency = np.logspace(2, 5, 31)
-        dpred = self.simulate(self.srcLoc, self.rxLoc, frequency)
+        _ = self.simulate(self.srcLoc, self.rxLoc, frequency)
 
         def foo(Field, Component, Scale):
             # Printout for null cases
@@ -823,7 +823,7 @@ class HarmonicVMDCylWidget(object):
                     "Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey."
                 )
             else:
-                fig = plt.figure()
+                plt.figure()
                 ax = plt.subplot(111)
                 bType = "b"
                 if (Field == "Bsec") or (Field == "B"):

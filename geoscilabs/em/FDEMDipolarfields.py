@@ -8,7 +8,11 @@ from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erf
 from SimPEG import Utils
 
-omega = lambda f: 2.0 * np.pi * f
+
+def omega(f):
+    return 2.0 * np.pi * f
+
+
 # TODO:
 # r = lambda dx, dy, dz: np.sqrt( dx**2. + dy**2. + dz**2.)
 # k = lambda f, mu, epsilon, sig: np.sqrt( omega(f)**2. *mu*epsilon -1j*omega(f)*mu*sig )
@@ -251,7 +255,7 @@ def J_galvanic_from_ElectricDipoleWholeSpace(
             Add description of parameters
     """
 
-    Ex_galvanic, Ey_galvanic, Ez_galvanic = E_galvanic_from_ElectricDipoleWholeSpaced(
+    Ex_galvanic, Ey_galvanic, Ez_galvanic = E_galvanic_from_ElectricDipoleWholeSpace(
         XYZ,
         srcLoc,
         sig,
@@ -287,7 +291,7 @@ def J_inductive_from_ElectricDipoleWholeSpace(
             Add description of parameters
     """
 
-    Ex_inductive, Ey_inductive, Ez_inductive = E_inductive_from_ElectricDipoleWholeSpaced(
+    Ex_inductive, Ey_inductive, Ez_inductive = E_inductive_from_ElectricDipoleWholeSpace(
         XYZ,
         srcLoc,
         sig,

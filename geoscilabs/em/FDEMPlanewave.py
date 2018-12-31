@@ -5,10 +5,11 @@ from __future__ import division
 
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
-import numpy as np
 from SimPEG import Utils
 
-omega = lambda f: 2.0 * np.pi * f
+
+def omega(f):
+    return 2.0 * np.pi * f
 
 
 def e_field_from_sheet_current(
@@ -29,7 +30,7 @@ def e_field_from_sheet_current(
 
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    sig_hat = sig + 1j * omega(f) * epsilon
+    # sig_hat = sig + 1j * omega(f) * epsilon
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
     # print t
     if orientation == "X":
@@ -42,7 +43,7 @@ def e_field_from_sheet_current(
         raise NotImplementedError()
 
 
-def J_field_from_SheetCurruent(
+def j_field_from_sheet_current(
     XYZ, srcLoc, sig, f, E0=1.0, orientation="X", kappa=0.0, epsr=1.0, t=0.0
 ):
     """
@@ -58,7 +59,7 @@ def J_field_from_SheetCurruent(
 
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    sig_hat = sig + 1j * omega(f) * epsilon
+    # sig_hat = sig + 1j * omega(f) * epsilon
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
 
     if orientation == "X":
@@ -87,7 +88,7 @@ def h_field_from_sheet_current(
 
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    sig_hat = sig + 1j * omega(f) * epsilon
+    # sig_hat = sig + 1j * omega(f) * epsilon
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
     Z = omega(f) * mu / k
     if orientation == "X":
@@ -100,7 +101,7 @@ def h_field_from_sheet_current(
         raise NotImplementedError()
 
 
-def B_field_from_SheetCurruent(
+def b_field_from_sheet_current(
     XYZ, srcLoc, sig, f, E0=1.0, orientation="X", kappa=0.0, epsr=1.0, t=0.0
 ):
     """
@@ -116,7 +117,7 @@ def B_field_from_SheetCurruent(
 
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    sig_hat = sig + 1j * omega(f) * epsilon
+    # sig_hat = sig + 1j * omega(f) * epsilon
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
     Z = omega(f) * mu / k
     if orientation == "X":

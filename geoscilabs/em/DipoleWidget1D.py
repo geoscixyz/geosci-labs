@@ -9,15 +9,12 @@ import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
 
-matplotlib.rcParams["font.size"] = 12
-import warnings
-
-warnings.filterwarnings("ignore")
-
-from ipywidgets import *
+from ipywidgets import ToggleButtons, FloatSlider
 
 from ..base import widgetify
 from .view import DataView
+
+matplotlib.rcParams["font.size"] = 12
 
 
 def linefun(x1, x2, y1, y2, nx, tol=1e-3):
@@ -77,10 +74,10 @@ class DipoleWidget1D(object):
             y = np.arange(-50.0, 50.0, 100)
 
             srcLoc = np.r_[0.0, 0.0, 0.0]  # source location
-            sig, f = (
-                10.0 ** sigsl,
-                np.r_[10.0 ** freqsl],
-            )  # conductivity (S/m), frequency (Hz)
+            # sig, f = (
+            #     10.0 ** sigsl,
+            #     np.r_[10.0 ** freqsl],
+            # )  # conductivity (S/m), frequency (Hz)
 
             if normal.upper() == "Z":
                 obsLoc = np.c_[absloc, coordloc, np.r_[0.0]]
@@ -110,7 +107,7 @@ class DipoleWidget1D(object):
                 EM.Analytics.E_from_ElectricDipoleWholeSpace,
             )  # evaluate
 
-            fig = plt.figure(figsize=(6.5 * 3, 5))
+            plt.figure(figsize=(6.5 * 3, 5))
             ax0 = plt.subplot(121)
             ax2 = plt.subplot(122)
 

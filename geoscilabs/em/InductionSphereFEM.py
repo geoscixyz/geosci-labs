@@ -349,7 +349,7 @@ def plotResponseFEM(Ax, fi, f, H, Comp):
 
     FS = 20
 
-    xTicks = np.logspace(np.log(np.min(f)), np.log(np.max(f)), 9)
+    # xTicks = np.logspace(np.log(np.min(f)), np.log(np.max(f)), 9)
     Ylim = np.array([np.min(np.real(H)), np.max(np.real(H))])
 
     Ax.grid("both", linestyle="-", linewidth=0.8, color=[0.8, 0.8, 0.8])
@@ -391,7 +391,7 @@ def plotProfileTxRxSphere(Ax, xtx, ztx, x0, z0, a, xrx, zrx, X, Z, orient):
     FS = 22
 
     phi = np.linspace(0, 2 * np.pi, 41)
-    psi = np.linspace(0, np.pi, 21)
+    # psi = np.linspace(0, np.pi, 21)
 
     if orient == "x":
         Xtx = xtx + 0.5 * np.cos(phi)

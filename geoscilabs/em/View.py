@@ -191,7 +191,7 @@ class DataView(object):
             2D visualization of dipole fields
         """
         if ax is None:
-            fig = plt.figure(figsize=(6.5, 5))
+            plt.figure(figsize=(6.5, 5))
             ax = plt.subplot(111)
 
         if component == "real":
@@ -264,11 +264,11 @@ class DataView(object):
 
         if colorbar:
             if logamp is True:
-                cb = plt.colorbar(
+                plt.colorbar(
                     dat, ax=ax, format="$10^{%.1f}$", ticks=np.linspace(vmin, vmax, 3)
                 )
             else:
-                cb = plt.colorbar(
+                plt.colorbar(
                     dat, ax=ax, format="%.1e", ticks=np.linspace(vmin, vmax, 3)
                 )
 
@@ -276,8 +276,8 @@ class DataView(object):
         ax.set_ylabel(ylabel)
 
         if view == "vec":
-            nx = self.x.size
-            nskip = int(nx / 15)
+            # nx = self.x.size
+            # nskip = int(nx / 15)
             if component == "real":
                 # ax.quiver(a[::nskip], b[::nskip], (vec_a.real/VEC_amp)[::nskip,::nskip],  (vec_b.real/VEC_amp)[::nskip,::nskip], color="w", linewidth=0.5)
                 ax.streamplot(a, b, vec_a.real, vec_b.real, color="w", linewidth=0.5)
@@ -311,7 +311,7 @@ class DataView(object):
             2D visualization of dipole fields
         """
         if ax is None:
-            fig = plt.figure(figsize=(6.5, 5))
+            plt.figure(figsize=(6.5, 5))
             ax = plt.subplot(111)
 
         if view == "amp" or view == "vec":
@@ -358,11 +358,11 @@ class DataView(object):
 
         if colorbar:
             if logamp is True:
-                cb = plt.colorbar(
+                plt.colorbar(
                     dat, ax=ax, format="$10^{%.1f}$", ticks=np.linspace(vmin, vmax, 3)
                 )
             else:
-                cb = plt.colorbar(
+                plt.colorbar(
                     dat, ax=ax, format="%.1e", ticks=np.linspace(vmin, vmax, 3)
                 )
 
@@ -370,8 +370,8 @@ class DataView(object):
         ax.set_ylabel(ylabel)
 
         if view == "vec":
-            nx = self.x.size
-            nskip = int(nx / 15)
+            # nx = self.x.size
+            # nskip = int(nx / 15)
             # ax.quiver(a[::nskip], b[::nskip], (vec_a.real/VEC_amp)[::nskip,::nskip],  (vec_b.real/VEC_amp)[::nskip,::nskip], color="w", linewidth=0.5)
             ax.streamplot(a, b, vec_a, vec_b, color="w", linewidth=0.5)
 
@@ -390,7 +390,7 @@ class DataView(object):
     ):
 
         if ax is None:
-            fig = plt.figure(figsize=(6.5, 5))
+            plt.figure(figsize=(6.5, 5))
             ax = plt.subplot(111)
 
         if self.geometry.upper() == "PROFILE":
@@ -553,7 +553,7 @@ class DataView(object):
     ):
 
         if ax is None:
-            fig = plt.figure(figsize=(6.5, 5))
+            plt.figure(figsize=(6.5, 5))
             ax = plt.subplot(111)
 
         slice_ind = 0
@@ -584,7 +584,7 @@ class DataView(object):
         elif component.upper() == "AMPLITUDE":
             pltvalue = np.absolute(pltvalue)
             ax.set_ylabel("E field, Amplitude (V/m)")
-            if logamp == True:
+            if logamp is True:
                 ax.set_yscale("log")
         elif component.upper() == "PHASE":
             pltvalue = phase(pltvalue)
@@ -1697,7 +1697,7 @@ class DataView(object):
         # sigind = np.where( sigplt == self.sigvec)[0][0]
         # freqind = np.where( freqplt == self.fvec)[0][0]
 
-        fig = plt.figure(figsize=(14, 5))
+        plt.figure(figsize=(14, 5))
         ax0 = plt.subplot(121)
         ax2 = plt.subplot(122)
 
@@ -1839,7 +1839,7 @@ class DataView(object):
         # sigind = np.where( sigplt == self.sigvec)[0][0]
         # freqind = np.where( freqplt == self.fvec)[0][0]
 
-        fig = plt.figure(figsize=(14, 5))
+        plt.figure(figsize=(14, 5))
         ax0 = plt.subplot(121)
         ax2 = plt.subplot(122)
 
@@ -1963,7 +1963,7 @@ class DataView(object):
         # sigind = np.where( sigplt == self.sigvec)[0][0]
         # freqind = np.where( freqplt == self.fvec)[0][0]
 
-        fig = plt.figure(figsize=(14, 5))
+        plt.figure(figsize=(14, 5))
         ax0 = plt.subplot(121)
         ax2 = plt.subplot(122)
 

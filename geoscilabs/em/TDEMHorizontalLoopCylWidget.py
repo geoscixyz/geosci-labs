@@ -2,7 +2,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from ipywidgets import widgets
+from ipywidgets import widgets, FloatText
 from SimPEG import Mesh, Maps, EM, Utils
 
 # from pymatsolver import PardisoSolver
@@ -186,7 +186,7 @@ class TDEMHorizontalLoopCylWidget(object):
     def simulate(self, srcLoc, rxLoc, time, radius=1.0):
 
         bz = EM.TDEM.Rx.Point_b(rxLoc, time, orientation="z")
-        dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation="z")
+        # dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation="z")
         src = EM.TDEM.Src.CircularLoop(
             [bz], waveform=EM.TDEM.Src.StepOffWaveform(), loc=srcLoc, radius=radius
         )
@@ -314,7 +314,7 @@ class TDEMHorizontalLoopCylWidget(object):
             ax.set_title("Conductivity Model")
             plt.show()
         else:
-            fig = plt.figure(figsize=(10, 6))
+            plt.figure(figsize=(10, 6))
             ax = plt.subplot(111)
             vec = False
             if view == "vec":
@@ -464,7 +464,7 @@ class TDEMHorizontalLoopCylWidget(object):
 
             if AmpDir == "Direction (B or dBdt)":
                 Component = "vec"
-            m = self.setThreeLayerParam(
+            self.setThreeLayerParam(
                 h1=h1,
                 h2=h2,
                 sig0=Sigma0,
@@ -477,7 +477,7 @@ class TDEMHorizontalLoopCylWidget(object):
             self.rxLoc = np.array([[rxOffset, 0.0, z]])
             self.radius = radius
             if Update:
-                dpred = self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
+                self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
             self.getFields(itime)
             return self.plotField(
                 Field=Field,
@@ -586,9 +586,9 @@ class TDEMHorizontalLoopCylWidget(object):
                     "Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey."
                 )
             else:
-                fig = plt.figure()
+                plt.figure()
                 ax = plt.subplot(111)
-                bType = "b"
+                # bType = "b"
                 self.getData()
                 if Field == "B":
                     label = "Magnetic field (T)"
@@ -702,7 +702,7 @@ class TDEMHorizontalLoopCylWidget(object):
 
             if AmpDir == "Direction (B or dBdt)":
                 Component = "vec"
-            m = self.setLayerSphereParam(
+            self.setLayerSphereParam(
                 d1=d1,
                 h=h,
                 d2=d2,
@@ -717,7 +717,7 @@ class TDEMHorizontalLoopCylWidget(object):
             self.rxLoc = np.array([[rxOffset, 0.0, z]])
             self.radius = radius
             if Update:
-                dpred = self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
+                self.simulate(self.srcLoc, self.rxLoc, self.time, self.radius)
             self.getFields(itime)
             return self.plotField(
                 Field=Field,
@@ -842,7 +842,7 @@ class TDEMHorizontalLoopCylWidget(object):
                     "Think about the problem geometry. There is NO Ex or Ez in this case. Only Ey."
                 )
             else:
-                fig = plt.figure()
+                plt.figure()
                 ax = plt.subplot(111)
                 bType = "b"
                 self.getData()

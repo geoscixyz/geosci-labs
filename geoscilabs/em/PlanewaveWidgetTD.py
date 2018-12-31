@@ -16,11 +16,12 @@ from .DipoleWidgetTD import DipoleWidgetTD, linefun, DisPosNegvalues
 from .view import DataView
 from .VolumeWidget import polyplane
 from .TDEMPlanewave import (
-    e_field_from_sheet_current, h_field_from_sheet_current, j_field_from_sheet_current
+    e_field_from_sheet_current,
+    h_field_from_sheet_current,
+    j_field_from_sheet_current,
 )
 
 matplotlib.rcParams["font.size"] = 12
-
 
 
 def PlaneEHfield(z, t=0.0, sig=1.0, mu=mu_0, epsilon=epsilon_0, E0=1.0):
@@ -275,8 +276,6 @@ class PlanewaveWidget(DipoleWidgetTD):
 
 
 def InteractivePlaneProfile():
-    srcLoc = 0.0
-    orientation = "X"
     nRx = 100
 
     def foo(Field, Sigma, Scale, Time):

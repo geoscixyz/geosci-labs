@@ -26,25 +26,25 @@ def show_canonical_model():
     ]  # Layer anisotropies (same for anomaly and background)
 
     # Spatial parameters
-    zsrc = 999.0  # Src-depth
-    dx = 500.0
-    dy = 500.0
-    x = np.r_[-100.0, np.arange(10) * dx + dx]  # Offsets
-    y = np.r_[-100.0, np.arange(10) * dy + dy]  # Offsets
+    # zsrc = 999.0  # Src-depth
+    # dx = 500.0
+    # dy = 500.0
+    # x = np.r_[-100.0, np.arange(10) * dx + dx]  # Offsets
+    # y = np.r_[-100.0, np.arange(10) * dy + dy]  # Offsets
 
-    mid_d = (np.array(depth)[:-1] + np.array(depth)[1:]) * 0.5
-    z = np.r_[
-        -500,
-        depth[0],
-        mid_d[0],
-        depth[1],
-        mid_d[1],
-        mid_d[2],
-        depth[2] + 500.0,
-        depth[2] + 1000.0,
-    ]
-    nlayers = 5
-    srcloc = np.r_[0.0, 0.0, zsrc]
+    # mid_d = (np.array(depth)[:-1] + np.array(depth)[1:]) * 0.5
+    # z = np.r_[
+    #     -500,
+    #     depth[0],
+    #     mid_d[0],
+    #     depth[1],
+    #     mid_d[1],
+    #     mid_d[2],
+    #     depth[2] + 500.0,
+    #     depth[2] + 1000.0,
+    # ]
+    # nlayers = 5
+    # srcloc = np.r_[0.0, 0.0, zsrc]
 
     pdepth = np.repeat(np.r_[-500, depth], 2)
     pdepth[:-1] = pdepth[1:]
@@ -170,9 +170,9 @@ def viz_plane(
     ylim=None,
     plane="XZ",
 ):
-    fig = plt.figure(figsize=(12, 5))
+    plt.figure(figsize=(12, 5))
     ax = plt.subplot(111)
-    nskip = 5
+    # nskip = 5
     eps = 1e-31
     vabs = np.sqrt(vx ** 2 + vz ** 2) + eps
     fxrtemp = (-vx / vabs).reshape((x.size, z.size))[:, :].T
@@ -273,7 +273,7 @@ def csem_fields_app(
     vmax,
 ):
 
-    lamda0, lamda1, lamda2, lamda3, lamda4 = 1.0, 1.0, 1.0, 1.0, 1.0
+    # lamda0, lamda1, lamda2, lamda3, lamda4 = 1.0, 1.0, 1.0, 1.0, 1.0
     d = np.r_[0.0, np.cumsum(np.r_[dz1, dz2, dz3])]
     depth = [d[0], d[1], d[2], d[3]]  # Layer boundaries
     res = [rho0, rho1, rho2, rho3, rho4]  # Anomaly resistivities
@@ -286,7 +286,7 @@ def csem_fields_app(
     ]  # Layer anisotropies (same for anomaly and background)
 
     # Modelling parameters
-    verb = 1
+    # verb = 1
 
     # Spatial parameters
     #     zsrc=999.               # Src-depth
@@ -307,7 +307,7 @@ def csem_fields_app(
         depth[2] + 500.0,
         depth[2] + 1000.0,
     ]
-    nlayers = 5
+    # nlayers = 5
     srcloc = np.r_[0.0, 0.0, -zsrc]
 
     if Plane == "XZ":
@@ -478,7 +478,7 @@ def csem_data_app(
     vmax,
 ):
     rcParams["font.size"] = 16
-    lamda0, lamda1, lamda2, lamda3, lamda4 = 1.0, 1.0, 1.0, 1.0, 1.0
+    # lamda0, lamda1, lamda2, lamda3, lamda4 = 1.0, 1.0, 1.0, 1.0, 1.0
     d = np.r_[0.0, np.cumsum(np.r_[dz1, dz2, dz3])]
     depth = [d[0], d[1], d[2], d[3]]  # Layer boundaries
     d_bg = np.r_[0.0, np.cumsum(np.r_[dz1_bg, dz2_bg, dz3_bg])]
@@ -502,7 +502,7 @@ def csem_data_app(
     ]  # Layer anisotropies (same for anomaly and background)
 
     # Modelling parameters
-    verb = 1
+    # verb = 1
 
     # Spatial parameters
     dx = 100.0
@@ -517,12 +517,12 @@ def csem_data_app(
     if Plane == "XZ":
         rxlocs = np.c_[x, np.zeros_like(x), z]
         xlabel = "X offset (m)"
-        x0 = y.copy()
+        # x0 = y.copy()
 
     elif Plane == "YZ":
         rxlocs = np.c_[np.zeros_like(x), y, z]
         xlabel = "Y offset (m)"
-        x0 = x.copy()
+        # x0 = x.copy()
 
     if Field == "E":
         label = "Electric field (V/m)"
@@ -612,7 +612,7 @@ def csem_data_app(
         val = data.pha
         val_bg = data_bg.pha
 
-    fig = plt.figure(figsize=(8 * 1.4, 3 * 1.4))
+    plt.figure(figsize=(8 * 1.4, 3 * 1.4))
     ax = plt.subplot(111)
     if scale == "log":
         ax.plot(x, abs(val), "r")
@@ -681,7 +681,7 @@ def DataApp():
     Fixed = widgets.widget_bool.Checkbox(value=False, description="Fixed")
     vmin = FloatText(value=None, description="vmin")
     vmax = FloatText(value=None, description="vmax")
-    __manual = True
+    # __manual = True
 
     out = widgets.interactive_output(
         csem_data_app,

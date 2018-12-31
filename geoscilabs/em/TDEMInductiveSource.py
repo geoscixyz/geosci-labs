@@ -8,7 +8,6 @@ import os
 from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
@@ -202,7 +201,7 @@ class PlotTDEM(object):
         x = np.r_[X1, X2, X2, X1, X1]
         y = np.r_[Y1, Y1, Y2, Y2, Y1]
 
-        plt.figure(figsize=(8, 8))
+        fig = plt.figure(figsize=(8, 8))
         ax = fig.gca(projection="3d")
         ax.plot3D(np.r_[0, 0], np.r_[0, 0], np.r_[1, 1] * 30.0, "ro", ms=5)
         ax.legend(("Tx",), loc=1)

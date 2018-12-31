@@ -2,10 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
-import warnings
-
-warnings.filterwarnings("ignore")
-
 from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
 
 
@@ -93,8 +89,8 @@ def fem3loop(
 
     f_factor = (alpha ** 2.0 + 1j * alpha) / (1 + alpha ** 2.0)
 
-    amin = 0.01
-    amax = 100.0
+    # amin = 0.01
+    # amax = 100.0
     da = 4.0 / 40.0
     alf = np.arange(-2.0, 2.0, da)
     alf = 10.0 ** alf
@@ -206,9 +202,10 @@ def interactfem3loop():
     # xmin = lambda dx: -40.*dx
     # xmax = lambda dx: 40.*dx
 
-    fem3loopwrap = lambda L, R, yc, xc, zc, dincl, ddecl, f, dx, showDataPts: fem3loop(
-        L, R, -yc, xc, zc, dincl, ddecl, S, ht, f, xmin, xmax, dx, showDataPts
-    )
+    def fem3loopwrap(L, R, yc, xc, zc, dincl, ddecl, f, dx, showDataPts):
+        return fem3loop(
+            L, R, -yc, xc, zc, dincl, ddecl, S, ht, f, xmin, xmax, dx, showDataPts
+        )
 
     Q = interactive(
         fem3loopwrap,

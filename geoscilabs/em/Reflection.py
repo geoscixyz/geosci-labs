@@ -66,7 +66,7 @@ def PowerReflection(sig1, sig2, f, Type):
     rTM, tTM, theta_t_TM = getReflectionandTransmission(
         sig1, sig2, f, theta_i, dtype="TM"
     )
-    fig = plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(5, 5))
     ylabel = "Percentage"
 
     if Type == "Reflection":

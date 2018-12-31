@@ -8,12 +8,17 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import matplotlib.gridspec as gridspec
-from ipywidgets import *
+from ipywidgets import widgets, interactive, IntSlider
 from scipy.constants import mu_0, epsilon_0
 
 from .DipoleWidgetFD import DipoleWidgetFD, linefun, DisPosNegvalues
 from .VolumeWidget import polyplane
-from .FDEMPlanewave import *
+from .FDEMPlanewave import (
+    e_field_from_sheet_current,
+    b_field_from_sheet_current,
+    h_field_from_sheet_current,
+    j_field_from_sheet_current,
+)
 from .view import DataView
 
 matplotlib.rcParams["font.size"] = 12
@@ -156,11 +161,11 @@ class PlanewaveWidget(DipoleWidgetFD):
         )  # set plane and locations ...
 
         if self.functype == "E_from_SheetCurrent":
-            self.func = E_field_from_SheetCurruent
+            self.func = e_field_from_sheet_current
         elif self.functype == "H_from_SheetCurrent":
-            self.func = H_field_from_SheetCurruent
+            self.func = h_field_from_sheet_current
         elif self.functype == "J_from_SheetCurrent":
-            self.func = J_field_from_SheetCurruent
+            self.func = j_field_from_sheet_current
         else:
             raise NotImplementedError()
 
@@ -209,7 +214,7 @@ class PlanewaveWidget(DipoleWidgetFD):
             xyz_line = np.c_[x, y, np.ones_like(x) * self.z]
             self.dataview.xyz_line = xyz_line
 
-        fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+        plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
         gs1 = gridspec.GridSpec(2, 7)
         gs1.update(left=0.05, right=0.48, wspace=0.05)
         ax1 = plt.subplot(gs1[:2, :3])
@@ -275,7 +280,10 @@ class PlanewaveWidget(DipoleWidgetFD):
             elif view == "Z" or view == "z":
                 val_line = val_line_z
             elif view == "vec" or "amp":
-                vecamp = lambda a, b, c: np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
+                def vecamp(a, b, c):
+                    return np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
                 if component == "real":
                     val_line = vecamp(val_line_x.real, val_line_y.real, val_line_z.real)
                 elif component == "imag":
@@ -433,13 +441,13 @@ class PlanewaveWidget(DipoleWidgetFD):
 
 
 def InteractivePlaneProfile():
-    srcLoc = 0.0
-    orientation = "X"
+    # srcLoc = 0.0
+    # orientation = "X"
     nRx = 100
 
     def foo(Field, Sigma, Scale, Fixed, Frequency, Time):
 
-        fig = plt.figure(figsize=(8, 4))
+        plt.figure(figsize=(8, 4))
         ax1 = plt.subplot(111)
         ax2 = ax1.twinx()
 

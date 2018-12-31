@@ -2,19 +2,23 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Utils
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from scipy.sparse import spdiags, csr_matrix, eye, kron, hstack, vstack, eye, diags
 import copy
-from scipy.constants import mu_0
-from SimPEG import SolverLU
-from scipy.sparse.linalg import spsolve, splu
-from SimPEG.EM import TDEM
-from SimPEG.EM.Analytics.TDEM import hzAnalyticDipoleT, hzAnalyticCentLoopT
+import numpy as np
+
 from scipy.interpolate import interp2d, LinearNDInterpolator
 from scipy.special import ellipk, ellipe
+from scipy.sparse import spdiags, csr_matrix, eye, kron, hstack, vstack, diags
+from scipy.constants import mu_0
+from scipy.sparse.linalg import spsolve, splu
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+from SimPEG import Mesh, Utils
+from SimPEG import SolverLU
+from SimPEG.EM import TDEM
+from SimPEG.EM.Analytics.TDEM import hzAnalyticDipoleT, hzAnalyticCentLoopT
+
 
 
 def rectangular_plane_layout(mesh, corner, closed=False, I=1.0):
@@ -185,7 +189,7 @@ def analytic_infinite_wire(obsloc, wireloc, orientation, I=1.0):
     idxmind = d.argmin(axis=1)
     r = obsloc - wireloc[idxmind]
 
-    orient = np.c_[[orientation for i in range(obsloc.shape[0])]]
+    # orient = np.c_[[orientation for i in range(obsloc.shape[0])]]
     B = (mu_0 * I) / (2 * np.pi * (distr ** 2.0)) * np.cross(orientation, r)
 
     return B
@@ -242,15 +246,15 @@ def circularloop(a, obsloc, I=1.0):
     y = np.atleast_2d(obsloc[:, 1]).T
     z = np.atleast_2d(obsloc[:, 2]).T
 
-    r = np.linalg.norm(obsloc, axis=1)
-    loc = np.r_[[[0.0, 0.0, 0.0]]]
+    # r = np.linalg.norm(obsloc, axis=1)
+    # loc = np.r_[[[0.0, 0.0, 0.0]]]
     n, d = obsloc.shape
     r2 = x ** 2.0 + y ** 2.0 + z ** 2.0
     rho2 = x ** 2.0 + y ** 2.0
     alpha2 = a ** 2.0 + r2 - 2 * a * np.sqrt(rho2)
     beta2 = a ** 2.0 + r2 + 2 * a * np.sqrt(rho2)
     k2 = 1 - (alpha2 / beta2)
-    lbda = x ** 2.0 - y ** 2.0
+    # lbda = x ** 2.0 - y ** 2.0
     C = mu_0 * I / np.pi
 
     Bx = ((C * x * z) / (2 * alpha2 * np.sqrt(beta2) * rho2)) * (

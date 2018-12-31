@@ -1,10 +1,8 @@
 import numpy as np
-import scipy as sp
-from scipy import sparse as spar
 from scipy.sparse import linalg
 from SimPEG import mkvc
 import scipy.optimize as op
-from em_examples.Base import widgetify
+from ..base import widgetify
 from ipywidgets import (
     interact,
     interactive,
@@ -16,9 +14,8 @@ from ipywidgets import (
 )
 import matplotlib.pyplot as plt
 from IPython.display import display
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from scipy import sparse as spar
 from cvxopt import solvers, matrix
 
 
@@ -1406,12 +1403,12 @@ def fcnImageUXOWidget(
     wnt = np.dot(A, np.r_[-Lx, Ly, Lz])
     ent = np.dot(A, np.r_[Lx, Ly, Lz])
 
-    x1 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
-    x2 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
-    y1 = 2 * np.dot(A, np.r_[0.0, 1.0, 0.0])
-    y2 = 2 * np.dot(A, np.r_[0.0, 1.0, 0.0])
-    z1 = 2 * np.dot(A, np.r_[0.0, 0.0, 1.0])
-    z2 = 2 * np.dot(A, np.r_[0.0, 0.0, 1.0])
+    # x1 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
+    # x2 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
+    # y1 = 2 * np.dot(A, np.r_[0.0, 1.0, 0.0])
+    # y2 = 2 * np.dot(A, np.r_[0.0, 1.0, 0.0])
+    # z1 = 2 * np.dot(A, np.r_[0.0, 0.0, 1.0])
+    # z2 = 2 * np.dot(A, np.r_[0.0, 0.0, 1.0])
 
     # UXO polygons
     v1 = [
@@ -1503,94 +1500,94 @@ def fcnImageUXOWidget(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(14, 6))
-    Ax1 = Fig.add_axes([0, 0, 0.47, 1], projection="3d")
-    Ax2 = Fig.add_axes([0.63, 0.1, 0.37, 0.8])
+    fig = plt.figure(figsize=(14, 6))
+    ax1 = fig.add_axes([0, 0, 0.47, 1], projection="3d")
+    ax2 = fig.add_axes([0.63, 0.1, 0.37, 0.8])
     FS = 20
 
     # Orientation plot
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v1, facecolors="k", linewidths=0.25, edgecolors="k")
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v2, facecolors="k", linewidths=0.25, edgecolors="k")
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v3, facecolors="r", linewidths=0.25, edgecolors="k")
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v4, facecolors="r", linewidths=0.25, edgecolors="k")
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v5, facecolors="b", linewidths=0.25, edgecolors="k")
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v6, facecolors="b", linewidths=0.25, edgecolors="k")
     )
 
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v7, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v8, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v9, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v10, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v11, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
-    Ax1.add_collection3d(
+    ax1.add_collection3d(
         Poly3DCollection(v12, facecolors=(0.7, 0.7, 0.7), linewidths=0.25)
     )
 
-    Ax1.set_xticks([-2, -1, 0, 1, 2])
-    Ax1.set_yticks([-2, -1, 0, 1, 2])
-    Ax1.set_zticks([-2, -1, 0, 1, 2])
-    Ax1.set_xticklabels([])
-    Ax1.set_yticklabels([])
-    Ax1.set_zticklabels([])
+    ax1.set_xticks([-2, -1, 0, 1, 2])
+    ax1.set_yticks([-2, -1, 0, 1, 2])
+    ax1.set_zticks([-2, -1, 0, 1, 2])
+    ax1.set_xticklabels([])
+    ax1.set_yticklabels([])
+    ax1.set_zticklabels([])
 
-    Ax1.set_xbound(-2.5, 2.5)
-    Ax1.set_ybound(-2.5, 2.5)
-    Ax1.set_zbound(-2.5, 2.5)
+    ax1.set_xbound(-2.5, 2.5)
+    ax1.set_ybound(-2.5, 2.5)
+    ax1.set_zbound(-2.5, 2.5)
 
-    Ax1.tick_params(labelsize=FS - 2)
-    Ax1.set_xlabel("Easting", fontsize=FS, labelpad=11)
-    Ax1.set_ylabel("Northing", fontsize=FS, labelpad=11)
-    Ax1.set_zlabel("Z", fontsize=FS)
+    ax1.tick_params(labelsize=FS - 2)
+    ax1.set_xlabel("Easting", fontsize=FS, labelpad=11)
+    ax1.set_ylabel("Northing", fontsize=FS, labelpad=11)
+    ax1.set_zlabel("Z", fontsize=FS)
 
-    Ax1.view_init(30.0, 225.0)
+    ax1.view_init(30.0, 225.0)
 
     # Decay plot
     Lxt = uxoObj.L[0:11]
     Lyt = uxoObj.L[11:22]
     Lzt = uxoObj.L[22:33]
 
-    Ax2.loglog(uxoObj.times, Lxt, lw=2, color="b")
-    Ax2.loglog(uxoObj.times, Lyt, lw=2, color="r")
-    Ax2.loglog(uxoObj.times, Lzt, lw=2, color="k")
+    ax2.loglog(uxoObj.times, Lxt, lw=2, color="b")
+    ax2.loglog(uxoObj.times, Lyt, lw=2, color="r")
+    ax2.loglog(uxoObj.times, Lzt, lw=2, color="k")
 
-    Ax2.set_xlabel("t [s]", fontsize=FS)
-    Ax2.set_ylabel("Polarization", fontsize=FS)
-    Ax2.tick_params(labelsize=FS - 2)
+    ax2.set_xlabel("t [s]", fontsize=FS)
+    ax2.set_ylabel("Polarization", fontsize=FS)
+    ax2.tick_params(labelsize=FS - 2)
 
-    Ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
-    Ax2.set_ybound(1e-4 * np.max(uxoObj.L), 1.2 * np.max(uxoObj.L))
-    Ax2.text(
+    ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
+    ax2.set_ybound(1e-4 * np.max(uxoObj.L), 1.2 * np.max(uxoObj.L))
+    ax2.text(
         1.2e-4, 7e-4 * np.max(uxoObj.L), "$\mathbf{L_{x'}}$", fontsize=FS, color="b"
     )
-    Ax2.text(
+    ax2.text(
         1.2e-4, 3e-4 * np.max(uxoObj.L), "$\mathbf{L_{y'}}$", fontsize=FS, color="r"
     )
-    Ax2.text(
+    ax2.text(
         1.2e-4, 1.3e-4 * np.max(uxoObj.L), "$\mathbf{L_{z'}}$", fontsize=FS, color="k"
     )
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 ######################################
@@ -1648,7 +1645,7 @@ def fcnImageDataWidgetEM61(
 
     # PREDICT DATA
     uxoObj.defineSensorLoc(XYZ)
-    A = uxoObj.computeRotMatrix()
+    # A = uxoObj.computeRotMatrix()
     Hp = uxoObj.computeHp()
     Brx = uxoObj.computeBrx()
     P = uxoObj.computeP(Hp, Brx)
@@ -1657,45 +1654,45 @@ def fcnImageDataWidgetEM61(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 5.3))
-    Ax1 = Fig.add_axes([0, 0, 0.47, 1])
-    Ax2 = Fig.add_axes([0.63, 0, 0.37, 1])
+    fig = plt.figure(figsize=(13.5, 5.3))
+    ax1 = fig.add_axes([0, 0, 0.47, 1])
+    ax2 = fig.add_axes([0.63, 0, 0.37, 1])
     FS = 18
 
     # Anomaly
 
     d_tn = 1e6 * np.reshape(data[:, tn - 1], (N, N))  # 1e6 for uV
-    Cplot = Ax1.contourf(X, Y, d_tn.T, 40, cmap="viridis")
-    cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02, format="%.2e")
+    Cplot = ax1.contourf(X, Y, d_tn.T, 40, cmap="viridis")
+    cbar = plt.colorbar(Cplot, ax=ax1, pad=0.02, format="%.2e")
     cbar.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar.ax.tick_params(labelsize=FS - 2)
 
-    Ax1.set_xlabel("X [m]", fontsize=FS)
-    Ax1.set_ylabel("Y [m]", fontsize=FS)
-    Ax1.tick_params(labelsize=FS - 2)
+    ax1.set_xlabel("X [m]", fontsize=FS)
+    ax1.set_ylabel("Y [m]", fontsize=FS)
+    ax1.tick_params(labelsize=FS - 2)
 
     titlestr1 = "Anomaly at t = " + "{:.3e}".format(uxoObj.times[tn - 1]) + " s"
-    Ax1.set_title(titlestr1, fontsize=FS + 2)
-    Ax1.scatter(X, Y, color=(1, 1, 1), s=3)
+    ax1.set_title(titlestr1, fontsize=FS + 2)
+    ax1.scatter(X, Y, color=(1, 1, 1), s=3)
 
     i = int(np.round((3 + xTx) / 0.25))
     j = int(np.round((3 + yTx) / 0.25))
-    Ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
+    ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
 
-    Ax1.set_xbound(-3.0, 3.0)
-    Ax1.set_ybound(-3.0, 3.0)
+    ax1.set_xbound(-3.0, 3.0)
+    ax1.set_ybound(-3.0, 3.0)
 
     # Decay
 
     d_ij = 1e6 * np.abs(data[25 * i + j, :])  # 1e6 for uV
-    Ax2.loglog(uxoObj.times, d_ij, color="k")
+    ax2.loglog(uxoObj.times, d_ij, color="k")
 
-    Ax2.set_xlabel("t [s]", fontsize=FS)
-    Ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
-    Ax2.tick_params(labelsize=FS - 2)
+    ax2.set_xlabel("t [s]", fontsize=FS)
+    ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
+    ax2.tick_params(labelsize=FS - 2)
 
-    Ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
-    Ax2.set_ybound(1.2 * np.max(d_ij), 1e-4 * np.max(d_ij))
+    ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
+    ax2.set_ybound(1.2 * np.max(d_ij), 1e-4 * np.max(d_ij))
     titlestr2 = (
         "Decay at X = "
         + "{:.2f}".format(xTx)
@@ -1703,10 +1700,10 @@ def fcnImageDataWidgetEM61(
         + "{:.2f}".format(yTx)
         + " m"
     )
-    Ax2.set_title(titlestr2, fontsize=FS + 2)
-    Ax2.text(1.2e-4, 1.3e-4 * np.max(d_ij), "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
+    ax2.set_title(titlestr2, fontsize=FS + 2)
+    ax2.text(1.2e-4, 1.3e-4 * np.max(d_ij), "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 def fcnImageDataWidgetTEMTADS(
@@ -1760,7 +1757,7 @@ def fcnImageDataWidgetTEMTADS(
 
     # PREDICT DATA
     uxoObj.defineSensorLoc(XYZ)
-    A = uxoObj.computeRotMatrix()
+    # A = uxoObj.computeRotMatrix()
     Hp = uxoObj.computeHp()
     Brx = uxoObj.computeBrx()
     P = uxoObj.computeP(Hp, Brx)
@@ -1769,46 +1766,46 @@ def fcnImageDataWidgetTEMTADS(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 5.3))
-    Ax1 = Fig.add_axes([0, 0, 0.47, 1])
-    Ax2 = Fig.add_axes([0.63, 0, 0.37, 1])
+    fig = plt.figure(figsize=(13.5, 5.3))
+    ax1 = fig.add_axes([0, 0, 0.47, 1])
+    ax2 = fig.add_axes([0.63, 0, 0.37, 1])
     FS = 18
 
     # Anomaly
     di = 1e6 * np.reshape(data[12 : 25 * N ** 2 : 25, tn - 1], (N, N))
-    Cplot = Ax1.contourf(X, Y, di.T, 40, cmap="viridis")
-    cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02)
+    Cplot = ax1.contourf(X, Y, di.T, 40, cmap="viridis")
+    cbar = plt.colorbar(Cplot, ax=ax1, pad=0.02)
     cbar.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar.ax.tick_params(labelsize=FS - 2)
 
-    Ax1.set_xlabel("X [m]", fontsize=FS)
-    Ax1.set_ylabel("Y [m]", fontsize=FS)
-    Ax1.tick_params(labelsize=FS - 2)
+    ax1.set_xlabel("X [m]", fontsize=FS)
+    ax1.set_ylabel("Y [m]", fontsize=FS)
+    ax1.tick_params(labelsize=FS - 2)
 
-    Ax1.scatter(X, Y, color=(1, 1, 1), s=2)
+    ax1.scatter(X, Y, color=(1, 1, 1), s=2)
 
     titlestr1 = "Anomaly at t = " + "{:.3e}".format(uxoObj.times[tn - 1]) + " s"
-    Ax1.set_title(titlestr1, fontsize=FS + 2)
+    ax1.set_title(titlestr1, fontsize=FS + 2)
 
     i = int(np.round((3 + xTx) / 0.25))
     j = int(np.round((3 + yTx) / 0.25))
-    Ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
+    ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
 
-    Ax1.set_xbound(-3.0, 3.0)
-    Ax1.set_ybound(-3.0, 3.0)
+    ax1.set_xbound(-3.0, 3.0)
+    ax1.set_ybound(-3.0, 3.0)
 
     # Decay
     d_ij = 1e6 * np.abs(
         data[i * 25 ** 2 + j * 25 : i * 25 ** 2 + (j + 1) * 25, :]
     )  # 1e3 for mV
-    Ax2.loglog(uxoObj.times, d_ij.T, color="k")
+    ax2.loglog(uxoObj.times, d_ij.T, color="k")
 
-    Ax2.set_xlabel("t [s]", fontsize=FS)
-    Ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
-    Ax2.tick_params(labelsize=FS - 2)
+    ax2.set_xlabel("t [s]", fontsize=FS)
+    ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
+    ax2.tick_params(labelsize=FS - 2)
 
-    Ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
-    Ax2.set_ybound(1.2 * np.max(d_ij), 1e-4 * np.max(d_ij))
+    ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
+    ax2.set_ybound(1.2 * np.max(d_ij), 1e-4 * np.max(d_ij))
     titlestr2 = (
         "Decays at X = "
         + "{:.2f}".format(xTx)
@@ -1816,10 +1813,10 @@ def fcnImageDataWidgetTEMTADS(
         + "{:.2f}".format(yTx)
         + " m"
     )
-    Ax2.set_title(titlestr2, fontsize=FS + 2)
-    Ax2.text(1.2e-4, 1.3e-4 * np.max(d_ij), "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
+    ax2.set_title(titlestr2, fontsize=FS + 2)
+    ax2.text(1.2e-4, 1.3e-4 * np.max(d_ij), "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 def fcnImageDataWidgetMPV(
@@ -1874,7 +1871,7 @@ def fcnImageDataWidgetMPV(
 
     # PREDICT DATA
     uxoObj.defineSensorLoc(XYZ)
-    A = uxoObj.computeRotMatrix()
+    # A = uxoObj.computeRotMatrix()
     Hp = uxoObj.computeHp()
     Brx = uxoObj.computeBrx()
     P = uxoObj.computeP(Hp, Brx)
@@ -1883,9 +1880,9 @@ def fcnImageDataWidgetMPV(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 5.3))
-    Ax1 = Fig.add_axes([0, 0, 0.47, 1])
-    Ax2 = Fig.add_axes([0.63, 0, 0.37, 1])
+    fig = plt.figure(figsize=(13.5, 5.3))
+    ax1 = fig.add_axes([0, 0, 0.47, 1])
+    ax2 = fig.add_axes([0.63, 0, 0.37, 1])
     FS = 18
 
     # Anomaly
@@ -1899,8 +1896,8 @@ def fcnImageDataWidgetMPV(
         k = 2
 
     di = 1e6 * np.reshape(data[6 + k : 15 * N ** 2 : 15, tn - 1], (N, N))
-    Cplot = Ax1.contourf(X, Y, di.T, 40, cmap="viridis")
-    cbar = plt.colorbar(Cplot, ax=Ax1, pad=0.02)
+    Cplot = ax1.contourf(X, Y, di.T, 40, cmap="viridis")
+    cbar = plt.colorbar(Cplot, ax=ax1, pad=0.02)
 
     if dComp is "X":
         cbar.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
@@ -1910,20 +1907,20 @@ def fcnImageDataWidgetMPV(
         cbar.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar.ax.tick_params(labelsize=FS - 2)
 
-    Ax1.set_xlabel("X [m]", fontsize=FS)
-    Ax1.set_ylabel("Y [m]", fontsize=FS)
-    Ax1.tick_params(labelsize=FS - 2)
+    ax1.set_xlabel("X [m]", fontsize=FS)
+    ax1.set_ylabel("Y [m]", fontsize=FS)
+    ax1.tick_params(labelsize=FS - 2)
 
-    Ax1.scatter(X, Y, color=(1, 1, 1), s=2)
+    ax1.scatter(X, Y, color=(1, 1, 1), s=2)
 
-    Ax1.set_title(titlestr1, fontsize=FS + 2)
+    ax1.set_title(titlestr1, fontsize=FS + 2)
 
     i = int(np.round((3 + xTx) / 0.25))
     j = int(np.round((3 + yTx) / 0.25))
-    Ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
+    ax1.scatter(X[j, i], Y[j, i], color=(1, 0, 0), s=15)
 
-    Ax1.set_xbound(-3.0, 3.0)
-    Ax1.set_ybound(-3.0, 3.0)
+    ax1.set_xbound(-3.0, 3.0)
+    ax1.set_ybound(-3.0, 3.0)
 
     # Decay
     d_ijx = 1e6 * np.abs(
@@ -1936,16 +1933,16 @@ def fcnImageDataWidgetMPV(
         data[2 + i * 15 * 25 + j * 15 : i * 15 * 25 + (j + 1) * 15 : 3, :]
     )  # 1e6 for uV
     maxdij = np.max(np.r_[d_ijx, d_ijy, d_ijz])
-    Ax2.loglog(uxoObj.times, d_ijx.T, color="b")
-    Ax2.loglog(uxoObj.times, d_ijy.T, color="r")
-    Ax2.loglog(uxoObj.times, d_ijz.T, color="k")
+    ax2.loglog(uxoObj.times, d_ijx.T, color="b")
+    ax2.loglog(uxoObj.times, d_ijy.T, color="r")
+    ax2.loglog(uxoObj.times, d_ijz.T, color="k")
 
-    Ax2.set_xlabel("t [s]", fontsize=FS)
-    Ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
-    Ax2.tick_params(labelsize=FS - 2)
+    ax2.set_xlabel("t [s]", fontsize=FS)
+    ax2.set_ylabel("|dB/dt| Field [$\mu$V]", fontsize=FS)
+    ax2.tick_params(labelsize=FS - 2)
 
-    Ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
-    Ax2.set_ybound(1.2 * maxdij, 1e-4 * maxdij)
+    ax2.set_xbound(np.min(uxoObj.times), np.max(uxoObj.times))
+    ax2.set_ybound(1.2 * maxdij, 1e-4 * maxdij)
     titlestr2 = (
         "Decays at X = "
         + "{:.2f}".format(xTx)
@@ -1953,12 +1950,12 @@ def fcnImageDataWidgetMPV(
         + "{:.2f}".format(yTx)
         + " m"
     )
-    Ax2.set_title(titlestr2, fontsize=FS + 2)
-    Ax2.text(1.2e-4, 7e-4 * maxdij, "$\mathbf{dBx/dt}$", fontsize=FS, color="b")
-    Ax2.text(1.2e-4, 3e-4 * maxdij, "$\mathbf{dBy/dt}$", fontsize=FS, color="r")
-    Ax2.text(1.2e-4, 1.3e-4 * maxdij, "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
+    ax2.set_title(titlestr2, fontsize=FS + 2)
+    ax2.text(1.2e-4, 7e-4 * maxdij, "$\mathbf{dBx/dt}$", fontsize=FS, color="b")
+    ax2.text(1.2e-4, 3e-4 * maxdij, "$\mathbf{dBy/dt}$", fontsize=FS, color="r")
+    ax2.text(1.2e-4, 1.3e-4 * maxdij, "$\mathbf{dBz/dt}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 ##################################
@@ -2020,7 +2017,7 @@ def fcnInversionWidgetEM61(
     X1, Y1 = np.meshgrid(np.linspace(-3.0, 3.0, N), np.linspace(-3.0, 3.0, N))
     XYZ1 = np.c_[mkvc(X1), mkvc(Y1), 0.1 * np.ones(np.size(X1))]
     uxoObj1.defineSensorLoc(XYZ1)
-    A = uxoObj1.computeRotMatrix()
+    # A = uxoObj1.computeRotMatrix()
     Hp = uxoObj1.computeHp()
     Brx = uxoObj1.computeBrx()
     P1 = uxoObj1.computeP(Hp, Brx)
@@ -2096,58 +2093,58 @@ def fcnInversionWidgetEM61(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 8.5))
-    Ax11 = Fig.add_axes([0, 0.55, 0.35, 0.45])
-    Ax12 = Fig.add_axes([0.5, 0.55, 0.35, 0.45])
-    Ax21 = Fig.add_axes([0.0, 0.0, 0.4, 0.45])
-    Ax22 = Fig.add_axes([0.5, 0.0, 0.4, 0.45])
+    fig = plt.figure(figsize=(13.5, 8.5))
+    ax11 = fig.add_axes([0, 0.55, 0.35, 0.45])
+    ax12 = fig.add_axes([0.5, 0.55, 0.35, 0.45])
+    ax21 = fig.add_axes([0.0, 0.0, 0.4, 0.45])
+    ax22 = fig.add_axes([0.5, 0.0, 0.4, 0.45])
     FS = 18
 
     # True Anomaly
     d11 = 1e6 * np.reshape(da_true[:, tn - 1], (N, N))  # 1e6 for uV
-    Cplot1 = Ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
-    cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format="%.2e")
+    Cplot1 = ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
+    cbar1 = plt.colorbar(Cplot1, ax=ax11, pad=0.02, format="%.2e")
     cbar1.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar1.ax.tick_params(labelsize=FS - 2)
 
-    Ax11.set_xlabel("X [m]", fontsize=FS)
-    Ax11.set_ylabel("Y [m]", fontsize=FS)
-    Ax11.tick_params(labelsize=FS - 2)
+    ax11.set_xlabel("X [m]", fontsize=FS)
+    ax11.set_ylabel("Y [m]", fontsize=FS)
+    ax11.tick_params(labelsize=FS - 2)
 
     titlestr1 = "Observed at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax11.set_title(titlestr1, fontsize=FS + 2)
+    ax11.set_title(titlestr1, fontsize=FS + 2)
     # Xn,Yn = np.meshgrid(np.linspace(-Dx/2,Dx/2,Nx),np.linspace(-Dy/2,Dy/2,Ny))
-    Ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
+    ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
 
-    Ax11.set_xbound(-3.0, 3.0)
-    Ax11.set_ybound(-3.0, 3.0)
+    ax11.set_xbound(-3.0, 3.0)
+    ax11.set_ybound(-3.0, 3.0)
 
     # Predicted Anomaly
     d12 = 1e6 * np.reshape(da_pre[:, tn - 1], (N, N))  # 1e3 for mV
-    Cplot2 = Ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
-    cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format="%.2e")
+    Cplot2 = ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
+    cbar2 = plt.colorbar(Cplot2, ax=ax12, pad=0.02, format="%.2e")
     cbar2.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar2.ax.tick_params(labelsize=FS - 2)
 
-    Ax12.set_xlabel("X [m]", fontsize=FS)
-    Ax12.set_ylabel("Y [m]", fontsize=FS)
-    Ax12.tick_params(labelsize=FS - 2)
+    ax12.set_xlabel("X [m]", fontsize=FS)
+    ax12.set_ylabel("Y [m]", fontsize=FS)
+    ax12.tick_params(labelsize=FS - 2)
 
     titlestr2 = "Predicted at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax12.set_title(titlestr2, fontsize=FS + 2)
-    # Ax12.scatter(X,Y,color=(1,1,1),s=3)
+    ax12.set_title(titlestr2, fontsize=FS + 2)
+    # ax12.scatter(X,Y,color=(1,1,1),s=3)
 
-    Ax12.set_xbound(-3.0, 3.0)
-    Ax12.set_ybound(-3.0, 3.0)
+    ax12.set_xbound(-3.0, 3.0)
+    ax12.set_ybound(-3.0, 3.0)
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
-    Ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
-    Ax21.set_xbound(0, len(m_vec) - 1)
-    Ax21.set_ybound(0, np.max(m_vec))
-    Ax21.set_xlabel("Count", fontsize=FS)
-    Ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
-    Ax21.tick_params(labelsize=FS - 2)
+    ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
+    ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
+    ax21.set_xbound(0, len(m_vec) - 1)
+    ax21.set_ybound(0, np.max(m_vec))
+    ax21.set_xlabel("Count", fontsize=FS)
+    ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
+    ax21.tick_params(labelsize=FS - 2)
 
     rt_str = (
         "$r_{true}$ = ("
@@ -2169,13 +2166,13 @@ def fcnInversionWidgetEM61(
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
     if COUNT is 1:
-        Ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
     else:
-        Ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
 
     # POLARIATIONS
     Lxt = uxoObj1.L[0:11]
@@ -2186,24 +2183,24 @@ def fcnInversionWidgetEM61(
     Lzn = Ln[2, :].T
     maxLtn = np.max([np.max(uxoObj1.L), np.max(Ln)])
 
-    Ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
-    Ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
-    Ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
-    Ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
-    Ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
-    Ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
+    ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
+    ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
+    ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
+    ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
+    ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
+    ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
 
-    Ax22.set_xlabel("t [s]", fontsize=FS)
-    Ax22.set_ylabel("Polarization", fontsize=FS)
-    Ax22.tick_params(labelsize=FS - 2)
+    ax22.set_xlabel("t [s]", fontsize=FS)
+    ax22.set_ylabel("Polarization", fontsize=FS)
+    ax22.tick_params(labelsize=FS - 2)
 
-    Ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
-    Ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
-    Ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
-    Ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
-    Ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
+    ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
+    ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
+    ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
+    ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
+    ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 def fcnInversionWidgetTEMTADS(
@@ -2335,57 +2332,57 @@ def fcnInversionWidgetTEMTADS(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 8.5))
-    Ax11 = Fig.add_axes([0, 0.55, 0.35, 0.45])
-    Ax12 = Fig.add_axes([0.5, 0.55, 0.35, 0.45])
-    Ax21 = Fig.add_axes([0.0, 0.0, 0.4, 0.45])
-    Ax22 = Fig.add_axes([0.5, 0.0, 0.4, 0.45])
+    fig = plt.figure(figsize=(13.5, 8.5))
+    ax11 = fig.add_axes([0, 0.55, 0.35, 0.45])
+    ax12 = fig.add_axes([0.5, 0.55, 0.35, 0.45])
+    ax21 = fig.add_axes([0.0, 0.0, 0.4, 0.45])
+    ax22 = fig.add_axes([0.5, 0.0, 0.4, 0.45])
     FS = 18
 
     # True Anomaly
     d11 = 1e6 * np.reshape(da_true[12 : 25 * N ** 2 : 25, tn - 1], (N, N))  # 1e6 for uV
-    Cplot1 = Ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
-    cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format="%.2e")
+    Cplot1 = ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
+    cbar1 = plt.colorbar(Cplot1, ax=ax11, pad=0.02, format="%.2e")
     cbar1.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar1.ax.tick_params(labelsize=FS - 2)
 
-    Ax11.set_xlabel("X [m]", fontsize=FS)
-    Ax11.set_ylabel("Y [m]", fontsize=FS)
-    Ax11.tick_params(labelsize=FS - 2)
+    ax11.set_xlabel("X [m]", fontsize=FS)
+    ax11.set_ylabel("Y [m]", fontsize=FS)
+    ax11.tick_params(labelsize=FS - 2)
 
     titlestr1 = "Observed at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax11.set_title(titlestr1, fontsize=FS + 2)
-    Ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
+    ax11.set_title(titlestr1, fontsize=FS + 2)
+    ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
 
-    Ax11.set_xbound(-3.0, 3.0)
-    Ax11.set_ybound(-3.0, 3.0)
+    ax11.set_xbound(-3.0, 3.0)
+    ax11.set_ybound(-3.0, 3.0)
 
     # Predicted Anomaly
     d12 = 1e6 * np.reshape(da_pre[12 : 25 * N ** 2 : 25, tn - 1], (N, N))  # 1e6 for uV
-    Cplot2 = Ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
-    cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format="%.2e")
+    Cplot2 = ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
+    cbar2 = plt.colorbar(Cplot2, ax=ax12, pad=0.02, format="%.2e")
     cbar2.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar2.ax.tick_params(labelsize=FS - 2)
 
-    Ax12.set_xlabel("X [m]", fontsize=FS)
-    Ax12.set_ylabel("Y [m]", fontsize=FS)
-    Ax12.tick_params(labelsize=FS - 2)
+    ax12.set_xlabel("X [m]", fontsize=FS)
+    ax12.set_ylabel("Y [m]", fontsize=FS)
+    ax12.tick_params(labelsize=FS - 2)
 
     titlestr2 = "Predicted at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax12.set_title(titlestr2, fontsize=FS + 2)
-    # Ax12.scatter(X,Y,color=(1,1,1),s=3)
+    ax12.set_title(titlestr2, fontsize=FS + 2)
+    # ax12.scatter(X,Y,color=(1,1,1),s=3)
 
-    Ax12.set_xbound(-3.0, 3.0)
-    Ax12.set_ybound(-3.0, 3.0)
+    ax12.set_xbound(-3.0, 3.0)
+    ax12.set_ybound(-3.0, 3.0)
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
-    Ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
-    Ax21.set_xbound(0, len(m_vec) - 1)
-    Ax21.set_ybound(0, np.max(m_vec))
-    Ax21.set_xlabel("Count", fontsize=FS)
-    Ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
-    Ax21.tick_params(labelsize=FS - 2)
+    ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
+    ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
+    ax21.set_xbound(0, len(m_vec) - 1)
+    ax21.set_ybound(0, np.max(m_vec))
+    ax21.set_xlabel("Count", fontsize=FS)
+    ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
+    ax21.tick_params(labelsize=FS - 2)
 
     rt_str = (
         "$r_{true}$ = ("
@@ -2407,13 +2404,13 @@ def fcnInversionWidgetTEMTADS(
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
     if COUNT is 1:
-        Ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
     else:
-        Ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
 
     # POLARIATIONS
     Lxt = uxoObj1.L[0:11]
@@ -2424,24 +2421,24 @@ def fcnInversionWidgetTEMTADS(
     Lzn = Ln[2, :].T
     maxLtn = np.max([np.max(uxoObj1.L), np.max(Ln)])
 
-    Ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
-    Ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
-    Ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
-    Ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
-    Ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
-    Ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
+    ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
+    ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
+    ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
+    ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
+    ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
+    ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
 
-    Ax22.set_xlabel("t [s]", fontsize=FS)
-    Ax22.set_ylabel("Polarization", fontsize=FS)
-    Ax22.tick_params(labelsize=FS - 2)
+    ax22.set_xlabel("t [s]", fontsize=FS)
+    ax22.set_ylabel("Polarization", fontsize=FS)
+    ax22.tick_params(labelsize=FS - 2)
 
-    Ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
-    Ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
-    Ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
-    Ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
-    Ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
+    ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
+    ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
+    ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
+    ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
+    ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 def fcnInversionWidgetMPV(
@@ -2576,11 +2573,11 @@ def fcnInversionWidgetMPV(
 
     # PLOTTING
 
-    Fig = plt.figure(figsize=(13.5, 8.5))
-    Ax11 = Fig.add_axes([0, 0.55, 0.35, 0.45])
-    Ax12 = Fig.add_axes([0.5, 0.55, 0.35, 0.45])
-    Ax21 = Fig.add_axes([0.0, 0.0, 0.4, 0.45])
-    Ax22 = Fig.add_axes([0.5, 0.0, 0.4, 0.45])
+    fig = plt.figure(figsize=(13.5, 8.5))
+    ax11 = fig.add_axes([0, 0.55, 0.35, 0.45])
+    ax12 = fig.add_axes([0.5, 0.55, 0.35, 0.45])
+    ax21 = fig.add_axes([0.0, 0.0, 0.4, 0.45])
+    ax22 = fig.add_axes([0.5, 0.0, 0.4, 0.45])
     FS = 18
 
     if dComp is "X":
@@ -2594,8 +2591,8 @@ def fcnInversionWidgetMPV(
     d11 = 1e6 * np.reshape(
         da_true[6 + k : 15 * N ** 2 : 15, tn - 1], (N, N)
     )  # 1e6 for uV
-    Cplot1 = Ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
-    cbar1 = plt.colorbar(Cplot1, ax=Ax11, pad=0.02, format="%.2e")
+    Cplot1 = ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
+    cbar1 = plt.colorbar(Cplot1, ax=ax11, pad=0.02, format="%.2e")
     if dComp is "X":
         cbar1.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     elif dComp is "Y":
@@ -2604,23 +2601,23 @@ def fcnInversionWidgetMPV(
         cbar1.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar1.ax.tick_params(labelsize=FS - 2)
 
-    Ax11.set_xlabel("X [m]", fontsize=FS)
-    Ax11.set_ylabel("Y [m]", fontsize=FS)
-    Ax11.tick_params(labelsize=FS - 2)
+    ax11.set_xlabel("X [m]", fontsize=FS)
+    ax11.set_ylabel("Y [m]", fontsize=FS)
+    ax11.tick_params(labelsize=FS - 2)
 
     titlestr1 = "Observed at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax11.set_title(titlestr1, fontsize=FS + 2)
-    Ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
+    ax11.set_title(titlestr1, fontsize=FS + 2)
+    ax11.scatter(X2, Y2, color=(1, 1, 1), s=3)
 
-    Ax11.set_xbound(-3.0, 3.0)
-    Ax11.set_ybound(-3.0, 3.0)
+    ax11.set_xbound(-3.0, 3.0)
+    ax11.set_ybound(-3.0, 3.0)
 
     # Predicted Anomaly
     d12 = 1e6 * np.reshape(
         da_pre[6 + k : 15 * N ** 2 : 15, tn - 1], (N, N)
     )  # 1e6 for uV
-    Cplot2 = Ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
-    cbar2 = plt.colorbar(Cplot2, ax=Ax12, pad=0.02, format="%.2e")
+    Cplot2 = ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
+    cbar2 = plt.colorbar(Cplot2, ax=ax12, pad=0.02, format="%.2e")
     if dComp is "X":
         cbar2.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     elif dComp is "Y":
@@ -2629,25 +2626,25 @@ def fcnInversionWidgetMPV(
         cbar2.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar2.ax.tick_params(labelsize=FS - 2)
 
-    Ax12.set_xlabel("X [m]", fontsize=FS)
-    Ax12.set_ylabel("Y [m]", fontsize=FS)
-    Ax12.tick_params(labelsize=FS - 2)
+    ax12.set_xlabel("X [m]", fontsize=FS)
+    ax12.set_ylabel("Y [m]", fontsize=FS)
+    ax12.tick_params(labelsize=FS - 2)
 
     titlestr2 = "Predicted at t = " + "{:.3e}".format(uxoObj1.times[tn - 1]) + " s"
-    Ax12.set_title(titlestr2, fontsize=FS + 2)
-    # Ax12.scatter(X,Y,color=(1,1,1),s=3)
+    ax12.set_title(titlestr2, fontsize=FS + 2)
+    # ax12.scatter(X,Y,color=(1,1,1),s=3)
 
-    Ax12.set_xbound(-3.0, 3.0)
-    Ax12.set_ybound(-3.0, 3.0)
+    ax12.set_xbound(-3.0, 3.0)
+    ax12.set_ybound(-3.0, 3.0)
 
     # CONVERGENCE AND PRINTOUT
-    Ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
-    Ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
-    Ax21.set_xbound(0, len(m_vec) - 1)
-    Ax21.set_ybound(0, np.max(m_vec))
-    Ax21.set_xlabel("Count", fontsize=FS)
-    Ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
-    Ax21.tick_params(labelsize=FS - 2)
+    ax21.plot(np.arange(0, len(m_vec)), np.ones(len(m_vec)), lw=3, color="k", ls=":")
+    ax21.plot(np.arange(0, len(m_vec)), m_vec, lw=2, color=(1, 0, 0))
+    ax21.set_xbound(0, len(m_vec) - 1)
+    ax21.set_ybound(0, np.max(m_vec))
+    ax21.set_xlabel("Count", fontsize=FS)
+    ax21.set_ylabel("$\chi^2$ Misfit", fontsize=FS)
+    ax21.tick_params(labelsize=FS - 2)
 
     rt_str = (
         "$r_{true}$ = ("
@@ -2669,13 +2666,13 @@ def fcnInversionWidgetMPV(
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
     if COUNT is 1:
-        Ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
     else:
-        Ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
-        Ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.92 * m_vec[0], rt_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.83 * m_vec[0], rn_str, fontsize=FS)
+        ax21.text(0.4 * len(m_vec), 0.74 * m_vec[0], fm_str, fontsize=FS)
 
     # POLARIATIONS
     Lxt = uxoObj1.L[0:11]
@@ -2686,24 +2683,24 @@ def fcnInversionWidgetMPV(
     Lzn = Ln[2, :].T
     maxLtn = np.max([np.max(uxoObj1.L), np.max(Ln)])
 
-    Ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
-    Ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
-    Ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
-    Ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
-    Ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
-    Ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
+    ax22.loglog(uxoObj1.times, Lxt, lw=2, color="b")
+    ax22.loglog(uxoObj1.times, Lyt, lw=2, color="r")
+    ax22.loglog(uxoObj1.times, Lzt, lw=2, color="k")
+    ax22.loglog(uxoObj1.times, Lxn, lw=2, color="b", ls=":")
+    ax22.loglog(uxoObj1.times, Lyn, lw=2, color="r", ls=":")
+    ax22.loglog(uxoObj1.times, Lzn, lw=2, color="k", ls=":")
 
-    Ax22.set_xlabel("t [s]", fontsize=FS)
-    Ax22.set_ylabel("Polarization", fontsize=FS)
-    Ax22.tick_params(labelsize=FS - 2)
+    ax22.set_xlabel("t [s]", fontsize=FS)
+    ax22.set_ylabel("Polarization", fontsize=FS)
+    ax22.tick_params(labelsize=FS - 2)
 
-    Ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
-    Ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
-    Ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
-    Ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
-    Ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
+    ax22.set_xbound(np.min(uxoObj1.times), np.max(uxoObj1.times))
+    ax22.set_ybound(1e-4 * maxLtn, 1.2 * maxLtn)
+    ax22.text(1.2e-4, 7e-4 * maxLtn, "$\mathbf{L_{x'}}$", fontsize=FS, color="b")
+    ax22.text(1.2e-4, 3e-4 * maxLtn, "$\mathbf{L_{y'}}$", fontsize=FS, color="r")
+    ax22.text(1.2e-4, 1.3e-4 * maxLtn, "$\mathbf{L_{z'}}$", fontsize=FS, color="k")
 
-    plt.show(Fig)
+    plt.show(fig)
 
 
 ##############################################################################
@@ -3094,7 +3091,7 @@ class EM61problem(UXOTEM):
         Brx = self.computeBrx(r0=r0, update=False)
         P = self.computeP(Hp, Brx)
 
-        N = np.size(dobs)
+        # N = np.size(dobs)
 
         dpre = np.dot(P, q)
 
@@ -3204,8 +3201,8 @@ class EM61problem(UXOTEM):
 
     def updateLocation(self, r0):
 
-        lb = np.r_[-6.0, -6.0, -5.0]
-        ub = np.r_[6.0, 6.0, -0.1]
+        # lb = np.r_[-6.0, -6.0, -5.0]
+        # ub = np.r_[6.0, 6.0, -0.1]
         # Sol = op.minimize(self.computeMisfit,r0,method='Powell',options={'xtol':1e-5})
         Sol = op.root(self.computeVecFcn, r0, method="lm", options={"xtol": 1e-5})
 
@@ -3473,7 +3470,7 @@ class TEMTADSproblem(UXOTEM):
         Brx = self.computeBrx(r0=r0, update=False)
         P = self.computeP(Hp, Brx)
 
-        N = np.size(dobs)
+        # N = np.size(dobs)
 
         dpre = np.dot(P, q)
 
@@ -3850,7 +3847,7 @@ class MPVproblem(UXOTEM):
         Brx = self.computeBrx(r0=r0, update=False)
         P = self.computeP(Hp, Brx)
 
-        N = np.size(dobs)
+        # N = np.size(dobs)
 
         dpre = np.dot(P, q)
 
