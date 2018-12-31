@@ -2,18 +2,16 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
-from SimPEG.EM.Static import DC
+from scipy.constants import epsilon_0
+import copy
+
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
-from scipy.constants import epsilon_0
-import copy
 
 from ipywidgets import (
     interact,
@@ -25,6 +23,10 @@ from ipywidgets import (
     fixed,
     Widget,
 )
+
+from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.Utils import ExtractCoreMesh
+from SimPEG.EM.Static import DC
 
 from ..base import widgetify
 
@@ -200,7 +202,7 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
 def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
     phi = field_obj["phi"]
-    CCLoc = mesh.gridCC
+    # CCLoc = mesh.gridCC
     XLoc = np.unique(mesh.gridCC[:, 0])
     surfaceInd, zsurfaceLoc = get_Surface(mtrue, XLoc)
     phiSurface = phi[surfaceInd]
@@ -265,19 +267,19 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
     return plateCorners
 
 
-def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
-    xLocOrig1 = np.arange(
-        -target_wide / 2.0, target_wide / 2.0 + target_wide / 10.0, target_wide / 10.0
-    )
-    xLocOrig2 = np.arange(
-        target_wide / 2.0, -target_wide / 2.0 - target_wide / 10.0, -target_wide / 10.0
-    )
-    zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc)
-    zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc - target_thick)
+# def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
+#     xLocOrig1 = np.arange(
+#         -target_wide / 2.0, target_wide / 2.0 + target_wide / 10.0, target_wide / 10.0
+#     )
+#     # xLocOrig2 = np.arange(
+#     #     target_wide / 2.0, -target_wide / 2.0 - target_wide / 10.0, -target_wide / 10.0
+#     # )
+#     # zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc)
+#     zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc - target_thick)
 
-    corner
+#     # corner
 
-    targetpoint = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
+#     targetpoint = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
 
 
 def getSensitivity(survey, A, B, M, N, model):
@@ -405,8 +407,8 @@ def PLOT(
         VM = phiTotalSurface[MInd[0]]
         VN = 0.0
 
-        VMprim = phiPrimSurface[MInd[0]]
-        VNprim = 0.0
+        # VMprim = phiPrimSurface[MInd[0]]
+        # VNprim = 0.0
 
         VMair = phiAirSurface[MInd[0]]
         VNair = 0.0
@@ -418,8 +420,8 @@ def PLOT(
         VM = phiTotalSurface[MInd[0]]
         VN = phiTotalSurface[NInd[0]]
 
-        VMprim = phiPrimSurface[MInd[0]]
-        VNprim = phiPrimSurface[NInd[0]]
+        # VMprim = phiPrimSurface[MInd[0]]
+        # VNprim = phiPrimSurface[NInd[0]]
 
         VMair = phiAirSurface[MInd[0]]
         VNair = phiAirSurface[NInd[0]]

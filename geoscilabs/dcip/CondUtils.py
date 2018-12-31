@@ -28,7 +28,10 @@ def ColeColePelton(f, sigmaInf, eta, tau, c, option):
 def vizColeCole(sigres="sigma", eta=0.1, tau=0.1, c=0.5, t1=800, t2=1400):
     frequency = np.logspace(-3, 6, 81)
     val = ColeColePelton(frequency, 1.0, eta, tau, c, option=sigres)
-    datFcn = lambda f: ColeColePelton(f, 1.0, eta, tau, c, option=sigres)
+
+    def datFcn(f):
+        return ColeColePelton(f, 1.0, eta, tau, c, option=sigres)
+
     dt = 1e-3
     time = np.arange(10000) * dt + dt
     valT = transFilt(datFcn, time)

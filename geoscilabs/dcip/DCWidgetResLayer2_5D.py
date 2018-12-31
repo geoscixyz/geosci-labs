@@ -2,18 +2,21 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
-from SimPEG.EM.Static import DC
+
+from scipy.constants import epsilon_0
+import copy
+
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
-from scipy.constants import epsilon_0
-import copy
+
+from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.Utils import ExtractCoreMesh
+from SimPEG.EM.Static import DC
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
@@ -60,7 +63,6 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
     mhalf = np.log(halfspaceMod)
     # Add layer to model
     LayerMod = addLayer2Mod(zcLayer, dzLayer, halfspaceMod, sigLayer)
-    mLayer = np.log(LayerMod)
 
     # Add plate or cylinder
     # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
@@ -295,8 +297,8 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
     qPosLoc = plateChargeLocs[posInd, :][0]
     qNegLoc = plateChargeLocs[negInd, :][0]
 
-    qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
-    qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
+    # qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
+    # qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
 
     if qNeg.shape == (0,) or qPos.shape == (0,):
         qNegAvgLoc = np.r_[-10, -10]

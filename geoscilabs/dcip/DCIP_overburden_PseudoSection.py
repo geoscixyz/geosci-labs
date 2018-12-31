@@ -2,17 +2,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
-from SimPEG.EM.Static import DC, IP
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.pylab as pylab
-from matplotlib.ticker import LogFormatter
-from matplotlib import colors, ticker, cm
-from matplotlib.path import Path
-import matplotlib.patches as patches
+
 from scipy.constants import epsilon_0
 from scipy.interpolate import griddata
 import copy
@@ -27,6 +18,18 @@ from ipywidgets import (
     fixed,
     Widget,
 )
+
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
+from matplotlib.ticker import LogFormatter
+from matplotlib import colors, ticker, cm
+from matplotlib.path import Path
+import matplotlib.patches as patches
+
+from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.Utils import ExtractCoreMesh
+from SimPEG.EM.Static import DC, IP
 
 from ..base import widgetify
 
@@ -272,19 +275,19 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
     return plateCorners
 
 
-def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
-    xLocOrig1 = np.arange(
-        -target_wide / 2.0, target_wide / 2.0 + target_wide / 10.0, target_wide / 10.0
-    )
-    xLocOrig2 = np.arange(
-        target_wide / 2.0, -target_wide / 2.0 - target_wide / 10.0, -target_wide / 10.0
-    )
-    zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc)
-    zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc - target_thick)
+# def get_TargetPoints(target_thick, target_wide, ellips_b, ellips_zc):
+#     xLocOrig1 = np.arange(
+#         -target_wide / 2.0, target_wide / 2.0 + target_wide / 10.0, target_wide / 10.0
+#     )
+#     xLocOrig2 = np.arange(
+#         target_wide / 2.0, -target_wide / 2.0 - target_wide / 10.0, -target_wide / 10.0
+#     )
+#     zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc)
+#     zloc1 = np.ones_like(xLocOrig1) * (ellips_b + ellips_zc - target_thick)
 
-    corner
+#     corner
 
-    targetpoint = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
+#     targetpoint = np.vstack([np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T])
 
 
 def getSensitivity(survey, A, B, M, N, model):
@@ -730,8 +733,11 @@ def PseudoSectionWidget(survey, flag):
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size - 3, 8
         dxr = np.diff(xr)
-    xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
-    PseudoSectionPlot = lambda i, j, flag: PseudoSectionPlotfnc(i, j, survey, flag)
+    # xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
+
+    def PseudoSectionPlot(i, j, flag):
+        return PseudoSectionPlotfnc(i, j, survey, flag)
+
     return widgetify(
         PseudoSectionPlot,
         i=IntSlider(min=0, max=ntx - 1, step=1, value=0),
@@ -844,7 +850,7 @@ def DCIP2Dfwdfun(
     else:
         label = "Resistivity (Ohm-m)"
 
-    fig = plt.figure(figsize=(12, 9))
+    plt.figure(figsize=(12, 9))
     ax1 = plt.subplot(311)
 
     if which == "IP":

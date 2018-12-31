@@ -20,7 +20,6 @@ from SimPEG.EM import TDEM
 from SimPEG.EM.Analytics.TDEM import hzAnalyticDipoleT, hzAnalyticCentLoopT
 
 
-
 def rectangular_plane_layout(mesh, corner, closed=False, I=1.0):
     """
     corner: sorted list of four corners (x,y,z)

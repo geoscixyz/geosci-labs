@@ -295,7 +295,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 "Think about the problem geometry. J only has components along y. Vector plot not possible"
             )
         elif Field == "Model":
-            fig = plt.figure(figsize=(7, 6))
+            plt.figure(figsize=(7, 6))
             ax = plt.subplot(111)
             if Scenario == "Sphere":
                 model2D, mapping2D = self.getCoreModel("Sphere")
@@ -844,7 +844,7 @@ class TDEMHorizontalLoopCylWidget(object):
             else:
                 plt.figure()
                 ax = plt.subplot(111)
-                bType = "b"
+                # bType = "b"
                 self.getData()
                 if Field == "B":
                     label = "Magnetic field (T)"

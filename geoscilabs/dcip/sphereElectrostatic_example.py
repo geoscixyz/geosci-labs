@@ -2,10 +2,11 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import numpy as np
 from scipy.constants import epsilon_0
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-import numpy as np
+
 from SimPEG.Utils import ndgrid, mkvc
 
 """
@@ -29,8 +30,12 @@ ftsize_axis = 14  # font size for axis ticks
 ftsize_label = 14  # font size for axis labels
 
 # Radius function, useful sigma ratio, and log scale converter
-r = lambda x, y, z: np.sqrt(x ** 2.0 + y ** 2.0 + z ** 2.0)
-sigf = lambda sig0, sig1: (sig1 - sig0) / (sig1 + 2.0 * sig0)
+def r(x, y, z):
+    return np.sqrt(x ** 2.0 + y ** 2.0 + z ** 2.0)
+
+
+def sigf(sig0, sig1):
+    return (sig1 - sig0) / (sig1 + 2.0 * sig0)
 
 
 # tools to convert log conductivity in conductivity
@@ -56,7 +61,7 @@ def get_Setup(XYZ, sig0, sig1, R, E0, ax, label, colorsphere):
     """
 
     xplt = np.linspace(-R, R, num=100)
-    xr, yr, zr = (np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2]))
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
     dx = xr[1] - xr[0]
     top = np.sqrt(R ** 2 - xplt ** 2)
     bot = -np.sqrt(R ** 2 - xplt ** 2)
@@ -252,7 +257,7 @@ def get_Potential(XYZ, sig0, sig1, R, E0):
 def Plot_Primary_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     Vt, Vp, Vs = get_Potential(XYZ, sig0, sig1, R, E0)
-    xr, yr, zr = (np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2]))
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
 
     xcirc = xr[np.abs(xr) <= R]
 
@@ -284,7 +289,7 @@ def Plot_Total_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     Vt, Vp, Vs = get_Potential(XYZ, sig0, sig1, R, E0)
 
-    xr, yr, zr = (np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2]))
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
 
     xcirc = xr[np.abs(xr) <= R]
 
@@ -502,7 +507,7 @@ def get_Current(XYZ, sig0, sig1, R, Et, Ep, Es):
     assert (ind0 + ind1).all(), "Some indicies not included"
 
     Jt = np.zeros(shape=(len(x), 3))
-    J0 = np.zeros(shape=(len(x), 3))
+    # J0 = np.zeros(shape=(len(x), 3))
     Js = np.zeros(shape=(len(x), 3))
 
     Jp = sig0 * Ep
@@ -522,7 +527,7 @@ def Plot_Total_Currents(XYZ, sig0, sig1, R, E0, ax):
     Et, Ep, Es = get_ElectricField(XYZ, sig0, sig1, R, E0)
     Jt, Jp, Js = get_Current(XYZ, sig0, sig1, R, Et, Ep, Es)
 
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
     xcirc = xr[np.abs(xr) <= R]
 
     JtXr = Jt[:, 0].reshape(xr.size, yr.size)
@@ -564,7 +569,7 @@ def Plot_Secondary_Currents(XYZ, sig0, sig1, R, E0, ax):
     Et, Ep, Es = get_ElectricField(XYZ, sig0, sig1, R, E0)
     Jt, Jp, Js = get_Current(XYZ, sig0, sig1, R, Et, Ep, Es)
 
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
     xcirc = xr[np.abs(xr) <= R]
 
     JsXr = Js[:, 0].reshape(xr.size, yr.size)
@@ -637,7 +642,7 @@ def get_ChargesDensity(XYZ, sig0, sig1, R, Et, Ep):
 # Plot charges density on ax
 def Plot_ChargesDensity(XYZ, sig0, sig1, R, E0, ax):
 
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
     xcirc = xr[np.abs(xr) <= R]
 
     Et, Ep, Es = get_ElectricField(XYZ, sig0, sig1, R, E0)
@@ -712,12 +717,12 @@ def MN_Potential_total(sig0, sig1, R, E0, start, end, nbmp, mn):
     dVsMPn = np.zeros(
         nbmp
     )  # Diffence (d-) of Secondary Potential (Vt-) at each dipole (-MP) normalized for the mn spacing (n)
-    dVpMP = np.zeros(
-        nbmp
-    )  # Diffence (d-) of Primary Potential (Vt-) at each dipole (-MP)
-    dVpMPn = np.zeros(
-        nbmp
-    )  # Diffence (d-) of Primary Potential (Vt-) at each dipole (-MP) normalized for the mn spacing (n)
+    # dVpMP = np.zeros(
+    #     nbmp
+    # )  # Diffence (d-) of Primary Potential (Vt-) at each dipole (-MP)
+    # dVpMPn = np.zeros(
+    #     nbmp
+    # )  # Diffence (d-) of Primary Potential (Vt-) at each dipole (-MP) normalized for the mn spacing (n)
 
     # Computing VtEL
     for m in range(0, 2 * nbmp):
@@ -761,9 +766,6 @@ def two_configurations_comparison(
     PlotOpt,
 ):  # , linearcolor):
 
-    # Define the mesh
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
-
     # Defining the Profile
     start = np.array([xstart, ystart])
     end = np.array([xend, yend])
@@ -802,7 +804,7 @@ def two_configurations_comparison(
         ax4 = Plot_Total_Potential(XYZ, sig0, sig2, R1, E0, ax4)
 
         # Plot the Data (from Configuration 0)
-        gphy0 = ax2.plot(
+        ax2.plot(
             np.sqrt((MP0[0, 0] - MP0[:, 0]) ** 2 + (MP0[:, 1] - MP0[0, 1]) ** 2),
             VtdMP0,
             marker="o",
@@ -812,7 +814,7 @@ def two_configurations_comparison(
         )
 
         # Plot the Data (from Configuration 1)
-        gphy1 = ax2.plot(
+        ax2.plot(
             np.sqrt((MP1[0, 0] - MP1[:, 0]) ** 2 + (MP1[:, 1] - MP1[0, 1]) ** 2),
             VtdMP1,
             marker="o",
@@ -828,7 +830,7 @@ def two_configurations_comparison(
         ax4 = Plot_Secondary_Potential(XYZ, sig0, sig2, R1, E0, ax4)
 
         # Plot the data(from configuration 0)
-        gphy0 = ax2.plot(
+        ax2.plot(
             np.sqrt((MP0[0, 0] - MP0[:, 0]) ** 2 + (MP0[:, 1] - MP0[0, 1]) ** 2),
             VsdMP0,
             color="blue",
@@ -838,7 +840,7 @@ def two_configurations_comparison(
         )
 
         # Plot the Data (from Configuration 1)
-        gphy1 = ax2.plot(
+        ax2.plot(
             np.sqrt((MP1[0, 0] - MP1[:, 0]) ** 2 + (MP1[:, 1] - MP1[0, 1]) ** 2),
             VsdMP1,
             marker="o",

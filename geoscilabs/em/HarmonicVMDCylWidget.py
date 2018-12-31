@@ -808,7 +808,7 @@ class HarmonicVMDCylWidget(object):
 
     def InteractiveData_Sphere(self, fieldvalue="B", compvalue="z", z=0.0):
         frequency = np.logspace(2, 5, 31)
-        _ = self.simulate(self.srcLoc, self.rxLoc, frequency)
+        self.simulate(self.srcLoc, self.rxLoc, frequency)
 
         def foo(Field, Component, Scale):
             # Printout for null cases

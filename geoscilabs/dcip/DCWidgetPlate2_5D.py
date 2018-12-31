@@ -2,25 +2,23 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
 import numpy as np
-from SimPEG.EM.Static import DC
+
+from scipy.constants import epsilon_0
+from scipy.ndimage.measurements import center_of_mass
+
+from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
+
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
-from scipy.constants import epsilon_0
-from scipy.ndimage.measurements import center_of_mass
 
-from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
-
-import warnings
-
-# ignore warnings: only use this once you are sure things are working
-warnings.filterwarnings("ignore")
+from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.Utils import ExtractCoreMesh
+from SimPEG.EM.Static import DC
 from ..base import widgetify
 
 # Mesh, mapping can be globals global
@@ -225,8 +223,8 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
     qPosLoc = plateChargeLocs[posInd, :][0]
     qNegLoc = plateChargeLocs[negInd, :][0]
 
-    qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
-    qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
+    # qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
+    # qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
 
     if qNeg.shape == (0,) or qPos.shape == (0,):
         qNegAvgLoc = np.r_[-10, -10]

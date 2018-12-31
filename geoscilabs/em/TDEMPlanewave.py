@@ -2,9 +2,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import division
+
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
-import numpy as np
 from SimPEG import Utils
 
 

@@ -2,21 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, Checkbox
 
 
 def fempipeWidget(alpha, pipedepth):
     respEW, respNS, X, Y = fempipe(alpha, pipedepth)
-
-    plt.figure(figsize=(12, 9))
+    fig = plt.figure(figsize=(12, 9))
     ax0 = plt.subplot2grid((2, 2), (0, 0))
     ax1 = plt.subplot2grid((2, 2), (0, 1))
     ax2 = plt.subplot2grid((2, 2), (1, 0), colspan=2)
 
     dat0 = ax0.imshow(respEW.real * 100, extent=[X.min(), X.max(), Y.min(), Y.max()])
     dat1 = ax1.imshow(respNS.real * 100, extent=[X.min(), X.max(), Y.min(), Y.max()])
-    plt.colorbar(dat0, ax=ax0)
-    plt.colorbar(dat1, ax=ax1)
+    cb0 = plt.colorbar(dat0, ax=ax0)
+    cb1 = plt.colorbar(dat1, ax=ax1)
     ax0.set_title("In-phase EW boom (%)", fontsize=12)
     ax1.set_title("In-phase NS boom (%)", fontsize=12)
     ax0.set_xlabel("Easting (m)", fontsize=12)
@@ -62,8 +65,8 @@ def fempipe(a, pipedepth):
     L = 0.1
     s = 3.6
     R = 2 * np.pi * freq * L / a
-    # fa = (1j * a) / (1 + 1j * a)
-    # tau = L / R
+    fa = (1j * a) / (1 + 1j * a)
+    tau = L / R
     boomheight = 1.0
     Npipe = 20
     xmax = 10.0
@@ -74,7 +77,7 @@ def fempipe(a, pipedepth):
     ]
     pipeloc = np.vstack((pipeloc, pipeloc))
     pipeangle1 = np.c_[np.zeros(Npipe) + 90, np.zeros(Npipe) + 0]
-    # pipeangle2 = np.c_[np.zeros(Npipe) + 90, np.zeros(Npipe) + 90]  # .. what's this?
+    pipeangle2 = np.c_[np.zeros(Npipe) + 90, np.zeros(Npipe) + 90]  # .. what's this?
     pipeangle3 = np.c_[np.zeros(Npipe) + 0, np.zeros(Npipe) + 0]
     pipeangle = np.vstack((pipeangle1, pipeangle3))
 
@@ -151,10 +154,10 @@ def Lij(loopiloc, loopiangle, loopjloc, loopjangle):
     thetaj = loopjangle[:, 0]
     alphaj = loopjangle[:, 1]
 
-    thetai = thetai / 180 * np.pi  # degtorad(thetai)
-    alphai = alphai / 180 * np.pi  # degtorad(alphai)
-    thetaj = thetaj / 180 * np.pi  # degtorad(thetaj)
-    alphaj = alphaj / 180 * np.pi  # degtorad(alphaj)
+    thetai = thetai / 180 * np.pi  #  degtorad(thetai);
+    alphai = alphai / 180 * np.pi  #  degtorad(alphai);
+    thetaj = thetaj / 180 * np.pi  #  degtorad(thetaj);
+    alphaj = alphaj / 180 * np.pi  #  degtorad(alphaj);
 
     # http://en.wikipedia.org/wiki/Magnetic_moment#Magnetic_flux_density_due_to_an_arbitrary_oriented_dipole_moment_at_the_origin
     # assume the dipole at origin, the observation is now at
@@ -250,6 +253,9 @@ if __name__ == "__main__":
     a = 1.0
     pipedepth = 1.0
     respEW, respNS, X, Y = fempipe(a, pipedepth)
+
+    # print resp.shape
+    import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(1, 2, figsize=(12, 5))
     ax[0].pcolor(X, Y, respEW.real, 40)

@@ -14,7 +14,6 @@ from ipywidgets import (
 )
 import matplotlib.pyplot as plt
 from IPython.display import display
-from mpl_toolkits.mplot3d import axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from cvxopt import solvers, matrix
 
@@ -2040,7 +2039,7 @@ def fcnInversionWidgetEM61(
 
     XYZ2 = np.c_[mkvc(X2), mkvc(Y2), 0.1 * np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
-    A = uxoObj2.computeRotMatrix()
+    # A = uxoObj2.computeRotMatrix()
     Hp = uxoObj2.computeHp()
     Brx = uxoObj2.computeBrx()
     P2 = uxoObj2.computeP(Hp, Brx)
@@ -2281,7 +2280,7 @@ def fcnInversionWidgetTEMTADS(
 
     XYZ2 = np.c_[mkvc(X2), mkvc(Y2), 0.1 * np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
-    A = uxoObj2.computeRotMatrix()
+    # A = uxoObj2.computeRotMatrix()
     Hp = uxoObj2.computeHp()
     Brx = uxoObj2.computeBrx()
     P2 = uxoObj2.computeP(Hp, Brx)
@@ -2520,7 +2519,7 @@ def fcnInversionWidgetMPV(
 
     XYZ2 = np.c_[mkvc(X2), mkvc(Y2), 0.1 * np.ones(np.size(X2))]
     uxoObj2.defineSensorLoc(XYZ2)
-    A = uxoObj2.computeRotMatrix()
+    # A = uxoObj2.computeRotMatrix()
     Hp = uxoObj2.computeHp()
     Brx = uxoObj2.computeBrx()
     P2 = uxoObj2.computeP(Hp, Brx)

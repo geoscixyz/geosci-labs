@@ -2,16 +2,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
 import numpy as np
-from SimPEG.EM.Static import DC
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.ticker import LogFormatter
-from matplotlib.path import Path
-import matplotlib.patches as patches
 from scipy.interpolate import griddata, LinearNDInterpolator
-import warnings
+
 from ipywidgets import (
     interactive,
     IntSlider,
@@ -21,11 +14,17 @@ from ipywidgets import (
     VBox,
 )
 
-from ..base import widgetify
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.ticker import LogFormatter
+from matplotlib.path import Path
+import matplotlib.patches as patches
+
+from SimPEG import Mesh, Maps, SolverLU, Utils
+from SimPEG.EM.Static import DC
 from SimPEG.Maps import IdentityMap
 
-# only use this if you are sure things are working
-warnings.filterwarnings("ignore")
+from ..base import widgetify
 
 
 class ParametricCircleLayerMap(IdentityMap):
@@ -46,7 +45,7 @@ class ParametricCircleLayerMap(IdentityMap):
         return 7
 
     def _transform(self, m):
-        a = self.slope
+        # a = self.slope
         sig1, sig2, sig3, x, zc, r, zh = m[0], m[1], m[2], m[3], m[4], m[5], m[6]
         if self.logSigma:
             sig1, sig2, sig3 = np.exp(sig1), np.exp(sig2), np.exp(sig3)
@@ -255,7 +254,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
     dx = 5
     xr = np.arange(-40, 41, dx)
     ntx = xr.size - 2
-    dxr = np.diff(xr)
+    # dxr = np.diff(xr)
     TxObj = survey.srcList
     TxLoc = TxObj[i].loc
     RxLoc = TxObj[i].rxList[0].locs
@@ -452,8 +451,10 @@ def PseudoSectionWidget(survey, flag):
     elif flag == "PolePole":
         ntx, nmax = xr.size - 2, 8
         dxr = xr
-    xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
-    PseudoSectionPlot = lambda i, j: PseudoSectionPlotfnc(i, j, survey, flag)
+    # xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
+    def PseudoSectionPlot(i, j):
+        return PseudoSectionPlotfnc(i, j, survey, flag)
+
     return widgetify(
         PseudoSectionPlot,
         i=IntSlider(min=0, max=ntx - 1, step=1, value=0),
@@ -522,7 +523,7 @@ def DC2Dfwdfun(
     xi, yi = np.meshgrid(
         np.linspace(xr.min(), xr.max(), 120), np.linspace(1.0, nmax, 100)
     )
-    extent = (xi.min(), xi.max(), yi.min(), yi.max())
+    # extent = (xi.min(), xi.max(), yi.min(), yi.max())
     # Cheat to compute a geometric factor
     # define as G = dV_halfspace / rho_halfspace
     appres = dpred / dini / sighalf
@@ -531,7 +532,7 @@ def DC2Dfwdfun(
     pred = griddata(xzlocs, appres, (xi, yi), method="linear")
 
     if plotFlag is not None:
-        fig = plt.figure(figsize=(12, 6))
+        plt.figure(figsize=(12, 6))
         ax1 = plt.subplot(211)
         ax2 = plt.subplot(212)
 

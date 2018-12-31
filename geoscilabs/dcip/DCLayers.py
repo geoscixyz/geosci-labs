@@ -3,20 +3,19 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
-from SimPEG import Mesh, Maps, Utils, SolverLU
 from scipy.constants import epsilon_0
-
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-
-
-from matplotlib import rcParams
-
-rcParams["font.size"] = 16
 
 from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
 
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from matplotlib import rcParams
+
+from SimPEG import Mesh, Maps, Utils, SolverLU
+
 from ..base import widgetify
+
+rcParams["font.size"] = 16
 
 # Mesh parameters
 npad = 20
@@ -89,11 +88,16 @@ def layer_potentials(rho1, rho2, h, A, B, xyz):
 def layer_E(rho1, rho2, h, A, B, xyz):
     k = (rho2 - rho1) / (rho2 + rho1)
 
-    dr_dx = lambda src_loc: (xyz[:, 0] - src_loc[0]) / r(xyz, src_loc)
-    dr_dy = lambda src_loc: (xyz[:, 1] - src_loc[1]) / r(xyz, src_loc)
-    dr_dz = lambda src_loc: (xyz[:, 2] - src_loc[2]) / r(xyz, src_loc)
+    def dr_dx(src_loc):
+        return (xyz[:, 0] - src_loc[0]) / r(xyz, src_loc)
 
-    m = Utils.mkvc(np.arange(1, infinity + 1))
+    def dr_dy(src_loc):
+        return (xyz[:, 1] - src_loc[1]) / r(xyz, src_loc)
+
+    def dr_dz(src_loc):
+        return (xyz[:, 2] - src_loc[2]) / r(xyz, src_loc)
+
+    # m = Utils.mkvc(np.arange(1, infinity + 1))
 
     def deriv_1(r):
         return (-1.0 / r) * (1.0 + 2.0 * sum_term(rho1, rho2, h, r))

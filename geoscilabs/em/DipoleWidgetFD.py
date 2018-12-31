@@ -235,7 +235,10 @@ class DipoleWidgetFD(object):
             elif view == "Z" or view == "z":
                 val_line = val_line_z
             elif view == "vec" or "amp":
-                vecamp = lambda a, b, c: np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
+                def vecamp(a, b, c):
+                    return np.sqrt((a) ** 2 + (b) ** 2 + (c) ** 2)
+
                 if component == "real":
                     val_line = vecamp(val_line_x.real, val_line_y.real, val_line_z.real)
                 elif component == "imag":
@@ -349,7 +352,7 @@ class DipoleWidgetFD(object):
             SigLog,
             SrcType=SrcType,
         ):
-            if Slider == True:
+            if Slider is True:
                 f = np.r_[10 ** FreqLog]
                 sig = np.r_[10 ** SigLog]
             else:
@@ -557,7 +560,7 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
                 np.linspace(-20.0, 80.0, nRx), np.zeros(nRx), np.zeros(nRx)
             ]
             r = xyz_line[:, 0]
-            fig = plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
+            plt.figure(figsize=(18 * 1.5, 3.4 * 1.5))
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])

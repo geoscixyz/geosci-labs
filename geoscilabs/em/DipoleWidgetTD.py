@@ -19,7 +19,6 @@ from .TDEMDipolarfields import (
     dHdt_from_ElectricDipoleWholeSpace,
     J_from_ElectricDipoleWholeSpace,
     B_from_ElectricDipoleWholeSpace,
-    dBdt_from_ElectricDipoleWholeSpace,
     E_from_MagneticDipoleWholeSpace,
     H_from_MagneticDipoleWholeSpace,
     dHdt_from_MagneticDipoleWholeSpace,

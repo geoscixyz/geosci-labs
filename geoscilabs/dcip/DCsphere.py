@@ -6,8 +6,12 @@ import numpy as np
 from scipy import special
 
 
-deg2rad = lambda deg: deg / 180.0 * np.pi
-rad2deg = lambda rad: rad * 180.0 / np.pi
+def deg2rad(deg):
+    return deg / 180.0 * np.pi
+
+
+def rad2deg(rad):
+    return rad * 180.0 / np.pi
 
 
 def AnBnfun(n, radius, x0, rho, rho1, I=1.0):
@@ -57,7 +61,7 @@ def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, flag="sec", order=
     x0 = abs(txloc[0] - xc)
 
     costheta = xyz[:, 0] / r * (txloc[0] - xc) / x0
-    phi = np.zeros_like(r)
+    # phi = np.zeros_like(r)
     R = (r ** 2 + x0 ** 2.0 - 2.0 * r * x0 * costheta) ** 0.5
     # primary potential in a whole space
     prim = rho * 1.0 / (4 * np.pi * R)
