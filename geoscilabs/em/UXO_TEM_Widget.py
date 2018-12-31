@@ -2257,7 +2257,7 @@ def fcnInversionWidgetTEMTADS(
     X1, Y1 = np.meshgrid(np.linspace(-3.0, 3.0, N), np.linspace(-3.0, 3.0, N))
     XYZ1 = np.c_[mkvc(X1), mkvc(Y1), 0.1 * np.ones(np.size(X1))]
     uxoObj1.defineSensorLoc(XYZ1)
-    A = uxoObj1.computeRotMatrix()
+    # A = uxoObj1.computeRotMatrix()
     Hp = uxoObj1.computeHp()
     Brx = uxoObj1.computeBrx()
     P1 = uxoObj1.computeP(Hp, Brx)
@@ -2496,7 +2496,7 @@ def fcnInversionWidgetMPV(
     X1, Y1 = np.meshgrid(np.linspace(-3.0, 3.0, N), np.linspace(-3.0, 3.0, N))
     XYZ1 = np.c_[mkvc(X1), mkvc(Y1), 0.1 * np.ones(np.size(X1))]
     uxoObj1.defineSensorLoc(XYZ1)
-    A = uxoObj1.computeRotMatrix()
+    # A = uxoObj1.computeRotMatrix()
     Hp = uxoObj1.computeHp()
     Brx = uxoObj1.computeBrx()
     P1 = uxoObj1.computeP(Hp, Brx)

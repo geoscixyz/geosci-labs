@@ -213,7 +213,7 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
 def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
     phi = field_obj["phi"]
-    CCLoc = mesh.gridCC
+    # CCLoc = mesh.gridCC
     XLoc = np.unique(mesh.gridCC[:, 0])
     surfaceInd, zsurfaceLoc = get_Surface(mtrue, XLoc)
     phiSurface = phi[surfaceInd]
@@ -726,14 +726,10 @@ def DipoleDipolefun(i):
 def PseudoSectionWidget(survey, flag):
     if flag == "PoleDipole":
         ntx, nmax = xr.size - 2, 8
-        dxr = np.diff(xr)
     elif flag == "DipolePole":
         ntx, nmax = xr.size - 1, 7
-        dxr = xr
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size - 3, 8
-        dxr = np.diff(xr)
-    # xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
 
     def PseudoSectionPlot(i, j, flag):
         return PseudoSectionPlotfnc(i, j, survey, flag)

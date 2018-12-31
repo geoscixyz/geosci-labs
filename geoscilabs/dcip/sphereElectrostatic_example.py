@@ -62,7 +62,7 @@ def get_Setup(XYZ, sig0, sig1, R, E0, ax, label, colorsphere):
 
     xplt = np.linspace(-R, R, num=100)
     xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
-    dx = xr[1] - xr[0]
+    # dx = xr[1] - xr[0]
     top = np.sqrt(R ** 2 - xplt ** 2)
     bot = -np.sqrt(R ** 2 - xplt ** 2)
 
@@ -321,7 +321,7 @@ def Plot_Secondary_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     Vt, Vp, Vs = get_Potential(XYZ, sig0, sig1, R, E0)
 
-    xr, yr, zr = (np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2]))
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
 
     xcirc = xr[np.abs(xr) <= R]
 
@@ -404,7 +404,7 @@ def Plot_Total_ElectricField(XYZ, sig0, sig1, R, E0, ax):
 
     Et, Ep, Es = get_ElectricField(XYZ, sig0, sig1, R, E0)
 
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
 
     xcirc = xr[np.abs(xr) <= R]
 
@@ -446,7 +446,7 @@ def Plot_Secondary_ElectricField(XYZ, sig0, sig1, R, E0, ax):
 
     Et, Ep, Es = get_ElectricField(XYZ, sig0, sig1, R, E0)
 
-    xr, yr, zr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1]), np.unique(XYZ[:, 2])
+    xr, yr = np.unique(XYZ[:, 0]), np.unique(XYZ[:, 1])
 
     xcirc = xr[np.abs(xr) <= R]
 

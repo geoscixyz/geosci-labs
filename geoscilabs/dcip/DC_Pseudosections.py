@@ -441,17 +441,13 @@ def PseudoSectionWidget(survey, flag):
     xr = np.arange(-40, 41, dx)
     if flag == "PoleDipole":
         ntx, nmax = xr.size - 2, 8
-        dxr = np.diff(xr)
     elif flag == "DipolePole":
         ntx, nmax = xr.size - 1, 7
-        dxr = xr
     elif flag == "DipoleDipole":
         ntx, nmax = xr.size - 3, 8
-        dxr = np.diff(xr)
     elif flag == "PolePole":
         ntx, nmax = xr.size - 2, 8
-        dxr = xr
-    # xzlocs = getPseudoLocs(dxr, ntx, nmax, flag)
+
     def PseudoSectionPlot(i, j):
         return PseudoSectionPlotfnc(i, j, survey, flag)
 
@@ -574,7 +570,7 @@ def DC2Dfwdfun(
 
     else:
         obs = griddata(xzlocs, appresobs, (xi, yi), method="linear")
-        fig = plt.figure(figsize=(12, 9))
+        plt.figure(figsize=(12, 9))
         ax1 = plt.subplot(311)
         dat1 = mesh.plotImage(
             np.log10(1.0 / (mapping * mtrue)),

@@ -262,8 +262,8 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
     qPosLoc = plateChargeLocs[posInd, :][0]
     qNegLoc = plateChargeLocs[negInd, :][0]
 
-    qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
-    qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
+    # qPosData = np.vstack([qPosLoc[:, 0], qPosLoc[:, 1], qPos]).T
+    # qNegData = np.vstack([qNegLoc[:, 0], qNegLoc[:, 1], qNeg]).T
 
     if qNeg.shape == (0,) or qPos.shape == (0,):
         qNegAvgLoc = np.r_[-10, -10]

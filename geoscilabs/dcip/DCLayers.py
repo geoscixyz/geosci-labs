@@ -86,8 +86,6 @@ def layer_potentials(rho1, rho2, h, A, B, xyz):
 
 
 def layer_E(rho1, rho2, h, A, B, xyz):
-    k = (rho2 - rho1) / (rho2 + rho1)
-
     def dr_dx(src_loc):
         return (xyz[:, 0] - src_loc[0]) / r(xyz, src_loc)
 
@@ -467,9 +465,9 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
 
 
 def plot_layer_potentials_app():
-    plot_layer_potentials_interact = lambda A, B, M, N, rho1, rho2, h, Plot: plot_layer_potentials(
-        rho1, rho2, h, A, B, M, N, Plot
-    )
+    def plot_layer_potentials_interact(A, B, M, N, rho1, rho2, h, Plot):
+        return plot_layer_potentials(rho1, rho2, h, A, B, M, N, Plot)
+
     app = widgetify(
         plot_layer_potentials_interact,
         A=FloatSlider(

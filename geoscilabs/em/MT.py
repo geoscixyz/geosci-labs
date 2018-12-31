@@ -781,7 +781,3 @@ def run(n, plotIt=True):
         )
 
     return Res, Phase
-
-
-if __name__ == "__main__":
-    run(3)

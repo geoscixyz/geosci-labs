@@ -575,7 +575,7 @@ def InteractiveDipoleProfile(self, sig, Field, Scale):
             else:
                 raise NotImplementedError()
             r = xyz_line[:, 2]
-            fig = plt.figure(figsize=(18 * 1.0, 3.4 * 1.5))
+            plt.figure(figsize=(18 * 1.0, 3.4 * 1.5))
             gs1 = gridspec.GridSpec(2, 7)
             gs1.update(left=0.05, right=0.48, wspace=0.05)
             ax1 = plt.subplot(gs1[:2, :3])
