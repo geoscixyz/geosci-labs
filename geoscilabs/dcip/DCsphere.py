@@ -6,24 +6,25 @@ import numpy as np
 from scipy import special
 
 
-deg2rad = lambda deg: deg/180.*np.pi
-rad2deg = lambda rad: rad*180./np.pi
+def deg2rad(deg):
+    return deg / 180.0 * np.pi
 
 
-def AnBnfun(n, radius, x0, rho, rho1, I=1.):
-    const = I*rho/(4*np.pi)
-    bunmo = n*rho + (n+1)*rho1
-    An = const * radius**(2*n+1) / x0 ** (n+1.) * n * \
-        (rho1-rho) / bunmo
-    Bn = const * 1. / x0 ** (n+1.) * (2*n+1) * (rho1) / bunmo
+def rad2deg(rad):
+    return rad * 180.0 / np.pi
+
+
+def AnBnfun(n, radius, x0, rho, rho1, I=1.0):
+    const = I * rho / (4 * np.pi)
+    bunmo = n * rho + (n + 1) * rho1
+    An = const * radius ** (2 * n + 1) / x0 ** (n + 1.0) * n * (rho1 - rho) / bunmo
+    Bn = const * 1.0 / x0 ** (n + 1.0) * (2 * n + 1) * (rho1) / bunmo
     return An, Bn
 
 
-def DCSpherePointCurrent(
-    txloc, rxloc, xc, radius, rho, rho1, flag = "sec", order=12
-):
-# def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, \
-#                  flag = "sec", order=12):
+def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, flag="sec", order=12):
+    # def DCSpherePointCurrent(txloc, rxloc, xc, radius, rho, rho1, \
+    #                  flag = "sec", order=12):
     """
 
         Parameters:
@@ -54,37 +55,36 @@ def DCSpherePointCurrent(
 
     # Center of the sphere should be aligned in txloc in y-direction
     yc = txloc[1]
-    xyz = np.c_[rxloc[:,0]-xc, rxloc[:,1]-yc, rxloc[:,2]]
-    r = np.sqrt( (xyz**2).sum(axis=1) )
+    xyz = np.c_[rxloc[:, 0] - xc, rxloc[:, 1] - yc, rxloc[:, 2]]
+    r = np.sqrt((xyz ** 2).sum(axis=1))
 
-    x0 = abs(txloc[0]-xc)
+    x0 = abs(txloc[0] - xc)
 
-    costheta = xyz[:,0]/r * (txloc[0]-xc)/x0
-    phi = np.zeros_like(r)
-    R = (r**2+x0**2.-2.*r*x0*costheta)**0.5
+    costheta = xyz[:, 0] / r * (txloc[0] - xc) / x0
+    # phi = np.zeros_like(r)
+    R = (r ** 2 + x0 ** 2.0 - 2.0 * r * x0 * costheta) ** 0.5
     # primary potential in a whole space
-    prim = rho*1./(4*np.pi*R)
+    prim = rho * 1.0 / (4 * np.pi * R)
 
-    if flag =="prim":
+    if flag == "prim":
         return prim
 
     sphind = r < radius
     out = np.zeros_like(r)
     for n in range(order):
         An, Bn = AnBnfun(n, radius, x0, rho, rho1)
-        dumout = An*r[~sphind]**(-n-1.)*Pleg[n](costheta[~sphind])
+        dumout = An * r[~sphind] ** (-n - 1.0) * Pleg[n](costheta[~sphind])
         out[~sphind] += dumout
-        dumin = Bn*r[sphind]**(n)*Pleg[n](costheta[sphind])
+        dumin = Bn * r[sphind] ** (n) * Pleg[n](costheta[sphind])
         out[sphind] += dumin
 
     out[~sphind] += prim[~sphind]
 
     if flag == "sec":
-        return out-prim
+        return out - prim
     elif flag == "total":
         return out
 
+
 # if __name__ == '__main__':
-#TODO add an exmple run
-
-
+# TODO add an exmple run

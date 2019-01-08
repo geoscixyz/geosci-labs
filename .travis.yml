@@ -15,6 +15,7 @@ env:
   - TEST=test_inversion.py
   - TEST=test_mag.py
   - TEST=test_seismic.py
+  - TEST=style
 
 install:
   - pip install -e .
@@ -23,7 +24,11 @@ install:
 
 # Run test
 script:
-  - pytest tests/$TEST -v -s
+  - if [ $TEST = "style" ]; then
+      make check ;
+    else
+      pytest tests/$TEST -v -s ;
+    fi
 
 # upload to pypi on success
 # after_success:

@@ -10,13 +10,17 @@ def rotationMatrix(inc, dec, normal=True):
     phi = -np.deg2rad(np.asarray(inc))
     theta = -np.deg2rad(np.asarray(dec))
 
-    Rx = np.asarray([[1, 0, 0],
-                    [0, np.cos(phi), -np.sin(phi)],
-                    [0, np.sin(phi), np.cos(phi)]])
+    Rx = np.asarray(
+        [[1, 0, 0], [0, np.cos(phi), -np.sin(phi)], [0, np.sin(phi), np.cos(phi)]]
+    )
 
-    Rz = np.asarray([[np.cos(theta), -np.sin(theta), 0],
-                    [np.sin(theta), np.cos(theta), 0],
-                    [0, 0, 1]])
+    Rz = np.asarray(
+        [
+            [np.cos(theta), -np.sin(theta), 0],
+            [np.sin(theta), np.cos(theta), 0],
+            [0, 0, 1],
+        ]
+    )
 
     if normal:
         R = Rz.dot(Rx)
@@ -46,7 +50,7 @@ def dipazm_2_xyz(dip, azm_N):
     """
 
     # Modify azimuth from North to Cartesian-X
-    azm_X = (450. - azm_N) % 360.
+    azm_X = (450.0 - azm_N) % 360.0
 
     D = np.deg2rad(np.asarray(dip))
     I = np.deg2rad(azm_X)
