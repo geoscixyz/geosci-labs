@@ -1,0 +1,24 @@
+name: geosci-labs
+
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - scipy
+  - matplotlib
+  - Pillow
+  - ipywidgets>=0.6.0
+  - requests
+  - mkl
+  - pytest
+  - flake8
+  - black
+  - pip:
+    - pymatsolver
+    - discretize
+    - deepdish
+    - SimPEG
+    - empymod
+    - testipynb
+
