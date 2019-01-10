@@ -1,4 +1,4 @@
-name: geosci-labs
+name: geosci-labs-dev
 
 channels:
   - conda-forge
