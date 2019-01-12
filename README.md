@@ -1,9 +1,9 @@
 # GeoSci Labs
 
-[![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/lheagy/geosci-labs/master?filepath=index.ipynb)
-[![azure](https://notebooks.azure.com/launch.png)](https://notebooks.azure.com/import/gh/lheagy/geosci-labs)
-[![travis](https://travis-ci.org/lheagy/geosci-labs.svg?branch=master)](https://travis-ci.org/lheagy/geosci-labs)
-[![License](https://img.shields.io/github/license/lheagy/geosci-labs.svg)](https://github.com/lheagy/geosci-labs/blob/master/LICENSE)
+[![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=index.ipynb)
+[![azure](https://notebooks.azure.com/launch.png)](https://notebooks.azure.com/import/gh/geoscixyz/geosci-labs)
+[![travis](https://travis-ci.org/geoscixyz/geosci-labs.svg?branch=master)](https://travis-ci.org/geoscixyz/geosci-labs)
+[![License](https://img.shields.io/github/license/geoscixyz/geosci-labs.svg)](https://github.com/geoscixyz/geosci-labs/blob/master/LICENSE)
 [![SimPEG](https://img.shields.io/badge/powered%20by-SimPEG-blue.svg)](http://simpeg.xyz)
 
 This is a repository of code used to power the notebooks and interactive examples for https://em.geosci.xyz and https://gpg.geosci.xyz.
@@ -16,7 +16,7 @@ Interactive visualizations are a powerful way to interrogate mathematical equati
 
 ## Scope
 
-The repository contains the python code to run the ipython-widget style apps in http://github.com/lheagy/geosci-labs. These are mainly plotting code and some simple analytics. More complex numerical simulations depend on [SimPEG](http://simpeg.xyz)
+The repository contains the python code to run the ipython-widget style apps in http://github.com/geoscixyz/geosci-labs. These are mainly plotting code and some simple analytics. More complex numerical simulations depend on [SimPEG](http://simpeg.xyz)
 
 ## Usage
 
@@ -24,9 +24,9 @@ The notebooks can be run online through [Binder](#Binder), or [downloaded and ru
 
 ### Binder
 
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/lheagy/geosci-labs/master?filepath=notebooks%2Findex.ipyn)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipyn)
 
-1. Launch the binder by clicking on the badge above or going to: https://mybinder.org/v2/gh/lheagy/geosci-labs/master?filepath=notebooks%2Findex.ipynb.
+1. Launch the binder by clicking on the badge above or going to: https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipynb.
    This can sometimes take a couple minutes, so be patient...
 
 2. Select the notebook of interest from the contents
@@ -42,7 +42,7 @@ To run them locally, you will need to have python installed, preferably through 
 You can then clone this reposiroty. From a command line, run
 
 ```
-git clone https://github.com/lheagy/geosci-labs.git
+git clone https://github.com/geoscixyz/geosci-labs.git
 ```
 
 Then `cd` into `gpgLabs`
@@ -98,7 +98,7 @@ Each notebook has the following structure
 
 ### Setting up your environment
 
-- to develop code for these notebooks, please see https://github.com/lheagy/geosci-labs
+- to develop code for these notebooks, please see https://github.com/geoscixyz/geosci-labs
 - add the notebook name and path to the [index](index.ipynb)
 
 ## Contributing
