@@ -158,6 +158,29 @@ This installs your project in *editable* mode, meaning that changes made to the 
 code will be available when you import the package (even if you're on a different
 directory).
 
+### Notebook structure
+
+To maintain consistency of the notebook-apps, please use the following structure 
+
+- Title: title of the notebook that include the geophysical method name
+- Purpose: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
+- Setup: Overview of the relevant parameters in the problem
+- App: interactive visualization that uses [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/)
+- (Additional material: supporting derivations, links to related case studies, ...)
+- Acknowledgement: please include the below statement a markdown cell at the end of the notebook, appending any other geoscience
+  package names that are being used in the notebook and should be acknowledged:
+  ```
+  # Acknowledgements
+  
+  This app is a part of the [GeoSci.xyz](https://geosci.xyz) project and relies on [SimPEG](https://simpeg.xyz). Thanks to all of the [contributors](https://github.com/geoscixyz/geosci-labs/graphs/contributors) for their work! 
+  
+  # License
+  
+  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  ```
+
+Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state. 
+
 ### Code style
 
 We use [Black](https://github.com/ambv/black) to format the code so we don't have to
