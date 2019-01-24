@@ -158,7 +158,7 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
     for ii in range(ndata):
 
-        tx, ty, tz = PF.Magnetics.get_T_mat(Xn, Yn, Zn, rxLoc[ii, :])
+        tx, ty, tz = PF.Magnetics.calcRow(Xn, Yn, Zn, rxLoc[ii, :])
 
         G[ii, :] = tx / 1e-9 * mu_0
         G[ii + ndata, :] = ty / 1e-9 * mu_0
