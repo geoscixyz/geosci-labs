@@ -4,21 +4,24 @@ import matplotlib.contour as ctr
 import scipy.io
 import copy
 
-from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, ToggleButton, VBox, HBox, Output
+from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, ToggleButton, VBox, HBox, Output, Layout
 
 plotdata = []
 colorList = ['red','blue','green','orange','black','pink','brown','deepskyblue','darkkhaki','fuchsia','midnightblue','yellow','gold','lime']
 index = 0
+currentResult = []
 
 def drawfunction(delta_rho,a,z,stationSpacing,B):
 	global plotdata
 	global index
 	global colorList
+	global currentResult
 	respEW, respNS, X, Y = datagenerator(delta_rho,a,z,stationSpacing)
-	fig = plt.figure(figsize=(10, 22))
-	ax0 = plt.subplot2grid((22, 1), (1, 0), rowspan=6)
-	ax2 = plt.subplot2grid((22, 19), (7, 5), rowspan=6, colspan=9)
-	ax1 = plt.subplot2grid((22, 1), (13, 0), rowspan=8)
+	Dpi = 60
+	fig = plt.figure(figsize=(15, 20), dpi = Dpi)
+	ax0 = plt.subplot2grid((20, 1), (1, 0), rowspan=4)
+	ax2 = plt.subplot2grid((20, 18), (5, 6), rowspan=6, colspan=6)
+	ax1 = plt.subplot2grid((20, 18), (11, 6), rowspan=4, colspan=6)
 	textShow = []
 	colors = []
 	maxG = -100
@@ -38,16 +41,18 @@ def drawfunction(delta_rho,a,z,stationSpacing,B):
 		maxG = -100
 		minG = 100
 	ax0.plot(Y[:, 0], respNS, "k.-",color=colorList[index])
+	currentResult = [Y[:,0], respNS]
 	showText = r'$\Delta\rho$'+'='+str(delta_rho)+', a='+str(a)+' ,z='+str(z)
 	textShow.append(showText)
 	colors.append(colorList[index])
 	textLocation = max(max(respNS),maxG)
+	maxG = max(max(respNS),maxG)
 	minG = min(min(respNS),minG)
-	textheight = 12/2.845/50*(maxG-minG)
+	textheight = 12/2.845/80*(maxG-minG)
 	for i in range(len(textShow)):
 		ax0.text(-10,textLocation-i*textheight,textShow[i],color=colors[i],verticalalignment='top',fontsize=10)
 	ax0.grid(True)
-	ax0.set_ylabel("g (mGal)", fontsize=16)
+	ax0.set_ylabel(r'$\Delta gz$'+"(mGal)", fontsize=16)
 	ax0.set_xlabel("x (m)", fontsize=16)
 	printGrapha(delta_rho,a,z,ax1,stationSpacing)
 	printCirCle(a,z,ax2)
@@ -91,10 +96,10 @@ def datagenerator(delta_rho,a,z,stationSpacing):
 	return respEW, gravity_change, X, Y
 
 def calculategravity(delta_rho,a,z,x)->float:
-	G = 6.67259e-11
+	G = 6.67259e-8
 	partial = (4/3*np.pi*G)*delta_rho*a*a*a*z
 	g = partial/float(np.power(x*x+z*z,1.5))
-	response = g
+	response = g * pow(10,5)
 	return response
 
 def printGrapha(delta_rho,a,z,axeToDraw,stationSpacing):
@@ -105,7 +110,7 @@ def printGrapha(delta_rho,a,z,axeToDraw,stationSpacing):
 	Step = pow(stationSpacing,0.5)
 	scalax, scalay, color = graphaDataGenerator(delta_rho,a,z,maxR,maxScala,Step)
 	dat0 = axeToDraw.scatter(scalax,scalay,c=color,cmap='plasma',marker='s',s=450*pow(Step,0.5))
-	axeToDraw.set_title(r'$\Delta g$'+' (mGal)', fontsize=16)
+	axeToDraw.set_title(r'$\Delta gz$'+' (mGal)', fontsize=16)
 	plt.colorbar(dat0,ax=axeToDraw)
 
 def graphaDataGenerator(delta_rho,a,z,maxR,maxScala,Step):
@@ -136,23 +141,20 @@ def interact_gravity_sphere():
 		),
 		B = ToggleButton(
 			value=True,
-			description='Memory the line',
+			description='keep previous plots',
 			disabled=False,
 			button_style='',
 			tooltip='Click me',
-			icon='check'
+			layout=Layout(width='20%')
 		)
 	)
 	return Q
 
-def clearPlotdata(button):
-	global plotdata
-	plotdata.clear()
-	
-def clearButton():
-	
-	B.on_click(callback=clearPlotdata)
-	return B
+def printResult():
+	global currentResult
+	print('{0: ^10}{1: ^10}'.format('X','Δgz'))
+	for i in range(len(currentResult[0])):
+		print('{0: ^10}{1: ^10}'.format('%.3f'%currentResult[0][i],'%.6f'%currentResult[1][i]))
 
 if __name__ == "__main__":
 	drawfunction(1,2,3)

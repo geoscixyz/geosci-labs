@@ -4,22 +4,25 @@ import matplotlib.contour as ctr
 import scipy.io
 import copy
 from math import *
-from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, ToggleButton, VBox, HBox, Output, interactive_output
+from ipywidgets import interactive, IntSlider, widget, FloatText, FloatSlider, ToggleButton, VBox, HBox, Output, interactive_output, Layout
 
 plotdata = []
 colorList = ['red','blue','green','orange','black','pink','brown','deepskyblue','darkkhaki','fuchsia','midnightblue','yellow','gold','lime']
 index = 0
+currentResult = []
 
 def drawfunction(delta_rho,z1,z2,b,beta,stationSpacing,B):
 	global plotdata
 	global index
 	global colorList
+	global currentResult
 	beta = beta*pi/180
 	respEW, respNS, X, Y = datagenerator(delta_rho,z1,z2,b,beta,stationSpacing)
-	fig = plt.figure(figsize=(10, 22))
+	Dpi = 60
+	fig = plt.figure(figsize=(10, 22), dpi = Dpi)
 	ax0 = plt.subplot2grid((22, 1), (1, 0), rowspan=6)
-	ax2 = plt.subplot2grid((22, 19), (7, 0), rowspan=6, colspan=19)
-	ax1 = plt.subplot2grid((22, 1), (13, 0), rowspan=8)
+	ax2 = plt.subplot2grid((22, 1), (7, 0), rowspan=6)
+	ax1 = plt.subplot2grid((22, 4), (13, 1), rowspan=4, colspan=2)
 	textShow = []
 	colors = []
 	maxG = -100
@@ -39,16 +42,18 @@ def drawfunction(delta_rho,z1,z2,b,beta,stationSpacing,B):
 		maxG = -100
 		minG = 100
 	ax0.plot(Y[:, 0], respNS, "k.-",color=colorList[index])
+	currentResult = [Y[:,0], respNS]
 	showText = r'$\Delta\rho$'+'='+str(delta_rho)+', z1=%.2f'%z1+' ,z2=%.2f'%z2+' ,b=%d ,'%b+r'$\beta=$%d'%(beta*180/pi)+' ,Step=%.3f'%stationSpacing
 	textShow.append(showText)
 	colors.append(colorList[index])
 	textLocation = max(max(respNS),maxG)
 	minG = min(min(respNS),minG)
+	maxG = max(max(respNS),maxG)
 	textheight = 12/2.845/50*(maxG-minG)
 	for i in range(len(textShow)):
 		ax0.text(-6,textLocation-i*textheight,textShow[i],color=colors[i],verticalalignment='top',fontsize=10)
 	ax0.grid(True)
-	ax0.set_ylabel("g (mGal)", fontsize=16)
+	ax0.set_ylabel(r'$\Delta gz$'+"(mGal)", fontsize=16)
 	ax0.set_xlabel("x (m)", fontsize=16)
 	printGrapha(delta_rho,z1,z2,b,beta,ax1,stationSpacing)
 	printDike(ax2,z1,z2,b,beta,5)
@@ -63,8 +68,6 @@ def drawfunction(delta_rho,z1,z2,b,beta,stationSpacing,B):
 def printDike(axeToDraw,z1,z2,b,beta,x):
 	boundry = max(z2,b,x)
 	axeToDraw.plot(0,0,'.')
-	axeToDraw.plot(x,0,'.')
-	axeToDraw.plot([0,0], [-z1/2,z1/2], color='black', linewidth=1.0)
 	axeToDraw.plot([-6,6], [0,0], color='black', linewidth=1.5)
 	x1 = -z1*float(np.tan(beta))
 	x3 = b-z1*float(np.tan(beta))
@@ -116,7 +119,7 @@ def datagenerator(delta_rho,z1,z2,b,beta,stationSpacing):
 	return respEW, gravity_change, X, Y
 
 def calculategravity(delta_rho,z1,z2,b,beta,x)->float:
-	G = 6.67259e-11
+	G = 6.67259e-8
 	r1 = pow(pow(x+z1*tan(beta),2)+pow(z1,2),0.5)
 	r2 = pow(pow(x+z2*tan(beta),2)+pow(z2,2),0.5)
 	r3 = pow(pow(x+z1*tan(beta)-b,2)+pow(z1,2),0.5)
@@ -137,7 +140,7 @@ def calculategravity(delta_rho,z1,z2,b,beta,x)->float:
 	part2 = sin(beta)*cos(beta)*(x*(theta2-theta1)-(x-b)*(theta4-theta3))
 	part3 = pow(cos(beta),2)*(x*log(r2/r1)-(x-b)*log(r4/r3))
 	g = 2*G*delta_rho*(part1+part2+part3)
-	response = g
+	response = g * pow(10,5)
 	return response
 
 def printGrapha(delta_rho,z1,z2,b,beta,axeToDraw,stationSpacing):
@@ -148,7 +151,7 @@ def printGrapha(delta_rho,z1,z2,b,beta,axeToDraw,stationSpacing):
 	Step = pow(stationSpacing,0.5)
 	scalax, scalay, color = graphaDataGenerator(delta_rho,z1,z2,b,beta,maxR,maxScala,Step)
 	dat0 = axeToDraw.scatter(scalax,scalay,c=color,cmap='plasma',marker='s',s=450*pow(Step,0.5))
-	axeToDraw.set_title('The delta of gravity (mGal)', fontsize=16)
+	axeToDraw.set_title(r'$\Delta gz$'+'(mGal)', fontsize=16)
 	plt.colorbar(dat0,ax=axeToDraw)
 
 def graphaDataGenerator(delta_rho,z1,z2,b,beta,maxR,maxScala,Step):
@@ -168,10 +171,10 @@ def interact_gravity_Dike():
 		description=r'$\Delta\rho$',min=-5.0, max=5.0, step=0.1, value=1.0, continuous_update=False
 	)
 	s2=FloatSlider(
-		description='z1', min=0.1, max=4.0, step=0.1, value=1/3, continuous_update=False
+		description=r'$z_1$', min=0.1, max=4.0, step=0.1, value=1/3, continuous_update=False
 	)
 	s3=FloatSlider(
-		description='z2',min=0.1, max=5.0, step=0.1, value=4/3, continuous_update=False
+		description=r'$z_2$',min=0.1, max=5.0, step=0.1, value=4/3, continuous_update=False
 	)
 	s4=FloatSlider(
 		description ='b' ,min=0.1, max=5.0, step=0.1, value=1.0, continuous_update=False
@@ -188,21 +191,20 @@ def interact_gravity_Dike():
 		disabled=False,
 		button_style='', # 'success', 'info', 'warning', 'danger' or ''
 		tooltip='Click me',
-		icon=''
+		layout=Layout(width='20%')		
 	)
 	v1 = VBox([s1,s2,s3])
 	v2 = VBox([s4,s5,s6])
 	out1 = HBox([v1,v2,b1])
 	out = interactive_output(drawfunction,{'delta_rho':s1,'z1':s2,'z2':s3,'b':s4,'beta':s5,'stationSpacing':s6,'B':b1})
 	return VBox([out1,out])
-def clearPlotdata(button):
-	global plotdata
-	plotdata.clear()
-	
-def clearButton():
-	
-	B.on_click(callback=clearPlotdata)
-	return B
+
+def printResult():
+	global currentResult
+	print('{0: ^10}{1: ^10}'.format('X','Δgz'))
+	for i in range(len(currentResult[0])):
+		print('{0: ^10}{1: ^10}'.format('%.3f'%currentResult[0][i],'%.6f'%currentResult[1][i]))
+
 
 if __name__ == "__main__":
 	drawfunction(1,1/3,3/4,1,1,0.01,True)
