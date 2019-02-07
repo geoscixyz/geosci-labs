@@ -53,7 +53,7 @@ def drawfunction(delta_rho,z1,z2,b,beta,stationSpacing,B):
 	for i in range(len(textShow)):
 		ax0.text(-6,textLocation-i*textheight,textShow[i],color=colors[i],verticalalignment='top',fontsize=10)
 	ax0.grid(True)
-	ax0.set_ylabel(r'$\Delta gz$'+"(mGal)", fontsize=16)
+	ax0.set_ylabel(r'$\Delta g_z$'+"(mGal)", fontsize=16)
 	ax0.set_xlabel("x (m)", fontsize=16)
 	printGrapha(delta_rho,z1,z2,b,beta,ax1,stationSpacing)
 	printDike(ax2,z1,z2,b,beta,5)
@@ -151,7 +151,7 @@ def printGrapha(delta_rho,z1,z2,b,beta,axeToDraw,stationSpacing):
 	Step = pow(stationSpacing,0.5)
 	scalax, scalay, color = graphaDataGenerator(delta_rho,z1,z2,b,beta,maxR,maxScala,Step)
 	dat0 = axeToDraw.scatter(scalax,scalay,c=color,cmap='plasma',marker='s',s=450*pow(Step,0.5))
-	axeToDraw.set_title(r'$\Delta gz$'+'(mGal)', fontsize=16)
+	axeToDraw.set_title(r'$\Delta g_z$'+'(mGal)', fontsize=16)
 	plt.colorbar(dat0,ax=axeToDraw)
 
 def graphaDataGenerator(delta_rho,z1,z2,b,beta,maxR,maxScala,Step):

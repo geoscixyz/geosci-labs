@@ -20,8 +20,8 @@ def drawfunction(delta_rho,a,z,stationSpacing,B):
 	Dpi = 60
 	fig = plt.figure(figsize=(15, 20), dpi = Dpi)
 	ax0 = plt.subplot2grid((20, 1), (1, 0), rowspan=4)
-	ax2 = plt.subplot2grid((20, 18), (5, 6), rowspan=6, colspan=6)
-	ax1 = plt.subplot2grid((20, 18), (11, 6), rowspan=4, colspan=6)
+	ax2 = plt.subplot2grid((20, 1), (5, 0), rowspan=9)
+	ax1 = plt.subplot2grid((20, 18), (14, 6), rowspan=4, colspan=6)
 	textShow = []
 	colors = []
 	maxG = -100
@@ -52,7 +52,7 @@ def drawfunction(delta_rho,a,z,stationSpacing,B):
 	for i in range(len(textShow)):
 		ax0.text(-10,textLocation-i*textheight,textShow[i],color=colors[i],verticalalignment='top',fontsize=10)
 	ax0.grid(True)
-	ax0.set_ylabel(r'$\Delta gz$'+"(mGal)", fontsize=16)
+	ax0.set_ylabel(r'$\Delta g_z$'+"(mGal)", fontsize=16)
 	ax0.set_xlabel("x (m)", fontsize=16)
 	printGrapha(delta_rho,a,z,ax1,stationSpacing)
 	printCirCle(a,z,ax2)
@@ -69,7 +69,7 @@ def printCirCle(a,z,axeToDraw):
 	x,y = np.cos(theta)*a, np.sin(theta)*a-z
 	axeToDraw.text(a,-z,'The Sphere')
 	axeToDraw.text(-0.6,0.3,'Ground')
-	axeToDraw.plot([-5,5], [0,0], color='black', linewidth=3.0)
+	axeToDraw.plot([-10,10], [0,0], color='black', linewidth=3.0)
 	axeToDraw.plot([-5,5], [-9,-9], color='white', linewidth=1.0)
 	axeToDraw.plot([-5,5], [4,4], color='white', linewidth=1.0)
 	axeToDraw.plot([-5,-5], [-9,4], color='white', linewidth=1.0)
@@ -110,7 +110,7 @@ def printGrapha(delta_rho,a,z,axeToDraw,stationSpacing):
 	Step = pow(stationSpacing,0.5)
 	scalax, scalay, color = graphaDataGenerator(delta_rho,a,z,maxR,maxScala,Step)
 	dat0 = axeToDraw.scatter(scalax,scalay,c=color,cmap='plasma',marker='s',s=450*pow(Step,0.5))
-	axeToDraw.set_title(r'$\Delta gz$'+' (mGal)', fontsize=16)
+	axeToDraw.set_title(r'$\Delta g_z$'+' (mGal)', fontsize=16)
 	plt.colorbar(dat0,ax=axeToDraw)
 
 def graphaDataGenerator(delta_rho,a,z,maxR,maxScala,Step):
