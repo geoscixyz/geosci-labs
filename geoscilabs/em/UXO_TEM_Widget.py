@@ -2059,7 +2059,7 @@ def fcnInversionWidgetEM61(
     COUNT = 0
     m_vec = [Misfit]
 
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT == 0:
 
         MisPrev = Misfit
 
@@ -2164,7 +2164,7 @@ def fcnInversionWidgetEM61(
         + ")"
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
-    if COUNT is 1:
+    if COUNT == 1:
         ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
         ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
         ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
@@ -2267,12 +2267,12 @@ def fcnInversionWidgetTEMTADS(
 
     # PREDICT TRUE DATA
     uxoObj2 = TEMTADSproblem(rt, phi, L, times, I)
-    if Nx is 1:
+    if Nx == 1:
         Xn = 0.0
     else:
         Xn = np.linspace(-Dx / 2, Dx / 2, Nx)
 
-    if Ny is 1:
+    if Ny == 1:
         Yn = 0.0
     else:
         Yn = np.linspace(-Dy / 2, Dy / 2, Ny)
@@ -2299,7 +2299,7 @@ def fcnInversionWidgetTEMTADS(
     COUNT = 0
     m_vec = [Misfit]
 
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT == 0:
 
         MisPrev = Misfit
 
@@ -2402,7 +2402,7 @@ def fcnInversionWidgetTEMTADS(
         + ")"
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
-    if COUNT is 1:
+    if COUNT == 1:
         ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
         ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
         ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
@@ -2506,12 +2506,12 @@ def fcnInversionWidgetMPV(
 
     # PREDICT TRUE DATA
     uxoObj2 = MPVproblem(rt, phi, L, times, I)
-    if Nx is 1:
+    if Nx == 1:
         Xn = 0.0
     else:
         Xn = np.linspace(-Dx / 2, Dx / 2, Nx)
 
-    if Ny is 1:
+    if Ny == 1:
         Yn = 0.0
     else:
         Yn = np.linspace(-Dy / 2, Dy / 2, Ny)
@@ -2540,7 +2540,7 @@ def fcnInversionWidgetMPV(
     COUNT = 0
     m_vec = [Misfit]
 
-    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT is 0:
+    while Misfit > 1.001 and COUNT < 100 and dMis > 1e-5 or COUNT == 0:
 
         MisPrev = Misfit
 
@@ -2664,7 +2664,7 @@ def fcnInversionWidgetMPV(
         + ")"
     )
     fm_str = "Final Misfit = " + "{:.2f}".format(m_vec[-1])
-    if COUNT is 1:
+    if COUNT == 1:
         ax21.text(0.1, 0.92 * m_vec[0], rt_str, fontsize=FS)
         ax21.text(0.1, 0.83 * m_vec[0], rn_str, fontsize=FS)
         ax21.text(0.1, 0.74 * m_vec[0], fm_str, fontsize=FS)
@@ -2788,9 +2788,9 @@ class UXOTEM:
 
         if karg is False:
             A = self.computeRotMatrix()
-        elif np.size(karg) is 3:
+        elif np.size(karg) == 3:
             A = self.computeRotMatrix(karg)
-        elif np.size(karg) is 9:
+        elif np.size(karg) == 9:
             A = karg
 
         q = np.zeros((6, N))
@@ -3794,7 +3794,7 @@ class MPVproblem(UXOTEM):
 
         Floor = FloorVal * np.max(np.abs(dpre)) * np.ones(np.shape(dpre))
 
-        if len(Pct) is 1:
+        if len(Pct) == 1:
             dunc = Floor + Pct * np.abs(dpre)
         else:
             dunc = Floor
