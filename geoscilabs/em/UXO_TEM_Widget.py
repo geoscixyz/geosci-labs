@@ -164,7 +164,7 @@ def ImageDataWidget(TxType):
 
     # TxType MUST be: "EM61", "TEMTADS" or "MPV"
 
-    if TxType is "EM61":
+    if TxType == "EM61":
 
         Out = interactive(
             fcnImageDataWidgetEM61,
@@ -338,7 +338,7 @@ def ImageDataWidget(TxType):
             ),
         )
 
-    elif TxType is "TEMTADS":
+    elif TxType == "TEMTADS":
         Out = interactive(
             fcnImageDataWidgetTEMTADS,
             x0=FloatSlider(
@@ -511,7 +511,7 @@ def ImageDataWidget(TxType):
             ),
         )
 
-    elif TxType is "MPV":
+    elif TxType == "MPV":
         Out = interactive(
             fcnImageDataWidgetMPV,
             x0=FloatSlider(
@@ -692,7 +692,7 @@ def InversionWidget(TxType):
 
     # TxType MUST be: "EM61", "TEMTADS" or "MPV"
 
-    if TxType is "EM61":
+    if TxType == "EM61":
 
         Out = interactive(
             fcnInversionWidgetEM61,
@@ -906,7 +906,7 @@ def InversionWidget(TxType):
             ),
         )
 
-    elif TxType is "TEMTADS":
+    elif TxType == "TEMTADS":
 
         Out = interactive(
             fcnInversionWidgetTEMTADS,
@@ -1120,7 +1120,7 @@ def InversionWidget(TxType):
             ),
         )
 
-    elif TxType is "MPV":
+    elif TxType == "MPV":
 
         Out = interactive(
             fcnInversionWidgetMPV,
@@ -1887,22 +1887,22 @@ def fcnImageDataWidgetMPV(
     # Anomaly
     titlestr1 = "Anomaly at t = " + "{:.3e}".format(uxoObj.times[tn - 1]) + " s"
 
-    if dComp is "X":
+    if dComp == "X":
         k = 0
-    elif dComp is "Y":
+    elif dComp == "Y":
         k = 1
-    elif dComp is "Z":
+    elif dComp == "Z":
         k = 2
 
     di = 1e6 * np.reshape(data[6 + k : 15 * N ** 2 : 15, tn - 1], (N, N))
     Cplot = ax1.contourf(X, Y, di.T, 40, cmap="viridis")
     cbar = plt.colorbar(Cplot, ax=ax1, pad=0.02)
 
-    if dComp is "X":
+    if dComp == "X":
         cbar.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Y":
+    elif dComp == "Y":
         cbar.set_label("dBy/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Z":
+    elif dComp == "Z":
         cbar.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar.ax.tick_params(labelsize=FS - 2)
 
@@ -2026,12 +2026,12 @@ def fcnInversionWidgetEM61(
 
     # PREDICT TRUE DATA
     uxoObj2 = EM61problem(rt, phi, L, times, I)
-    if Nx is 1:
+    if Nx == 1:
         Xn = 0.0
     else:
         Xn = np.linspace(-Dx / 2, Dx / 2, Nx)
 
-    if Ny is 1:
+    if Ny == 1:
         Yn = 0.0
     else:
         Yn = np.linspace(-Dy / 2, Dy / 2, Ny)
@@ -2579,11 +2579,11 @@ def fcnInversionWidgetMPV(
     ax22 = fig.add_axes([0.5, 0.0, 0.4, 0.45])
     FS = 18
 
-    if dComp is "X":
+    if dComp == "X":
         k = 0
-    elif dComp is "Y":
+    elif dComp == "Y":
         k = 1
-    elif dComp is "Z":
+    elif dComp == "Z":
         k = 2
 
     # True Anomaly
@@ -2592,11 +2592,11 @@ def fcnInversionWidgetMPV(
     )  # 1e6 for uV
     Cplot1 = ax11.contourf(X1, Y1, d11.T, 40, cmap="viridis")
     cbar1 = plt.colorbar(Cplot1, ax=ax11, pad=0.02, format="%.2e")
-    if dComp is "X":
+    if dComp == "X":
         cbar1.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Y":
+    elif dComp == "Y":
         cbar1.set_label("dBy/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Z":
+    elif dComp == "Z":
         cbar1.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar1.ax.tick_params(labelsize=FS - 2)
 
@@ -2617,11 +2617,11 @@ def fcnInversionWidgetMPV(
     )  # 1e6 for uV
     Cplot2 = ax12.contourf(X1, Y1, d12.T, 40, cmap="viridis")
     cbar2 = plt.colorbar(Cplot2, ax=ax12, pad=0.02, format="%.2e")
-    if dComp is "X":
+    if dComp == "X":
         cbar2.set_label("dBx/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Y":
+    elif dComp == "Y":
         cbar2.set_label("dBy/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
-    elif dComp is "Z":
+    elif dComp == "Z":
         cbar2.set_label("dBz/dt [$\mu$V]", rotation=270, labelpad=25, size=FS)
     cbar2.ax.tick_params(labelsize=FS - 2)
 

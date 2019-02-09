@@ -62,11 +62,11 @@ def plot_ResponseFct(h_boom, h_1, sigma_1, sigma_2, orientation="HCP"):
     sigvec = sigma_1 * np.ones(z.shape)
     sigvec[z > h_1] = sigma_2
 
-    if orientation is "HCP":
+    if orientation == "HCP":
         phi = phi_v(z + h_boom)
         sig_a = sigma_av(h_boom, h_1, sigma_1, sigma_2)
         phi_title = "$\phi_V$"
-    elif orientation is "VCP":
+    elif orientation == "VCP":
         phi = phi_h(z + h_boom)
         sig_a = sigma_ah(h_boom, h_1, sigma_1, sigma_2)
         phi_title = "$\phi_H$"
