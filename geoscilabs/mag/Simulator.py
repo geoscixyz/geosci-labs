@@ -186,9 +186,7 @@ def PlotFwrSim(
         xyz = survey.srcField.rxList[0].locs
         dobs = survey.dobs
 
-        return plotProfile(
-            xyz, dobs, a, b, Profile_npt, data=data, fig=fig, ax=ax
-        )
+        return plotProfile(xyz, dobs, a, b, Profile_npt, data=data, fig=fig, ax=ax)
 
     survey = prob.survey
     prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
@@ -235,24 +233,15 @@ def PlotFwrSim(
 
 
 def ViewMagSurvey2D(survey):
-
-    def MagSurvey2D(
-        East, North, Width, Height, Azimuth, Length, Npts, Profile
-    ):
+    def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
         Azimuth /= 180.0 / np.pi
         Length /= 2.0 * 0.98
 
-        a = [
-            East - np.cos(-Azimuth) * Length,
-            North - np.sin(-Azimuth) * Length
-        ]
+        a = [East - np.cos(-Azimuth) * Length, North - np.sin(-Azimuth) * Length]
 
-        b = [
-            East + np.cos(-Azimuth) * Length,
-            North + np.sin(-Azimuth) * Length
-        ]
+        b = [East + np.cos(-Azimuth) * Length, North + np.sin(-Azimuth) * Length]
 
         xlim = East + np.asarray([-Width / 2.0, Width / 2.0])
         ylim = North + np.asarray([-Height / 2.0, Height / 2.0])
@@ -320,12 +309,10 @@ def ViewMagSurvey2D(survey):
             continuous_update=False,
         ),
         Width=widgets.FloatSlider(
-            min=10, max=Lx * 1.05, step=10, value=Lx * 1.05,
-            continuous_update=False
+            min=10, max=Lx * 1.05, step=10, value=Lx * 1.05, continuous_update=False
         ),
         Height=widgets.FloatSlider(
-            min=10, max=Ly * 1.05, step=10, value=Ly * 1.05,
-            continuous_update=False
+            min=10, max=Ly * 1.05, step=10, value=Ly * 1.05, continuous_update=False
         ),
         Azimuth=widgets.FloatSlider(
             min=-90, max=90, step=5, value=0, continuous_update=False
@@ -343,8 +330,7 @@ def ViewMagSurvey2D(survey):
 
 
 def plotMagSurvey2D(
-    survey, a, b, npts,
-    data=None, pred=None, fig=None, ax=None, vmin=None, vmax=None
+    survey, a, b, npts, data=None, pred=None, fig=None, ax=None, vmin=None, vmax=None
 ):
     """
     Plot the data and line profile inside the spcified limits
@@ -363,9 +349,7 @@ def plotMagSurvey2D(
         data = survey.dobs
 
     # Use SimPEG.PF ploting function
-    Utils.PlotUtils.plot2Ddata(
-        rxLoc, data, ax=ax
-    )
+    Utils.PlotUtils.plot2Ddata(rxLoc, data, ax=ax)
 
     ax.plot(x, y, "w.", ms=10)
     ax.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
@@ -375,12 +359,7 @@ def plotMagSurvey2D(
     if pred is not None:
         ax2 = plt.subplot(1, 2, 2)
 
-        Utils.PlotUtils.plot2Ddata(
-            rxLoc,
-            pred,
-            ax=ax2,
-            clim=[pred.min(), pred.max()],
-        )
+        Utils.PlotUtils.plot2Ddata(rxLoc, pred, ax=ax2, clim=[pred.min(), pred.max()])
         ax2.plot(x, y, "w.", ms=10)
         ax2.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
         ax2.text(x[-1], y[-1], "B", fontsize=16, color="w", ha="right")
@@ -392,9 +371,7 @@ def plotMagSurvey2D(
     return
 
 
-def plotProfile(
-    xyz, dobs, a, b, npts, data=None, fig=None, ax=None, dType="3D"
-):
+def plotProfile(xyz, dobs, a, b, npts, data=None, fig=None, ax=None, dType="3D"):
     """
     Plot the data and line profile inside the spcified limits
     """
@@ -506,16 +483,13 @@ def ViewPrism(survey):
         Prism,
         update=widgets.ToggleButton(description="Refresh", value=False),
         dx=widgets.FloatSlider(
-            min=0.01, max=1000.0, step=0.01, value=lim / 4,
-            continuous_update=False
+            min=0.01, max=1000.0, step=0.01, value=lim / 4, continuous_update=False
         ),
         dy=widgets.FloatSlider(
-            min=0.01, max=1000.0, step=0.01, value=lim / 4,
-            continuous_update=False
+            min=0.01, max=1000.0, step=0.01, value=lim / 4, continuous_update=False
         ),
         dz=widgets.FloatSlider(
-            min=0.01, max=1000.0, step=0.01, value=lim / 4,
-            continuous_update=False
+            min=0.01, max=1000.0, step=0.01, value=lim / 4, continuous_update=False
         ),
         x0=widgets.FloatSlider(
             min=cntr[1] - 1000,
@@ -532,8 +506,7 @@ def ViewPrism(survey):
             continuous_update=False,
         ),
         elev=widgets.FloatSlider(
-            min=-1000.0, max=1000.0, step=1.0, value=0.0,
-            continuous_update=False
+            min=-1000.0, max=1000.0, step=1.0, value=0.0, continuous_update=False
         ),
         prism_inc=(-90.0, 90.0, 5.0),
         prism_dec=(-90.0, 90.0, 5.0),
@@ -579,10 +552,7 @@ def plotObj3D(
     cntr = [prism.x0, prism.y0]
     axs.set_xlim3d(-View_lim + cntr[0], View_lim + cntr[0])
     axs.set_ylim3d(-View_lim + cntr[1], View_lim + cntr[1])
-    axs.set_zlim3d(
-        rxLoc[:, 2].max() * 1.1 - View_lim * 2,
-        rxLoc[:, 2].max() * 1.1
-    )
+    axs.set_zlim3d(rxLoc[:, 2].max() * 1.1 - View_lim * 2, rxLoc[:, 2].max() * 1.1)
 
     # Create a rectangular prism, rotate and plot
     block_xyz = np.asarray(
@@ -606,22 +576,14 @@ def plotObj3D(
     # Face 1
     axs.add_collection3d(
         Poly3DCollection(
-            [list(
-                zip(xyz[:4, 0] + offx,
-                    xyz[:4, 1] + offy,
-                    xyz[:4, 2] + offz)
-                )]
+            [list(zip(xyz[:4, 0] + offx, xyz[:4, 1] + offy, xyz[:4, 2] + offz))]
         )
     )
 
     # Face 2
     axs.add_collection3d(
         Poly3DCollection(
-            [list(
-                zip(xyz[4:, 0] + offx,
-                    xyz[4:, 1] + offy,
-                    xyz[4:, 2] + offz)
-                )],
+            [list(zip(xyz[4:, 0] + offx, xyz[4:, 1] + offy, xyz[4:, 2] + offz))],
             facecolors="w",
         )
     )
@@ -750,10 +712,7 @@ class definePrism(object):
 
 
 def fitline(prism, survey):
-    def profiledata(
-        Binc, Bdec, Bigrf, depth, susc, comp, irt,
-        Q, rinc, rdec, update
-    ):
+    def profiledata(Binc, Bdec, Bigrf, depth, susc, comp, irt, Q, rinc, rdec, update):
 
         # Get the line extent from the 2D survey for now
         prob = Mag.problem()
@@ -782,9 +741,7 @@ def fitline(prism, survey):
         dpred += +Bigrf
         a = np.r_[xyzLoc[:, 0].min(), 0]
         b = np.r_[xyzLoc[:, 0].max(), 0]
-        return plotProfile(
-                xyzLoc, survey2D.dobs, a, b, 10, data=dpred, dType="2D"
-        )
+        return plotProfile(xyzLoc, survey2D.dobs, a, b, 10, data=dpred, dType="2D")
 
     Q = widgets.interactive(
         profiledata,
@@ -795,8 +752,7 @@ def fitline(prism, survey):
             min=-90.0, max=90, step=5, value=0, continuous_update=False
         ),
         Bigrf=widgets.FloatSlider(
-            min=54000.0, max=55000, step=10, value=54500,
-            continuous_update=False
+            min=54000.0, max=55000, step=10, value=54500, continuous_update=False
         ),
         depth=widgets.FloatSlider(min=0.0, max=5.0, step=0.05, value=0.5),
         susc=widgets.FloatSlider(min=0.0, max=800.0, step=5.0, value=1.0),
