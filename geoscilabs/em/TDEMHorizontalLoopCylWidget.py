@@ -400,14 +400,14 @@ class TDEMHorizontalLoopCylWidget(object):
             cb.set_label(label)
             xmax = self.mesh2D.gridCC[:, 0].max()
             if Geometry:
-                if Scenario is "Layer":
+                if Scenario == "Layer":
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.srcLoc[2], "w-", lw=1)
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.z0, "w--", lw=1)
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.z1, "w--", lw=1)
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.z2, "w--", lw=1)
                     ax.plot(0, self.srcLoc[2], "ko", ms=4)
                     ax.plot(self.rxLoc[0, 0], self.srcLoc[2], "ro", ms=4)
-                elif Scenario is "Sphere":
+                elif Scenario == "Sphere":
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.srcLoc[2], "k-", lw=1)
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.z0, "w--", lw=1)
                     ax.plot(np.r_[-xmax, xmax], np.ones(2) * self.z1, "w--", lw=1)
