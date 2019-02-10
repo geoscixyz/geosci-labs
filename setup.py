@@ -30,14 +30,14 @@ with open("README.md", "r") as f:
 
 setup(
     name="geoscilabs",
-    version="0.0.1",
+    version="0.0.2",
     packages=find_packages(),
     install_requires=[
         "numpy>=1.7",
         "scipy>=1.0",
         "matplotlib>2.1",
         "ipywidgets",
-        "SimPEG>=0.4.1",
+        "SimPEG>=0.10.4",
         "empymod",
         "jupyter",
         "ipywidgets",

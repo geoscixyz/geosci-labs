@@ -131,9 +131,9 @@ def csem_layered_earth(
         rx = [rxlocs[:, 0], rxlocs[:, 1], rxlocs[:, 2], 0.0, 90.0]
     else:
         raise Exception("rx_direction should be x, y, or z")
-    if rx_type is "electric":
+    if rx_type == "electric":
         rx_type = None
-    if src_type is "electric":
+    if src_type == "electric":
         src_type = None
     if len(np.unique(np.array(res))) == 1:
         xdirect = True

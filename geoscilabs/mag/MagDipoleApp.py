@@ -336,7 +336,7 @@ class MagneticDipoleApp(object):
             ax2.set_xlabel(("Halfwidth: %.1fm") % (abs(np.diff(x_half))))
         else:
             ax2.set_xlabel(" ")
-        plt.tight_layout()
+        # plt.tight_layout()
         if profile == "None":
             ax2.remove()
         else:

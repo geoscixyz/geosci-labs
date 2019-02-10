@@ -25,7 +25,7 @@ install:
 
 # Run test
 script:
-  - if [ $TEST = "style" ]; then
+  - if [ $TEST == "style" ]; then
       make check ;
     else
       pytest tests/$TEST -v -s ;

@@ -1,8 +1,6 @@
 from . import Mag
 from . import MagUtils
-import SimPEG.PF as PF
-from SimPEG.Utils import mkvc
-from scipy.constants import mu_0
+
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
@@ -10,6 +8,10 @@ import ipywidgets as widgets
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.interpolate import griddata, interp1d
+
+import SimPEG.PF as PF
+from SimPEG import Utils
+from scipy.constants import mu_0
 
 
 def PFSimulator(prism, survey):
@@ -32,7 +34,6 @@ def PFSimulator(prism, survey):
         prob = Mag.problem()
         prob.prism = prism.result
         prob.survey = survey.result
-        print(survey.result)
 
         return PlotFwrSim(
             prob,
@@ -237,7 +238,9 @@ def ViewMagSurvey2D(survey):
         # Get the line extent from the 2D survey for now
         Azimuth /= 180.0 / np.pi
         Length /= 2.0 * 0.98
+
         a = [East - np.cos(-Azimuth) * Length, North - np.sin(-Azimuth) * Length]
+
         b = [East + np.cos(-Azimuth) * Length, North + np.sin(-Azimuth) * Length]
 
         xlim = East + np.asarray([-Width / 2.0, Width / 2.0])
@@ -346,9 +349,7 @@ def plotMagSurvey2D(
         data = survey.dobs
 
     # Use SimPEG.PF ploting function
-    PF.Magnetics.plot_obs_2D(
-        rxLoc, d=data, fig=fig, ax=ax, vmin=vmin, vmax=vmax, marker=False, cmap="RdBu_r"
-    )
+    Utils.PlotUtils.plot2Ddata(rxLoc, data, ax=ax)
 
     ax.plot(x, y, "w.", ms=10)
     ax.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
@@ -358,29 +359,7 @@ def plotMagSurvey2D(
     if pred is not None:
         ax2 = plt.subplot(1, 2, 2)
 
-        if pred.min() != pred.max():
-            PF.Magnetics.plot_obs_2D(
-                rxLoc,
-                d=pred,
-                fig=fig,
-                ax=ax2,
-                vmin=vmin,
-                vmax=vmax,
-                marker=False,
-                cmap="RdBu_r",
-            )
-
-        else:
-            PF.Magnetics.plot_obs_2D(
-                rxLoc,
-                d=pred,
-                fig=fig,
-                ax=ax2,
-                vmin=pred.min(),
-                vmax=pred.max(),
-                marker=False,
-                cmap="RdBu_r",
-            )
+        Utils.PlotUtils.plot2Ddata(rxLoc, pred, ax=ax2, clim=[pred.min(), pred.max()])
         ax2.plot(x, y, "w.", ms=10)
         ax2.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
         ax2.text(x[-1], y[-1], "B", fontsize=16, color="w", ha="right")

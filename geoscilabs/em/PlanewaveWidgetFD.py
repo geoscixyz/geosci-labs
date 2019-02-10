@@ -511,7 +511,7 @@ def InteractivePlaneProfile():
             yticksa = np.linspace(y.min(), y.max(), 3)
             ax1.yaxis.set_ticks(yticksa)
 
-            if Fixed and Field is not "Impedance":
+            if Fixed and Field != "Impedance":
                 vmax = np.r_[abs(valr), abs(vali)].max()
                 vmin = -vmax
                 ax1.set_ylim(vmin, vmax)
