@@ -41,4 +41,5 @@ deploy:
 
 # notify slack
 notifications:
+  email: false
   slack: ubcgif:1Z2lR3XYRSM3GHflG71ZHEN6
