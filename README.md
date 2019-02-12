@@ -46,10 +46,10 @@ You can then clone this reposiroty. From a command line, run
 git clone https://github.com/geoscixyz/geosci-labs.git
 ```
 
-Then `cd` into `gpgLabs`
+Then `cd` into `geosci-labs`
 
 ```
-cd gpgLabs
+cd geosci-labs
 ```
 
 To setup your software environment, we recommend you use the provided conda environment
