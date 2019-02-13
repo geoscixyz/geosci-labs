@@ -17,4 +17,4 @@ dependencies:
     - deepdish
     - SimPEG
     - empymod
-    - git+https://github.com/wwzzyyzzrr/geosci-labs@master
+    - git+https://github.com/wwzzyyzzrr/geosci-labs
