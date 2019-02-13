@@ -18,7 +18,7 @@ from ipywidgets import (
     Layout,
 )
 
-plotdata = []#Storage the data that will print on the picture
+plotdata = []  # Storage the data that will print on the picture
 colorList = [
     "red",
     "blue",
@@ -34,11 +34,11 @@ colorList = [
     "yellow",
     "gold",
     "lime",
-]#The Colors
+]  # The Colors
 index = 0
 currentResult = []
 
-#The main function and draw the first table
+# The main function and draw the first table
 def drawfunction(delta_rho, z1, z2, b, beta, stationSpacing, B):
     global plotdata
     global index
@@ -117,7 +117,8 @@ def drawfunction(delta_rho, z1, z2, b, beta, stationSpacing, B):
     plt.tight_layout()
     plt.show()
 
-#draw the figure of the Dike
+
+# draw the figure of the Dike
 def printDike(axeToDraw, z1, z2, b, beta, x):
     axeToDraw.plot(0, 0, ".")
     axeToDraw.plot([-6, 6], [0, 0], color="black", linewidth=1.5)
@@ -156,14 +157,16 @@ def printDike(axeToDraw, z1, z2, b, beta, x):
     axeToDraw.plot([6, 6], [1, -6], color="white", linewidth=1.0)
     axeToDraw.set_title("Position of Block", fontsize=16)
 
-#Get the sign of the input
+
+# Get the sign of the input
 def getSigned(a):
     if a > 0:
         return 1
     else:
         return -1
 
-#generate the data of table
+
+# generate the data of table
 def datagenerator(delta_rho, z1, z2, b, beta, stationSpacing):
     respEW = 0
     gravity_change = []
@@ -176,7 +179,8 @@ def datagenerator(delta_rho, z1, z2, b, beta, stationSpacing):
         gravity_change.append(calculategravity(delta_rho, z1, z2, b, beta, x[each]))
     return respEW, gravity_change, X, Y
 
-#get the value of the delta gravity 
+
+# get the value of the delta gravity
 def calculategravity(delta_rho, z1, z2, b, beta, x) -> float:
     G = 6.67259e-8
     r1 = pow(pow(x + z1 * tan(beta), 2) + pow(z1, 2), 0.5)
@@ -204,7 +208,8 @@ def calculategravity(delta_rho, z1, z2, b, beta, x) -> float:
     response = g * pow(10, 5)
     return response
 
-#draw the third picture
+
+# draw the third picture
 def printGrapha(delta_rho, z1, z2, b, beta, axeToDraw, stationSpacing):
     maxR = 5
     maxScala = 50
@@ -220,7 +225,8 @@ def printGrapha(delta_rho, z1, z2, b, beta, axeToDraw, stationSpacing):
     axeToDraw.set_title(r"$\Delta g_z$" + "(mGal)", fontsize=16)
     plt.colorbar(dat0, ax=axeToDraw)
 
-#get the data of the third picture
+
+# get the data of the third picture
 def graphaDataGenerator(delta_rho, z1, z2, b, beta, maxR, maxScala, Step):
     scalax = []
     scalay = []
@@ -233,7 +239,8 @@ def graphaDataGenerator(delta_rho, z1, z2, b, beta, maxR, maxScala, Step):
             color.append(g)
     return scalax, scalay, color
 
-#draw the widgets
+
+# draw the widgets
 def interact_gravity_Dike():
     s1 = FloatSlider(
         description=r"$\Delta\rho$",
@@ -304,7 +311,8 @@ def interact_gravity_Dike():
     )
     return VBox([out1, out])
 
-#Print the result of the last data
+
+# Print the result of the last data
 def printResult():
     global currentResult
     print("{0: ^10}{1: ^10}".format("X", "Δgz"))

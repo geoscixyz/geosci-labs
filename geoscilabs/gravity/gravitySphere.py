@@ -17,7 +17,7 @@ from ipywidgets import (
     Layout,
 )
 
-plotdata = []#Storage the data that will print on the picture
+plotdata = []  # Storage the data that will print on the picture
 colorList = [
     "red",
     "blue",
@@ -33,11 +33,11 @@ colorList = [
     "yellow",
     "gold",
     "lime",
-]#The Colors
+]  # The Colors
 index = 0
 currentResult = []
 
-#The main function and draw the first table
+# The main function and draw the first table
 def drawfunction(delta_rho, a, z, stationSpacing, B):
     global plotdata
     global index
@@ -109,7 +109,7 @@ def drawfunction(delta_rho, a, z, stationSpacing, B):
     plt.show()
 
 
-#draw the figure of the Sphere
+# draw the figure of the Sphere
 def printCirCle(a, z, axeToDraw):
     theta = np.linspace(0, 2 * np.pi, 800)
     x, y = np.cos(theta) * a, np.sin(theta) * a - z
@@ -123,7 +123,8 @@ def printCirCle(a, z, axeToDraw):
     axeToDraw.plot(x, y, color="blue", linewidth=2.0)
     axeToDraw.set_title("Position of the Sphere", fontsize=16)
 
-#generate the data of table
+
+# generate the data of table
 def datagenerator(delta_rho, a, z, stationSpacing):
     respEW = 0
     gravity_change = []
@@ -136,7 +137,8 @@ def datagenerator(delta_rho, a, z, stationSpacing):
         gravity_change.append(calculategravity(delta_rho, a, z, x[each]))
     return respEW, gravity_change, X, Y
 
-#get the value of the delta gravity 
+
+# get the value of the delta gravity
 def calculategravity(delta_rho, a, z, x) -> float:
     G = 6.67259e-8
     partial = (4 / 3 * np.pi * G) * delta_rho * a * a * a * z
@@ -145,7 +147,7 @@ def calculategravity(delta_rho, a, z, x) -> float:
     return response
 
 
-#draw the third picture
+# draw the third picture
 def printGrapha(delta_rho, a, z, axeToDraw, stationSpacing):
     maxR = 5
     maxScala = 50
@@ -160,7 +162,7 @@ def printGrapha(delta_rho, a, z, axeToDraw, stationSpacing):
     plt.colorbar(dat0, ax=axeToDraw)
 
 
-#get the data of the third picture
+# get the data of the third picture
 def graphaDataGenerator(delta_rho, a, z, maxR, maxScala, Step):
     scalax = []
     scalay = []
@@ -175,7 +177,7 @@ def graphaDataGenerator(delta_rho, a, z, maxR, maxScala, Step):
     return scalax, scalay, color
 
 
-#draw the widgets
+# draw the widgets
 def interact_gravity_sphere():
     Q = interactive(
         drawfunction,
@@ -210,7 +212,7 @@ def interact_gravity_sphere():
     return Q
 
 
-#Print the result of the last data
+# Print the result of the last data
 def printResult():
     global currentResult
     print("{0: ^10}{1: ^10}".format("X", "Δgz"))
