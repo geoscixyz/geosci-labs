@@ -16,6 +16,7 @@ env:
   - TEST=test_inversion.py
   - TEST=test_mag.py
   - TEST=test_seismic.py
+  - TEST=test_gravity.py
   - TEST=style
 
 install:
