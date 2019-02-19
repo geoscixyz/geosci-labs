@@ -222,7 +222,3 @@ def printResult():
                 "%.3f" % currentResult[0][i], "%.6f" % currentResult[1][i]
             )
         )
-
-
-if __name__ == "__main__":
-    pass
