@@ -51,7 +51,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     keywords="geophysics, electromagnetics",
     url="https://geosci.xyz",
-    download_url="https://github.com/geoscixyz/geoscilabs",
+    download_url="https://github.com/geoscixyz/geosci-labs",
     classifiers=CLASSIFIERS,
     platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     license="MIT License",
