@@ -4,6 +4,7 @@ import matplotlib.contour as ctr
 import scipy.io
 import copy
 from math import pi, tan, cos, acos, log, sin
+from scipy.constants import G
 from ipywidgets import (
     interactive,
     IntSlider,
@@ -182,7 +183,6 @@ def datagenerator(delta_rho, z1, z2, b, beta, stationSpacing):
 
 # get the value of the delta gravity
 def calculategravity(delta_rho, z1, z2, b, beta, x) -> float:
-    G = 6.67259e-8
     r1 = pow(pow(x + z1 * tan(beta), 2) + pow(z1, 2), 0.5)
     r2 = pow(pow(x + z2 * tan(beta), 2) + pow(z2, 2), 0.5)
     r3 = pow(pow(x + z1 * tan(beta) - b, 2) + pow(z1, 2), 0.5)
@@ -204,7 +204,7 @@ def calculategravity(delta_rho, z1, z2, b, beta, x) -> float:
         sin(beta) * cos(beta) * (x * (theta2 - theta1) - (x - b) * (theta4 - theta3))
     )
     part3 = pow(cos(beta), 2) * (x * log(r2 / r1) - (x - b) * log(r4 / r3))
-    g = 2 * G * delta_rho * (part1 + part2 + part3)
+    g = 2000 * G * delta_rho * (part1 + part2 + part3)
     response = g * pow(10, 5)
     return response
 

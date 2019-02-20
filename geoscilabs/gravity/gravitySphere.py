@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.contour as ctr
 import scipy.io
+from scipy.constants import G
 import copy
 
 from ipywidgets import (
@@ -140,8 +141,7 @@ def datagenerator(delta_rho, a, z, stationSpacing):
 
 # get the value of the delta gravity
 def calculategravity(delta_rho, a, z, x) -> float:
-    G = 6.67259e-8
-    partial = (4 / 3 * np.pi * G) * delta_rho * a * a * a * z
+    partial = (4000 / 3 * np.pi * G) * delta_rho * a * a * a * z
     g = partial / float(np.power(x * x + z * z, 1.5))
     response = g * pow(10, 5)
     return response
