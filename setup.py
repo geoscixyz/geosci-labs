@@ -30,7 +30,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="geoscilabs",
-    version="0.0.2",
+    version="0.1.0",
     packages=find_packages(),
     install_requires=[
         "numpy>=1.7",
@@ -51,7 +51,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     keywords="geophysics, electromagnetics",
     url="https://geosci.xyz",
-    download_url="https://github.com/geoscixyz/geoscilabs",
+    download_url="https://github.com/geoscixyz/geosci-labs",
     classifiers=CLASSIFIERS,
     platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     license="MIT License",
