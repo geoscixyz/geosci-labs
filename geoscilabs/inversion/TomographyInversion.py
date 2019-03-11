@@ -224,7 +224,7 @@ class TomographyInversionApp(object):
         )
 
         floor = widgets.FloatText(
-            value=1e-2,
+            value=1e-3,
             min=0.,
             max=10.,
             step=1,
@@ -241,7 +241,7 @@ class TomographyInversionApp(object):
         )
 
         add_noise = widgets.Checkbox(
-            value=False,
+            value=True,
             description='add noise?',
             disabled=False
         )
