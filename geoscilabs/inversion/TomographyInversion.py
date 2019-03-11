@@ -25,6 +25,7 @@ class TomographyInversionApp(object):
     percentage = None
     floor = None
     uncertainty = None
+    _slowness = None
 
     def __init__(self):
         super(TomographyInversionApp, self).__init__()
@@ -125,20 +126,24 @@ class TomographyInversionApp(object):
 
     def plot_model(self, v0, v1, xc, yc, dx, dy, model_type="background", add_block="inactive"):
         fig, ax = plt.subplots(1,1)
-        self._slowness = np.ones(self.mesh.nC) * 1./v0
+
         if model_type == "background":
-            pass
+            self._slowness = np.ones(self.mesh.nC) * 1./v0
         elif model_type == "block":
             x, y = self.get_block_points(xc, yc, dx, dy)
             ax.plot(x, y, 'w-')
             if add_block == "active":
                 index = self.get_block_index(xc=xc, yc=yc, dx=dx, dy=dy)
+                if self._slowness is None:
+                    self._slowness = np.ones(self.mesh.nC) * 1./v0
                 self._slowness[index] = 1./v1
         out = self.mesh.plotImage(1./self._slowness, ax=ax)
         cb = plt.colorbar(out[0], ax=ax, fraction=0.02)
         ax.plot(self.rx_locations[:,0], self.rx_locations[:,1], 'wv')
         ax.plot(self.src_locations[:,0], self.src_locations[:,1], 'w*')
         ax.set_aspect(1)
+        ax.set_xlabel("x (m)")
+        ax.set_ylabel("z (m)")
 
     def plot_survey_data(self, percentage, floor, seed, add_noise, plot_type):
         self._percentage = percentage
@@ -153,6 +158,9 @@ class TomographyInversionApp(object):
         cb.set_label("Velocity (m/s)")
         self.survey.plot(ax=axs[0])
         axs[0].set_title('Survey')
+        axs[0].set_xlabel("x (m)")
+        axs[0].set_ylabel("z (m)")
+
         x = np.arange(10) + 1
         y = np.arange(10) + 1
         xy = Utils.ndgrid(x, y)
@@ -181,9 +189,9 @@ class TomographyInversionApp(object):
 
     def interact_plot_model(self):
         dx = widgets.FloatSlider(description='dx', continuous_update=False, min=0, max=400, step=10, value=50)
-        dy = widgets.FloatSlider(description='dy', continuous_update=False, min=0, max=400, step=10, value=50)
+        dy = widgets.FloatSlider(description='dz', continuous_update=False, min=0, max=400, step=10, value=50)
         xc = widgets.FloatSlider(description='xc', continuous_update=False, min=0, max=400, step=1, value=100)
-        yc = widgets.FloatSlider(description='yc', continuous_update=False, min=0, max=400, step=1, value=200)
+        yc = widgets.FloatSlider(description='zc', continuous_update=False, min=0, max=400, step=1, value=200)
         v0 = widgets.FloatSlider(description='v0', continuous_update=False, min=500, max=3000, step=50, value=1000)
         v1 = widgets.FloatSlider(description='v1', continuous_update=False, min=500, max=3000, step=50, value=2000)
         add_block = widgets.RadioButtons(
@@ -215,7 +223,7 @@ class TomographyInversionApp(object):
 
     def interact_data(self):
         percentage = widgets.BoundedFloatText(
-            value=5,
+            value=0,
             min=0,
             max=100.,
             step=1,
@@ -224,7 +232,7 @@ class TomographyInversionApp(object):
         )
 
         floor = widgets.FloatText(
-            value=1e-3,
+            value=1e-2,
             min=0.,
             max=10.,
             step=1,
@@ -396,8 +404,8 @@ class TomographyInversionApp(object):
         cb = plt.colorbar(out[0], ax=axs[1], fraction=0.02)
         axs[1].set_aspect(1)
         for ax in axs:
-            ax.plot(self.rx_locations[:,0], self.rx_locations[:,1], 'wv')
-            ax.plot(self.src_locations[:,0], self.src_locations[:,1], 'w*')
+            ax.plot(self.rx_locations[:, 0], self.rx_locations[:, 1], 'wv')
+            ax.plot(self.src_locations[:, 0], self.src_locations[:, 1], 'w*')
             ax.set_aspect(1)
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
@@ -431,8 +439,9 @@ class TomographyInversionApp(object):
             self.plot_model_inversion(ii, model, fixed=fixed)
         interact(
             foo,
-            ii=IntSlider(min=0, max=len(model)-1, step=1, value=len(model)-1),
-            continuous_update=False
+            ii=IntSlider(
+                min=0, max=len(model)-1, step=1, value=len(model)-1),
+                continuous_update=False
         )
 
     def interact_data_inversion(self, pred):
