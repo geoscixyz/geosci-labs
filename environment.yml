@@ -17,4 +17,4 @@ dependencies:
     - deepdish
     - SimPEG
     - empymod
-    - git+https://github.com/geoscixyz/geosci-labs
+    - git+https://github.com/geoscixyz/geosci-labs.git@tomography-inversion
