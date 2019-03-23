@@ -1,5 +1,6 @@
 import numpy as np
-
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 def MagneticMonopoleField(obsloc, poleloc=(0.0, 0.0, 0.0), Q=1):
     # relative obs. loc. to pole, assuming pole at origin
@@ -88,3 +89,90 @@ def MagneticLongDipoleField(
         obsloc, (x2 + dipoleloc[0], y2 + dipoleloc[1], z2 + dipoleloc[2]), Q=-Q
     )
     return Bx1 + Bx2, By1 + By2, Bz1 + Bz2
+
+def DrawMagneticDipole3D(
+    dipoleloc=(0.,0.,-50.), dipoledec=0., dipoleinc=90., dipoleL=100., obsloc="null", dipolemoment=1.0
+):
+    # define a dipole
+    # dipoleloc = (0.,0.,-50.)
+    # dipoleL = 100.
+    # dipoledec, dipoleinc = 0., 90.
+    # dipolemoment = 1e13
+
+    # geomagnetic field
+    B0, Binc, Bdec = 53600e-9, 90., 0. # in Tesla, degree, degree
+    B0x = B0*np.cos(np.radians(Binc))*np.sin(np.radians(Bdec))
+    B0y = B0*np.cos(np.radians(Binc))*np.cos(np.radians(Bdec))
+    B0z = -B0*np.sin(np.radians(Binc))
+
+    # set observation grid
+    xmin, xmax, ymin, ymax, z = -5., 5., -5., 5., 1. # x, y bounds and elevation
+    profile_x = 0. # x-coordinate of y-profile
+    profile_y = 0. # y-coordinate of x-profile
+    h = 0.2 # grid interval
+    radii = (2., 5.) # how many layers of field lines for plotting
+    Naz = 10 # number of azimuth
+
+    # get field lines
+    linex, liney, linez = MagneticLongDipoleLine(dipoleloc,dipoledec,dipoleinc,dipoleL,radii,Naz)
+
+    # get map
+    xi, yi = np.meshgrid(np.r_[xmin:xmax+h:h], np.r_[ymin:ymax+h:h])
+    x1, y1 = xi.flatten(), yi.flatten()
+    z1 = np.full(x1.shape,z)
+    Bx, By, Bz = np.zeros(len(x1)), np.zeros(len(x1)), np.zeros(len(x1))
+
+    for i in np.arange(len(x1)):
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x1[i],y1[i],z1[i]),dipolemoment)
+    Ba1 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+
+    # get x-profile
+    x2 = np.r_[xmin:xmax+h:h]
+    y2, z2 = np.full(x2.shape,profile_y), np.full(x2.shape,z)
+    Bx, By, Bz = np.zeros(len(x2)), np.zeros(len(x2)), np.zeros(len(x2))
+    for i in np.arange(len(x2)):
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x2[i],y2[i],z2[i]),dipolemoment)
+    Ba2 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+
+    # get y-profile
+    y3 = np.r_[ymin:ymax+h:h]
+    x3, z3 = np.full(y3.shape,profile_x), np.full(y3.shape,z)
+    Bx, By, Bz = np.zeros(len(x3)), np.zeros(len(x3)), np.zeros(len(x3))
+    for i in np.arange(len(x3)):
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x3[i],y3[i],z3[i]),dipolemoment)
+    Ba3 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    # plot field lines
+    for lx,ly,lz in zip(linex,liney,linez):
+        ax.plot(lx,ly,lz,'-',markersize=1)
+
+    # plot map
+    ax.scatter(x1,y1,z1,s=2,alpha=0.3)
+    Bt = Ba1.reshape(xi.shape)*1e9 # contour and color scale in nT 
+    c = ax.contourf(xi,yi,Bt,alpha=1,zdir='z',offset=z-max(radii)*2,cmap='jet',
+                      levels=np.linspace(Bt.min(),Bt.max(),50,endpoint=True))
+    fig.colorbar(c)
+
+    # auto-scaling for profile plot
+    ptpmax = np.max((Ba2.ptp(),Ba3.ptp())) # dynamic range
+    autoscaling = np.max(radii) / ptpmax
+
+    # plot x-profile
+    ax.scatter(x2,y2,z2,s=2,c='black',alpha=0.3)
+    ax.plot(x2,Ba2*autoscaling,zs=ymax,c='black',zdir='y')
+
+    # plot y-profile
+    ax.scatter(x3,y3,z3,s=2,c='black',alpha=0.3)
+    ax.plot(y3,Ba3*autoscaling,zs=xmin,c='black',zdir='x')
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_zlim(z-max(radii)*2, max(radii)*1.5)
+
