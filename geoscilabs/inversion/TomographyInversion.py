@@ -26,10 +26,10 @@ class TomographyInversionApp(object):
     floor = None
     uncertainty = None
     _slowness = None
+    _mesh = None
 
     def __init__(self):
         super(TomographyInversionApp, self).__init__()
-        self.get_problem_survey()
 
     @property
     def problem(self):
@@ -59,7 +59,7 @@ class TomographyInversionApp(object):
         hx = np.ones(nx) * dx
         hy = np.ones(ny) * dy
         self._mesh = Mesh.TensorMesh([hx, hy])
-        y = np.linspace(self._mesh.x0[1], dy*ny, ny/2)
+        y = np.linspace(0, 400, 10)
         self._src_locations = np.c_[y*0+self._mesh.vectorCCx[0], y]
         self._rx_locations = np.c_[y*0+self._mesh.vectorCCx[-1], y]
         rx = StraightRay.Rx(self._rx_locations, None)
@@ -124,28 +124,58 @@ class TomographyInversionApp(object):
         y = np.array([yc-dy/2., yc-dy/2., yc+dy/2., yc+dy/2., yc-dy/2.])
         return x, y
 
-    def plot_model(self, v0, v1, xc, yc, dx, dy, model_type="background", add_block="inactive"):
-        fig, ax = plt.subplots(1,1)
+    def plot_model(self, v0, v1, xc, yc, dx, dy, nx, ny, model_type="background", add_block="inactive", show_grid=False, set_mesh='inactive'):
 
-        if model_type == "background":
-            self._slowness = np.ones(self.mesh.nC) * 1./v0
-        elif model_type == "block":
-            x, y = self.get_block_points(xc, yc, dx, dy)
-            ax.plot(x, y, 'w-')
-            if add_block == "active":
-                index = self.get_block_index(xc=xc, yc=yc, dx=dx, dy=dy)
-                if self._slowness is None:
-                    self._slowness = np.ones(self.mesh.nC) * 1./v0
-                self._slowness[index] = 1./v1
-        out = self.mesh.plotImage(1./self._slowness, ax=ax)
-        cb = plt.colorbar(out[0], ax=ax, fraction=0.02)
-        ax.plot(self.rx_locations[:,0], self.rx_locations[:,1], 'wv')
-        ax.plot(self.src_locations[:,0], self.src_locations[:,1], 'w*')
-        ax.set_aspect(1)
-        ax.set_xlabel("x (m)")
-        ax.set_ylabel("z (m)")
+        # size of the domain is fixed
+        lx = 200.
+        ly = 400.
 
-    def plot_survey_data(self, percentage, floor, seed, add_noise, plot_type):
+        if set_mesh == 'active':
+            self.get_problem_survey(nx=nx, ny=ny, dx=lx/nx, dy=ly/ny)
+            fig, ax = plt.subplots(1, 1)
+            self._slowness = 1./v1 * np.ones(self.mesh.nC)
+            out = self.mesh.plotImage(
+                1./self._slowness, ax=ax, grid=show_grid,
+                gridOpts={'color': 'white', 'alpha': 0.5}
+            )
+            cb = plt.colorbar(out[0], ax=ax, fraction=0.02)
+            ax.plot(self.rx_locations[:,0], self.rx_locations[:,1], 'wv')
+            ax.plot(self.src_locations[:,0], self.src_locations[:,1], 'w*')
+            ax.set_aspect(1)
+            ax.set_xlabel("x (m)")
+            ax.set_ylabel("z (m)")
+            ax.set_title(
+                ("(%.1fm, %.1fm)") % (self.mesh.hx.min(), self.mesh.hy.min())
+            )
+        else:
+
+            if self.mesh is None:
+                self.get_problem_survey(nx=nx, ny=ny, dx=lx/nx, dy=ly/ny)
+
+            fig, ax = plt.subplots(1,1)
+            if model_type == "background":
+                self._slowness = np.ones(self.mesh.nC) * 1./v0
+            elif model_type == "block":
+                x, y = self.get_block_points(xc, yc, dx, dy)
+                ax.plot(x, y, 'w-')
+                if add_block == "active":
+                    index = self.get_block_index(xc=xc, yc=yc, dx=dx, dy=dy)
+                    if self._slowness is None:
+                        self._slowness = np.ones(self.mesh.nC) * 1./v0
+                    self._slowness[index] = 1./v1
+            out = self.mesh.plotImage(
+                1./self._slowness, ax=ax, grid=show_grid,
+                gridOpts={'color':'white',  'alpha':0.5}
+            )
+            cb = plt.colorbar(out[0], ax=ax, fraction=0.02)
+            ax.plot(self.rx_locations[:,0], self.rx_locations[:,1], 'w^')
+            ax.plot(self.src_locations[:,0], self.src_locations[:,1], 'ws')
+            ax.set_aspect(1)
+            ax.set_xlabel("x (m)")
+            ax.set_ylabel("z (m)")
+            ax.set_title("Velocity")
+
+    def plot_survey_data(self, percentage, floor, seed, add_noise, plot_type, update):
         self._percentage = percentage
         self._floor = floor
         self._seed = seed
@@ -179,21 +209,31 @@ class TomographyInversionApp(object):
                 ax.set_aspect(1)
         else:
             if add_noise:
-                out = axs[1].hist(self.pred)
+                out = axs[1].hist(self.pred, edgecolor='k')
             else:
-                out = axs[1].hist(self.dobs)
+                out = axs[1].hist(self.dobs, edgecolor='k')
             axs[1].set_ylabel("Count")
             axs[1].set_xlabel("Travel time (s)")
             axs[0].set_aspect(1)
         plt.tight_layout()
 
     def interact_plot_model(self):
-        dx = widgets.FloatSlider(description='dx', continuous_update=False, min=0, max=400, step=10, value=50)
-        dy = widgets.FloatSlider(description='dz', continuous_update=False, min=0, max=400, step=10, value=50)
+        dx = widgets.FloatSlider(description='dx', continuous_update=False, min=0, max=400, step=10, value=80)
+        dy = widgets.FloatSlider(description='dz', continuous_update=False, min=0, max=400, step=10, value=80)
         xc = widgets.FloatSlider(description='xc', continuous_update=False, min=0, max=400, step=1, value=100)
         yc = widgets.FloatSlider(description='zc', continuous_update=False, min=0, max=400, step=1, value=200)
         v0 = widgets.FloatSlider(description='v0', continuous_update=False, min=500, max=3000, step=50, value=1000)
         v1 = widgets.FloatSlider(description='v1', continuous_update=False, min=500, max=3000, step=50, value=2000)
+        nx = widgets.IntSlider(description='nx', continuous_update=False, min=10, max=40, step=2, value=10)
+        ny = widgets.IntSlider(description='ny', continuous_update=False, min=10, max=80, step=2, value=20)
+
+        set_mesh = widgets.RadioButtons(
+            options=["active", "inactive"],
+            value='inactive',
+            description='set mesh',
+            disabled=False
+        )
+
         add_block = widgets.RadioButtons(
             options=["active", "inactive"],
             value='active',
@@ -206,9 +246,17 @@ class TomographyInversionApp(object):
             description='model type',
             disabled=False
         )
+
+        show_grid = widgets.Checkbox(
+            value=True,
+            description='show grid?',
+            disabled=False
+        )
         out = widgets.interactive_output(
             self.plot_model,
             {
+                'nx': nx,
+                'ny': ny,
                 'dx': dx,
                 'dy': dy,
                 'xc': xc,
@@ -217,11 +265,23 @@ class TomographyInversionApp(object):
                 'v1': v1,
                 'add_block': add_block,
                 'model_type': model_type,
+                'show_grid': show_grid,
+                'set_mesh': set_mesh,
             }
         )
-        return widgets.HBox([widgets.VBox([v0, v1, xc, yc, dx, dy]), out, widgets.VBox([add_block, model_type])])
+        return widgets.HBox([widgets.VBox([v0, v1, xc, yc, dx, dy, nx, ny]), out, widgets.VBox([set_mesh, add_block, model_type, show_grid])])
 
     def interact_data(self):
+
+        update = widgets.ToggleButton(
+            value=False,
+            description='update',
+            disabled=False,
+            button_style='', # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Description',
+            icon='check'
+        )
+
         percentage = widgets.BoundedFloatText(
             value=0,
             min=0,
@@ -268,6 +328,7 @@ class TomographyInversionApp(object):
                 'seed': seed,
                 'add_noise': add_noise,
                 'plot_type': plot_type,
+                'update': update,
             }
         )
         form_item_layout = widgets.Layout(
@@ -281,7 +342,8 @@ class TomographyInversionApp(object):
             widgets.Box([floor], layout=form_item_layout),
             widgets.Box([seed], layout=form_item_layout),
             widgets.Box([add_noise], layout=form_item_layout),
-            widgets.Box([plot_type], layout=form_item_layout)
+            widgets.Box([plot_type], layout=form_item_layout),
+            widgets.Box([update], layout=form_item_layout)
         ]
 
         form = widgets.Box(form_items, layout=widgets.Layout(
@@ -305,16 +367,17 @@ class TomographyInversionApp(object):
         chifact=1,
         beta0_ratio=1.,
         coolingFactor=1,
-        coolingRate=1,
+        n_iter_per_beta=1,
         alpha_s=1.,
         alpha_x=1.,
         alpha_z=1.,
         use_target=False,
-        use_lplq=False,
-        p=2,
-        qx=2,
-        qy=2,
-        qz=2,
+        use_tikhonov=True,
+        use_irls=False,
+        p_s=2,
+        p_x=2,
+        p_y=2,
+        p_z=2,
         beta_start=None
     ):
 
@@ -322,22 +385,34 @@ class TomographyInversionApp(object):
 
         m0 = np.ones(self.mesh.nC) * m0
         mref = np.ones(self.mesh.nC) * mref
-        reg = Regularization.Sparse(
-            self.mesh,
-            alpha_s =alpha_s,
-            alpha_x =alpha_x,
-            alpha_y =alpha_z,
-            mref =mref,
-            mapping = Maps.IdentityMap(self.mesh),
-            cell_weights = self.mesh.vol
-        )
+
+        if ~use_tikhonov:
+            reg = Regularization.Sparse(
+                    self.mesh,
+                    alpha_s=alpha_s,
+                    alpha_x=alpha_x,
+                    alpha_y=alpha_z,
+                    mref=mref,
+                    mapping= Maps.IdentityMap(self.mesh),
+                    cell_weights=self.mesh.vol
+            )
+        else:
+            reg = Regularization.Tikhonov(
+                self.mesh,
+                alpha_s=alpha_s,
+                alpha_x=alpha_x,
+                alpha_y=alpha_z,
+                mref=mref,
+                mapping=Maps.IdentityMap(self.mesh),
+            )
         dmis = DataMisfit.l2_DataMisfit(self.survey)
         dmis.W =1./self.uncertainty
 
-        opt = Optimization.InexactGaussNewton(
+        opt = Optimization.ProjectedGNCG(
             maxIter =maxIter,
             maxIterCG =20
         )
+        opt.lower = 0.
         opt.remember('xc')
         opt.tolG =1e-10
         opt.eps =1e-10
@@ -345,11 +420,11 @@ class TomographyInversionApp(object):
         save =Directives.SaveOutputEveryIteration()
         beta_schedule =Directives.BetaSchedule(
             coolingFactor =coolingFactor,
-            coolingRate =coolingRate
+            coolingRate =n_iter_per_beta
         )
         update_Jacobi = Directives.UpdatePreconditioner()
 
-        if use_lplq:
+        if use_irls:
             IRLS = Directives.Update_IRLS(
                 f_min_change=1e-4,
                 minGNiter=1,
@@ -372,7 +447,7 @@ class TomographyInversionApp(object):
                     save
                 ]
                 invProb.beta = beta_start
-            reg.norms = np.c_[p, qx, qz, 2]
+            reg.norms = np.c_[p_s, p_x, p_z, 2]
         else:
             target = Directives.TargetMisfit(chifact=chifact)
             directives = [
@@ -404,8 +479,8 @@ class TomographyInversionApp(object):
         cb = plt.colorbar(out[0], ax=axs[1], fraction=0.02)
         axs[1].set_aspect(1)
         for ax in axs:
-            ax.plot(self.rx_locations[:, 0], self.rx_locations[:, 1], 'wv')
-            ax.plot(self.src_locations[:, 0], self.src_locations[:, 1], 'w*')
+            ax.plot(self.rx_locations[:, 0], self.rx_locations[:, 1], 'w^')
+            ax.plot(self.src_locations[:, 0], self.src_locations[:, 1], 'ws')
             ax.set_aspect(1)
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
@@ -425,8 +500,8 @@ class TomographyInversionApp(object):
         cb = plt.colorbar(out[0], ax=axs[0], fraction=0.02)
         out = Utils.plot2Ddata(xy, pred[ii], ax=axs[1], clim=clim)
         cb = plt.colorbar(out[0], ax=axs[1], fraction=0.02)
-        out = Utils.plot2Ddata(xy, (pred[ii]-self.dobs)/self.uncertainty, ax=axs[2], clim=(-1,1))
-        cb = plt.colorbar(out[0], ax=axs[2], fraction=0.02, ticks=[-1, 0, 1])
+        out = Utils.plot2Ddata(xy, (pred[ii]-self.dobs)/self.uncertainty, ax=axs[2], clim=(-3, 3))
+        cb = plt.colorbar(out[0], ax=axs[2], fraction=0.02, ticks=[-2, -1, 0, 1,  2])
         for ii, ax in enumerate(axs):
             ax.set_aspect(1)
             ax.set_title(titles[ii])
