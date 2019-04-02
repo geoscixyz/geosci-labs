@@ -21,6 +21,7 @@ from ipywidgets import (
     FloatText,
     IntText,
     SelectMultiple,
+    RadioButtons
 )
 import ipywidgets as widgets
 
@@ -269,6 +270,7 @@ class LinearInversionDirectApp(object):
         mref=0.0,
         percentage=5,
         floor=0.1,
+        chi_fact=1.,
         beta_min=1e-4,
         beta_max=1e0,
         n_beta=31,
@@ -290,14 +292,16 @@ class LinearInversionDirectApp(object):
         dmis.W = 1.0 / self.uncertainty
 
         betas = np.logspace(np.log10(beta_min), np.log10(beta_max), n_beta)[::-1]
-        b = self.G.T.dot(survey.dobs)
+
         phi_d = np.zeros(n_beta, dtype=float)
         phi_m = np.zeros(n_beta, dtype=float)
         models = []
         preds = []
         G = dmis.W * self.G
+        b = self.G.T.dot(survey.dobs)
+
         for ii, beta in enumerate(betas):
-            A = self.G.T.dot(self.G ) + beta * reg.deriv2(self.m)
+            A = self.G.T.dot(self.G)  + beta * reg.deriv2(self.m)
             m = np.linalg.solve(A, b)
             residual = self.G.dot(m)-survey.dobs
             phi_d[ii] = dmis(m)*2.
@@ -309,22 +313,23 @@ class LinearInversionDirectApp(object):
 
     def plot_inversion(
         self,
+        mode=True,
         m0=0.0,
         mref=0.0,
         percentage=5,
         floor=0.1,
+        chifact=1,
         beta_min=1e-4,
         beta_max=1e0,
         n_beta=31,
         alpha_s=1.0,
         alpha_x=1.0,
-        run=True,
         option="model",
         i_beta=1,
         scale='log'
     ):
 
-        if run:
+        if mode=="Run":
             self.phi_d, self.phi_m, self.model, self.pred, self.betas = self.run_inversion_direct(
                 m0=m0,
                 mref=mref,
@@ -337,7 +342,7 @@ class LinearInversionDirectApp(object):
                 alpha_x=alpha_x,
             )
         nD = self.data.size
-        i_target = np.argmin(abs(self.phi_d-nD))
+        i_target = np.argmin(abs(self.phi_d-nD*chifact))
 
         if i_beta > n_beta-1:
             print(
@@ -350,12 +355,12 @@ class LinearInversionDirectApp(object):
 
         fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
         axes[0].plot(self.mesh.vectorCCx, self.m)
-        if run:
+        if mode=="Run":
             axes[0].plot(self.mesh.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].errorbar(x=self.jk, y=self.data, yerr=self.uncertainty, color="k", lw=1)
         axes[1].plot(self.jk, self.data, "ko")
-        if run:
+        if mode=="Run":
             axes[1].plot(self.jk, self.pred[i_target], "bx")
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
@@ -368,7 +373,7 @@ class LinearInversionDirectApp(object):
         axes[1].set_ylabel("$d_j$")
 
         if option == "misfit":
-            if not run:
+            if mode == "Explore":
                 axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
                 axes[1].plot(self.jk, self.pred[i_beta], "bx")
                 axes[1].legend(("Observed", "Predicted"))
@@ -394,7 +399,7 @@ class LinearInversionDirectApp(object):
             axes[2].set_title("Misfit curves")
             xmin, xmax = beta_max, beta_min
         elif option == "tikhonov":
-            if not run:
+            if mode == "Explore":
                 axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
                 axes[1].plot(self.jk, self.pred[i_beta], "bx")
                 axes[0].legend(("True", "Pred"))
@@ -414,7 +419,7 @@ class LinearInversionDirectApp(object):
         else:
             axes[2].set_yscale('linear')
             axes[2].set_xscale('linear')
-        axes[2].plot((xmin, xmax), (nD, nD), 'k--')
+        axes[2].plot((xmin, xmax), (nD*chifact, nD*chifact), 'k--')
         axes[2].set_xlim(xmin, xmax)
         plt.tight_layout()
 
@@ -508,6 +513,11 @@ class LinearInversionDirectApp(object):
     def interact_plot_inversion(self, n_beta=81):
         interact(
             self.plot_inversion,
+            mode=RadioButtons(
+                description="mode",
+                options=["Run", "Explore"],
+                value="Run"
+            ),
             m0=FloatSlider(
                 min=-2, max=2, step=0.05, value=0.0, continuous_update=False
             ),
@@ -521,11 +531,13 @@ class LinearInversionDirectApp(object):
             n_beta=IntText(value=n_beta, min=10, max=100),
             alpha_s=FloatText(value=1e-2),
             alpha_x=FloatText(value=0),
-            run=True,
-            option=ToggleButtons(options=["misfit", "tikhonov"], value="tikhonov"),
+            option=ToggleButtons(
+                options=["misfit", "tikhonov"],
+                value="tikhonov"
+            ),
             scale=ToggleButtons(options=["linear", "log"], value="log"),
             i_beta=IntSlider(
                 min=0, max=n_beta-1, step=1, value=0, continuous_update=False
             ),
-
+            chifact=FloatText(value=1.0),
         )

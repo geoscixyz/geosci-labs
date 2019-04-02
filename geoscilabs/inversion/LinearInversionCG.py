@@ -21,6 +21,7 @@ from ipywidgets import (
     FloatText,
     IntText,
     SelectMultiple,
+    RadioButtons
 )
 import ipywidgets as widgets
 
@@ -205,6 +206,7 @@ class LinearInversionCGApp(object):
         self.floor = floor
 
         option_bools = [False, False, False]
+
         for item in option:
             if item == "kernel":
                 option_bools[0] = True
@@ -325,10 +327,9 @@ class LinearInversionCGApp(object):
             pred.append(survey.dpred(m))
         return model, pred, save
 
-
-
     def plot_inversion(
         self,
+        mode='Run',
         maxIter=60,
         m0=0.0,
         mref=0.0,
@@ -341,12 +342,11 @@ class LinearInversionCGApp(object):
         alpha_s=1.0,
         alpha_x=1.0,
         use_target=False,
-        run=True,
         option="model",
         i_iteration=1,
     ):
 
-        if run:
+        if mode == 'Run':
             self.model, self.pred, self.save = self.run_inversion_cg(
                 maxIter=maxIter,
                 m0=m0,
@@ -373,12 +373,12 @@ class LinearInversionCGApp(object):
             fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
 
         axes[0].plot(self.mesh.vectorCCx, self.m)
-        if run:
+        if mode == 'Run':
             axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].errorbar(x=self.jk, y=self.data, yerr=self.uncertainty, color="k", lw=1)
         axes[1].plot(self.jk, self.data, "ko")
-        if run:
+        if mode == 'Run':
             axes[1].plot(self.jk, self.pred[i_plot], "bx")
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
@@ -402,7 +402,7 @@ class LinearInversionCGApp(object):
                 i_iteration = max_iteration
 
             if option == "misfit":
-                if not run:
+                if mode == "Explore":
                     axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
                     axes[1].plot(self.jk, self.pred[i_iteration], "bx")
                     # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
@@ -446,7 +446,7 @@ class LinearInversionCGApp(object):
                 axes[2].set_title("Misfit curves")
 
             elif option == "tikhonov":
-                if not run:
+                if mode == "Explore":
                     axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
                     axes[1].plot(self.jk, self.pred[i_iteration], "bx")
                     # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
@@ -569,6 +569,11 @@ class LinearInversionCGApp(object):
     def interact_plot_inversion(self, maxIter=30):
         interact(
             self.plot_inversion,
+            mode=RadioButtons(
+                description="mode",
+                options=["Run", "Explore"],
+                value="Run"
+            ),
             maxIter=IntText(value=maxIter),
             m0=FloatSlider(
                 min=-2, max=2, step=0.05, value=0.0, continuous_update=False
@@ -588,7 +593,6 @@ class LinearInversionCGApp(object):
             ),
             alpha_s=FloatText(value=1e-10),
             alpha_x=FloatText(value=0),
-            run=True,
             target=False,
             option=ToggleButtons(options=["misfit", "tikhonov"], value="misfit"),
             i_iteration=IntSlider(
