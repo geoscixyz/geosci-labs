@@ -25,7 +25,7 @@ from ipywidgets import (
 import ipywidgets as widgets
 
 
-class LinearInversionApp(object):
+class LinearInversionDirectApp(object):
     """docstring for LinearInversionApp"""
 
     # Parameters for sensitivity matrix, G
@@ -53,7 +53,7 @@ class LinearInversionApp(object):
     save = None
 
     def __init__(self):
-        super(LinearInversionApp, self).__init__()
+        super(LinearInversionDirectApp, self).__init__()
 
     @property
     def G(self):
@@ -263,20 +263,17 @@ class LinearInversionApp(object):
         survey.pair(prob)
         return survey, prob
 
-    def run_inversion(
+    def run_inversion_direct(
         self,
-        maxIter=60,
         m0=0.0,
         mref=0.0,
         percentage=5,
         floor=0.1,
-        chifact=1,
-        beta0_ratio=1.0,
-        coolingFactor=1,
-        coolingRate=1,
+        beta_min=1e-4,
+        beta_max=1e0,
+        n_beta=31,
         alpha_s=1.0,
         alpha_x=1.0,
-        use_target=False,
     ):
         survey, prob = self.get_problem_survey()
         survey.eps = percentage
@@ -292,92 +289,74 @@ class LinearInversionApp(object):
         dmis = DataMisfit.l2_DataMisfit(survey)
         dmis.W = 1.0 / self.uncertainty
 
-        opt = Optimization.InexactGaussNewton(maxIter=maxIter, maxIterCG=20)
-        opt.remember("xc")
-        opt.tolG = 1e-10
-        opt.eps = 1e-10
-        invProb = InvProblem.BaseInvProblem(dmis, reg, opt)
-        save = Directives.SaveOutputEveryIteration()
-        beta_schedule = Directives.BetaSchedule(
-            coolingFactor=coolingFactor, coolingRate=coolingRate
-        )
-        target = Directives.TargetMisfit(chifact=chifact)
+        betas = np.logspace(np.log10(beta_min), np.log10(beta_max), n_beta)[::-1]
+        b = self.G.T.dot(survey.dobs)
+        phi_d = np.zeros(n_beta, dtype=float)
+        phi_m = np.zeros(n_beta, dtype=float)
+        models = []
+        preds = []
+        G = dmis.W * self.G
+        for ii, beta in enumerate(betas):
+            A = self.G.T.dot(self.G ) + beta * reg.deriv2(self.m)
+            m = np.linalg.solve(A, b)
+            residual = self.G.dot(m)-survey.dobs
+            phi_d[ii] = dmis(m)*2.
+            phi_m[ii] = reg(m)*2.
+            models.append(m)
+            preds.append(survey.dpred(m))
 
-        if use_target:
-            directives = [
-                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
-                beta_schedule,
-                target,
-                save,
-            ]
-        else:
-            directives = [
-                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
-                beta_schedule,
-                save,
-            ]
-        inv = Inversion.BaseInversion(invProb, directiveList=directives)
-        mopt = inv.run(m0)
-        model = opt.recall("xc")
-        model.append(mopt)
-        pred = []
-        for m in model:
-            pred.append(survey.dpred(m))
-        return model, pred, save
+        return phi_d, phi_m, models, preds, betas
 
     def plot_inversion(
         self,
-        maxIter=60,
         m0=0.0,
         mref=0.0,
         percentage=5,
         floor=0.1,
-        chifact=1,
-        beta0_ratio=1.0,
-        coolingFactor=1,
-        coolingRate=1,
+        beta_min=1e-4,
+        beta_max=1e0,
+        n_beta=31,
         alpha_s=1.0,
         alpha_x=1.0,
-        use_target=False,
         run=True,
         option="model",
-        i_iteration=1,
+        i_beta=1,
+        scale='log'
     ):
 
         if run:
-            self.model, self.pred, self.save = self.run_inversion(
-                maxIter=maxIter,
+            self.phi_d, self.phi_m, self.model, self.pred, self.betas = self.run_inversion_direct(
                 m0=m0,
                 mref=mref,
                 percentage=percentage,
                 floor=floor,
-                chifact=chifact,
-                beta0_ratio=beta0_ratio,
-                coolingFactor=coolingFactor,
-                coolingRate=coolingRate,
+                beta_min=beta_min,
+                beta_max=beta_max,
+                n_beta=n_beta,
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
-                use_target=use_target,
             )
-        if len(self.model) == 2:
-            fig, axes = plt.subplots(1, 2, figsize=(14 * 1.2 * 2 / 3, 3 * 1.2))
-            i_plot = -1
-        else:
-            self.save.load_results()
-            if self.save.i_target is None:
-                i_plot = -1
-            else:
-                i_plot = self.save.i_target + 1
-            fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
+        nD = self.data.size
+        i_target = np.argmin(abs(self.phi_d-nD))
 
+        if i_beta > n_beta-1:
+            print(
+                (
+                    ">> Warning: input i_beta (%i) is greater than n_beta (%i)"
+                )
+                % (i_beta, n_beta - 1)
+            )
+            i_beta = n_beta-1
+
+        fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
         axes[0].plot(self.mesh.vectorCCx, self.m)
         if run:
-            axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
+            axes[0].plot(self.mesh.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].errorbar(x=self.jk, y=self.data, yerr=self.uncertainty, color="k", lw=1)
         axes[1].plot(self.jk, self.data, "ko")
         if run:
-            axes[1].plot(self.jk, self.pred[i_plot], "bx")
+            axes[1].plot(self.jk, self.pred[i_target], "bx")
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
         axes[0].set_title("Model")
@@ -388,93 +367,55 @@ class LinearInversionApp(object):
         axes[1].set_xlabel("$k_j$")
         axes[1].set_ylabel("$d_j$")
 
-        if len(self.model) > 2:
-            max_iteration = len(self.model) - 1
-            if i_iteration > max_iteration:
-                print(
-                    (
-                        ">> Warning: input iteration (%i) is greater than maximum iteration (%i)"
-                    )
-                    % (i_iteration, len(self.model) - 1)
+        if option == "misfit":
+            if not run:
+                axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
+                axes[1].plot(self.jk, self.pred[i_beta], "bx")
+                axes[1].legend(("Observed", "Predicted"))
+                axes[2].plot(
+                    self.betas[i_beta], self.phi_d[i_beta], "go", ms=10
                 )
-                i_iteration = max_iteration
 
-            if option == "misfit":
-                if not run:
-                    axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                    axes[1].plot(self.jk, self.pred[i_iteration], "bx")
-                    # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
-                    # axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
-                    axes[1].legend(("Observed", "Predicted"))
+            ax_1 = axes[2].twinx()
+            axes[2].loglog(
+                self.betas, self.phi_d, "k-", lw=2
+            )
+            axes[2].plot(
+                self.betas[i_target], self.phi_d[i_target], "k*", ms=10
+            )
+            ax_1.plot(
+                self.betas, self.phi_m, "r", lw=2
+            )
+            axes[2].set_xlabel("Beta")
+            axes[2].set_ylabel("$\phi_d$")
+            ax_1.set_ylabel("$\phi_m$", color="r")
+            for tl in ax_1.get_yticklabels():
+                tl.set_color("r")
+            axes[2].set_title("Misfit curves")
+            xmin, xmax = beta_max, beta_min
+        elif option == "tikhonov":
+            if not run:
+                axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
+                axes[1].plot(self.jk, self.pred[i_beta], "bx")
+                axes[0].legend(("True", "Pred"))
+                axes[1].legend(("Observed", "Predicted"))
+                axes[2].plot(self.phi_m[i_beta], self.phi_d[i_beta], "go", ms=10)
 
-                    if i_iteration == 0:
-                        i_iteration = 1
-                    axes[2].plot(
-                        np.arange(len(self.save.phi_d))[i_iteration - 1] + 1,
-                        self.save.phi_d[i_iteration - 1] * 2,
-                        "go",
-                        ms=10,
-                    )
+            axes[2].plot(self.phi_m, self.phi_d , "k-", lw=2)
+            axes[2].plot(self.phi_m[i_target], self.phi_d[i_target], "k*", ms=10)
+            xmin, xmax = np.hstack(self.phi_m).min(), np.hstack(self.phi_m).max()
 
-                ax_1 = axes[2].twinx()
-                axes[2].semilogy(
-                    np.arange(len(self.save.phi_d)) + 1, self.save.phi_d * 2, "k-", lw=2
-                )
-                if self.save.i_target is not None:
-                    axes[2].plot(
-                        np.arange(len(self.save.phi_d))[self.save.i_target] + 1,
-                        self.save.phi_d[self.save.i_target] * 2,
-                        "k*",
-                        ms=10,
-                    )
-                    axes[2].plot(
-                        np.r_[axes[2].get_xlim()[0], axes[2].get_xlim()[1]],
-                        np.ones(2) * self.save.target_misfit * 2,
-                        "k:",
-                    )
-
-                ax_1.semilogy(
-                    np.arange(len(self.save.phi_d)) + 1, self.save.phi_m, "r", lw=2
-                )
-                axes[2].set_xlabel("Iteration")
-                axes[2].set_ylabel("$\phi_d$")
-                ax_1.set_ylabel("$\phi_m$", color="r")
-                for tl in ax_1.get_yticklabels():
-                    tl.set_color("r")
-                axes[2].set_title("Misfit curves")
-
-            elif option == "tikhonov":
-                if not run:
-                    axes[0].plot(self.mesh.vectorCCx, self.model[i_iteration])
-                    axes[1].plot(self.jk, self.pred[i_iteration], "bx")
-                    # axes[0].legend(("True", "Pred", ("%ith")%(i_iteration)))
-                    # axes[1].legend(("Observed", "Predicted", ("%ith")%(i_iteration)))
-                    axes[0].legend(("True", "Pred"))
-                    axes[1].legend(("Observed", "Predicted"))
-
-                    if i_iteration == 0:
-                        i_iteration = 1
-                    axes[2].plot(
-                        self.save.phi_m[i_iteration - 1],
-                        self.save.phi_d[i_iteration - 1] * 2,
-                        "go",
-                        ms=10,
-                    )
-
-                axes[2].plot(self.save.phi_m, self.save.phi_d * 2, "k-", lw=2)
-                axes[2].set_xlim(
-                    np.hstack(self.save.phi_m).min(), np.hstack(self.save.phi_m).max()
-                )
-                axes[2].set_xlabel("$\phi_m$", fontsize=14)
-                axes[2].set_ylabel("$\phi_d$", fontsize=14)
-                if self.save.i_target is not None:
-                    axes[2].plot(
-                        self.save.phi_m[self.save.i_target],
-                        self.save.phi_d[self.save.i_target] * 2.0,
-                        "k*",
-                        ms=10,
-                    )
-                axes[2].set_title("Tikhonov curve")
+            axes[2].set_xlabel("$\phi_m$", fontsize=14)
+            axes[2].set_ylabel("$\phi_d$", fontsize=14)
+            axes[2].set_title("Tikhonov curve")
+        if scale == "log":
+            axes[2].set_yscale('log')
+            axes[2].set_xscale('log')
+        else:
+            axes[2].set_yscale('linear')
+            axes[2].set_xscale('linear')
+        axes[2].plot((xmin, xmax), (nD, nD), 'k--')
+        axes[2].set_xlim(xmin, xmax)
         plt.tight_layout()
 
     def interact_plot_G(self):
@@ -564,10 +505,9 @@ class LinearInversionApp(object):
         )
         return Q
 
-    def interact_plot_inversion(self, maxIter=30):
+    def interact_plot_inversion(self, n_beta=81):
         interact(
             self.plot_inversion,
-            maxIter=IntText(value=maxIter),
             m0=FloatSlider(
                 min=-2, max=2, step=0.05, value=0.0, continuous_update=False
             ),
@@ -576,20 +516,16 @@ class LinearInversionApp(object):
             ),
             percentage=FloatText(value=self.percentage),
             floor=FloatText(value=self.floor),
-            chifact=FloatText(value=1.0),
-            beta0_ratio=FloatText(value=100),
-            coolingFactor=FloatSlider(
-                min=0.1, max=10, step=1, value=2, continuous_update=False
-            ),
-            coolingRate=IntSlider(
-                min=1, max=10, step=1, value=1, continuous_update=False
-            ),
-            alpha_s=FloatText(value=1e-10),
+            beta_min=FloatText(value=1e-4),
+            beta_max=FloatText(value=1e2),
+            n_beta=IntText(value=n_beta, min=10, max=100),
+            alpha_s=FloatText(value=1e-2),
             alpha_x=FloatText(value=0),
             run=True,
-            target=False,
-            option=ToggleButtons(options=["misfit", "tikhonov"], value="misfit"),
-            i_iteration=IntSlider(
-                min=0, max=maxIter, step=1, value=0, continuous_update=False
+            option=ToggleButtons(options=["misfit", "tikhonov"], value="tikhonov"),
+            scale=ToggleButtons(options=["linear", "log"], value="log"),
+            i_beta=IntSlider(
+                min=0, max=n_beta-1, step=1, value=0, continuous_update=False
             ),
+
         )

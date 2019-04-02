@@ -224,8 +224,8 @@ class TomographyInversionApp(object):
         yc = widgets.FloatSlider(description='zc', continuous_update=False, min=0, max=400, step=1, value=200)
         v0 = widgets.FloatSlider(description='v0', continuous_update=False, min=500, max=3000, step=50, value=1000)
         v1 = widgets.FloatSlider(description='v1', continuous_update=False, min=500, max=3000, step=50, value=2000)
-        nx = widgets.IntSlider(description='nx', continuous_update=False, min=10, max=40, step=2, value=10)
-        ny = widgets.IntSlider(description='ny', continuous_update=False, min=10, max=80, step=2, value=20)
+        nx = widgets.IntSlider(description='nx', continuous_update=False, min=5, max=80, step=2, value=10)
+        ny = widgets.IntSlider(description='ny', continuous_update=False, min=5, max=160, step=2, value=20)
 
         set_mesh = widgets.RadioButtons(
             options=["active", "inactive"],
@@ -467,12 +467,14 @@ class TomographyInversionApp(object):
             pred.append(self.survey.dpred(m))
         return model, pred, save
 
-    def plot_model_inversion(self, ii, model, fixed=False):
+    def plot_model_inversion(self, ii, model, fixed=False, clim=None):
         fig, axs = plt.subplots(1, 2)
         if fixed:
-            clim = (1./self.slowness).min(), (1./self.slowness).max()
-        else:
-            clim = None
+            if clim is None:
+                clim = (1./self.slowness).min(), (1./self.slowness).max()
+            else:
+                clim = clim
+
         out = self.mesh.plotImage(1./model[ii], ax=axs[0], clim=clim)
         cb = plt.colorbar(out[0], ax=axs[0], fraction=0.02)
         out = self.mesh.plotImage(1./self.slowness, ax=axs[1], clim=clim)
@@ -509,9 +511,9 @@ class TomographyInversionApp(object):
             ax.set_ylabel('Tx')
         plt.tight_layout()
 
-    def interact_model_inversion(self, model):
+    def interact_model_inversion(self, model, clim=None):
         def foo(ii, fixed=False):
-            self.plot_model_inversion(ii, model, fixed=fixed)
+            self.plot_model_inversion(ii, model, fixed=fixed, clim=clim)
         interact(
             foo,
             ii=IntSlider(
