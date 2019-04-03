@@ -105,10 +105,13 @@ def MagneticLongDipoleField(
     return Bx1 + Bx2, By1 + By2, Bz1 + Bz2
 
 def DrawMagneticDipole3D(
-    dipoleLoc_X=0.,dipoleLoc_Y=0.,dipoleLoc_Z=-50., dipoledec=0., dipoleinc=90., dipoleL=100., dipolemoment=1.0, B0=53600e-9 , Binc=90., Bdec=0,
-    xStart=-3, xEnd=3, yStart=-3,yEnd=3,
-    showField =True,showCurve=True,showLocation=True,showStrength=True
+    dipoleLoc_X=0.,dipoleLoc_Y=0.,dipoleLoc_Z=-5., dipoledec=0., dipoleinc=0., dipoleL=1., dipolemoment=1.0, B0=53600e-9 , Binc=90., Bdec=0,
+    xStart=-6, xEnd=6, yStart=-6,yEnd=6,
+    showField =True,showCurve=True,showLocation=True,showStrength=True,
+    ifUpdate=True
 ):
+    if(ifUpdate==False):
+        return 0;
     dipoleloc=(dipoleLoc_X,dipoleLoc_Y,dipoleLoc_Z);
     B0x = B0*np.cos(np.radians(Binc))*np.sin(np.radians(Bdec))
     B0y = B0*np.cos(np.radians(Binc))*np.cos(np.radians(Bdec))
@@ -116,12 +119,12 @@ def DrawMagneticDipole3D(
 
     # set observation grid
     z =  1. # x, y bounds and elevation
-    ymin=xmin = min(xStart,yStart)
-    ymax=xmax = max(xEnd,yEnd)
+    radii = (2., 5.) # how many layers of field lines for plotting
+    ymin=xmin = min(xStart,yStart,z-max(radii)*2)
+    ymax=xmax = max(xEnd,yEnd,max(radii)*2)
     profile_x = 0. # x-coordinate of y-profile
     profile_y = 0. # y-coordinate of x-profile
     h = 0.2 # grid interval
-    radii = (2., 5.) # how many layers of field lines for plotting
     Naz = 10 # number of azimuth
 
     # get field lines
@@ -167,7 +170,7 @@ def DrawMagneticDipole3D(
     if showStrength:
         # plot map
         Bt = Ba1.reshape(xi.shape)*1e9 # contour and color scale in nT
-        c = ax.contourf(xi,yi,Bt,alpha=1,zdir='z',offset=z-max(radii)*2,cmap='jet',
+        c = ax.contourf(xi,yi,Bt,alpha=1,zdir='z',offset=xmin,cmap='jet',
                         levels=np.linspace(Bt.min(),Bt.max(),50,endpoint=True),zorder = 0)
         fig.colorbar(c)
 
@@ -187,30 +190,33 @@ def DrawMagneticDipole3D(
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
-    ax.set_xlim(xmin, xmax)
-    ax.set_ylim(ymin, ymax)
-    ax.set_zlim(z-max(radii)*2, max(radii)*1.5)
+    # ax.set_xlim(xmin, xmax)
+    # ax.set_ylim(ymin, ymax)
+    # ax.set_zlim(-(xmax-xmin)/2, (xmax-xmin)/2)
+    ax.set_xlim(xmin,xmax)
+    ax.set_ylim(xmin,xmax)
+    ax.set_zlim(xmin,xmax)
     
 
 # draw the widgets
 def interact_pic():
     dipoleLoc_X=FloatText(
             value=0,
-            description='X',
+            description='DipoleX',
             disabled=False
     )
     dipoleLoc_Y=FloatText(
         value=0,
-        description='Y',
+        description='DipoleY',
         disabled=False
     )
     dipoleLoc_Z=FloatText(
-        value=-50.,
-        description='Z',
+        value=-5.,
+        description='DipoleZ',
         disabled=False
     )
     dipoleL=FloatText(
-        value=100.,
+        value=1.,
         description='Length',
         disabled=False
     )
@@ -220,13 +226,13 @@ def interact_pic():
         disabled=False
     )
     dipoleInc=FloatText(
-        value=90.,
+        value=0.,
         description='dipoleInc',
         disabled=False
     )
     dipolemoment=FloatText(
         value=1.,
-        description='Dipolemoment',
+        description='Moment',
         disabled=False
     )
     B0 = FloatText(
@@ -246,22 +252,22 @@ def interact_pic():
     )
 
     xStart = FloatText(
-        value=-3,
+        value=-6,
         description="xStart",
         disabled=False
     )
     xEnd = FloatText(
-        value=3,
+        value=6,
         description="xEnd",
         disabled=False
     )
     yStart = FloatText(
-        value=-3,
+        value=-6,
         description="yStart",
         disabled=False
     )
     yEnd = FloatText(
-        value=3,
+        value=6,
         description="yEnd",
         disabled=False
     )
@@ -273,12 +279,12 @@ def interact_pic():
     )
     showCurve = Checkbox(
         value=True,
-        description='Show the Black Curve',
+        description='show the profiles',
         disabled=False
     )
     showLocation = Checkbox(
         value=True,
-        description='Show the Location of the Point',
+        description='show the locations of measurement',
         disabled=False
     )
     showStrength = Checkbox(
@@ -286,7 +292,18 @@ def interact_pic():
         description='Show the Field Strength Figure',
         disabled=False
     )
-
+    ifUpdate = Checkbox(
+        value=True,
+        description='Update Fig Real Time',
+        disabled=False
+    )
+    # ifUpdate = ToggleButton(
+    #     value=True,
+    #     description="UpdateRealTime",
+    #     disabled=False,
+    #     button_style="info",  # 'success', 'info', 'warning', 'danger' or ''
+    #     tooltip="Click me"
+    # )
     
 
     out1 = HBox([dipoleLoc_X,dipoleLoc_Y,dipoleLoc_Z])
@@ -296,7 +313,7 @@ def interact_pic():
     out5 = HBox([B0,Binc,Bdec])
     out6 = HBox([xStart,xEnd])
     out7 = HBox([yStart,yEnd])
-    out8 = VBox([showField,showCurve, showLocation, showStrength])
+    out8 = VBox([showField,showCurve, showLocation, showStrength,ifUpdate])
     out = interactive_output(
         DrawMagneticDipole3D,
         {
@@ -318,6 +335,7 @@ def interact_pic():
             "showCurve":showCurve,
             "showLocation":showLocation,
             "showStrength":showStrength,
+            "ifUpdate":ifUpdate
         },
     )
     return VBox([out1,out2,out3,out4,out5,out6,out7,HBox([out, out8])])
