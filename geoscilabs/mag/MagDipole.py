@@ -14,8 +14,10 @@ from ipywidgets import (
     interactive_output,
     Layout,
     FloatRangeSlider,
-    Checkbox
+    Checkbox,
 )
+
+
 def MagneticMonopoleField(obsloc, poleloc=(0.0, 0.0, 0.0), Q=1):
     # relative obs. loc. to pole, assuming pole at origin
     dx, dy, dz = obsloc[0] - poleloc[0], obsloc[1] - poleloc[1], obsloc[2] - poleloc[2]
@@ -104,199 +106,175 @@ def MagneticLongDipoleField(
     )
     return Bx1 + Bx2, By1 + By2, Bz1 + Bz2
 
+
 def DrawMagneticDipole3D(
-    dipoleLoc_X=0.,dipoleLoc_Y=0.,dipoleLoc_Z=-5., dipoledec=0., dipoleinc=0., dipoleL=1., dipolemoment=1.0, B0=53600e-9 , Binc=90., Bdec=0,
-    xStart=-6, xEnd=6, yStart=-6,yEnd=6,
-    showField =True,showCurve=True,showLocation=True,showStrength=True,
-    ifUpdate=True
+    dipoleLoc_X=0.0,
+    dipoleLoc_Y=0.0,
+    dipoleLoc_Z=-5.0,
+    dipoledec=0.0,
+    dipoleinc=0.0,
+    dipoleL=1.0,
+    dipolemoment=1.0,
+    B0=53600e-9,
+    Binc=90.0,
+    Bdec=0,
+    xStart=-6,
+    xEnd=6,
+    yStart=-6,
+    yEnd=6,
+    showField=True,
+    showCurve=True,
+    showLocation=True,
+    showStrength=True,
+    ifUpdate=True,
 ):
-    if(ifUpdate==False):
-        return 0;
-    dipoleloc=(dipoleLoc_X,dipoleLoc_Y,dipoleLoc_Z);
-    B0x = B0*np.cos(np.radians(Binc))*np.sin(np.radians(Bdec))
-    B0y = B0*np.cos(np.radians(Binc))*np.cos(np.radians(Bdec))
-    B0z = -B0*np.sin(np.radians(Binc))
+    if ifUpdate == False:
+        return 0
+    dipoleloc = (dipoleLoc_X, dipoleLoc_Y, dipoleLoc_Z)
+    B0x = B0 * np.cos(np.radians(Binc)) * np.sin(np.radians(Bdec))
+    B0y = B0 * np.cos(np.radians(Binc)) * np.cos(np.radians(Bdec))
+    B0z = -B0 * np.sin(np.radians(Binc))
 
     # set observation grid
-    z =  1. # x, y bounds and elevation
-    radii = (2., 5.) # how many layers of field lines for plotting
-    ymin=xmin = min(xStart,yStart,z-max(radii)*2)
-    ymax=xmax = max(xEnd,yEnd,max(radii)*2)
-    profile_x = 0. # x-coordinate of y-profile
-    profile_y = 0. # y-coordinate of x-profile
-    h = 0.2 # grid interval
-    Naz = 10 # number of azimuth
+    z = 1.0  # x, y bounds and elevation
+    radii = (2.0, 5.0)  # how many layers of field lines for plotting
+    ymin = xmin = min(xStart, yStart, z - max(radii) * 2)
+    ymax = xmax = max(xEnd, yEnd, max(radii) * 2)
+    profile_x = 0.0  # x-coordinate of y-profile
+    profile_y = 0.0  # y-coordinate of x-profile
+    h = 0.2  # grid interval
+    Naz = 10  # number of azimuth
 
     # get field lines
-    linex, liney, linez = MagneticLongDipoleLine(dipoleloc,dipoledec,dipoleinc,dipoleL,radii,Naz)
+    linex, liney, linez = MagneticLongDipoleLine(
+        dipoleloc, dipoledec, dipoleinc, dipoleL, radii, Naz
+    )
 
     # get map
-    xi, yi = np.meshgrid(np.r_[xStart:xEnd+h:h], np.r_[yStart:yEnd+h:h])
+    xi, yi = np.meshgrid(np.r_[xStart : xEnd + h : h], np.r_[yStart : yEnd + h : h])
     x1, y1 = xi.flatten(), yi.flatten()
-    z1 = np.full(x1.shape,z)
+    z1 = np.full(x1.shape, z)
     Bx, By, Bz = np.zeros(len(x1)), np.zeros(len(x1)), np.zeros(len(x1))
 
     for i in np.arange(len(x1)):
-        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x1[i],y1[i],z1[i]),dipolemoment)
-    Ba1 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(
+            dipoleloc,
+            dipoledec,
+            dipoleinc,
+            dipoleL,
+            (x1[i], y1[i], z1[i]),
+            dipolemoment,
+        )
+    Ba1 = np.dot(np.r_[B0x, B0y, B0z], np.vstack((Bx, By, Bz)))
 
     # get x-profile
-    x2 = np.r_[xStart:xEnd+h:h]
-    y2, z2 = np.full(x2.shape,profile_y), np.full(x2.shape,z)
+    x2 = np.r_[xStart : xEnd + h : h]
+    y2, z2 = np.full(x2.shape, profile_y), np.full(x2.shape, z)
     Bx, By, Bz = np.zeros(len(x2)), np.zeros(len(x2)), np.zeros(len(x2))
     for i in np.arange(len(x2)):
-        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x2[i],y2[i],z2[i]),dipolemoment)
-    Ba2 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(
+            dipoleloc,
+            dipoledec,
+            dipoleinc,
+            dipoleL,
+            (x2[i], y2[i], z2[i]),
+            dipolemoment,
+        )
+    Ba2 = np.dot(np.r_[B0x, B0y, B0z], np.vstack((Bx, By, Bz)))
 
     # get y-profile
-    y3 = np.r_[yStart:yEnd+h:h]
-    x3, z3 = np.full(y3.shape,profile_x), np.full(y3.shape,z)
+    y3 = np.r_[yStart : yEnd + h : h]
+    x3, z3 = np.full(y3.shape, profile_x), np.full(y3.shape, z)
     Bx, By, Bz = np.zeros(len(x3)), np.zeros(len(x3)), np.zeros(len(x3))
     for i in np.arange(len(x3)):
-        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(dipoleloc,dipoledec,dipoleinc,dipoleL,(x3[i],y3[i],z3[i]),dipolemoment)
-    Ba3 = np.dot(np.r_[B0x,B0y,B0z], np.vstack((Bx,By,Bz)))
+        Bx[i], By[i], Bz[i] = MagneticLongDipoleField(
+            dipoleloc,
+            dipoledec,
+            dipoleinc,
+            dipoleL,
+            (x3[i], y3[i], z3[i]),
+            dipolemoment,
+        )
+    Ba3 = np.dot(np.r_[B0x, B0y, B0z], np.vstack((Bx, By, Bz)))
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.gca(projection="3d")
 
     if showField:
         # plot field lines
-        for lx,ly,lz in zip(linex,liney,linez):
-            ax.plot(lx,ly,lz,'-',markersize=1, zorder=100)
+        for lx, ly, lz in zip(linex, liney, linez):
+            ax.plot(lx, ly, lz, "-", markersize=1, zorder=100)
 
     if showLocation:
-        ax.scatter(x1,y1,z1,s=2,alpha=0.3)
-    
+        ax.scatter(x1, y1, z1, s=2, alpha=0.3)
+
     if showStrength:
         # plot map
-        Bt = Ba1.reshape(xi.shape)*1e9 # contour and color scale in nT
-        c = ax.contourf(xi,yi,Bt,alpha=1,zdir='z',offset=xmin,cmap='jet',
-                        levels=np.linspace(Bt.min(),Bt.max(),50,endpoint=True),zorder = 0)
+        Bt = Ba1.reshape(xi.shape) * 1e9  # contour and color scale in nT
+        c = ax.contourf(
+            xi,
+            yi,
+            Bt,
+            alpha=1,
+            zdir="z",
+            offset=xmin,
+            cmap="jet",
+            levels=np.linspace(Bt.min(), Bt.max(), 50, endpoint=True),
+            zorder=0,
+        )
         fig.colorbar(c)
 
     if showCurve:
-         # auto-scaling for profile plot
-        ptpmax = np.max((Ba2.ptp(),Ba3.ptp())) # dynamic range
+        # auto-scaling for profile plot
+        ptpmax = np.max((Ba2.ptp(), Ba3.ptp()))  # dynamic range
         autoscaling = np.max(radii) / ptpmax
         # plot x-profile
-        ax.scatter(x2,y2,z2,s=2,c='black',alpha=0.3)
-        ax.plot(x2,Ba2*autoscaling,zs=ymax,c='black',zdir='y')
+        ax.scatter(x2, y2, z2, s=2, c="black", alpha=0.3)
+        ax.plot(x2, Ba2 * autoscaling, zs=ymax, c="black", zdir="y")
 
         # plot y-profile
-        ax.scatter(x3,y3,z3,s=2,c='black',alpha=0.3)
-        ax.plot(y3,Ba3*autoscaling,zs=xmin,c='black',zdir='x')
+        ax.scatter(x3, y3, z3, s=2, c="black", alpha=0.3)
+        ax.plot(y3, Ba3 * autoscaling, zs=xmin, c="black", zdir="x")
 
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
 
     # ax.set_xlim(xmin, xmax)
     # ax.set_ylim(ymin, ymax)
     # ax.set_zlim(-(xmax-xmin)/2, (xmax-xmin)/2)
-    ax.set_xlim(xmin,xmax)
-    ax.set_ylim(xmin,xmax)
-    ax.set_zlim(xmin,xmax)
-    
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(xmin, xmax)
+    ax.set_zlim(xmin, xmax)
+
 
 # draw the widgets
 def interact_pic():
-    dipoleLoc_X=FloatText(
-            value=0,
-            description='DipoleX',
-            disabled=False
-    )
-    dipoleLoc_Y=FloatText(
-        value=0,
-        description='DipoleY',
-        disabled=False
-    )
-    dipoleLoc_Z=FloatText(
-        value=-5.,
-        description='DipoleZ',
-        disabled=False
-    )
-    dipoleL=FloatText(
-        value=1.,
-        description='Length',
-        disabled=False
-    )
-    dipoleDec=FloatText(
-        value=0,
-        description='dipoleDec',
-        disabled=False
-    )
-    dipoleInc=FloatText(
-        value=0.,
-        description='dipoleInc',
-        disabled=False
-    )
-    dipolemoment=FloatText(
-        value=1.,
-        description='Moment',
-        disabled=False
-    )
-    B0 = FloatText(
-        value=53600e-9,
-        description=r"$B_0$",
-        disabled=False
-    )
-    Binc = FloatText(
-        value=90,
-        description="Binc",
-        disabled=False
-    )
-    Bdec = FloatText(
-        value=0,
-        description="Bdec",
-        disabled=False
-    )
+    dipoleLoc_X = FloatText(value=0, description="DipoleX", disabled=False)
+    dipoleLoc_Y = FloatText(value=0, description="DipoleY", disabled=False)
+    dipoleLoc_Z = FloatText(value=-5.0, description="DipoleZ", disabled=False)
+    dipoleL = FloatText(value=1.0, description="Length", disabled=False)
+    dipoleDec = FloatText(value=0, description="dipoleDec", disabled=False)
+    dipoleInc = FloatText(value=0.0, description="dipoleInc", disabled=False)
+    dipolemoment = FloatText(value=1.0, description="Moment", disabled=False)
+    B0 = FloatText(value=53600e-9, description=r"$B_0$", disabled=False)
+    Binc = FloatText(value=90, description="Binc", disabled=False)
+    Bdec = FloatText(value=0, description="Bdec", disabled=False)
 
-    xStart = FloatText(
-        value=-6,
-        description="xStart",
-        disabled=False
-    )
-    xEnd = FloatText(
-        value=6,
-        description="xEnd",
-        disabled=False
-    )
-    yStart = FloatText(
-        value=-6,
-        description="yStart",
-        disabled=False
-    )
-    yEnd = FloatText(
-        value=6,
-        description="yEnd",
-        disabled=False
-    )
+    xStart = FloatText(value=-6, description="xStart", disabled=False)
+    xEnd = FloatText(value=6, description="xEnd", disabled=False)
+    yStart = FloatText(value=-6, description="yStart", disabled=False)
+    yEnd = FloatText(value=6, description="yEnd", disabled=False)
 
-    showField = Checkbox(
-        value=True,
-        description='Show the Field',
-        disabled=False
-    )
-    showCurve = Checkbox(
-        value=True,
-        description='show the profiles',
-        disabled=False
-    )
+    showField = Checkbox(value=True, description="Show the Field", disabled=False)
+    showCurve = Checkbox(value=True, description="show the profiles", disabled=False)
     showLocation = Checkbox(
-        value=True,
-        description='show the locations of measurement',
-        disabled=False
+        value=True, description="show the locations of measurement", disabled=False
     )
     showStrength = Checkbox(
-        value=True,
-        description='Show the Field Strength Figure',
-        disabled=False
+        value=True, description="Show the Field Strength Figure", disabled=False
     )
-    ifUpdate = Checkbox(
-        value=True,
-        description='Update Fig Real Time',
-        disabled=False
-    )
+    ifUpdate = Checkbox(value=True, description="Update Fig Real Time", disabled=False)
     # ifUpdate = ToggleButton(
     #     value=True,
     #     description="UpdateRealTime",
@@ -304,38 +282,37 @@ def interact_pic():
     #     button_style="info",  # 'success', 'info', 'warning', 'danger' or ''
     #     tooltip="Click me"
     # )
-    
 
-    out1 = HBox([dipoleLoc_X,dipoleLoc_Y,dipoleLoc_Z])
+    out1 = HBox([dipoleLoc_X, dipoleLoc_Y, dipoleLoc_Z])
     out2 = HBox([dipoleDec, dipoleInc])
     out3 = HBox([dipoleL])
     out4 = HBox([dipolemoment])
-    out5 = HBox([B0,Binc,Bdec])
-    out6 = HBox([xStart,xEnd])
-    out7 = HBox([yStart,yEnd])
-    out8 = VBox([showField,showCurve, showLocation, showStrength,ifUpdate])
+    out5 = HBox([B0, Binc, Bdec])
+    out6 = HBox([xStart, xEnd])
+    out7 = HBox([yStart, yEnd])
+    out8 = VBox([showField, showCurve, showLocation, showStrength, ifUpdate])
     out = interactive_output(
         DrawMagneticDipole3D,
         {
-            "dipoleLoc_X":dipoleLoc_X,
-            "dipoleLoc_Y":dipoleLoc_Y,
-            "dipoleLoc_Z":dipoleLoc_Z,
+            "dipoleLoc_X": dipoleLoc_X,
+            "dipoleLoc_Y": dipoleLoc_Y,
+            "dipoleLoc_Z": dipoleLoc_Z,
             "dipoledec": dipoleDec,
             "dipoleinc": dipoleInc,
             "dipoleL": dipoleL,
             "dipolemoment": dipolemoment,
-            "B0":B0,
-            "Binc":Binc,
-            "Bdec":Bdec,
-            "xStart":xStart,
-            "xEnd":xEnd,
-            "yStart":yStart,
-            "yEnd":yEnd,
-            "showField":showField,
-            "showCurve":showCurve,
-            "showLocation":showLocation,
-            "showStrength":showStrength,
-            "ifUpdate":ifUpdate
+            "B0": B0,
+            "Binc": Binc,
+            "Bdec": Bdec,
+            "xStart": xStart,
+            "xEnd": xEnd,
+            "yStart": yStart,
+            "yEnd": yEnd,
+            "showField": showField,
+            "showCurve": showCurve,
+            "showLocation": showLocation,
+            "showStrength": showStrength,
+            "ifUpdate": ifUpdate,
         },
     )
-    return VBox([out1,out2,out3,out4,out5,out6,out7,HBox([out, out8])])
+    return VBox([out1, out2, out3, out4, out5, out6, out7, HBox([out, out8])])
