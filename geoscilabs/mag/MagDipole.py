@@ -128,7 +128,7 @@ def DrawMagneticDipole3D(
     showStrength=True,
     ifUpdate=True,
 ):
-    if ifUpdate == False:
+    if ifUpdate is False:
         return 0
     dipoleloc = (dipoleLoc_X, dipoleLoc_Y, dipoleLoc_Z)
     B0x = B0 * np.cos(np.radians(Binc)) * np.sin(np.radians(Bdec))
@@ -138,8 +138,8 @@ def DrawMagneticDipole3D(
     # set observation grid
     z = 1.0  # x, y bounds and elevation
     radii = (2.0, 5.0)  # how many layers of field lines for plotting
-    ymin = xmin = min(xStart, yStart, z - max(radii) * 2)
-    ymax = xmax = max(xEnd, yEnd, max(radii) * 2)
+    xmin = min(xStart, yStart, z - max(radii) * 2)
+    xmax = max(xEnd, yEnd, max(radii) * 2)
     profile_x = 0.0  # x-coordinate of y-profile
     profile_y = 0.0  # y-coordinate of x-profile
     h = 0.2  # grid interval
@@ -230,7 +230,7 @@ def DrawMagneticDipole3D(
         autoscaling = np.max(radii) / ptpmax
         # plot x-profile
         ax.scatter(x2, y2, z2, s=2, c="black", alpha=0.3)
-        ax.plot(x2, Ba2 * autoscaling, zs=ymax, c="black", zdir="y")
+        ax.plot(x2, Ba2 * autoscaling, zs=xmax, c="black", zdir="y")
 
         # plot y-profile
         ax.scatter(x3, y3, z3, s=2, c="black", alpha=0.3)
