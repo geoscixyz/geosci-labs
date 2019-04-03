@@ -21,7 +21,7 @@ from ipywidgets import (
     FloatText,
     IntText,
     SelectMultiple,
-    RadioButtons
+    RadioButtons,
 )
 import ipywidgets as widgets
 
@@ -329,7 +329,7 @@ class LinearInversionCGApp(object):
 
     def plot_inversion(
         self,
-        mode='Run',
+        mode="Run",
         maxIter=60,
         m0=0.0,
         mref=0.0,
@@ -346,7 +346,7 @@ class LinearInversionCGApp(object):
         i_iteration=1,
     ):
 
-        if mode == 'Run':
+        if mode == "Run":
             self.model, self.pred, self.save = self.run_inversion_cg(
                 maxIter=maxIter,
                 m0=m0,
@@ -373,12 +373,12 @@ class LinearInversionCGApp(object):
             fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
 
         axes[0].plot(self.mesh.vectorCCx, self.m)
-        if mode == 'Run':
+        if mode == "Run":
             axes[0].plot(self.mesh.vectorCCx, self.model[i_plot])
         axes[0].set_ylim([-2.5, 2.5])
         axes[1].errorbar(x=self.jk, y=self.data, yerr=self.uncertainty, color="k", lw=1)
         axes[1].plot(self.jk, self.data, "ko")
-        if mode == 'Run':
+        if mode == "Run":
             axes[1].plot(self.jk, self.pred[i_plot], "bx")
         axes[1].legend(("Observed", "Predicted"))
         axes[0].legend(("True", "Pred"))
@@ -570,9 +570,7 @@ class LinearInversionCGApp(object):
         interact(
             self.plot_inversion,
             mode=RadioButtons(
-                description="mode",
-                options=["Run", "Explore"],
-                value="Run"
+                description="mode", options=["Run", "Explore"], value="Run"
             ),
             maxIter=IntText(value=maxIter),
             m0=FloatSlider(
