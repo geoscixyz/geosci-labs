@@ -181,6 +181,8 @@ To maintain consistency of the notebook-apps, please use the following structure
 
 Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state. 
 
+If you create a new notebook, please add it to the list in [index.ipynb](notebooks/index.ipynb)
+
 ### Conventions
 
 
