@@ -181,6 +181,23 @@ To maintain consistency of the notebook-apps, please use the following structure
 
 Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state. 
 
+### Conventions
+
+
+**For colormaps** (http://matplotlib.org/examples/color/colormaps_reference.html)
+- **fields** are plotted with the `viridis`
+- **potentials** are plotted with `viridis`
+- **sensitivities** are plotted with `viridis`
+- **physical properties** are plotted with `jet`
+- **charges** are plotted with `RdBu`
+
+**Order of widgets:**
+
+- geometry of survey
+- geomerty target
+- physical properties of target
+- view options
+
 ### Code style
 
 We use [Black](https://github.com/ambv/black) to format the code so we don't have to
