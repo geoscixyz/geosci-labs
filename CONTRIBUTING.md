@@ -162,12 +162,12 @@ directory).
 
 To maintain consistency of the notebook-apps, please use the following structure 
 
-- Title: title of the notebook that include the geophysical method name
-- Purpose: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
-- Setup: Overview of the relevant parameters in the problem
-- App: interactive visualization that uses [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/)
-- (Additional material: supporting derivations, links to related case studies, ...)
-- Acknowledgement: please include the below statement a markdown cell at the end of the notebook, appending any other geoscience
+- **Title**: title of the notebook that include the geophysical method name
+- **Purpose**: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
+- **Setup**: Overview of the relevant parameters in the problem
+- **App**: interactive visualization that uses [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/)
+- (**Additional material**: supporting derivations, links to related case studies, ...)
+- **Acknowledgement**: please include the below statement a markdown cell at the end of the notebook, appending any other geoscience
   package names that are being used in the notebook and should be acknowledged:
   ```
   # Acknowledgements
