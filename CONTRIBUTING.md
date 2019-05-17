@@ -162,12 +162,12 @@ directory).
 
 To maintain consistency of the notebook-apps, please use the following structure 
 
-- Title: title of the notebook that include the geophysical method name
-- Purpose: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
-- Setup: Overview of the relevant parameters in the problem
-- App: interactive visualization that uses [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/)
-- (Additional material: supporting derivations, links to related case studies, ...)
-- Acknowledgement: please include the below statement a markdown cell at the end of the notebook, appending any other geoscience
+- **Title**: title of the notebook that include the geophysical method name
+- **Purpose**: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
+- **Setup**: Overview of the relevant parameters in the problem
+- **App**: interactive visualization that uses [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/)
+- (**Additional material**: supporting derivations, links to related case studies, ...)
+- **Acknowledgement**: please include the below statement a markdown cell at the end of the notebook, appending any other geoscience
   package names that are being used in the notebook and should be acknowledged:
   ```
   # Acknowledgements
@@ -180,6 +180,25 @@ To maintain consistency of the notebook-apps, please use the following structure
   ```
 
 Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state. 
+
+If you create a new notebook, please add it to the list in [index.ipynb](notebooks/index.ipynb)
+
+### Conventions
+
+
+**For colormaps** (http://matplotlib.org/examples/color/colormaps_reference.html)
+- **fields** are plotted with the `viridis`
+- **potentials** are plotted with `viridis`
+- **sensitivities** are plotted with `viridis`
+- **physical properties** are plotted with `jet`
+- **charges** are plotted with `RdBu`
+
+**Order of widgets:**
+
+- geometry of survey
+- geomerty target
+- physical properties of target
+- view options
 
 ### Code style
 

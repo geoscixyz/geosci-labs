@@ -83,25 +83,9 @@ For more information on running Jupyter notebooks, see the [Jupyter Documentatio
 
 ## Issues
 
-If you run into problems or bugs, please let us know by [creating an issue](https://github.com/geoscixyz/em-apps/issues/new) in this repository.
+If you run into problems or bugs, please let us know by [creating an issue](https://github.com/geoscixyz/geosci-labs/issues/new) in this repository.
 
 ## For Contributors
 
-### Notebook Structure
-
-Each notebook has the following structure
-
-- **Purpose** : Motivation and key concepts addressed by the notebook
-- **Setup** : Overview of the relevant parameters in the problem
-- **Questions** : Guiding questions related to the purpose
-- **App** : interactive visualizations
-- **Explore** : further questions that can be explored with the app
-
-### Setting up your environment
-
-- to develop code for these notebooks, please see https://github.com/geoscixyz/geosci-labs
-- add the notebook name and path to the [index](index.ipynb)
-
-## Contributing
-
+We are glad you are interested in contributing! Please check out the [contributing guide](CONTRIBUTING.md) for ideas of how to get involved. 
 
