@@ -1,14 +1,19 @@
 import numpy as np
-import warnings
 from pymatsolver import Pardiso
 from SimPEG import DC, Utils, Maps
+from SimPEG import (
+    DataMisfit, Regularization, Optimization,
+    InvProblem, Directives, Inversion
+)
 import matplotlib.pyplot as plt
 import matplotlib
-
+import warnings
 warnings.filterwarnings("ignore")
 matplotlib.rcParams['font.size'] = 14
 
 from ipywidgets import GridspecLayout, widgets
+import os
+
 
 class DCRSimulationApp(object):
     """docstring for DCRSimulationApp"""
@@ -63,7 +68,7 @@ class DCRSimulationApp(object):
         if i_rx > rx.nD-1:
             print("Maximum rx number is {0}!".format(rx.nD-1))
         else:
-            fig, ax = plt.subplots(1, 1, figsize=(10, 7))
+            fig, ax = plt.subplots(1, 1, figsize=(10, 5))
             ax.set_xlabel("x (m)")
             ax.set_ylabel("n-spacing")
 
@@ -158,8 +163,8 @@ class DCRSimulationApp(object):
         if add_topography:
             topo, mesh1D = DC.Utils.genTopography(self.mesh, -10, 0, its=100, seed=seed)
             self.actind = Utils.surface2ind_topo(self.mesh, np.c_[mesh1D.vectorCCx, topo])
-            self.survey.drapeTopo(self.mesh, self.actind, option="top")
 
+        self.survey.drapeTopo(self.mesh, self.actind, option="top")
         self.survey.getABMN_locations()
         self.survey = self.IO.from_ambn_locations_to_survey(
             self.survey.a_locations, self.survey.b_locations,
@@ -205,9 +210,17 @@ class DCRSimulationApp(object):
         self.std = std
 
         if simulate:
-            self.plot_data()
+            fig, ax = plt.subplots(1, 1, figsize = (10, 7))
+            self.get_mesh(add_topography=add_topography)
+            self._rho = np.ones(self.mesh.nC) * rho0
+            index = self.get_block_index(xc=xc, yc=yc, dx=dx, dy=dy)
+            self._rho[index] = rho1
+            self._rho[~self.actind] = np.nan
+
+            self.plot_data(ax=ax)
+            ax.set_aspect(1)
             if write_obs_file:
-                self.write_ubc_obs_file(obs_name)
+                self.write_to_csv(obs_name)
                 print ('{0} is written'.format(obs_name))
         else:
             if write_obs_file:
@@ -229,7 +242,7 @@ class DCRSimulationApp(object):
                     gridOpts={"color": "white", "alpha": 0.5},
                     clim=(vmin, vmax)
                 )
-                cb = plt.colorbar(out[0], ax=ax, fraction=0.03, orientation='horizontal', ticks=np.linspace(vmin, vmax, 3))
+                cb = plt.colorbar(out[0], ax=ax, fraction=0.02, orientation='horizontal', ticks=np.linspace(vmin, vmax, 3))
                 cb.set_ticklabels([("%.1f")%(10**value) for value in np.linspace(vmin, vmax, 3)])
                 ax.plot(self.IO.electrode_locations[:, 0], self.IO.electrode_locations[:, 1], "wo", markeredgecolor='k')
                 ax.set_aspect(1)
@@ -241,6 +254,7 @@ class DCRSimulationApp(object):
                     ax.set_ylim(self.IO.xyzlim[1,:])
                 else:
                     ax.set_ylim(self.mesh.vectorNy.min(), 5)
+
     def interact_plot_survey(self):
         a=widgets.FloatText(value=10, description='spacing')
         survey_type = widgets.RadioButtons(
@@ -250,7 +264,7 @@ class DCRSimulationApp(object):
             disabled=False,
         )
         line_length=widgets.FloatText(value=200, description='line length')
-        n_spacing = widgets.IntSlider(min=5, max=18, step=1, value=8, description='n-spacing')
+        n_spacing = widgets.IntSlider(min=5, max=13, step=1, value=8, description='n-spacing')
         i_src = widgets.IntSlider(min=0, max=10, step=1, value=0, description='src #')
         i_rx = widgets.IntSlider(min=0, max=10, step=1, value=0, description='rx #')
         out = widgets.interactive_output(
@@ -275,20 +289,13 @@ class DCRSimulationApp(object):
 
         return grid
 
-#         return widgets.HBox(
-#             [
-#                 widgets.VBox([a, survey_type, line_length, n_spacing, i_src, i_rx]),
-#                 out,
-#             ]
-#         )
-
     def interact_plot_model(self):
         std=widgets.FloatText(value=0., description='noise (%)')
         dx = widgets.FloatSlider(
             description="dx", continuous_update=False, min=0, max=500, step=10, value=20
         )
         dy = widgets.FloatSlider(
-            description="dz", continuous_update=False, min=0, max=50, step=10, value=10
+            description="dz", continuous_update=False, min=0, max=50, step=1, value=10
         )
         xc = widgets.FloatSlider(
             description="xc", continuous_update=False, min=0, max=200, step=1, value=100
@@ -330,7 +337,7 @@ class DCRSimulationApp(object):
             value=False, description="show grid?", disabled=False
         )
         show_core = widgets.Checkbox(
-            value=False, description="show core?", disabled=False
+            value=True, description="show core?", disabled=False
         )
         add_topography = widgets.Checkbox(
             value=False, description="topography?", disabled=False
@@ -398,11 +405,11 @@ class DCRSimulationApp(object):
         return grid
 
     def simulate(self):
-        from SimPEG import Maps
-        # Use Exponential Map: m = log(rho)
         sigma_air = 1e-10
         actmap = Maps.InjectActiveCells(
-            self.mesh, indActive=self.actind, valInactive=np.log(sigma_air)
+            self.mesh,
+            indActive=self.actind,
+            valInactive=np.log(sigma_air)
         )
         mapping = Maps.ExpMap(self.mesh) * actmap
 
@@ -431,13 +438,379 @@ class DCRSimulationApp(object):
         self.survey.std = abs(data) * self.std / 100.
         return data
 
-    def plot_data(self):
+    def plot_data(self, ax=None):
         data = self.simulate()
-        self.IO.plotPseudoSection(data=data/self.IO.G, scale='log', ncontour=10, cmap='jet')
+        self.IO.plotPseudoSection(data=data/self.IO.G, scale='log', ncontour=10, cmap='jet', ax=ax)
 
-    def write_ubc_obs_file(self, fname):
-        DC.Utils.writeUBC_DCobs(
-            'test.obs', self.survey, 2,
-            'GENERAL',
-            survey_type=self.survey_type
+    def write_to_csv(self, fname):
+        self.IO.write_to_csv(fname, self.survey.dobs, self.survey.std)
+
+
+class DCRInversionApp(object):
+    """docstring for DCRInversionApp"""
+
+    uncertainty = None
+    mesh = None
+    actind = None
+    IO = None
+    survey = None
+    phi_d = None
+    phi_m = None
+    dpred = None
+    m = None
+    sigma_air = 1e-8
+
+    def __init__(self):
+        super(DCRInversionApp, self).__init__()
+        self.IO = DC.IO()
+
+    def set_mesh(self):
+        self.mesh, self.actind = self.IO.set_mesh(topo=self.IO.electrode_locations)
+
+    def load_obs(self, fname, load):
+        if load:
+            try:
+                self.survey = self.IO.read_dc_data_csv(fname)
+                print (">> {} is loaded".format(fname))
+                print (">> survey type: {}".format(self.IO.survey_type))
+                print ("   # of data: {0}".format(self.survey.nD))
+                rho_0 = self.get_initial_resistivity()
+                print ((">> suggested initial resistivity: %1.f ohm-m")%(rho_0))
+                self.set_mesh()
+                print (">> 2D tensor mesh is set.")
+                print ("   # of cells: {0}".format(self.mesh.nC))
+                print ("   # of active cells: {0}".format(self.actind.sum()))
+            except:
+                print (">> {} does not exist!".format(fname))
+
+    def get_problem(self):
+        actmap = Maps.InjectActiveCells(
+            self.mesh, indActive=self.actind, valInactive=np.log(self.sigma_air)
+        )
+        mapping = Maps.ExpMap(self.mesh) * actmap
+        problem = DC.Problem2D_N(
+            self.mesh,
+            sigmaMap=mapping,
+            storeJ=True,
+            Solver=Pardiso
+        )
+        if self.survey.ispaired:
+            self.survey.unpair()
+        problem.pair(self.survey)
+        return problem
+
+    def get_initial_resistivity(self):
+        out = np.histogram(np.log10(abs(self.IO.voltages/self.IO.G)))
+        return 10**out[1][np.argmax(out[0])]
+
+    def set_uncertainty(self, percentage, floor, set_value=True):
+        self.percentage = percentage
+        self.floor = floor
+        if set_value:
+            print ((">> percent error: %.1f and floor error: %1.e are set") % (percentage, floor))
+            self.uncertainty = abs(self.survey.dobs) * percentage / 100.+ floor
+
+    def run_inversion(
+        self,
+        rho_0,
+        rho_ref=None,
+        alpha_s=1e-3,
+        alpha_x=1,
+        alpha_z=1,
+        maxIter=20,
+        chifact=1.,
+        beta0_ratio=1.,
+        coolingFactor=5,
+        coolingRate=2,
+        rho_upper=np.Inf,
+        rho_lower=-np.Inf,
+        run=True,
+    ):
+        if run:
+            maxIterCG=20
+            problem = self.get_problem()
+            m0 = np.ones(self.actind.sum()) * np.log(1./rho_0)
+            if rho_ref is None:
+                rho_ref = rho_0
+            mref = np.ones(self.actind.sum()) * np.log(1./rho_ref)
+            dmis = DataMisfit.l2_DataMisfit(self.survey)
+            dmis.W = 1./self.uncertainty
+            reg = Regularization.Tikhonov(
+                self.mesh,
+                indActive=self.actind,
+                alpha_s=alpha_s,
+                alpha_x=alpha_x,
+                alpha_y=alpha_z,
+                mapping=Maps.IdentityMap(nP=self.actind.sum()),
+                mref=mref
+            )
+            # Personal preference for this solver with a Jacobi preconditioner
+            opt = Optimization.ProjectedGNCG(maxIter=maxIter, maxIterCG=maxIterCG)
+            opt.remember('xc')
+            invProb = InvProblem.BaseInvProblem(dmis, reg, opt)
+            beta = Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio)
+            target = Directives.TargetMisfit(chifact=chifact)
+            beta_schedule = Directives.BetaSchedule(
+                coolingFactor=coolingFactor,
+                coolingRate=coolingRate
+            )
+            save = Directives.SaveOutputEveryIteration()
+            save_outputs = Directives.SaveOutputDictEveryIteration()
+            sense_weight = Directives.UpdateSensitivityWeights()
+            inv = Inversion.BaseInversion(
+                invProb,
+                directiveList=[beta, target, beta_schedule, save_outputs]
+            )
+
+            minv = inv.run(m0)
+
+            self.phi_d = []
+            self.phi_m = []
+            self.m = []
+            self.dpred = []
+
+            for key in save_outputs.outDict.keys():
+                self.phi_d.append(save_outputs.outDict[key]['phi_d'].copy()*2.)
+                self.phi_m.append(save_outputs.outDict[key]['phi_m'].copy()*2.)
+                self.m.append(save_outputs.outDict[key]['m'].copy())
+                self.dpred.append(save_outputs.outDict[key]['dpred'].copy())
+            os.system("rm -f *.txt")
+        else:
+            pass
+
+    def interact_load_obs(self):
+        obs_name = widgets.Text(
+            value='dc.obs',
+            placeholder='Type something',
+            description='filename:',
+            disabled=False
+        )
+        load = widgets.Checkbox(
+            value=True, description="load", disabled=False
+        )
+        widgets.interact(self.load_obs, fname=obs_name, load=load)
+
+    def plot_obs_data(self, data_type, plot_type):
+        if plot_type == "pseudo-section":
+            self.IO.plotPseudoSection(aspect_ratio=1, cmap='jet', data_type=data_type)
+        elif plot_type == "histogram":
+            ax = plt.gca()
+            if data_type == "apparent_resistivity":
+                out = ax.hist(np.log10(self.IO.apparent_resistivity), edgecolor='k')
+                xlabel = 'App. Res ($\Omega$m)'
+                xticks = ax.get_xticks()
+                ax.set_xticklabels([ ("%.1f")%(10**xtick)for xtick in xticks])
+
+            elif data_type == "volt":
+                out = ax.hist(np.log10(abs(self.IO.voltages)), edgecolor='k')
+                xlabel = 'Voltage (V/A)'
+                xticks = ax.get_xticks()
+                ax.set_xticklabels([ ("%.1e")%(10**xtick)for xtick in xticks])
+            ax.set_ylabel('Count')
+            ax.set_xlabel(xlabel)
+
+    def plot_misfit_curve(self, iteration, scale='linear', curve_type='misfit'):
+        fig, ax = plt.subplots(1,1, figsize=(10, 5))
+        if curve_type == "misfit":
+            ax_1 = ax.twinx()
+            ax.plot(np.arange(len(self.phi_m))+1, self.phi_d, 'k.-')
+            ax_1.plot(np.arange(len(self.phi_d))+1, self.phi_m, 'r.-')
+            ax.plot(iteration, self.phi_d[iteration-1], 'ko', ms=10)
+            ax_1.plot(iteration, self.phi_m[iteration-1], 'ro', ms=10)
+
+            xlim = plt.xlim()
+            ax.plot(xlim, np.ones(2)*self.survey.nD, 'k--')
+            ax.set_xlim(xlim)
+            ax.set_xlabel("Iteration")
+            ax.set_ylabel("$\phi_d$", fontsize=16)
+            ax_1.set_ylabel("$\phi_m$", fontsize=16)
+            ax.set_yscale(scale)
+            ax_1.set_yscale(scale)
+            ax.set_title(("Misfit / Target misfit: %1.f / %.1f")%(self.phi_d[iteration-1], self.survey.nD))
+        elif curve_type == "tikhonov":
+            ax.plot(self.phi_m, self.phi_d, 'k.-')
+            ax.plot(self.phi_m[iteration-1], self.phi_d[iteration-1], 'ko', ms=10)
+            ax.set_ylabel("$\phi_d$", fontsize=16)
+            ax.set_xlabel("$\phi_m$", fontsize=16)
+            ax.set_xscale(scale)
+            ax.set_yscale(scale)
+
+    def plot_data_misfit(self, iteration):
+        dobs = self.survey.dobs
+        appres = dobs/self.IO.G
+        vmin, vmax = appres.min(), appres.max()
+        dpred = self.dpred[iteration-1]
+        fig, axs = plt.subplots(3,1, figsize = (10, 9))
+        self.IO.plotPseudoSection(data=appres, clim=(vmin, vmax), aspect_ratio=1, ax=axs[0], cmap='jet', scale='log')
+        self.IO.plotPseudoSection(data=dpred/self.IO.G, clim=(vmin, vmax), aspect_ratio=1, ax=axs[1], cmap='jet', scale='log')
+        misfit = (dpred-dobs) / self.uncertainty
+        self.IO.plotPseudoSection(
+            data=misfit, data_type='volt', scale='linear', aspect_ratio=1, ax=axs[2], clim=(-3, 3),
+            label='Normalized Misfit', cmap='jet'
+        )
+        titles = ["Observed", "Predicted", "Normalized misfit"]
+        for i_ax, ax in enumerate(axs):
+            ax.set_title(titles[i_ax])
+
+    def plot_model(self, iteration, vmin=None, vmax=None):
+        clim = (vmin, vmax)
+        inds_core, mesh_core = Utils.ExtractCoreMesh(self.IO.xyzlim, self.mesh)
+        fig, ax = plt.subplots(1,1, figsize=(10, 5))
+        tmp = np.log10(1./(self.survey.prob.sigmaMap*self.m[iteration-1]))
+        tmp[~self.actind] = np.nan
+        if clim is None:
+            vmin, vmax = tmp[self.actind].min(), tmp[self.actind].max()
+        else:
+            vmin, vmax = np.log10(clim[0]), np.log10(clim[1])
+        out = mesh_core.plotImage(
+            tmp[inds_core], grid=False, clim=(vmin, vmax), pcolorOpts={'cmap':'jet'}, ax=ax
+        )
+        ticks = np.linspace(vmin, vmax, 3)
+        cb = plt.colorbar(out[0], orientation='horizontal', fraction=0.03, ticks=ticks, ax=ax)
+        cb.set_ticklabels([("%.1f")%(10**tick)for tick in ticks])
+        ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
+        ax.set_xlabel("x (m)")
+        ax.set_ylabel("z (m)")
+        ymin, ymax = mesh_core.vectorNy.min(), mesh_core.vectorNy.max()
+        dx = (ymax-ymin)/10.
+        ax.set_ylim(ymin, ymax+dx)
+        ax.set_aspect(1)
+        plt.tight_layout()
+
+    def plot_inversion_results(
+        self,
+        iteration=1,
+        curve_type='misfit',
+        scale='log',
+        plot_type='misfit_curve',
+        rho_min=100,
+        rho_max=1000
+    ):
+        if plot_type == "misfit_curve":
+            self.plot_misfit_curve(iteration, curve_type=curve_type, scale=scale)
+        elif plot_type == "model":
+            self.plot_model(iteration, vmin=rho_min, vmax=rho_max)
+        elif plot_type == "data_misfit":
+            self.plot_data_misfit(iteration)
+        else:
+            raise NotImplementedError()
+
+    def interact_plot_obs_data(self):
+        data_type = widgets.ToggleButtons(
+            options=["apparent_resistivity", "volt"],
+            value="apparent_resistivity",
+            description="data type"
+        )
+        plot_type = widgets.ToggleButtons(
+            options=["pseudo-section", "histogram"],
+            value="pseudo-section",
+            description="plot type"
+        )
+        widgets.interact(
+            self.plot_obs_data,
+            data_type=data_type,
+            plot_type=plot_type,
+        )
+
+    def interact_set_uncertainty(self):
+        percentage = widgets.FloatText(value=5.)
+        floor = widgets.FloatText(value=0.)
+        widgets.interact(
+            self.set_uncertainty,
+            percentage=percentage,
+            floor=floor
+        )
+
+    def interact_run_inversion(self):
+        run = widgets.Checkbox(
+            value=True, description="run", disabled=False
+        )
+
+        rho_initial = np.ceil(self.get_initial_resistivity()                )
+        maxIter=widgets.IntText(value=30, continuous_update=False)
+        rho_0=widgets.FloatText(
+            value=rho_initial, continuous_update=False,
+            description="$\\rho_0$"
+        )
+        rho_ref=widgets.FloatText(
+            value=rho_initial, continuous_update=False,
+            description="$\\rho_{ref}$"
+            )
+        percentage=widgets.FloatText(value=self.percentage, continuous_update=False)
+        floor=widgets.FloatText(value=self.floor, continuous_update=False)
+        chifact=widgets.FloatText(value=1.0, continuous_update=False)
+        beta0_ratio=widgets.FloatText(value=10., continuous_update=False)
+        coolingFactor=widgets.FloatSlider(
+            min=0.1, max=10, step=1, value=2, continuous_update=False
+        )
+        coolingRate=widgets.IntSlider(
+            min=1, max=10, step=1, value=1, continuous_update=False
+        )
+        alpha_s=widgets.FloatText(
+            value=1e-10, continuous_update=False,
+            description="$\\alpha_{s}$"
+        )
+        alpha_x=widgets.FloatText(
+            value=1, continuous_update=False,
+            description="$\\alpha_{x}$"
+        )
+        alpha_z=widgets.FloatText(
+            value=1, continuous_update=False,
+            description="$\\alpha_{z}$"
+        )
+
+        widgets.interact(
+            self.run_inversion,
+            run=run,
+            rho_initial=rho_initial,
+            maxIter=maxIter,
+            rho_0=rho_0,
+            rho_ref=rho_ref,
+            percentage=percentage,
+            floor=floor,
+            chifact=chifact,
+            beta0_ratio=beta0_ratio,
+            coolingFactor=coolingFactor,
+            coolingRate=coolingRate,
+            alpha_s=alpha_s,
+            alpha_x=alpha_x,
+            alpha_z=alpha_z
+        )
+
+    def interact_plot_inversion_results(self):
+        iteration = widgets.IntSlider(
+            min=1, max=len(self.m), step=1, value=1, continuous_update=False
+        )
+        curve_type = widgets.ToggleButtons(
+            options=["misfit", "tikhonov"],
+            value="misfit",
+            description="curve type"
+        )
+        scale=widgets.ToggleButtons(
+            options=["linear", "log"],
+            value="linear",
+            description="scale"
+        )
+        plot_type = widgets.ToggleButtons(
+            options=["misfit_curve", "model", "data_misfit"],
+            value="misfit_curve",
+            description="plot type"
+        )
+        rho = 1./np.exp(self.m[-1])
+        rho_min=widgets.FloatText(
+            value=np.ceil(rho.min()), continuous_update=False,
+            description="$\\rho_{min}$"
+        )
+        rho_max=widgets.FloatText(
+            value=np.ceil(rho.max()), continuous_update=False,
+            description="$\\rho_{max}$"
+        )
+        widgets.interact(
+            self.plot_inversion_results,
+            iteration=iteration,
+            curve_type=curve_type,
+            scale=scale,
+            plot_type=plot_type,
+            rho_min=rho_min,
+            rho_max=rho_max
         )
