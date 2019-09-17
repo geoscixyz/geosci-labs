@@ -13,7 +13,7 @@ matplotlib.rcParams['font.size'] = 14
 
 from ipywidgets import GridspecLayout, widgets
 import os
-
+from scipy.interpolate import interp1d
 
 class DCRSimulationApp(object):
     """docstring for DCRSimulationApp"""
@@ -354,7 +354,7 @@ class DCRSimulationApp(object):
             icon='check'
         )
         obs_name = widgets.Text(
-            value='dc.obs',
+            value='dc.csv',
             placeholder='Type something',
             description='filename:',
             disabled=False,
@@ -459,18 +459,28 @@ class DCRInversionApp(object):
     dpred = None
     m = None
     sigma_air = 1e-8
+    topo = None
 
     def __init__(self):
         super(DCRInversionApp, self).__init__()
         self.IO = DC.IO()
 
     def set_mesh(self):
-        self.mesh, self.actind = self.IO.set_mesh(topo=self.IO.electrode_locations)
 
-    def load_obs(self, fname, load):
+        if self.topo is None:
+            self.topo = self.IO.electrode_locations
+        tmp_x = np.r_[-1e10, self.topo[:,0], 1e10]
+        tmp_z = np.r_[self.topo[0,1], self.topo[:,1], self.topo[-1,1]]
+        self.topo = np.c_[tmp_x, tmp_z]
+        self.mesh, self.actind = self.IO.set_mesh(topo=self.topo, method='linear')
+
+    def load_obs(self, fname, load, input_type):
         if load:
             try:
-                self.survey = self.IO.read_dc_data_csv(fname)
+                if input_type == 'csv':
+                    self.survey = self.IO.read_dc_data_csv(fname)
+                elif input_type == 'ubc_dc2d':
+                    self.survey = self.IO.read_ubc_dc2d_obs_file(fname)
                 print (">> {} is loaded".format(fname))
                 print (">> survey type: {}".format(self.IO.survey_type))
                 print ("   # of data: {0}".format(self.survey.nD))
@@ -481,7 +491,8 @@ class DCRInversionApp(object):
                 print ("   # of cells: {0}".format(self.mesh.nC))
                 print ("   # of active cells: {0}".format(self.actind.sum()))
             except:
-                print (">> {} does not exist!".format(fname))
+                print (">> Reading input file is failed!")
+                # print (">> {} does not exist!".format(fname))
 
     def get_problem(self):
         actmap = Maps.InjectActiveCells(
@@ -506,9 +517,16 @@ class DCRInversionApp(object):
     def set_uncertainty(self, percentage, floor, set_value=True):
         self.percentage = percentage
         self.floor = floor
+
         if set_value:
-            print ((">> percent error: %.1f and floor error: %1.e are set") % (percentage, floor))
             self.uncertainty = abs(self.survey.dobs) * percentage / 100.+ floor
+            print ((">> percent error: %.1f and floor error: %1.e are set") % (percentage, floor))
+        else:
+            self.uncertainty = self.survey.std.copy()
+            print (">> uncertainty in the observation file is used")
+        if np.any(self.uncertainty==0.):
+            print ("warning: uncertainty includse zero values!")
+
 
     def run_inversion(
         self,
@@ -580,7 +598,7 @@ class DCRInversionApp(object):
 
     def interact_load_obs(self):
         obs_name = widgets.Text(
-            value='dc.obs',
+            value='./ubc_dc_data/obs_dc.dat',
             placeholder='Type something',
             description='filename:',
             disabled=False
@@ -588,13 +606,18 @@ class DCRInversionApp(object):
         load = widgets.Checkbox(
             value=True, description="load", disabled=False
         )
-        widgets.interact(self.load_obs, fname=obs_name, load=load)
+        input_type = widgets.ToggleButtons(
+            options=["csv", "ubc_dc2d"],
+            value="ubc_dc2d",
+            description="input type"
+        )
+        widgets.interact(self.load_obs, fname=obs_name, load=load, input_type=input_type)
 
     def plot_obs_data(self, data_type, plot_type):
+        fig, ax = plt.subplots(1,1, figsize=(10, 5))
         if plot_type == "pseudo-section":
-            self.IO.plotPseudoSection(aspect_ratio=1, cmap='jet', data_type=data_type)
+            self.IO.plotPseudoSection(aspect_ratio=1, cmap='jet', data_type=data_type, ax=ax)
         elif plot_type == "histogram":
-            ax = plt.gca()
             if data_type == "apparent_resistivity":
                 out = ax.hist(np.log10(self.IO.apparent_resistivity), edgecolor='k')
                 xlabel = 'App. Res ($\Omega$m)'
@@ -603,7 +626,7 @@ class DCRInversionApp(object):
 
             elif data_type == "volt":
                 out = ax.hist(np.log10(abs(self.IO.voltages)), edgecolor='k')
-                xlabel = 'Voltage (V/A)'
+                xlabel = 'Voltage (V)'
                 xticks = ax.get_xticks()
                 ax.set_xticklabels([ ("%.1e")%(10**xtick)for xtick in xticks])
             ax.set_ylabel('Count')
@@ -652,9 +675,9 @@ class DCRInversionApp(object):
         for i_ax, ax in enumerate(axs):
             ax.set_title(titles[i_ax])
 
-    def plot_model(self, iteration, vmin=None, vmax=None):
+    def plot_model(self, iteration, vmin=None, vmax=None, show_core=True, show_grid=False):
         clim = (vmin, vmax)
-        inds_core, mesh_core = Utils.ExtractCoreMesh(self.IO.xyzlim, self.mesh)
+        # inds_core, self. = Utils.ExtractCoreMesh(self.IO.xyzlim, self.mesh)
         fig, ax = plt.subplots(1,1, figsize=(10, 5))
         tmp = np.log10(1./(self.survey.prob.sigmaMap*self.m[iteration-1]))
         tmp[~self.actind] = np.nan
@@ -662,8 +685,9 @@ class DCRInversionApp(object):
             vmin, vmax = tmp[self.actind].min(), tmp[self.actind].max()
         else:
             vmin, vmax = np.log10(clim[0]), np.log10(clim[1])
-        out = mesh_core.plotImage(
-            tmp[inds_core], grid=False, clim=(vmin, vmax), pcolorOpts={'cmap':'jet'}, ax=ax
+        out = self.mesh.plotImage(
+            tmp, grid=show_grid, clim=(vmin, vmax), pcolorOpts={'cmap':'jet'}, ax=ax,
+            gridOpts={"color": "white", "alpha": 0.5}
         )
         ticks = np.linspace(vmin, vmax, 3)
         cb = plt.colorbar(out[0], orientation='horizontal', fraction=0.03, ticks=ticks, ax=ax)
@@ -671,10 +695,20 @@ class DCRInversionApp(object):
         ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
         ax.set_xlabel("x (m)")
         ax.set_ylabel("z (m)")
-        ymin, ymax = mesh_core.vectorNy.min(), mesh_core.vectorNy.max()
-        dx = (ymax-ymin)/10.
-        ax.set_ylim(ymin, ymax+dx)
         ax.set_aspect(1)
+        if show_core:
+            ymin, ymax = self.IO.xyzlim[1,:]
+            xmin, xmax = self.IO.xyzlim[0,:]
+            dy = (ymax-ymin)/10.
+            ax.set_ylim(ymin, ymax+dy)
+            ax.set_xlim(xmin, xmax)
+        else:
+            ymin, ymax = self.mesh.vectorNy.min(), self.mesh.vectorNy.max()
+            xmin, xmax = self.mesh.vectorNx.min(), self.mesh.vectorNx.max()
+            dy = (ymax-ymin)/10.
+            ax.set_ylim(ymin, ymax+dy)
+            ax.set_xlim(xmin, xmax+dy)
+
         plt.tight_layout()
 
     def plot_inversion_results(
@@ -684,12 +718,14 @@ class DCRInversionApp(object):
         scale='log',
         plot_type='misfit_curve',
         rho_min=100,
-        rho_max=1000
+        rho_max=1000,
+        show_grid=False,
+        show_core=True,
     ):
         if plot_type == "misfit_curve":
             self.plot_misfit_curve(iteration, curve_type=curve_type, scale=scale)
         elif plot_type == "model":
-            self.plot_model(iteration, vmin=rho_min, vmax=rho_max)
+            self.plot_model(iteration, vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid)
         elif plot_type == "data_misfit":
             self.plot_data_misfit(iteration)
         else:
@@ -744,7 +780,8 @@ class DCRInversionApp(object):
             min=0.1, max=10, step=1, value=2, continuous_update=False
         )
         coolingRate=widgets.IntSlider(
-            min=1, max=10, step=1, value=1, continuous_update=False
+            min=1, max=10, step=1, value=1, continuous_update=False,
+            description='n_iter / beta'
         )
         alpha_s=widgets.FloatText(
             value=1e-10, continuous_update=False,
@@ -805,6 +842,14 @@ class DCRInversionApp(object):
             value=np.ceil(rho.max()), continuous_update=False,
             description="$\\rho_{max}$"
         )
+
+        show_grid = widgets.Checkbox(
+            value=False, description="show grid?", disabled=False
+        )
+        show_core = widgets.Checkbox(
+            value=True, description="show core?", disabled=False
+        )
+
         widgets.interact(
             self.plot_inversion_results,
             iteration=iteration,
@@ -812,5 +857,7 @@ class DCRInversionApp(object):
             scale=scale,
             plot_type=plot_type,
             rho_min=rho_min,
-            rho_max=rho_max
+            rho_max=rho_max,
+            show_grid=show_grid,
+            show_core=show_core
         )
