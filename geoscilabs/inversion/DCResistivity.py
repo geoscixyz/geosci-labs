@@ -559,7 +559,7 @@ class DCRInversionApp(object):
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
                 alpha_y=alpha_z,
-                mapping=Maps.IdentityMap(nP=self.actind.sum()),
+                mapping=Maps.IdentityMap(nP=np.int(self.actind.sum())),
                 mref=mref
             )
             # Personal preference for this solver with a Jacobi preconditioner
