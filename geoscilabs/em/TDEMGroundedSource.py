@@ -343,7 +343,7 @@ class PlotTDEM(object):
         ax.set_xlabel("X (m)")
         ax.set_ylabel("Y (m)")
         ax.set_zlabel("Depth (m)")
-        ax.set_aspect(1)
+        # ax.set_aspect(1)
         ax.view_init(elev=elev, azim=azim)
         plt.show()
 
