@@ -415,7 +415,7 @@ class DCRSimulationApp(object):
         obs_name = widgets.Text(
             value='dc.csv',
             placeholder='Type something',
-            description='filename:',
+            description='obsname:',
             disabled=False,
             continuous_update=False
         )
@@ -548,6 +548,9 @@ class DCRInversionApp(object):
 
         if self.topo is None:
             self.topo = self.IO.electrode_locations
+        else:
+            print ("set_topo")
+            self.topo = self.survey.topo
         
         if np.unique(self.topo[:,1]).size == 1:
             method = 'nearest'
@@ -560,26 +563,28 @@ class DCRInversionApp(object):
 
         self.mesh, self.actind = self.IO.set_mesh(topo=self.topo, method=method)
 
-    def load_obs(self, fname, load, input_type):
+    def load_obs(self, fname, load, input_type, toponame):
         if load:
-            try:
-                if input_type == 'csv':
-                    self.survey = self.IO.read_dc_data_csv(fname)
-                elif input_type == 'ubc_dc2d':
-                    self.survey = self.IO.read_ubc_dc2d_obs_file(fname)
-                print (">> {} is loaded".format(fname))
-                print (">> survey type: {}".format(self.IO.survey_type))
-                print ("   # of data: {0}".format(self.survey.nD))
-                rho_0 = self.get_initial_resistivity()
-                print ((">> suggested initial resistivity: %1.f ohm-m")%(rho_0))
-                self.set_mesh()
-                print (">> 2D tensor mesh is set.")
-                print ("   # of cells: {0}".format(self.mesh.nC))
-                print ("   # of active cells: {0}".format(self.actind.sum()))
-                print ("   size of 2D cells (hx, hy) = (%1.f m, %1.f m)" % (self.mesh.hx.min(), self.mesh.hy.min()))
-            except:
-                print (">> Reading input file is failed!")
-                # print (">> {} does not exist!".format(fname))
+            # try:
+            if input_type == 'csv':
+                self.input_type = 'csv'
+                self.survey = self.IO.read_dc_data_csv(fname)
+            elif input_type == 'ubc_dc2d':
+                self.input_type = 'ubc_dc2d'
+                self.survey = self.IO.read_ubc_dc2d_obs_file(fname, toponame=toponame)
+            print (">> {} is loaded".format(fname))
+            print (">> survey type: {}".format(self.IO.survey_type))
+            print ("   # of data: {0}".format(self.survey.nD))
+            rho_0 = self.get_initial_resistivity()
+            print ((">> suggested initial resistivity: %1.f ohm-m")%(rho_0))
+            self.set_mesh()
+            print (">> 2D tensor mesh is set.")
+            print ("   # of cells: {0}".format(self.mesh.nC))
+            print ("   # of active cells: {0}".format(self.actind.sum()))
+            print ("   size of 2D cells (hx, hy) = (%1.f m, %1.f m)" % (self.mesh.hx.min(), self.mesh.hy.min()))
+            # except:
+            #     print (">> Reading input file is failed!")
+            #     print (">> {} does not exist!".format(fname))
 
     def get_problem(self):
         actmap = Maps.InjectActiveCells(
@@ -701,10 +706,10 @@ class DCRInversionApp(object):
 
     def interact_load_obs(self):
         obs_name = widgets.Text(
-            # value='./ubc_dc_data/obs_dc.dat',
+            # value='./ubc_dc_data/test_prosys.dat',
             value='dc.csv',
             placeholder='Type something',
-            description='filename:',
+            description='obsname:',
             disabled=False
         )
         load = widgets.Checkbox(
@@ -713,9 +718,17 @@ class DCRInversionApp(object):
         input_type = widgets.ToggleButtons(
             options=["csv", "ubc_dc2d"],
             value="csv",
+            # value="ubc_dc2d",
             description="input type"
         )
-        widgets.interact(self.load_obs, fname=obs_name, load=load, input_type=input_type)
+        topo_name = widgets.Text(
+            # value='./ubc_dc_data/topo.dat',
+            value='topo.dat',
+            placeholder='Type something',
+            description='toponame:',
+            disabled=False
+        )        
+        widgets.interact(self.load_obs, fname=obs_name, load=load, input_type=input_type, toponame=topo_name)
 
     def plot_obs_data(self, data_type, plot_type, scale, nbins, aspect_ratio):
         fig, ax = plt.subplots(1,1, figsize=(10, 5))
@@ -789,7 +802,7 @@ class DCRInversionApp(object):
         for i_ax, ax in enumerate(axs):
             ax.set_title(titles[i_ax])
 
-    def plot_model(self, iteration, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log'):
+    def plot_model(self, iteration, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log', aspect_ratio=1):
         # inds_core, self. = Utils.ExtractCoreMesh(self.IO.xyzlim, self.mesh)
         fig, ax = plt.subplots(1,1, figsize=(10, 5))
         if scale == "log":
@@ -816,7 +829,7 @@ class DCRInversionApp(object):
         ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
         ax.set_xlabel("x (m)")
         ax.set_ylabel("z (m)")
-        ax.set_aspect(1)
+        ax.set_aspect(aspect_ratio)
         if show_core:
             ymin, ymax = self.IO.xyzlim[1,:]
             xmin, xmax = self.IO.xyzlim[0,:]
@@ -832,7 +845,7 @@ class DCRInversionApp(object):
 
         plt.tight_layout()
 
-    def plot_sensitivity(self, show_core, show_grid, scale):
+    def plot_sensitivity(self, show_core, show_grid, scale, aspect_ratio):
         # inds_core, self. = Utils.ExtractCoreMesh(self.IO.xyzlim, self.mesh)
         fig, ax = plt.subplots(1,1, figsize=(10, 5))
         if scale == "log":
@@ -855,7 +868,7 @@ class DCRInversionApp(object):
         ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
         ax.set_xlabel("x (m)")
         ax.set_ylabel("z (m)")
-        ax.set_aspect(1)
+        ax.set_aspect(aspect_ratio)
         if show_core:
             ymin, ymax = self.IO.xyzlim[1,:]
             xmin, xmax = self.IO.xyzlim[0,:]
@@ -881,20 +894,29 @@ class DCRInversionApp(object):
         rho_max=1000,
         show_grid=False,
         show_core=True,
+        aspect_ratio=1,
     ):
         if plot_type == "misfit_curve":
             self.plot_misfit_curve(iteration, curve_type=curve_type, scale=scale)
         elif plot_type == "model":
-            self.plot_model(iteration, vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid, scale=scale)
+            self.plot_model(
+                iteration, 
+                vmin=rho_min, vmax=rho_max, 
+                show_core=show_core, show_grid=show_grid, 
+                scale=scale, aspect_ratio=aspect_ratio
+            )
         elif plot_type == "data_misfit":
             self.plot_data_misfit(iteration)
         elif plot_type == "sensitivity":
-            self.plot_sensitivity(scale=scale, show_core=show_core, show_grid=show_grid)
+            self.plot_sensitivity(
+                scale=scale, show_core=show_core, show_grid=show_grid, 
+                aspect_ratio=aspect_ratio
+            )
         else:
             raise NotImplementedError()
 
 
-    def plot_model_doi(self, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log'):
+    def plot_model_doi(self, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log', aspect_ratio=1):
         
         m1 = self.m[-1]
         m2 = self.m_doi
@@ -938,7 +960,7 @@ class DCRInversionApp(object):
             ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
-            ax.set_aspect(1)
+            ax.set_aspect(aspect_ratio)
             if show_core:
                 ymin, ymax = self.IO.xyzlim[1,:]
                 xmin, xmax = self.IO.xyzlim[0,:]
@@ -955,7 +977,7 @@ class DCRInversionApp(object):
         plt.tight_layout()
 
 
-    def plot_doi_index(self, show_core=True, show_grid=False, vmin=0, vmax=2, level=0.3, k=100, power=2):
+    def plot_doi_index(self, show_core=True, show_grid=False, vmin=0, vmax=2, level=0.3, k=100, power=2, aspect_ratio=1):
         
         m1 = self.m[-1]
         m2 = self.m_doi
@@ -997,7 +1019,7 @@ class DCRInversionApp(object):
         ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
         ax.set_xlabel("x (m)")
         ax.set_ylabel("z (m)")
-        ax.set_aspect(1)
+        ax.set_aspect(aspect_ratio)
         if show_core:
             ymin, ymax = self.IO.xyzlim[1,:]
             xmin, xmax = self.IO.xyzlim[0,:]
@@ -1014,7 +1036,7 @@ class DCRInversionApp(object):
         plt.tight_layout()
 
 
-    def plot_model_with_doi(self, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log'):
+    def plot_model_with_doi(self, vmin=None, vmax=None, show_core=True, show_grid=False, scale='log', aspect_ratio=1):
         
         if scale == "log":
             rho1 = np.log10(1./(self.survey.prob.sigmaMap*self.m[-1]))
@@ -1045,7 +1067,7 @@ class DCRInversionApp(object):
         ax.plot(self.IO.electrode_locations[:,0], self.IO.electrode_locations[:,1], 'wo', markeredgecolor='k')
         ax.set_xlabel("x (m)")
         ax.set_ylabel("z (m)")
-        ax.set_aspect(1)
+        ax.set_aspect(aspect_ratio)
         if show_core:
             ymin, ymax = self.IO.xyzlim[1,:]
             xmin, xmax = self.IO.xyzlim[0,:]
@@ -1071,13 +1093,14 @@ class DCRInversionApp(object):
         scale='log',        
         show_grid=False,
         show_core=True,
+        aspect_ratio=1,
     ):
         if plot_type == "models":
-            self.plot_model_doi(vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid, scale=scale)
+            self.plot_model_doi(vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid, scale=scale, aspect_ratio=aspect_ratio)
         elif plot_type == "doi":
-            self.plot_doi_index(show_core=show_core, show_grid=show_grid, vmin=0, vmax=1, level=doi_level)
+            self.plot_doi_index(show_core=show_core, show_grid=show_grid, vmin=0, vmax=1, level=doi_level, aspect_ratio=aspect_ratio)
         elif plot_type == "final":
-            self.plot_model_with_doi(vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid, scale=scale)
+            self.plot_model_with_doi(vmin=rho_min, vmax=rho_max, show_core=show_core, show_grid=show_grid, scale=scale, aspect_ratio=aspect_ratio)
         else:
             raise NotImplementedError()
 
@@ -1133,6 +1156,8 @@ class DCRInversionApp(object):
         )
 
         doi_level = widgets.FloatText(value=0.3)
+        
+        aspect_ratio = widgets.FloatText(value=1)   
 
         interact(
             self.plot_doi_results, 
@@ -1142,7 +1167,8 @@ class DCRInversionApp(object):
             doi_level = doi_level,
             show_grid=show_grid,
             show_core=show_core,
-            scale=scale    
+            scale=scale, 
+            aspect_ratio=aspect_ratio 
         )        
 
     def interact_plot_obs_data(self):
@@ -1276,6 +1302,7 @@ class DCRInversionApp(object):
         show_core = widgets.Checkbox(
             value=True, description="show core?", disabled=False
         )
+        aspect_ratio = widgets.FloatText(value=1)
 
         widgets.interact(
             self.plot_inversion_results,
@@ -1286,7 +1313,8 @@ class DCRInversionApp(object):
             rho_min=rho_min,
             rho_max=rho_max,
             show_grid=show_grid,
-            show_core=show_core
+            show_core=show_core,
+            aspect_ratio=aspect_ratio
         )
 
 
