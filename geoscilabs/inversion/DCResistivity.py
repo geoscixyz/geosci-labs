@@ -1,5 +1,8 @@
 import numpy as np
-from pymatsolver import Pardiso
+try:
+    from pymatsolver import Pardiso as Solver
+except:
+    from SimPEG import Solver
 from SimPEG import DC, Utils, Maps
 from SimPEG import (
     DataMisfit, Regularization, Optimization,

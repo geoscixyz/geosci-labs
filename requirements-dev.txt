@@ -2,4 +2,3 @@ testipynb
 pytest
 flake8
 black
-pymatsolver
