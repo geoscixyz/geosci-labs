@@ -669,7 +669,7 @@ class DCRInversionApp(object):
             sense_weight = Directives.UpdateSensitivityWeights()
             inv = Inversion.BaseInversion(
                 invProb,
-                directiveList=[beta, target, beta_schedule, save_outputs    ]
+                directiveList=[beta, target, beta_schedule, save_outputs, sense_weight]
             )
 
             minv = inv.run(m0)
