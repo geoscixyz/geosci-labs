@@ -37,7 +37,6 @@ setup(
         "scipy>=1.0",
         "matplotlib>2.1",
         "ipywidgets",
-        "pyMKL",
         "SimPEG>=0.10.4",
         "empymod",
         "jupyter",
