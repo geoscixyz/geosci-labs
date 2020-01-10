@@ -722,12 +722,12 @@ def fitline(prism, survey):
         xyzLoc[:, 2] += depth
 
         rxLoc = PF.BaseMag.RxObs(xyzLoc)
-        srcField = PF.BaseMag.SrcField([rxLoc], param=[Bigrf, Binc, Bdec])
+        srcField = PF.BaseMag.SrcField([rxLoc], param=[Bigrf, -Binc, Bdec])
         survey2D = PF.BaseMag.LinearSurvey(srcField)
         survey2D.dobs = survey.dobs
         prob.survey = survey2D
 
-        prob.Q, prob.rinc, prob.rdec = Q, rinc, rdec
+        prob.Q, prob.rinc, prob.rdec = Q, -rinc, rdec
         prob.uType, prob.mType = comp, irt
         prob.susc = susc
 
