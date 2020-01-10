@@ -1402,7 +1402,6 @@ def fcnImageUXOWidget(
     wnt = np.dot(A, np.r_[-Lx, Ly, Lz])
     ent = np.dot(A, np.r_[Lx, Ly, Lz])
 
-
     # x1 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
     # x2 = 2 * np.dot(A, np.r_[1.0, 0.0, 0.0])
     # y1 = 2 * np.dot(A, np.r_[0.0, 1.0, 0.0])
@@ -1412,79 +1411,115 @@ def fcnImageUXOWidget(
 
     # UXO polygons
     v1 = [
-        list(zip(
-            [wsb[0], esb[0], enb[0], wnb[0]],
-            [wsb[1], esb[1], enb[1], wnb[1]],
-            [wsb[2], esb[2], enb[2], wnb[2]],
-        ))]
+        list(
+            zip(
+                [wsb[0], esb[0], enb[0], wnb[0]],
+                [wsb[1], esb[1], enb[1], wnb[1]],
+                [wsb[2], esb[2], enb[2], wnb[2]],
+            )
+        )
+    ]
     v2 = [
-        list(zip(
-            [wst[0], est[0], ent[0], wnt[0]],
-            [wst[1], est[1], ent[1], wnt[1]],
-            [wst[2], est[2], ent[2], wnt[2]],
-        ))]
+        list(
+            zip(
+                [wst[0], est[0], ent[0], wnt[0]],
+                [wst[1], est[1], ent[1], wnt[1]],
+                [wst[2], est[2], ent[2], wnt[2]],
+            )
+        )
+    ]
     v3 = [
-        list(zip(
-            [wsb[0], esb[0], est[0], wst[0]],
-            [wsb[1], esb[1], est[1], wst[1]],
-            [wsb[2], esb[2], est[2], wst[2]],
-        ))]
+        list(
+            zip(
+                [wsb[0], esb[0], est[0], wst[0]],
+                [wsb[1], esb[1], est[1], wst[1]],
+                [wsb[2], esb[2], est[2], wst[2]],
+            )
+        )
+    ]
     v4 = [
-        list(zip(
-            [wnb[0], enb[0], ent[0], wnt[0]],
-            [wnb[1], enb[1], ent[1], wnt[1]],
-            [wnb[2], enb[2], ent[2], wnt[2]],
-        ))]
+        list(
+            zip(
+                [wnb[0], enb[0], ent[0], wnt[0]],
+                [wnb[1], enb[1], ent[1], wnt[1]],
+                [wnb[2], enb[2], ent[2], wnt[2]],
+            )
+        )
+    ]
     v5 = [
-        list(zip(
-            [wsb[0], wnb[0], wnt[0], wst[0]],
-            [wsb[1], wnb[1], wnt[1], wst[1]],
-            [wsb[2], wnb[2], wnt[2], wst[2]],
-        ))]
+        list(
+            zip(
+                [wsb[0], wnb[0], wnt[0], wst[0]],
+                [wsb[1], wnb[1], wnt[1], wst[1]],
+                [wsb[2], wnb[2], wnt[2], wst[2]],
+            )
+        )
+    ]
     v6 = [
-        list(zip(
-            [esb[0], enb[0], ent[0], est[0]],
-            [esb[1], enb[1], ent[1], est[1]],
-            [esb[2], enb[2], ent[2], est[2]],
-        ))]
+        list(
+            zip(
+                [esb[0], enb[0], ent[0], est[0]],
+                [esb[1], enb[1], ent[1], est[1]],
+                [esb[2], enb[2], ent[2], est[2]],
+            )
+        )
+    ]
 
     # Shadow polygons
     v7 = [
-        list(zip(
-            [wsb[0], esb[0], enb[0], wnb[0]],
-            [wsb[1], esb[1], enb[1], wnb[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [wsb[0], esb[0], enb[0], wnb[0]],
+                [wsb[1], esb[1], enb[1], wnb[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
     v8 = [
-        list(zip(
-            [wst[0], est[0], ent[0], wnt[0]],
-            [wst[1], est[1], ent[1], wnt[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [wst[0], est[0], ent[0], wnt[0]],
+                [wst[1], est[1], ent[1], wnt[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
     v9 = [
-        list(zip(
-            [wsb[0], esb[0], est[0], wst[0]],
-            [wsb[1], esb[1], est[1], wst[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [wsb[0], esb[0], est[0], wst[0]],
+                [wsb[1], esb[1], est[1], wst[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
     v10 = [
-        list(zip(
-            [wnb[0], enb[0], ent[0], wnt[0]],
-            [wnb[1], enb[1], ent[1], wnt[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [wnb[0], enb[0], ent[0], wnt[0]],
+                [wnb[1], enb[1], ent[1], wnt[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
     v11 = [
-        list(zip(
-            [wsb[0], wnb[0], wnt[0], wst[0]],
-            [wsb[1], wnb[1], wnt[1], wst[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [wsb[0], wnb[0], wnt[0], wst[0]],
+                [wsb[1], wnb[1], wnt[1], wst[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
     v12 = [
-        list(zip(
-            [esb[0], enb[0], ent[0], est[0]],
-            [esb[1], enb[1], ent[1], est[1]],
-            [-2.5, -2.5, -2.5, -2.5],
-        ))]
+        list(
+            zip(
+                [esb[0], enb[0], ent[0], est[0]],
+                [esb[1], enb[1], ent[1], est[1]],
+                [-2.5, -2.5, -2.5, -2.5],
+            )
+        )
+    ]
 
     # PLOTTING
 

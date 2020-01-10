@@ -56,7 +56,7 @@ def E_from_ElectricDipoleWholeSpace(
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
 
     front = current * length / (4.0 * np.pi * sig_hat * r ** 3) * np.exp(-1j * k * r)
-    mid = -k ** 2 * r ** 2 + 3 * 1j * k * r + 3
+    mid = -(k ** 2) * r ** 2 + 3 * 1j * k * r + 3
 
     if orientation.upper() == "X":
         Ex = front * ((dx ** 2 / r ** 2) * mid + (k ** 2 * r ** 2 - 1j * k * r - 1.0))
@@ -117,7 +117,7 @@ def E_galvanic_from_ElectricDipoleWholeSpace(
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
 
     front = current * length / (4.0 * np.pi * sig_hat * r ** 3) * np.exp(-1j * k * r)
-    mid = -k ** 2 * r ** 2 + 3 * 1j * k * r + 3
+    mid = -(k ** 2) * r ** 2 + 3 * 1j * k * r + 3
 
     if orientation.upper() == "X":
         Ex_galvanic = front * ((dx ** 2 / r ** 2) * mid + (-1j * k * r - 1.0))
@@ -291,7 +291,11 @@ def J_inductive_from_ElectricDipoleWholeSpace(
             Add description of parameters
     """
 
-    Ex_inductive, Ey_inductive, Ez_inductive = E_inductive_from_ElectricDipoleWholeSpace(
+    (
+        Ex_inductive,
+        Ey_inductive,
+        Ez_inductive,
+    ) = E_inductive_from_ElectricDipoleWholeSpace(
         XYZ,
         srcLoc,
         sig,
@@ -598,7 +602,7 @@ def H_from_MagneticDipoleWholeSpace(
     k = np.sqrt(omega(f) ** 2.0 * mu * epsilon - 1j * omega(f) * mu * sig)
 
     front = m / (4.0 * np.pi * (r) ** 3) * np.exp(-1j * k * r)
-    mid = -k ** 2 * r ** 2 + 3 * 1j * k * r + 3
+    mid = -(k ** 2) * r ** 2 + 3 * 1j * k * r + 3
 
     if orientation.upper() == "X":
         Hx = front * ((dx ** 2 / r ** 2) * mid + (k ** 2 * r ** 2 - 1j * k * r - 1.0))

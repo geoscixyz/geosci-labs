@@ -219,7 +219,7 @@ class MagneticDipoleApp(object):
         prism_declination,
     ):
         self.component = component
-        self.inclination = -inclination # -ve accounts for LH modeling in SimPEG
+        self.inclination = -inclination  # -ve accounts for LH modeling in SimPEG
         self.declination = declination
         self.length = length
         self.dx = dx
@@ -248,7 +248,9 @@ class MagneticDipoleApp(object):
         self.mesh = Mesh.TensorMesh((hx, hy), "CC")
 
         z = np.r_[1.0]
-        B = np.r_[B0, -inclination, declination]  # -ve accounts for LH modeling in SimPEG
+        B = np.r_[
+            B0, -inclination, declination
+        ]  # -ve accounts for LH modeling in SimPEG
 
         # Project to the direction  of earth field
         if component == "Bt":
