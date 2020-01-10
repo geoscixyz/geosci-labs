@@ -219,7 +219,7 @@ class MagneticDipoleApp(object):
         prism_declination,
     ):
         self.component = component
-        self.inclination = inclination
+        self.inclination = -inclination  # -ve accounts for LH modeling in SimPEG
         self.declination = declination
         self.length = length
         self.dx = dx
@@ -248,7 +248,9 @@ class MagneticDipoleApp(object):
         self.mesh = Mesh.TensorMesh((hx, hy), "CC")
 
         z = np.r_[1.0]
-        B = np.r_[B0, inclination, declination]
+        B = np.r_[
+            B0, -inclination, declination
+        ]  # -ve accounts for LH modeling in SimPEG
 
         # Project to the direction  of earth field
         if component == "Bt":
@@ -305,8 +307,8 @@ class MagneticDipoleApp(object):
         cb = plt.colorbar(out[0], ticks=ticks, format="%.3f", cax=cax)
         cb.set_label("nT", labelpad=-40, y=-0.05, rotation=0)
         ax1.set_aspect(1)
-        ax1.set_ylabel("X (North)")
-        ax1.set_xlabel("Y (East)")
+        ax1.set_ylabel("Northing")
+        ax1.set_xlabel("Easting")
         if profile == "North":
             # xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
             ax1.text(1, length / 2 - length / 2 * 0.1, "B", color="w")
@@ -491,7 +493,7 @@ class MagneticDipoleApp(object):
             description="I", continuous_update=False, min=-90, max=90, step=1, value=90
         )
         declination = widgets.FloatSlider(
-            description="D", continuous_update=False, min=0, max=180, step=1, value=0
+            description="D", continuous_update=False, min=-180, max=180, step=1, value=0
         )
         length = widgets.FloatSlider(
             description="length",
@@ -584,7 +586,7 @@ class MagneticDipoleApp(object):
             description="I", continuous_update=False, min=-90, max=90, step=1, value=90
         )
         declination = widgets.FloatSlider(
-            description="D", continuous_update=False, min=0, max=180, step=1, value=0
+            description="D", continuous_update=False, min=-180, max=180, step=1, value=0
         )
         length = widgets.FloatSlider(
             description="length",
@@ -689,7 +691,7 @@ class MagneticDipoleApp(object):
             description="I", continuous_update=False, min=-90, max=90, step=1, value=90
         )
         declination = widgets.FloatSlider(
-            description="D", continuous_update=False, min=0, max=180, step=1, value=0
+            description="D", continuous_update=False, min=-180, max=180, step=1, value=0
         )
         length = widgets.FloatSlider(
             description="length",

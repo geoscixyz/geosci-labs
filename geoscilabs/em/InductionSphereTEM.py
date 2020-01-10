@@ -249,7 +249,7 @@ def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
         if Type == "b":
 
             if np.size(t) == 1:
-                SUM_1 = np.sum(np.exp(-(nvec * beta) ** 2 / t))
+                SUM_1 = np.sum(np.exp(-((nvec * beta) ** 2) / t))
                 SUM_2 = np.sum(nvec * sp.special.erfc(nvec * beta / np.sqrt(t)))
                 chi = (9 / 2) * (
                     1 / 3
@@ -260,7 +260,7 @@ def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
 
             else:
                 for tt in range(0, np.size(t)):
-                    SUM_1 = np.sum(np.exp(-(nvec * beta) ** 2 / t[tt]))
+                    SUM_1 = np.sum(np.exp(-((nvec * beta) ** 2) / t[tt]))
                     SUM_2 = np.sum(nvec * sp.special.erfc(nvec * beta / np.sqrt(t[tt])))
                     chi[tt] = (9 / 2) * (
                         1 / 3
@@ -272,14 +272,14 @@ def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
         elif Type == "dbdt":
 
             if np.size(t) == 1:
-                SUM = np.sum(np.exp(-(nvec * beta) ** 2 / t))
+                SUM = np.sum(np.exp(-((nvec * beta) ** 2) / t))
                 chi = (9 / 2) * (
                     1 / beta ** 2 - (1 / (beta * np.sqrt(np.pi * t))) * (1 + 2 * SUM)
                 )
 
             else:
                 for tt in range(0, np.size(t)):
-                    SUM = np.sum(np.exp(-(nvec * beta) ** 2 / t[tt]))
+                    SUM = np.sum(np.exp(-((nvec * beta) ** 2) / t[tt]))
                     chi[tt] = (9 / 2) * (
                         1 / beta ** 2
                         - (1 / (beta * np.sqrt(np.pi * t[tt]))) * (1 + 2 * SUM)

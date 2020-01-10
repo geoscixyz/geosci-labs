@@ -53,10 +53,10 @@ def E_from_ElectricDipoleWholeSpace(
     front = current * length / (4.0 * pi * sig * r ** 3)
     mid = 3 * erf(theta * r) - (
         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 6 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
+    ) * np.exp(-((theta) ** 2) * (r) ** 2)
     extra = erf(theta * r) - (
         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 2 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
+    ) * np.exp(-((theta) ** 2) * (r) ** 2)
 
     if orientation.upper() == "X":
         Ex = front * (dx ** 2 / r ** 2) * mid - front * extra
@@ -158,7 +158,7 @@ def H_from_ElectricDipoleWholeSpace(
 
     front = (current * length) / (4.0 * pi * (r) ** 3)
     mid = erf(theta * r) - (2 / np.sqrt(pi)) * theta * r * np.exp(
-        -(theta) ** 2 * (r) ** 2
+        -((theta) ** 2) * (r) ** 2
     )
     if orientation.upper() == "X":
         Hy = front * mid * -dz
@@ -217,7 +217,7 @@ def dHdt_from_ElectricDipoleWholeSpace(
     r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
     theta = np.sqrt((mu * sig) / (4 * t))
 
-    front = -2.0 * (current * length) * theta ** 5 * np.exp(-(theta) ** 2 * (r) ** 2)
+    front = -2.0 * (current * length) * theta ** 5 * np.exp(-((theta) ** 2) * (r) ** 2)
     mid = 1.0 / (np.pi ** 1.5 * mu * sig)
 
     if orientation.upper() == "X":
@@ -318,7 +318,7 @@ def E_from_MagneticDipoleWholeSpace(
     r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
     theta = np.sqrt((mu * sig) / (4 * t))
 
-    front = 2.0 * (current * length) * theta ** 5 * np.exp(-(theta) ** 2 * (r) ** 2)
+    front = 2.0 * (current * length) * theta ** 5 * np.exp(-((theta) ** 2) * (r) ** 2)
     mid = 1.0 / (np.pi ** 1.5 * sig)
 
     if orientation.upper() == "X":
@@ -421,10 +421,10 @@ def H_from_MagneticDipoleWholeSpace(
     front = current * length / (4.0 * pi * r ** 3)
     mid = 3 * erf(theta * r) - (
         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 6 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
+    ) * np.exp(-((theta) ** 2) * (r) ** 2)
     extra = erf(theta * r) - (
         4 / np.sqrt(pi) * (theta) ** 3 * r ** 3 + 2 / np.sqrt(pi) * theta * r
-    ) * np.exp(-(theta) ** 2 * (r) ** 2)
+    ) * np.exp(-((theta) ** 2) * (r) ** 2)
 
     if orientation.upper() == "X":
         Hx = front * (dx ** 2 / r ** 2) * mid - front * extra
@@ -486,7 +486,7 @@ def dHdt_from_MagneticDipoleWholeSpace(
     r = np.sqrt(dx ** 2.0 + dy ** 2.0 + dz ** 2.0)
     theta = np.sqrt((mu * sig) / (4 * t))
 
-    front = -4 * (current * length) * theta ** 5 * np.exp(-(theta) ** 2 * (r) ** 2)
+    front = -4 * (current * length) * theta ** 5 * np.exp(-((theta) ** 2) * (r) ** 2)
     front *= 1.0 / (np.pi ** 1.5 * mu * sig)
     mid = (theta) ** 2 * (r) ** 2
     extra = 1 - (theta) ** 2 * (r) ** 2

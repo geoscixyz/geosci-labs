@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import proj3d
 
 
 def download_and_unzip_data(
-    url="https://storage.googleapis.com/simpeg/em_examples/tdem_inductivesource/tdem_inductivesource.tar"
+    url="https://storage.googleapis.com/simpeg/em_examples/tdem_inductivesource/tdem_inductivesource.tar",
 ):
     """
     Download the data from the storage bucket, unzip the tar file, return
@@ -216,7 +216,7 @@ class PlotTDEM(object):
         ax.set_xlabel("X (m)")
         ax.set_ylabel("Y (m)")
         ax.set_zlabel("Depth (m)")
-        ax.set_aspect("equal")
+        # ax.set_aspect("equal")
         ax.view_init(elev=elev, azim=azim)
         plt.tight_layout()
         plt.show()

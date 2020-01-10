@@ -25,7 +25,7 @@ def getRicker(f, t, t0=t0):
     # assert len(f) == 1, 'Ricker wavelet needs 1 frequency as input'
     # f = f[0]
     pift = pi * f * (t - t0)
-    wav = (1 - 2 * pift ** 2) * np.exp(-pift ** 2)
+    wav = (1 - 2 * pift ** 2) * np.exp(-(pift ** 2))
     return wav
 
 

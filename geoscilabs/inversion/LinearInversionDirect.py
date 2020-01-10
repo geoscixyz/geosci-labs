@@ -329,7 +329,13 @@ class LinearInversionDirectApp(object):
     ):
         m0 = 0.0
         if mode == "Run":
-            self.phi_d, self.phi_m, self.model, self.pred, self.betas = self.run_inversion_direct(
+            (
+                self.phi_d,
+                self.phi_m,
+                self.model,
+                self.pred,
+                self.betas,
+            ) = self.run_inversion_direct(
                 m0=m0,
                 mref=mref,
                 percentage=percentage,
