@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 b = 2.5
 x = np.linspace(0, 20, 200)
 
-f = np.exp(-(x - b) ** 2 / 2)
+f = np.exp(-((x - b) ** 2) / 2)
 fig, ax = plt.subplots(1, 1, figsize=(9, 3))
 ax.plot(x, f, "k")
 ax.set_ylim([-0.5, 1.5])

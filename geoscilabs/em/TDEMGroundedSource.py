@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d import proj3d
 
 
 def download_and_unzip_data(
-    url="https://storage.googleapis.com/simpeg/em_examples/tdem_groundedsource/tdem_groundedsource.tar"
+    url="https://storage.googleapis.com/simpeg/em_examples/tdem_groundedsource/tdem_groundedsource.tar",
 ):
     """
     Download the data from the storage bucket, unzip the tar file, return

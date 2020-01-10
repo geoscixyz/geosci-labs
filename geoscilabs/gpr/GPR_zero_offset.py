@@ -217,7 +217,7 @@ def GPRWidgetWaveRegime(sig, epsr, fc, x1, d1, R1, x2, d2, R2):
 def fcnGetRicker(fc, t):
     """Compute Ricker wavelet for central operating frequency fc"""
 
-    A = (1 - 2 * (np.pi * fc * t) ** 2) * np.exp(-(np.pi * fc * t) ** 2)
+    A = (1 - 2 * (np.pi * fc * t) ** 2) * np.exp(-((np.pi * fc * t) ** 2))
 
     return A
 

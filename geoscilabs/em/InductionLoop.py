@@ -269,7 +269,7 @@ class IndEx:
         Phi = ax * Bpx + Az * Bpz
         EMF = w * Phi * np.sin(w * t)
         Is = (Phi / (R ** 2 + (w * L) ** 2)) * (
-            -w ** 2 * L * np.cos(w * t) + w * R * np.sin(w * t)
+            -(w ** 2) * L * np.cos(w * t) + w * R * np.sin(w * t)
         )
 
         return EMF, Is
