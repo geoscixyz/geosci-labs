@@ -11,9 +11,12 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
-from SimPEG.EM.Static import DC
+from pymatsolver import Pardiso
+from discretize import TensorMesh
+
+from SimPEG import maps, utils
+from SimPEG.utils import ExtractCoreMesh
+from SimPEG.electromagnetics.static import resistivity as DC
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
@@ -25,9 +28,9 @@ growrate = 2.0
 cs = 0.5
 hx = [(cs, npad, -growrate), (cs, 200), (cs, npad, growrate)]
 hy = [(cs, npad, -growrate), (cs, 100)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
-circmap = Maps.ParametricCircleMap(mesh)
-idmap = Maps.IdentityMap(mesh)
+mesh = TensorMesh([hx, hy], "CN")
+circmap = maps.ParametricCircleMap(mesh)
+idmap = maps.IdentityMap(mesh)
 circmap.slope = 1e16
 sigmaMap = idmap
 dx = 5
@@ -64,22 +67,20 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
 
     Mx = np.empty(shape=(0, 2))
     Nx = np.empty(shape=(0, 2))
-    # rx = DC.Rx.Dipole_ky(Mx,Nx)
-    rx = DC.Rx.Dipole(Mx, Nx)
+    # rx = DC.receivers.Dipole_ky_ky(Mx,Nx)
+    rx = DC.receivers.Dipole_ky(Mx, Nx)
     if B == []:
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    # survey = DC.Survey_ky([src])
-    survey = DC.Survey([src])
-    survey_prim = DC.Survey([src])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+    # survey = DC.Survey_ky_ky([src])
+    survey = DC.Survey_ky([src])
+    survey_prim = DC.Survey_ky([src])
     # problem = DC.Problem2D_CC(mesh, sigmaMap = sigmaMap)
-    problem = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-    problem.pair(survey)
-    problem_prim.pair(survey_prim)
+    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=sigmaMap)
+    problem_prim = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_prim, sigmaMap=sigmaMap)
+    problem.Solver = Pardiso
+    problem_prim.Solver = Pardiso
 
     primary_field = problem_prim.fields(mhalf)
     # phihalf = f[src, 'phi', 15]
@@ -128,7 +129,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = Utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -153,8 +154,8 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
     plateCharge = qSecondary[chargeRegionInsideInd]
     posInd = np.where(plateCharge >= 0)
     negInd = np.where(plateCharge < 0)
-    qPos = Utils.mkvc(plateCharge[posInd])
-    qNeg = Utils.mkvc(plateCharge[negInd])
+    qPos = utils.mkvc(plateCharge[posInd])
+    qNeg = utils.mkvc(plateCharge[negInd])
 
     qPosLoc = plateChargeLocs[posInd, :][0]
     qNegLoc = plateChargeLocs[negInd, :][0]
@@ -198,22 +199,21 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 def getSensitivity(survey, A, B, M, N, model):
 
     if survey == "Dipole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     elif survey == "Dipole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    Srv = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
-    problem.Solver = SolverLU
-    problem.pair(Srv)
+    Srv = DC.Survey_ky([src])
+    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=Srv, sigmaMap=sigmaMap)
+    problem.Solver = Pardiso
     fieldObj = problem.fields(model)
 
     J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)

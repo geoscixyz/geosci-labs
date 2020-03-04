@@ -27,9 +27,12 @@ from matplotlib import colors, ticker, cm
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
-from SimPEG.EM.Static import DC, IP
+from discretize import TensorMesh
+
+from SimPEG import maps, SolverLU, utils
+from SimPEG.utils import ExtractCoreMesh
+from SimPEG.electromagnetics.static import resistivity as DC
+from SimPEG.electromagnetics.static import induced_polarization as IP
 
 from ..base import widgetify
 
@@ -39,8 +42,8 @@ growrate = 2.0
 cs = 20.0
 hx = [(cs, npad, -growrate), (cs, 100), (cs, npad, growrate)]
 hy = [(cs, npad, -growrate), (cs, 50)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
-expmap = Maps.ExpMap(mesh)
+mesh = TensorMesh([hx, hy], "CN")
+expmap = maps.ExpMap(mesh)
 mapping = expmap
 xmin = -1000.0
 xmax = 1000.0
@@ -116,7 +119,7 @@ def model_valley(
     )
     mtrue[target] = ln_sigtarget * np.ones_like(mtrue[target])
 
-    mtrue = Utils.mkvc(mtrue)
+    mtrue = utils.mkvc(mtrue)
 
     return mtrue, mhalf, mair, mover
 
@@ -144,7 +147,7 @@ def get_Surface(mtrue, A):
             )
         )
         surface.append(mesh.gridCC[idm[-1], 1])
-    return Utils.mkvc(np.r_[idm]), Utils.mkvc(np.r_[surface])
+    return utils.mkvc(np.r_[idm]), utils.mkvc(np.r_[surface])
 
 
 def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
@@ -154,31 +157,27 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
 
     Mx = mesh.gridCC
     # Nx = np.empty(shape =(mesh.nC, 2))
-    rx = DC.Rx.Pole(Mx)
-    # rx = DC.Rx.Dipole(Mx, Nx)
+    rx = DC.receivers.Pole_ky(Mx)
+    # rx = DC.receivers.Dipole_ky(Mx, Nx)
     if B == []:
-        src = DC.Src.Pole([rx], np.r_[A, surfaceA])
+        src = DC.sources.Pole([rx], np.r_[A, surfaceA])
     else:
-        src = DC.Src.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
-    # src = DC.Src.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
-    survey = DC.Survey([src])
-    # survey = DC.Survey([src])
-    # survey_prim = DC.Survey([src])
-    survey_prim = DC.Survey([src])
-    survey_air = DC.Survey([src])
-    # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
-    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap=mapping)
-    problem_air = DC.Problem3D_CC(mesh, sigmaMap=mapping)
+        src = DC.sources.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
+    # src = DC.sources.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
+    survey = DC.Survey_ky([src])
+    # survey = DC.Survey_ky([src])
+    # survey_prim = DC.Survey_ky([src])
+    survey_prim = DC.Survey_ky([src])
+    survey_air = DC.Survey_ky([src])
+    # problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap = mapping)
+    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=mapping)
+    # problem_prim = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap = mapping)
+    problem_prim = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_prim, sigmaMap=mapping)
+    problem_air = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_air, sigmaMap=mapping)
 
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem_air.Solver = SolverLU
-
-    problem.pair(survey)
-    problem_prim.pair(survey_prim)
-    problem_air.pair(survey_air)
 
     mesh.setCellGradBC("neumann")
     cellGrad = mesh.cellGrad
@@ -220,7 +219,7 @@ def get_Surface_Potentials(mtrue, survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = Utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -293,20 +292,20 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 def getSensitivity(survey, A, B, M, N, model):
 
     if survey == "Dipole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     elif survey == "Dipole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    survey = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
+    survey = DC.Survey_ky([src])
+    problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap=mapping)
     problem.Solver = SolverLU
     problem.pair(survey)
     fieldObj = problem.fields(model)
@@ -458,12 +457,12 @@ def DC2Dsurvey(mtrue, flag="PoleDipole", nmax=8):
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
 
-        rx = DC.Rx.Dipole(M, N)
-        src = DC.Src.Dipole([rx], A, B)
+        rx = DC.receivers.Dipole_ky(M, N)
+        src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
+    survey = DC.Survey_ky(txList)
+    problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap=mapping)
     problem.pair(survey)
 
     return survey, xzlocs
@@ -543,12 +542,12 @@ def IP2Dsurvey(miptrue, sigmadc, flag="PoleDipole", nmax=8):
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
 
-        rx = DC.Rx.Dipole(M, N)
-        src = DC.Src.Dipole([rx], A, B)
+        rx = DC.receivers.Dipole_ky(M, N)
+        src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = IP.Survey(txList)
-    problem = IP.Problem3D_CC(mesh, sigma=sigmadc, etaMap=Maps.IdentityMap(mesh))
+    survey = IP.Survey_ky(txList)
+    problem = IP.simulation_2d.Problem2D_CC(mesh, sigma=sigmadc, etaMap=maps.IdentityMap(mesh))
     problem.pair(survey)
 
     return survey, xzlocs
