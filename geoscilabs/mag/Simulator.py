@@ -125,12 +125,12 @@ def PlotFwrSim(
 ):
     def MagSurvey2D(
         survey,
+        dobj,
         Profile_ctx,
         Profile_cty,
         Profile_azm,
         Profile_len,
         Profile_npt,
-        data=None,
         fig=None,
         ax=None,
         vmin=None,
@@ -150,26 +150,26 @@ def PlotFwrSim(
 
         return plotMagSurvey2D(
             survey,
+            dobj,
             a,
             b,
             Profile_npt,
-            data=data,
+            pred=None,
             fig=fig,
             ax=ax,
             vmin=vmin,
             vmax=vmax,
-            pred=pred,
         )
 
     def MagSurveyProfile(
         survey,
-        dobs,
+        dobj,
         Profile_ctx,
         Profile_cty,
         Profile_azm,
         Profile_len,
         Profile_npt,
-        data=None,
+        dpred=None,
         fig=None,
         ax=None,
     ):
@@ -184,9 +184,9 @@ def PlotFwrSim(
         a = [Profile_ctx - dx, Profile_cty - dy]
         b = [Profile_ctx + dx, Profile_cty + dy]
 
-        xyz = survey[0].receiver_locations
+        xyz = survey.receiver_locations
 
-        return plotProfile(xyz, dobs, a, b, Profile_npt, data=data, fig=fig, ax=ax)
+        return plotProfile(xyz, dobj, a, b, Profile_npt, fig=fig, ax=ax)
 
     survey = sim.survey
     sim.Q, sim.rinc, sim.rdec = Q, rinc, rdec
@@ -200,31 +200,32 @@ def PlotFwrSim(
     for b in fields:
         dpred += b
 
-    f = plt.figure(figsize=(8, 8))
-
-    ax0 = plt.subplot(1, 2, 1)
+    f = plt.figure(figsize=(6, 6))
+    ax1 = plt.subplot()
     MagSurvey2D(
         survey,
+        dpred,
         Profile_ctx,
         Profile_cty,
         Profile_azm,
         Profile_len,
         Profile_npt,
         fig=f,
-        ax=ax0,
-        pred=dpred,
+        ax=ax1,
+        pred=None,
     )
 
-    f = plt.figure(figsize=(12, 5))
+    f = plt.figure(figsize=(7, 3))
     ax2 = plt.subplot()
     MagSurveyProfile(
         survey,
+        dpred,
         Profile_ctx,
         Profile_cty,
         Profile_azm,
         Profile_len,
         Profile_npt,
-        data=dpred,
+        dpred=None,
         fig=f,
         ax=ax2,
     )
@@ -232,7 +233,11 @@ def PlotFwrSim(
     plt.show()
 
 
-def ViewMagSurvey2D(survey):
+def ViewMagSurvey2D(survey, dobj):
+
+    # survey: a mag.survey.MagneticSurvey object
+    # dobj: a data.Data object
+
     def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
@@ -259,27 +264,24 @@ def ViewMagSurvey2D(survey):
             axis=0,
         )
 
-        rxLoc = mag.receivers.point_receiver(rxLoc[ind, :])
-        srcField = mag.source_field.SourceField(receiver_list=[rxLoc], parameters=survey.source_field.parameters)
+        rxLoc = mag.receivers.Point(rxLoc[ind, :])
+        srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=survey.source_field.parameters)
         surveySim = mag.survey.MagneticSurvey(srcField)
-        surveySim.dobs = survey.dobs[ind]
 
         fig = plt.figure(figsize=(6, 9))
         ax1 = plt.subplot(2, 1, 1)
-
-        plotMagSurvey2D(surveySim, a, b, Npts, fig=fig, ax=ax1)
+        plotMagSurvey2D(surveySim, dobj.dobs[ind], a, b, Npts, fig=fig, ax=ax1)
 
         if Profile:
 
             ax2 = plt.subplot(2, 1, 2)
 
             xyz = surveySim.receiver_locations
-            dobs = surveySim.dobs
-            plotProfile(xyz, dobs, a, b, Npts, data=None, fig=fig, ax=ax2)
+            dobs = dobj.dobs
+            plotProfile(xyz, dobj.dobs[ind], a, b, Npts, pred=None, fig=fig, ax=ax2)
 
         return surveySim
 
-    # Calculate the original map extents
     locs = survey.receiver_locations
     xlim = np.asarray([locs[:, 0].min(), locs[:, 0].max()])
     ylim = np.asarray([locs[:, 1].min(), locs[:, 1].max()])
@@ -330,11 +332,15 @@ def ViewMagSurvey2D(survey):
 
 
 def plotMagSurvey2D(
-    survey, a, b, npts, data=None, pred=None, fig=None, ax=None, vmin=None, vmax=None
+    survey, dobj, a, b, npts, pred=None, fig=None, ax=None, vmin=None, vmax=None
 ):
     """
     Plot the data and line profile inside the spcified limits
     """
+
+    # So you can provide a vector
+    if isinstance(dobj, data.Data):
+        dobj = dobj.dobs
 
     if fig is None:
         fig = plt.figure()
@@ -345,11 +351,7 @@ def plotMagSurvey2D(
     x, y = linefun(a[0], b[0], a[1], b[1], npts)
     rxLoc = survey.receiver_locations
 
-    if data is None:
-        data = survey.dobs
-
-    # Use SimPEG.PF ploting function
-    utils.Plotutils.plot2Ddata(rxLoc, data, ax=ax)
+    utils.plot_utils.plot2Ddata(rxLoc, dobj, ax=ax)
 
     ax.plot(x, y, "w.", ms=10)
     ax.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
@@ -359,7 +361,7 @@ def plotMagSurvey2D(
     if pred is not None:
         ax2 = plt.subplot(1, 2, 2)
 
-        utils.Plotutils.plot2Ddata(rxLoc, pred, ax=ax2, clim=[pred.min(), pred.max()])
+        utils.plot_utils.plot2Ddata(rxLoc, pred, ax=ax2, clim=[pred.min(), pred.max()])
         ax2.plot(x, y, "w.", ms=10)
         ax2.text(x[0], y[0], "A", fontsize=16, color="w", ha="left")
         ax2.text(x[-1], y[-1], "B", fontsize=16, color="w", ha="right")
@@ -371,10 +373,14 @@ def plotMagSurvey2D(
     return
 
 
-def plotProfile(xyz, dobs, a, b, npts, data=None, fig=None, ax=None, dType="3D"):
+def plotProfile(xyz, dobj, a, b, npts, pred=None, fig=None, ax=None, dType="3D"):
     """
     Plot the data and line profile inside the spcified limits
     """
+
+    # So you can provide a vector
+    if isinstance(dobj, data.Data):
+        dobj = dobj.dobs
 
     if fig is None:
         fig = plt.figure(figsize=(6, 4))
@@ -392,21 +398,21 @@ def plotProfile(xyz, dobs, a, b, npts, data=None, fig=None, ax=None, dType="3D")
 
     if dType == "2D":
         distance = rxLoc[:, 1]
-        dline = dobs
+        dline = dobj
 
     else:
-        dline = griddata(rxLoc[:, :2], dobs, (x, y), method="linear")
+        dline = griddata(rxLoc[:, :2], dobj, (x, y), method="linear")
 
     ax.plot(distance, dline, "b.-")
 
-    if data is not None:
+    if pred is not None:
 
         if dType == "2D":
             distance = rxLoc[:, 1]
-            dline = data
+            dline = pred
 
         else:
-            dline = griddata(rxLoc[:, :2], data, (x, y), method="linear")
+            dline = griddata(rxLoc[:, :2], pred, (x, y), method="linear")
 
         ax.plot(distance, dline, "r.-")
 
@@ -471,7 +477,7 @@ def ViewPrism(survey):
 
         return prism
 
-    rxLoc = survey[0].receiver_locations
+    rxLoc = survey.receiver_locations
     cntr = np.mean(rxLoc[:, :2], axis=0)
 
     xlim = rxLoc[:, 0].max() - rxLoc[:, 0].min()
@@ -536,7 +542,11 @@ def plotObj3D(
     y1, y2 = prism.yn[0] - prism.yc, prism.yn[1] - prism.yc
     z1, z2 = prism.zn[0] - prism.zc, prism.zn[1] - prism.zc
     pinc, pdec = prism.pinc, prism.pdec
-    rxLoc = survey[0].receiver_locations
+    
+    if isinstance(survey, mag.survey.MagneticSurvey) is False:
+        survey = survey[0]
+
+    rxLoc = survey.receiver_locations
 
     if fig is None:
         fig = plt.figure(figsize=(7, 7))
@@ -711,20 +721,19 @@ class definePrism(object):
         return zc
 
 
-def fitline(prism, survey):
+def fitline(prism, survey, dobj):
     def profiledata(Binc, Bdec, Bigrf, depth, susc, comp, irt, Q, rinc, rdec, update):
 
         # Get the line extent from the 2D survey for now
         sim = Mag.Simulation()
         sim.prism = prism.result
 
-        xyzLoc = survey[0].receiver_locations.copy()
+        xyzLoc = survey.receiver_locations.copy()
         xyzLoc[:, 2] += depth
 
-        rxLoc = mag.receivers.point_receiver(xyzLoc)
+        rxLoc = mag.receivers.Point(xyzLoc)
         srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec))
         survey2D = mag.survey.MagneticSurvey(srcField)
-        # survey2D.dobs = survey.dobs
         sim.survey = survey2D
 
         sim.Q, sim.rinc, sim.rdec = Q, -rinc, rdec
@@ -741,7 +750,7 @@ def fitline(prism, survey):
         dpred += +Bigrf
         a = np.r_[xyzLoc[:, 0].min(), 0]
         b = np.r_[xyzLoc[:, 0].max(), 0]
-        return plotProfile(xyzLoc, survey2D.dobs, a, b, 10, data=dpred, dType="2D")
+        return plotProfile(xyzLoc, dobj, a, b, 10, pred=dpred, dType="2D")
 
     Q = widgets.interactive(
         profiledata,

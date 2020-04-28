@@ -319,9 +319,9 @@ def createMagSurvey(xyzd, B):
         :param array: B, 1-by-3 array of inducing field param [|B|, Inc, Dec]
     """
 
-    rxLoc = mag.receivers.point_receiver(xyzd[:, :3])
+    rxLoc = mag.receivers.Point(xyzd[:, :3])
     source_field = mag.sources.SourceField(receiver_list=[rxLoc], parameters=B)
     survey = mag.survey.MagneticSurvey(source_field)
-    dobs = data.Data(survey, xyzd[:, 3])
+    dobj = data.Data(survey, xyzd[:, 3])
 
-    return survey, dobs
+    return survey, dobj
