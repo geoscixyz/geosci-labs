@@ -15,7 +15,7 @@ from pymatsolver import Pardiso
 from discretize import TensorMesh
 
 from SimPEG import maps, utils
-from SimPEG.utils import ExtractCoreMesh
+from SimPEG.utils import ExtractCoreMesh, mkvc
 from SimPEG.electromagnetics.static import resistivity as DC
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
@@ -125,7 +125,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     zsurfaceLoc = np.max(CCLoc[:, 1])
     surfaceInd = np.where(CCLoc[:, 1] == zsurfaceLoc)
     xSurface = CCLoc[surfaceInd, 0].T
-    phiSurface = phi[surfaceInd]
+    phiSurface = phi[surfaceInd, 0].T
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
@@ -299,8 +299,8 @@ def plot_Surface_Potentials(
     G2D = rhohalf / (calculateRhoA(survey, VMprim, VNprim, A, B, M, N))
 
     # Subplot 1: Full set of surface potentials
-    ax[0].plot(xSurface, phiTotalSurface, color=[0.1, 0.5, 0.1], linewidth=2)
-    ax[0].plot(xSurface, phiPrimSurface, linestyle="dashed", linewidth=0.5, color="k")
+    ax[0].plot(xSurface, phiPrimSurface, linestyle="dashed", linewidth=2, color="k")
+    ax[0].plot(xSurface, phiTotalSurface, color=[0.1, 0.5, 0.1], linewidth=3)
     ax[0].grid(
         which="both", linestyle="-", linewidth=0.5, color=[0.2, 0.2, 0.2], alpha=0.5
     )
@@ -318,17 +318,22 @@ def plot_Surface_Potentials(
     if survey == "Dipole-Pole" or survey == "Pole-Pole":
         ax[0].plot(M, VM, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
-        ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
+        posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
+        xytextM = (M + 0.5, posVM + 0.5)
+        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
 
     else:
         ax[0].plot(M, VM, "o", color="k")
         ax[0].plot(N, VN, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
-        xytextN = (N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 0.5)
-        ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
-        ax[0].annotate("%2.1e" % (VN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
+        posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
+        posVN = np.max([np.min([max(mkvc(VN), key=abs), ylim.max()]), ylim.min()])
+
+        xytextM = (M + 0.5, posVM + 0.5)
+        xytextN = (N + 0.5, posVN - 0.5)
+
+        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
+        ax[0].annotate("%2.1e" % (posVN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
 
     ax[0].tick_params(axis="both", which="major", labelsize=ticksize)
 
@@ -342,7 +347,7 @@ def plot_Surface_Potentials(
         fontsize=labelsize,
     )
 
-    ax[0].legend(["Model Potential", "Half-Space Potential"], loc=3, fontsize=labelsize)
+    ax[0].legend(["Half-Space Potential", "Model Potential"], loc=3, fontsize=labelsize)
 
     # Subplot 2: Fields
     # ax[1].plot(np.arange(-r,r+r/10,r/10)+xc,np.sqrt(-np.arange(-r,r+r/10,r/10)**2.+r**2.)+zc,linestyle = 'dashed',color='k')
