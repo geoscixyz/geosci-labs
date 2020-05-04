@@ -3,7 +3,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from ipywidgets import widgets
-from SimPEG import Mesh, Maps, EM, Utils
+from discretize import CylMesh, TensorMesh
+from SimPEG import maps, utils
+from SimPEG.electromagnetics import frequency_domain as fdem
 
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
@@ -52,7 +54,7 @@ class HarmonicVMDCylWidget(object):
         # TODO: Make it adaptive due to z location
         hx = [(cs, ncx), (cs, npad, 1.3)]
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
-        self.mesh = Mesh.CylMesh([hx, 1, hz], "00C")
+        self.mesh = CylMesh([hx, 1, hz], "00C")
 
     def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.0):
 
@@ -71,7 +73,7 @@ class HarmonicVMDCylWidget(object):
         # if self.mesh2D is None:
         hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
         hz = self.mesh.hz[yind]
-        self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
+        self.mesh2D = TensorMesh([hx, hz], x0="CC")
 
     def getCoreModel(self, Type):
 
@@ -83,7 +85,7 @@ class HarmonicVMDCylWidget(object):
             ind2 = (self.mesh2D.vectorCCy < self.z1) & (
                 self.mesh2D.vectorCCy >= self.z2
             )
-            mapping2D = Maps.SurjectVertical1D(self.mesh2D) * Maps.InjectActiveCells(
+            mapping2D = maps.SurjectVertical1D(self.mesh2D) * maps.InjectActiveCells(
                 self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy
             )
             model2D = np.ones(self.mesh2D.nCy) * self.sig3
@@ -103,7 +105,7 @@ class HarmonicVMDCylWidget(object):
                 <= self.R
             )
 
-            mapping2D = Maps.InjectActiveCells(
+            mapping2D = maps.InjectActiveCells(
                 self.mesh2D, active, self.sig0, nC=self.mesh2D.nC
             )
             model2D = np.ones(self.mesh2D.nC) * self.sigb
@@ -136,7 +138,7 @@ class HarmonicVMDCylWidget(object):
         active = self.mesh.vectorCCz < self.z0
         ind1 = (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
         ind2 = (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
-        self.mapping = Maps.SurjectVertical1D(self.mesh) * Maps.InjectActiveCells(
+        self.mapping = maps.SurjectVertical1D(self.mesh) * maps.InjectActiveCells(
             self.mesh, active, sig0, nC=self.mesh.nCz
         )
         model = np.ones(self.mesh.nCz) * sig3
@@ -171,7 +173,7 @@ class HarmonicVMDCylWidget(object):
             <= self.R
         )
 
-        self.mapping = Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
+        self.mapping = maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
         model = np.ones(self.mesh.nC) * sigb
         model[ind1] = sig1
         model[ind2] = sig2
@@ -181,19 +183,19 @@ class HarmonicVMDCylWidget(object):
         return self.m
 
     def simulate(self, srcLoc, rxLoc, freqs):
-        bzr = EM.FDEM.Rx.Point_bSecondary(rxLoc, orientation="z", component="real")
-        bzi = EM.FDEM.Rx.Point_bSecondary(rxLoc, orientation="z", component="imag")
+        bzr = fdem.receivers.PointMagneticFluxDensitySecondary(rxLoc, orientation="z", component="real")
+        bzi = fdem.receivers.PointMagneticFluxDensitySecondary(rxLoc, orientation="z", component="imag")
         self.srcList = [
-            EM.FDEM.Src.MagDipole([bzr, bzi], freq, srcLoc, orientation="Z")
+            fdem.sources.MagDipole([bzr, bzi], freq, srcLoc, orientation="Z")
             for freq in freqs
         ]
 
-        prb = EM.FDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping, mu=self.mu)
-        survey = EM.FDEM.Survey(self.srcList)
-        prb.pair(survey)
-        self.f = prb.fields(self.m)
-        self.prb = prb
-        dpred = survey.dpred(self.m, f=self.f)
+        survey = fdem.survey.Survey(self.srcList)
+        sim = fdem.simulation.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu)
+        
+        self.f = sim.fields(self.m)
+        self.sim = sim
+        dpred = sim.dpred(self.m, f=self.f)
         self.srcLoc = srcLoc
         self.rxLoc = rxLoc
         return dpred
@@ -207,12 +209,12 @@ class HarmonicVMDCylWidget(object):
             self.mesh.gridCC[self.activeCC, :], locType="Fz"
         )
         Ey = self.mesh.aveE2CC * self.f[src, "e"]
-        Jy = Utils.sdiag(self.prb.sigma) * Ey
+        Jy = utils.sdiag(self.sim.sigma) * Ey
 
-        self.Ey = Utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
-        self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
-        self.Bx = Utils.mkvc(self.mirrorArray(Pfx * self.f[src, bType], direction="x"))
-        self.Bz = Utils.mkvc(self.mirrorArray(Pfz * self.f[src, bType], direction="z"))
+        self.Ey = utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
+        self.Jy = utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
+        self.Bx = utils.mkvc(self.mirrorArray(Pfx * self.f[src, bType], direction="x"))
+        self.Bz = utils.mkvc(self.mirrorArray(Pfz * self.f[src, bType], direction="z"))
 
     def getData(self, bType="b"):
 
@@ -355,7 +357,7 @@ class HarmonicVMDCylWidget(object):
                 else:
                     return
 
-            out = Utils.plot2Ddata(
+            out = utils.plot2Ddata(
                 self.mesh2D.gridCC,
                 val,
                 vec=vec,

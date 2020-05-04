@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import deepdish as dd
-from SimPEG import Utils, Mesh
+from discretize import TensorMesh
+from SimPEG import utils
 import tarfile
 import os
 
@@ -20,7 +21,7 @@ def download_and_unzip_data(
     the directory where the data are
     """
     # download the data
-    downloads = Utils.download(url)
+    downloads = utils.download(url)
 
     # directory where the downloaded files are
     directory = downloads.split(".")[0]
@@ -44,7 +45,7 @@ def load_or_run_results(re_run=False, fname=None, src_type="VMD", sigma_halfspac
         fname = os.path.sep.join([directory, fname])
 
     simulation_results = dd.io.load(fname)
-    mesh = Mesh.TensorMesh(
+    mesh = TensorMesh(
         simulation_results["mesh"]["h"], x0=simulation_results["mesh"]["x0"]
     )
     sigma = simulation_results["sigma"]
@@ -78,8 +79,8 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     pad_rate = 1.3
     hx = [(cs, npad, -pad_rate), (cs, ncx), (cs, npad, pad_rate)]
     hy = [(cs, npad, -pad_rate), (cs, ncy), (cs, npad, pad_rate)]
-    hz = Utils.meshTensor([(cs, npadz, -1.3), (cs / 2.0, ncz), (cs, 5, 2)])
-    mesh = Mesh.TensorMesh(
+    hz = utils.meshTensor([(cs, npadz, -1.3), (cs / 2.0, ncz), (cs, 5, 2)])
+    mesh = TensorMesh(
         [hx, hy, hz], x0=["C", "C", -hz[: int(npadz + ncz / 2)].sum()]
     )
     sigma = np.ones(mesh.nC) * sigma_halfspace
@@ -126,7 +127,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     f = prb.fields(sigma)
 
     xyzlim = np.array([[xmin, xmax], [ymin, ymax], [zmin, zmax]])
-    actinds, meshCore = Utils.ExtractCoreMesh(xyzlim, mesh)
+    actinds, meshCore = utils.ExtractCoreMesh(xyzlim, mesh)
     Pex = mesh.getInterpolationMat(meshCore.gridCC, locType="Ex")
     Pey = mesh.getInterpolationMat(meshCore.gridCC, locType="Ey")
     Pez = mesh.getInterpolationMat(meshCore.gridCC, locType="Ez")
@@ -139,7 +140,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     def getEBJcore(src0):
         B0 = np.r_[Pfx * f[src0, "b"], Pfy * f[src0, "b"], Pfz * f[src0, "b"]]
         E0 = np.r_[Pex * f[src0, "e"], Pey * f[src0, "e"], Pez * f[src0, "e"]]
-        J0 = Utils.sdiag(np.r_[sigma_core, sigma_core, sigma_core]) * E0
+        J0 = utils.sdiag(np.r_[sigma_core, sigma_core, sigma_core]) * E0
         return E0, B0, J0
 
     E, B, J = getEBJcore(src)
@@ -172,7 +173,7 @@ class PlotTDEM(object):
 
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
-        Utils.setKwargs(self, **kwargs)
+        utils.setKwargs(self, **kwargs)
         self.xmin, self.xmax = self.mesh.vectorCCx.min(), self.mesh.vectorCCx.max()
         self.ymin, self.ymax = self.mesh.vectorCCy.min(), self.mesh.vectorCCy.max()
         self.zmin, self.zmax = self.mesh.vectorCCz.min(), self.mesh.vectorCCz.max()
@@ -237,37 +238,37 @@ class PlotTDEM(object):
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
-            xy = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
+            xy = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
             if isz:
-                return Utils.mkvc(vz), xy
+                return utils.mkvc(vz), xy
             else:
-                return np.c_[Utils.mkvc(vx), Utils.mkvc(vy)], xy
+                return np.c_[utils.mkvc(vx), utils.mkvc(vy)], xy
 
         elif normal == "Y":
             ind = np.argmin(abs(mesh.vectorCCx - loc))
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
-            xz = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
+            xz = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
             if isz:
-                return Utils.mkvc(vz), xz
+                return utils.mkvc(vz), xz
             elif isy:
-                return Utils.mkvc(vy), xz
+                return utils.mkvc(vy), xz
             else:
-                return np.c_[Utils.mkvc(vx), Utils.mkvc(vz)], xz
+                return np.c_[utils.mkvc(vx), utils.mkvc(vz)], xz
 
         elif normal == "X":
             ind = np.argmin(abs(mesh.vectorCCy - loc))
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
-            yz = Utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
+            yz = utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
             if isz:
-                return Utils.mkvc(vy), yz
+                return utils.mkvc(vy), yz
             elif isy:
-                return Utils.mkvc(vy), yz
+                return utils.mkvc(vy), yz
             else:
-                return np.c_[Utils.mkvc(vy), Utils.mkvc(vz)], yz
+                return np.c_[utils.mkvc(vy), utils.mkvc(vz)], yz
 
     def plot_electric_currents(self, itime):
         exy, xy = self.getSlices(self.mesh, self.J, itime, normal="Z", loc=-100.5)
@@ -278,11 +279,11 @@ class PlotTDEM(object):
         plt.figure(figsize=(12, 5))
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
-        out_xz = Utils.plot2Ddata(
+        out_xz = utils.plot2Ddata(
             xz, exz, vec=False, ncontour=300, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin_xz, vmax_xz = out_xz[0].get_clim()
-        out_xy = Utils.plot2Ddata(
+        out_xy = utils.plot2Ddata(
             xy, exy, vec=True, ncontour=300, contourOpts={"cmap": "viridis"}, ax=ax1
         )
         vmin_xy, vmax_xy = out_xy[0].get_clim()
@@ -332,11 +333,11 @@ class PlotTDEM(object):
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
 
-        out_xy = Utils.plot2Ddata(
+        out_xy = utils.plot2Ddata(
             xy, bxy, vec=False, ncontour=300, contourOpts={"cmap": "viridis"}, ax=ax1
         )
         vmin_xy, vmax_xy = out_xy[0].get_clim()
-        out_xz = Utils.plot2Ddata(
+        out_xz = utils.plot2Ddata(
             xz, bxz, vec=True, ncontour=300, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin_xz, vmax_xz = out_xz[0].get_clim()

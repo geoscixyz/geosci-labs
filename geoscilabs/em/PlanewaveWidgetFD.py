@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
-from SimPEG import EM
+from SimPEG.electromagnetics.utils import waveform_utils
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
@@ -28,8 +28,8 @@ def PlaneEHfield(z, t=0.0, f=1.0, sig=1.0, mu=mu_0, epsilon=epsilon_0, E0=1.0):
     """
         Plane wave propagating downward (negative z (depth))
     """
-    k = EM.Utils.k(f, sig, mu=mu, eps=epsilon)
-    omega = EM.Utils.omega(f)
+    k = waveform_utils.k(f, sig, mu=mu, eps=epsilon)
+    omega = waveform_utils.omega(f)
     Ex = E0 * np.exp(1j * (k * z + omega * t))
     Z = omega * mu / k
     Hy = -E0 / Z * np.exp(1j * (k * z + omega * t))
