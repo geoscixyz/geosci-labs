@@ -933,8 +933,7 @@ def DCIP2Dfwdfun(
                 alpha=0.5,
             )
             ax3.plot(xzlocs[:, 0], xzlocs[:, 1], "k.", ms=3)
-            cb3 = plt.colorbar(dat3, ax=ax3, format="%4.0f")
-            cb3.set_clim(cb2.get_clim())
+            cb3 = plt.colorbar(dat3, ax=ax3, format="%4.0f", boundaries=(dtrue.min(), dtrue.max()))
         cb3.set_label("Apparent\n" + label)
         ax3.text(250, nmax - 1, "Predicted\nwithout Target")
 

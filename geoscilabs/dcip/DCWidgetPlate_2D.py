@@ -16,9 +16,10 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
-from SimPEG.EM.Static import DC
+from discretize import TensorMesh
+from SimPEG import maps, SolverLU, utils
+from SimPEG.utils import ExtractCoreMesh
+from SimPEG.electromagnetics.static import resistivity as DC
 
 from ..base import widgetify
 
@@ -28,8 +29,8 @@ growrate = 2.0
 cs = 0.5
 hx = [(cs, npad, -growrate), (cs, 200), (cs, npad, growrate)]
 hy = [(cs, npad, -growrate), (cs, 100)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
-expmap = Maps.ExpMap(mesh)
+mesh = TensorMesh([hx, hy], "CN")
+expmap = maps.ExpMap(mesh)
 mapping = expmap
 dx = 5
 xr = np.arange(-40, 41, dx)
@@ -64,21 +65,19 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
 
     Mx = np.empty(shape=(0, 2))
     Nx = np.empty(shape=(0, 2))
-    rx = DC.Rx.Dipole(Mx, Nx)
+    rx = DC.receivers.Dipole(Mx, Nx)
     if B == []:
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
-    survey = DC.Survey([src])
-    survey_prim = DC.Survey([src])
+    survey = DC.survey.Survey([src])
+    survey_prim = DC.survey.Survey([src])
 
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap=mapping)
+    problem = DC.simulation.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping)
+    problem_prim = DC.simulation.Simulation3DCellCentered(mesh, survey=survey_prim, sigmaMap=mapping)
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
-    problem.pair(survey)
-    problem_prim.pair(survey_prim)
 
     primary_field = problem_prim.fields(mhalf)
 
@@ -159,7 +158,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = Utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -201,8 +200,8 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
     plateCharge = qSecondary[chargeRegionInsideInd]
     posInd = np.where(plateCharge >= 0)
     negInd = np.where(plateCharge < 0)
-    qPos = Utils.mkvc(plateCharge[posInd])
-    qNeg = Utils.mkvc(plateCharge[negInd])
+    qPos = utils.mkvc(plateCharge[posInd])
+    qNeg = utils.mkvc(plateCharge[negInd])
 
     qPosLoc = plateChargeLocs[posInd, :][0]
     qNegLoc = plateChargeLocs[negInd, :][0]
@@ -240,20 +239,20 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
 def getSensitivity(survey, A, B, M, N, model):
 
     if survey == "Dipole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Dipole":
-        rx = DC.Rx.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     elif survey == "Dipole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Pole":
-        rx = DC.Rx.Pole(np.r_[M, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
     # Model mappings
-    expmap = Maps.ExpMap(mesh)
+    expmap = maps.ExpMap(mesh)
     mapping = expmap
 
     survey = DC.Survey([src])

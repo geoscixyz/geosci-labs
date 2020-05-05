@@ -82,13 +82,15 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
     problem.Solver = Pardiso
     problem_prim.Solver = Pardiso
 
-    primary_field = problem_prim.fields(mhalf)
+    f = problem_prim.fields(mhalf)
+    primary_field = problem_prim.fields_to_space(f)
     # phihalf = f[src, 'phi', 15]
     # ehalf = f[src, 'e']
     # jhalf = f[src, 'j']
     # charge = f[src, 'charge']
 
-    total_field = problem.fields(mtrue)
+    f = problem.fields(mtrue)
+    total_field = problem.fields_to_space(f)
     # phi = f[src, 'phi', 15]
     # e = f[src, 'e']
     # j = f[src, 'j']

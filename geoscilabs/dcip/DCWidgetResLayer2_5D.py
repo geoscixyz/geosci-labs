@@ -80,10 +80,10 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     # src = DC.sources.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
-    survey = DC.Survey_ky([src])
+    survey = DC.survey.Survey_ky([src])
     # survey = DC.Survey([src])
     # survey_prim = DC.Survey([src])
-    survey_prim = DC.Survey_ky([src])
+    survey_prim = DC.survey.Survey_ky([src])
     # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
     problem = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping)
     # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
@@ -95,13 +95,13 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
     cellGrad = mesh.cellGrad
     faceDiv = mesh.faceDiv
 
-    phi_primary = survey_prim.dpred(mhalf)
+    phi_primary = problem_prim.dpred(mhalf)
     e_primary = -cellGrad * phi_primary
     j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
     q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
     primary_field = {"phi": phi_primary, "e": e_primary, "j": j_primary, "q": q_primary}
 
-    phi_total = survey.dpred(mtrue)
+    phi_total = problem.dpred(mtrue)
     e_total = -cellGrad * phi_total
     j_total = problem.MfRhoI * problem.Grad * phi_total
     q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)

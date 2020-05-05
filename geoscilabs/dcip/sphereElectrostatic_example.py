@@ -7,7 +7,7 @@ from scipy.constants import epsilon_0
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-from SimPEG.Utils import ndgrid, mkvc
+from SimPEG.utils import ndgrid, mkvc
 
 """
 Authors: Thibaut Astic, Lindsey Heagy, Sanna Tyrvainen, Ronghua Peng
