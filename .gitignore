@@ -73,3 +73,7 @@ target/
 */.ipynb_checkpoints/*
 
 *.pklb
+
+# files produced by notebooks
+notebooks/inversion/InversionModel*
+

@@ -14,11 +14,11 @@ dependencies:
   - pytest
   - flake8
   - black
+  - discretize
+  - pymatsolver
+  - SimPEG<0.14
   - pip:
-    - pymatsolver
-    - discretize
     - deepdish
-    - SimPEG
     - empymod
     - testipynb
 
