@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib import rcParams
 
-from SimPEG import Mesh, Maps, Utils, SolverLU
+from discretize import TensorMesh
+
+from SimPEG import maps, utils, SolverLU
 
 from ..base import widgetify
 
@@ -22,7 +24,7 @@ npad = 20
 cs = 0.5
 hx = [(cs, npad, -1.3), (cs, 200), (cs, npad, 1.3)]
 hy = [(cs, npad, -1.3), (cs, 100)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
+mesh = TensorMesh([hx, hy], "CN")
 
 # bounds on electrical resistivity
 rhomin = 1e2
@@ -47,22 +49,22 @@ def r(xyz, src_loc):
 
 
 def sum_term(rho1, rho2, h, r):
-    m = Utils.mkvc(np.arange(1, infinity + 1))
+    m = utils.mkvc(np.arange(1, infinity + 1))
     k = (rho2 - rho1) / (rho2 + rho1)
     return np.sum(
-        ((k ** m.T) * np.ones_like(Utils.mkvc(r, 2)))
-        / np.sqrt(1.0 + (2.0 * h * m.T / Utils.mkvc(r, 2)) ** 2),
+        ((k ** m.T) * np.ones_like(utils.mkvc(r, 2)))
+        / np.sqrt(1.0 + (2.0 * h * m.T / utils.mkvc(r, 2)) ** 2),
         1,
     )
 
 
 def sum_term_deriv(rho1, rho2, h, r):
-    m = Utils.mkvc(np.arange(1, infinity + 1))
+    m = utils.mkvc(np.arange(1, infinity + 1))
     k = (rho2 - rho1) / (rho2 + rho1)
     return np.sum(
-        ((k ** m.T) * np.ones_like(Utils.mkvc(r, 2)))
-        / (1.0 + (2.0 * h * m.T / Utils.mkvc(r, 2)) ** 2) ** (3.0 / 2.0)
-        * ((2.0 * h * m.T) ** 2 / Utils.mkvc(r, 2) ** 3),
+        ((k ** m.T) * np.ones_like(utils.mkvc(r, 2)))
+        / (1.0 + (2.0 * h * m.T / utils.mkvc(r, 2)) ** 2) ** (3.0 / 2.0)
+        * ((2.0 * h * m.T) ** 2 / utils.mkvc(r, 2) ** 3),
         1,
     )
 
@@ -95,7 +97,7 @@ def layer_E(rho1, rho2, h, A, B, xyz):
     def dr_dz(src_loc):
         return (xyz[:, 2] - src_loc[2]) / r(xyz, src_loc)
 
-    # m = Utils.mkvc(np.arange(1, infinity + 1))
+    # m = utils.mkvc(np.arange(1, infinity + 1))
 
     def deriv_1(r):
         return (-1.0 / r) * (1.0 + 2.0 * sum_term(rho1, rho2, h, r))
@@ -160,8 +162,8 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
     sigma[mesh.gridCC[:, 1] >= -h] = 1.0 / rho1  # since the model is 2D
 
     q = np.zeros(mesh.nC)
-    a = Utils.closestPoints(mesh, A[:2])
-    b = Utils.closestPoints(mesh, B[:2])
+    a = utils.closestPoints(mesh, A[:2])
+    b = utils.closestPoints(mesh, B[:2])
 
     q[a] = 1.0 / mesh.vol[a]
     q[b] = -1.0 / mesh.vol[b]
@@ -170,7 +172,7 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
 
     A = (
         mesh.cellGrad.T
-        * Utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
+        * utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
         * mesh.cellGrad
     )
     Ainv = SolverLU(A)
@@ -198,7 +200,7 @@ def solve_2D_J(rho1, rho2, h, A, B):
     sigma = 1.0 / rho2 * np.ones(mesh.nC)
     sigma[mesh.gridCC[:, 1] >= -h] = 1.0 / rho1  # since the model is 2D
 
-    return Utils.sdiag(sigma) * ex, Utils.sdiag(sigma) * ez, V
+    return utils.sdiag(sigma) * ex, utils.sdiag(sigma) * ez, V
 
 
 def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
@@ -213,7 +215,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
     x = np.linspace(-40.0, 40.0, 200)
     z = np.linspace(x.min(), 0, 100)
 
-    pltgrid = Utils.ndgrid(x, z)
+    pltgrid = utils.ndgrid(x, z)
     xplt = pltgrid[:, 0].reshape(x.size, z.size, order="F")
     zplt = pltgrid[:, 1].reshape(x.size, z.size, order="F")
 
@@ -223,7 +225,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
         h,
         np.r_[A, 0.0, 0.0],
         np.r_[B, 0.0, 0.0],
-        Utils.ndgrid(x, np.r_[0.0], np.r_[0.0]),
+        utils.ndgrid(x, np.r_[0.0], np.r_[0.0]),
     )
     VM = layer_potentials(
         rho1,
@@ -231,7 +233,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
         h,
         np.r_[A, 0.0, 0.0],
         np.r_[B, 0.0, 0.0],
-        Utils.mkvc(np.r_[M, 0.0, 0], 2).T,
+        utils.mkvc(np.r_[M, 0.0, 0], 2).T,
     )
     VN = layer_potentials(
         rho1,
@@ -239,7 +241,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
         h,
         np.r_[A, 0.0, 0.0],
         np.r_[B, 0.0, 0.0],
-        Utils.mkvc(np.r_[N, 0.0, 0], 2).T,
+        utils.mkvc(np.r_[N, 0.0, 0], 2).T,
     )
 
     ax[0].plot(x, V, color=[0.1, 0.5, 0.1], linewidth=2)

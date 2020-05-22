@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erfc, erf
-from SimPEG import Utils
+from SimPEG import utils
 
 # TODO:
 # r = lambda dx, dy, dz: np.sqrt( dx**2. + dy**2. + dz**2.)
@@ -36,7 +36,7 @@ def E_from_ElectricDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -142,7 +142,7 @@ def H_from_ElectricDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -203,7 +203,7 @@ def dHdt_from_ElectricDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -304,7 +304,7 @@ def E_from_MagneticDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -404,7 +404,7 @@ def H_from_MagneticDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -472,7 +472,7 @@ def dHdt_from_MagneticDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = Utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(

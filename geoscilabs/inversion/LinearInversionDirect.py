@@ -1,13 +1,17 @@
 import numpy as np
-from SimPEG import Mesh
-from SimPEG import Problem
-from SimPEG import Survey
-from SimPEG import DataMisfit
-from SimPEG import Directives
-from SimPEG import Optimization
-from SimPEG import Regularization
-from SimPEG import InvProblem
-from SimPEG import Inversion
+from discretize import TensorMesh
+from SimPEG import (
+    maps,
+    simulation,
+    survey,
+    data,
+    data_misfit,
+    directives,
+    optimization,
+    regularization,
+    inverse_problem,
+    inversion
+    )
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -50,7 +54,7 @@ class LinearInversionDirectApp(object):
     m_min = None
     m_max = None
 
-    data = None
+    data_vec = None
     save = None
 
     def __init__(self):
@@ -65,8 +69,8 @@ class LinearInversionDirectApp(object):
         return self._jk
 
     @property
-    def mesh(self):
-        return self._mesh
+    def mesh_prop(self):
+        return self._mesh_prop
 
     def set_G(self, N=20, M=100, p=-0.25, q=0.25, j1=1, jn=60):
         """
@@ -79,17 +83,17 @@ class LinearInversionDirectApp(object):
         """
         self.N = N
         self.M = M
-        self._mesh = Mesh.TensorMesh([M])
+        self._mesh_prop = TensorMesh([M])
         jk = np.linspace(j1, jn, N)
-        self._G = np.zeros((N, self.mesh.nC), dtype=float, order="C")
+        self._G = np.zeros((N, self.mesh_prop.nC), dtype=float, order="C")
 
         def g(k):
-            return np.exp(p * jk[k] * self.mesh.vectorCCx) * np.cos(
-                np.pi * q * jk[k] * self.mesh.vectorCCx
+            return np.exp(p * jk[k] * self.mesh_prop.vectorCCx) * np.cos(
+                np.pi * q * jk[k] * self.mesh_prop.vectorCCx
             )
 
         for i in range(N):
-            self._G[i, :] = g(i) * self.mesh.hx
+            self._G[i, :] = g(i) * self.mesh_prop.hx
         self._jk = jk
 
     def plot_G(
@@ -117,7 +121,7 @@ class LinearInversionDirectApp(object):
         ax1 = plt.subplot(gs1[0, :3])
         ax2 = plt.subplot(gs1[0, 3:])
 
-        ax1.plot(self.mesh.vectorCCx, self.G.T)
+        ax1.plot(self.mesh_prop.vectorCCx, self.G.T)
         if fixed:
             ax1.set_ylim(ymin, ymax)
         ax1.set_xlabel("x")
@@ -146,17 +150,17 @@ class LinearInversionDirectApp(object):
         m2_center=0.5,
         sigma_2=1.0,
     ):
-        m = np.zeros(self.mesh.nC) + m_background
+        m = np.zeros(self.mesh_prop.nC) + m_background
         m1_inds = np.logical_and(
-            self.mesh.vectorCCx > m1_center - dm1 / 2.0,
-            self.mesh.vectorCCx < m1_center + dm1 / 2.0,
+            self.mesh_prop.vectorCCx > m1_center - dm1 / 2.0,
+            self.mesh_prop.vectorCCx < m1_center + dm1 / 2.0,
         )
         m[m1_inds] = m1
 
         def gaussian(x, x0, sigma):
             return np.exp(-np.power((x - x0) / sigma, 2.0) / 2.0)
 
-        m += gaussian(self.mesh.vectorCCx, m2_center, sigma_2) * m2
+        m += gaussian(self.mesh_prop.vectorCCx, m2_center, sigma_2) * m2
         return m
 
     def plot_model(
@@ -187,21 +191,21 @@ class LinearInversionDirectApp(object):
         np.random.seed(1)
 
         if add_noise:
-            survey, _ = self.get_problem_survey()
-            data = survey.dpred(m)
+            survey_obj, simulation_obj = self.get_problem_survey()
+            d = simulation_obj.dpred(m)
             noise = (
-                abs(data) * percentage * 0.01 * np.random.randn(self.N)
+                abs(d) * percentage * 0.01 * np.random.randn(self.N)
                 + np.random.randn(self.N) * floor
             )
         else:
-            survey, _ = self.get_problem_survey()
-            data = survey.dpred(m)
+            survey_obj, simulation_obj = self.get_problem_survey()
+            d = simulation_obj.dpred(m)
             noise = np.zeros(self.N, float)
 
-        data += noise
-        self.data = data.copy()
+        d += noise
+        self.data_vec = d.copy()
         self.m = m.copy()
-        self.uncertainty = abs(self.data) * percentage * 0.01 + floor
+        self.uncertainty = abs(self.data_vec) * percentage * 0.01 + floor
         self.percentage = percentage
         self.floor = floor
 
@@ -218,12 +222,12 @@ class LinearInversionDirectApp(object):
         for i, ax in enumerate(axes):
             if option_bools[i]:
                 if i == 0:
-                    ax.plot(self.mesh.vectorCCx, self.G.T)
+                    ax.plot(self.mesh_prop.vectorCCx, self.G.T)
                     ax.set_title("Rows of matrix G")
                     ax.set_xlabel("x")
                     ax.set_ylabel("g(x)")
                 elif i == 1:
-                    ax.plot(self.mesh.vectorCCx, m)
+                    ax.plot(self.mesh_prop.vectorCCx, m)
                     ax.set_ylim([-2.5, 2.5])
                     ax.set_title("Model")
                     ax.set_xlabel("x")
@@ -233,7 +237,7 @@ class LinearInversionDirectApp(object):
                         # this is just for visualization of uncertainty
                         ax.errorbar(
                             x=self.jk,
-                            y=self.data,
+                            y=self.data_vec,
                             yerr=self.uncertainty,
                             color="k",
                             lw=1,
@@ -258,10 +262,9 @@ class LinearInversionDirectApp(object):
         plt.tight_layout()
 
     def get_problem_survey(self):
-        prob = Problem.LinearProblem(self.mesh, G=self.G)
-        survey = Survey.LinearSurvey()
-        survey.pair(prob)
-        return survey, prob
+        survey_obj = survey.LinearSurvey()
+        simulation_obj = simulation.LinearSimulation(survey=survey_obj, mesh=self.mesh_prop, model_map=maps.IdentityMap(), G=self.G)
+        return survey_obj, simulation_obj
 
     def run_inversion_direct(
         self,
@@ -276,19 +279,26 @@ class LinearInversionDirectApp(object):
         alpha_s=1.0,
         alpha_x=1.0,
     ):
-        survey, prob = self.get_problem_survey()
-        survey.eps = percentage
-        survey.std = floor
-        survey.dobs = self.data.copy()
-        self.uncertainty = percentage * abs(survey.dobs) * 0.01 + floor
+
+        self.uncertainty = percentage * abs(self.data_vec) * 0.01 + floor
+
+        survey_obj, simulation_obj = self.get_problem_survey()
+        data_obj = data.Data(survey_obj, dobs=self.data_vec, noise_floor=self.uncertainty)
+        dmis = data_misfit.L2DataMisfit(simulation=simulation_obj, data=data_obj)
+        dmis.W = 1.0 / self.uncertainty
+
+        # survey.eps = percentage
+        # survey.std = floor
+        # survey.dobs = self.data.copy()
+        # self.uncertainty = percentage * abs(survey.dobs) * 0.01 + floor
 
         m0 = np.ones(self.M) * m0
         mref = np.ones(self.M) * mref
-        reg = Regularization.Tikhonov(
-            self.mesh, alpha_s=alpha_s, alpha_x=alpha_x, mref=mref
+        reg = regularization.Tikhonov(
+            self.mesh_prop, alpha_s=alpha_s, alpha_x=alpha_x, mref=mref
         )
-        dmis = DataMisfit.l2_DataMisfit(survey)
-        dmis.W = 1.0 / self.uncertainty
+        # dmis = data_misfit.L2DataMisfit(survey)
+        # dmis.W = 1.0 / self.uncertainty
 
         betas = np.logspace(np.log10(beta_min), np.log10(beta_max), n_beta)[::-1]
 
@@ -306,7 +316,7 @@ class LinearInversionDirectApp(object):
             phi_d[ii] = dmis(m) * 2.0
             phi_m[ii] = reg(m) * 2.0
             models.append(m)
-            preds.append(survey.dpred(m))
+            preds.append(simulation_obj.dpred(m))
 
         return phi_d, phi_m, models, preds, betas
 
@@ -346,7 +356,7 @@ class LinearInversionDirectApp(object):
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
             )
-        nD = self.data.size
+        nD = self.data_vec.size
         i_target = np.argmin(abs(self.phi_d - nD * chifact))
 
         if i_beta > n_beta - 1:
@@ -357,12 +367,12 @@ class LinearInversionDirectApp(object):
             i_beta = n_beta - 1
 
         fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
-        axes[0].plot(self.mesh.vectorCCx, self.m)
+        axes[0].plot(self.mesh_prop.vectorCCx, self.m)
         if mode == "Run":
-            axes[0].plot(self.mesh.vectorCCx, self.model[i_target])
+            axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         if data_option == "obs/pred":
-            axes[1].plot(self.jk, self.data, "ko")
+            axes[1].plot(self.jk, self.data_vec, "ko")
             if mode == "Run":
                 axes[1].plot(self.jk, self.pred[i_target], "bx")
             axes[1].legend(("Observed", "Predicted"))
@@ -371,9 +381,9 @@ class LinearInversionDirectApp(object):
             axes[1].set_ylabel("$d_j$")
         else:
             if mode == "Run":
-                misfit = (self.pred[i_target] - self.data) / self.uncertainty
+                misfit = (self.pred[i_target] - self.data_vec) / self.uncertainty
             else:
-                misfit = (self.pred[i_beta] - self.data) / self.uncertainty
+                misfit = (self.pred[i_beta] - self.data_vec) / self.uncertainty
 
             axes[1].plot(self.jk, misfit, "ko")
             axes[1].set_title("Normalized misfit")
@@ -392,7 +402,7 @@ class LinearInversionDirectApp(object):
 
         if option == "misfit":
             if mode == "Explore":
-                axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
+                axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
                 if data_option == "obs/pred":
                     axes[1].plot(self.jk, self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
@@ -411,7 +421,7 @@ class LinearInversionDirectApp(object):
             xmin, xmax = beta_max, beta_min
         elif option == "tikhonov":
             if mode == "Explore":
-                axes[0].plot(self.mesh.vectorCCx, self.model[i_beta])
+                axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
                 if data_option == "obs/pred":
                     axes[1].plot(self.jk, self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
