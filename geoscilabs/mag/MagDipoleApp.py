@@ -1,12 +1,13 @@
 import numpy as np
 from scipy.interpolate import interp1d
-from SimPEG import Mesh, Utils
+from discretize import TensorMesh
+from SimPEG import utils
 from geoana import em
 from ipywidgets import widgets
 from ipywidgets import Layout
 import matplotlib.pyplot as plt
 from .Simulator import definePrism, plotObj3D
-from .Mag import problem, createMagSurvey
+from .Mag import Simulation, createMagSurvey
 
 
 class MagneticDipoleApp(object):
@@ -69,28 +70,28 @@ class MagneticDipoleApp(object):
         nx = ny = int(length / dx)
         hx = np.ones(nx) * dx
         hy = np.ones(ny) * dx
-        self.mesh = Mesh.TensorMesh((hx, hy), "CC")
+        self.mesh = TensorMesh((hx, hy), "CC")
         z = np.r_[1.0]
         orientation = self.id_to_cartesian(inclination, declination)
         if self.target == "Dipole":
             md = em.static.MagneticDipoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
             b_vec = md.magnetic_flux_density(xyz)
 
         elif self.target == "Monopole (+)":
             md = em.static.MagneticPoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
             b_vec = md.magnetic_flux_density(xyz)
 
         elif self.target == "Monopole (-)":
             md = em.static.MagneticPoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
             b_vec = -md.magnetic_flux_density(xyz)
 
         # Project to the direction  of earth field
@@ -98,7 +99,7 @@ class MagneticDipoleApp(object):
             rx_orientation = orientation.copy()
         elif component == "Bg":
             rx_orientation = orientation.copy()
-            xyz_up = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
+            xyz_up = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
             b_vec -= md.magnetic_flux_density(xyz_up)
 
         elif component == "Bx":
@@ -116,7 +117,7 @@ class MagneticDipoleApp(object):
 
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
-        self.inds_profile = Utils.closestPoints(self.mesh, self.xy_profile)
+        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def simulate_two_monopole(
@@ -149,7 +150,7 @@ class MagneticDipoleApp(object):
         nx = ny = int(length / dx)
         hx = np.ones(nx) * dx
         hy = np.ones(ny) * dx
-        self.mesh = Mesh.TensorMesh((hx, hy), "CC")
+        self.mesh = TensorMesh((hx, hy), "CC")
         z = np.r_[1.0]
         orientation = self.id_to_cartesian(inclination, declination)
 
@@ -159,7 +160,7 @@ class MagneticDipoleApp(object):
         md_p = em.static.MagneticPoleWholeSpace(
             location=np.r_[0, 0, -depth_p], orientation=orientation, moment=moment
         )
-        xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+        xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
         b_vec = -md_n.magnetic_flux_density(xyz) + md_p.magnetic_flux_density(xyz)
 
         # Project to the direction  of earth field
@@ -173,7 +174,7 @@ class MagneticDipoleApp(object):
             rx_orientation = self.id_to_cartesian(90, 0)
         elif component == "Bg":
             rx_orientation = orientation.copy()
-            xyz_up = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
+            xyz_up = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
             b_vec -= -md_n.magnetic_flux_density(xyz_up)
             b_vec -= md_p.magnetic_flux_density(xyz_up)
 
@@ -186,7 +187,7 @@ class MagneticDipoleApp(object):
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
 
-        self.inds_profile = Utils.closestPoints(self.mesh, self.xy_profile)
+        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def get_prism(self, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec):
@@ -245,7 +246,7 @@ class MagneticDipoleApp(object):
         nx = ny = int(length / dx)
         hx = np.ones(nx) * dx
         hy = np.ones(ny) * dx
-        self.mesh = Mesh.TensorMesh((hx, hy), "CC")
+        self.mesh = TensorMesh((hx, hy), "CC")
 
         z = np.r_[1.0]
         B = np.r_[
@@ -262,16 +263,18 @@ class MagneticDipoleApp(object):
         elif component == "Bz":
             uType = "bz"
 
-        xyz = Utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
-        self.survey = createMagSurvey(np.c_[xyz, np.ones(self.mesh.nC)], B)
-        self.prob = problem()
+        xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+        out = createMagSurvey(np.c_[xyz, np.ones(self.mesh.nC)], B)
+        self.survey = out[0]
+        self.dobs = out[1]
+        self.sim = Simulation()
 
-        self.prob.prism = self.prism
-        self.prob.survey = self.survey
-        self.prob.susc = kappa
-        self.prob.uType, self.prob.mType = uType, "induced"
+        self.sim.prism = self.prism
+        self.sim.survey = self.survey
+        self.sim.susc = kappa
+        self.sim.uType, self.sim.mType = uType, "induced"
 
-        self.data = self.prob.fields()[0]
+        self.data = self.sim.fields()[0]
 
         # Compute profile
         if (profile == "North") or (profile == "None"):
@@ -279,7 +282,7 @@ class MagneticDipoleApp(object):
 
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
-        self.inds_profile = Utils.closestPoints(self.mesh, self.xy_profile)
+        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def plot_map(self):

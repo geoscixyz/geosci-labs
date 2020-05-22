@@ -2,10 +2,11 @@ from . import MagUtils
 from scipy.constants import mu_0
 import re
 import numpy as np
-from SimPEG import Utils, PF
+from SimPEG import utils, data
+from SimPEG.potential_fields import magnetics as mag
 
 
-class problem(object):
+class Simulation(object):
     """
             Earth's field:
             - Binc, Bdec : inclination and declination of Earth's mag field
@@ -23,12 +24,13 @@ class problem(object):
     susc = 1.0
     prism = None
     survey = None
+    dobs = None
 
     @property
     def Mind(self):
         # Define magnetization direction as sum of induced and remanence
         mind = MagUtils.dipazm_2_xyz(
-            self.survey.srcField.param[1], self.survey.srcField.param[2]
+            self.survey.source_field.parameters[1], self.survey.source_field.parameters[2]
         )
         R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
         Mind = self.susc * self.Higrf * R.dot(mind.T)
@@ -47,7 +49,7 @@ class problem(object):
 
     @property
     def Higrf(self):
-        Higrf = self.survey.srcField.param[0] * 1e-9 / mu_0
+        Higrf = self.survey.source_field.parameters[0] * 1e-9 / mu_0
 
         return Higrf
 
@@ -56,7 +58,7 @@ class problem(object):
 
         if getattr(self, "_G", None) is None:
 
-            rxLoc = self.survey.srcField.rxList[0].locs
+            rxLoc = self.survey.receiver_locations
 
             xLoc = rxLoc[:, 0] - self.prism.xc
             yLoc = rxLoc[:, 1] - self.prism.yc
@@ -108,23 +110,164 @@ class problem(object):
         bvec = R.dot(bvec)
 
         if self.uType == "bx":
-            u = Utils.mkvc(bvec[0, :])
+            u = utils.mkvc(bvec[0, :])
 
         if self.uType == "by":
-            u = Utils.mkvc(bvec[1, :])
+            u = utils.mkvc(bvec[1, :])
 
         if self.uType == "bz":
-            u = Utils.mkvc(bvec[2, :])
+            u = utils.mkvc(bvec[2, :])
 
         if self.uType == "tf":
             # Projection matrix
             Ptmi = MagUtils.dipazm_2_xyz(
-                self.survey.srcField.param[1], self.survey.srcField.param[2]
+                self.survey.source_field.parameters[1], self.survey.source_field.parameters[2]
             )
 
-            u = Utils.mkvc(Ptmi.dot(bvec))
+            u = utils.mkvc(Ptmi.dot(bvec))
 
         return u
+
+
+
+def calcRow(Xn, Yn, Zn, rxLoc):
+    """
+    Load in the active nodes of a tensor mesh and computes the magnetic tensor
+    for a given observation location rxLoc[obsx, obsy, obsz]
+
+    INPUT:
+    Xn, Yn, Zn: Node location matrix for the lower and upper most corners of
+                all cells in the mesh shape[nC,2]
+    M
+    OUTPUT:
+    Tx = [Txx Txy Txz]
+    Ty = [Tyx Tyy Tyz]
+    Tz = [Tzx Tzy Tzz]
+
+    where each elements have dimension 1-by-nC.
+    Only the upper half 5 elements have to be computed since symetric.
+    Currently done as for-loops but will eventually be changed to vector
+    indexing, once the topography has been figured out.
+
+    Created on Oct, 20th 2015
+
+    @author: dominiquef
+
+     """
+
+    eps = 1e-8  # add a small value to the locations to avoid /0
+
+    nC = Xn.shape[0]
+
+    # Pre-allocate space for 1D array
+    Tx = np.zeros((1, 3*nC))
+    Ty = np.zeros((1, 3*nC))
+    Tz = np.zeros((1, 3*nC))
+
+    dz2 = Zn[:, 1] - rxLoc[2] + eps
+    dz1 = Zn[:, 0] - rxLoc[2] + eps
+
+    dy2 = Yn[:, 1] - rxLoc[1] + eps
+    dy1 = Yn[:, 0] - rxLoc[1] + eps
+
+    dx2 = Xn[:, 1] - rxLoc[0] + eps
+    dx1 = Xn[:, 0] - rxLoc[0] + eps
+
+    dx2dx2 = dx2**2.
+    dx1dx1 = dx1**2.
+
+    dy2dy2 = dy2**2.
+    dy1dy1 = dy1**2.
+
+    dz2dz2 = dz2**2.
+    dz1dz1 = dz1**2.
+
+    R1 = (dy2dy2 + dx2dx2)
+    R2 = (dy2dy2 + dx1dx1)
+    R3 = (dy1dy1 + dx2dx2)
+    R4 = (dy1dy1 + dx1dx1)
+
+    arg1 = np.sqrt(dz2dz2 + R2)
+    arg2 = np.sqrt(dz2dz2 + R1)
+    arg3 = np.sqrt(dz1dz1 + R1)
+    arg4 = np.sqrt(dz1dz1 + R2)
+    arg5 = np.sqrt(dz2dz2 + R3)
+    arg6 = np.sqrt(dz2dz2 + R4)
+    arg7 = np.sqrt(dz1dz1 + R4)
+    arg8 = np.sqrt(dz1dz1 + R3)
+
+    Tx[0, 0:nC] = (
+        np.arctan2(dy1 * dz2, (dx2 * arg5 + eps)) -
+        np.arctan2(dy2 * dz2, (dx2 * arg2 + eps)) +
+        np.arctan2(dy2 * dz1, (dx2 * arg3 + eps)) -
+        np.arctan2(dy1 * dz1, (dx2 * arg8 + eps)) +
+        np.arctan2(dy2 * dz2, (dx1 * arg1 + eps)) -
+        np.arctan2(dy1 * dz2, (dx1 * arg6 + eps)) +
+        np.arctan2(dy1 * dz1, (dx1 * arg7 + eps)) -
+        np.arctan2(dy2 * dz1, (dx1 * arg4 + eps))
+    )
+
+    Ty[0, 0:nC] = (
+        np.log((dz2 + arg2 + eps) / (dz1 + arg3 + eps)) -
+        np.log((dz2 + arg1 + eps) / (dz1 + arg4 + eps)) +
+        np.log((dz2 + arg6 + eps) / (dz1 + arg7 + eps)) -
+        np.log((dz2 + arg5 + eps) / (dz1 + arg8 + eps))
+    )
+
+    Ty[0, nC:2*nC] = (
+        np.arctan2(dx1 * dz2, (dy2 * arg1 + eps)) -
+        np.arctan2(dx2 * dz2, (dy2 * arg2 + eps)) +
+        np.arctan2(dx2 * dz1, (dy2 * arg3 + eps)) -
+        np.arctan2(dx1 * dz1, (dy2 * arg4 + eps)) +
+        np.arctan2(dx2 * dz2, (dy1 * arg5 + eps)) -
+        np.arctan2(dx1 * dz2, (dy1 * arg6 + eps)) +
+        np.arctan2(dx1 * dz1, (dy1 * arg7 + eps)) -
+        np.arctan2(dx2 * dz1, (dy1 * arg8 + eps))
+    )
+
+    R1 = (dy2dy2 + dz1dz1)
+    R2 = (dy2dy2 + dz2dz2)
+    R3 = (dy1dy1 + dz1dz1)
+    R4 = (dy1dy1 + dz2dz2)
+
+    Ty[0, 2*nC:] = (
+        np.log((dx1 + np.sqrt(dx1dx1 + R1) + eps) /
+               (dx2 + np.sqrt(dx2dx2 + R1) + eps)) -
+        np.log((dx1 + np.sqrt(dx1dx1 + R2) + eps) /
+               (dx2 + np.sqrt(dx2dx2 + R2) + eps)) +
+        np.log((dx1 + np.sqrt(dx1dx1 + R4) + eps) /
+               (dx2 + np.sqrt(dx2dx2 + R4) + eps)) -
+        np.log((dx1 + np.sqrt(dx1dx1 + R3) + eps) /
+               (dx2 + np.sqrt(dx2dx2 + R3) + eps))
+    )
+
+    R1 = (dx2dx2 + dz1dz1)
+    R2 = (dx2dx2 + dz2dz2)
+    R3 = (dx1dx1 + dz1dz1)
+    R4 = (dx1dx1 + dz2dz2)
+
+    Tx[0, 2*nC:] = (
+        np.log((dy1 + np.sqrt(dy1dy1 + R1) + eps) /
+               (dy2 + np.sqrt(dy2dy2 + R1) + eps)) -
+        np.log((dy1 + np.sqrt(dy1dy1 + R2) + eps) /
+               (dy2 + np.sqrt(dy2dy2 + R2) + eps)) +
+        np.log((dy1 + np.sqrt(dy1dy1 + R4) + eps) /
+               (dy2 + np.sqrt(dy2dy2 + R4) + eps)) -
+        np.log((dy1 + np.sqrt(dy1dy1 + R3) + eps) /
+               (dy2 + np.sqrt(dy2dy2 + R3) + eps))
+    )
+
+    Tz[0, 2*nC:] = -(Ty[0, nC:2*nC] + Tx[0, 0:nC])
+    Tz[0, nC:2*nC] = Ty[0, 2*nC:]
+    Tx[0, nC:2*nC] = Ty[0, 0:nC]
+    Tz[0, 0:nC] = Tx[0, 2*nC:]
+
+    Tx = Tx/(4*np.pi)
+    Ty = Ty/(4*np.pi)
+    Tz = Tz/(4*np.pi)
+
+    return Tx, Ty, Tz
+
 
 
 def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
@@ -147,9 +290,9 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
     yn2, xn2, zn2 = np.meshgrid(yn[1:], xn[1:], zn[1:])
     yn1, xn1, zn1 = np.meshgrid(yn[0:-1], xn[0:-1], zn[0:-1])
 
-    Yn = np.c_[Utils.mkvc(yn1), Utils.mkvc(yn2)]
-    Xn = np.c_[Utils.mkvc(xn1), Utils.mkvc(xn2)]
-    Zn = np.c_[Utils.mkvc(zn1), Utils.mkvc(zn2)]
+    Yn = np.c_[utils.mkvc(yn1), utils.mkvc(yn2)]
+    Xn = np.c_[utils.mkvc(xn1), utils.mkvc(xn2)]
+    Zn = np.c_[utils.mkvc(zn1), utils.mkvc(zn2)]
 
     ndata = rxLoc.shape[0]
 
@@ -158,7 +301,7 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
     for ii in range(ndata):
 
-        tx, ty, tz = PF.Magnetics.calcRow(Xn, Yn, Zn, rxLoc[ii, :])
+        tx, ty, tz = calcRow(Xn, Yn, Zn, rxLoc[ii, :])
 
         G[ii, :] = tx / 1e-9 * mu_0
         G[ii + ndata, :] = ty / 1e-9 * mu_0
@@ -176,9 +319,9 @@ def createMagSurvey(xyzd, B):
         :param array: B, 1-by-3 array of inducing field param [|B|, Inc, Dec]
     """
 
-    rxLoc = PF.BaseMag.RxObs(xyzd[:, :3])
-    srcField = PF.BaseMag.SrcField([rxLoc], param=B)
-    survey = PF.BaseMag.LinearSurvey(srcField)
-    survey.dobs = xyzd[:, 3]
+    rxLoc = mag.receivers.Point(xyzd[:, :3])
+    source_field = mag.sources.SourceField(receiver_list=[rxLoc], parameters=B)
+    survey = mag.survey.MagneticSurvey(source_field)
+    dobj = data.Data(survey, xyzd[:, 3])
 
-    return survey
+    return survey, dobj

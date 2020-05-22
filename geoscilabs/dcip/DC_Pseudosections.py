@@ -20,9 +20,11 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.EM.Static import DC
-from SimPEG.Maps import IdentityMap
+from discretize import TensorMesh
+
+from SimPEG import maps, SolverLU, utils
+from SimPEG.electromagnetics.static import resistivity as DC
+from SimPEG.maps import IdentityMap
 
 from ..base import widgetify
 
@@ -51,7 +53,7 @@ class ParametricCircleLayerMap(IdentityMap):
             sig1, sig2, sig3 = np.exp(sig1), np.exp(sig2), np.exp(sig3)
         sigma = np.ones(mesh.nC) * sig1
         sigma[mesh.gridCC[:, 1] < zh] = sig2
-        blkind = Utils.ModelBuilder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
+        blkind = utils.ModelBuilder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
         sigma[blkind] = sig3
         return sigma
 
@@ -61,7 +63,7 @@ npad = 15
 cs = 1.25
 hx = [(cs, npad, -1.3), (cs, 100), (cs, npad, 1.3)]
 hy = [(cs, npad, -1.3), (cs, 50)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
+mesh = TensorMesh([hx, hy], "CN")
 circmap = ParametricCircleLayerMap(mesh)
 circmap.slope = 1e5
 mapping = circmap
@@ -73,7 +75,7 @@ xmax = 40.0
 ymin = -40.0
 ymax = 5.0
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = Utils.ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = utils.ExtractCoreMesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)
@@ -160,25 +162,24 @@ def DC2Dsurvey(flag="PolePole"):
                     np.ones(ntx - i) * mesh.vectorCCx.max(), np.ones(ntx - i) * zloc
                 ]
 
-        rx = DC.Rx.Dipole(M, N)
-        src = DC.Src.Dipole([rx], A, B)
+        rx = DC.receivers.Dipole_ky(M, N)
+        src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = DC.Survey(txList)
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
-    problem.pair(survey)
+    survey = DC.Survey_ky(txList)
+    simulation = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=mapping)
 
     sigblk, sighalf, siglayer = 2e-2, 2e-3, 1e-3
     xc, yc, r, zh = -15, -8, 4, -5
     mtrue = np.r_[np.log(sighalf), np.log(siglayer), np.log(sigblk), xc, yc, r, zh]
-    dtrue = survey.dpred(mtrue)
-    perc = 0.1
-    floor = np.linalg.norm(dtrue) * 1e-3
+    dtrue = simulation.dpred(mtrue)
+    perc = 0.0001
+    floor = np.linalg.norm(dtrue) * 1e-8
     np.random.seed([1])
     uncert = np.random.randn(survey.nD) * perc + floor
     dobs = dtrue + uncert
 
-    return dobs, uncert, survey, xzlocs
+    return dobs, uncert, simulation, xzlocs
 
 
 def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
@@ -471,7 +472,7 @@ def MidpointPseudoSectionWidget():
 
 def DC2Dfwdfun(
     mesh,
-    survey,
+    simulation,
     mapping,
     xr,
     xzlocs,
@@ -491,7 +492,7 @@ def DC2Dfwdfun(
     over a known geological model
 
     :param TensorMesh mesh: discretization of the model
-    :param SimPEG.Survey survey: survey object
+    :param SimPEG.Simulation sim: simulation object
     :param SimPEG.SigmaMap mapping: sigmamap of the model
     :param numpy.array xr: electrodes positions
     :param numpy.array xzlocs: pseudolocations
@@ -513,9 +514,9 @@ def DC2Dfwdfun(
     siglayer = 1e-3
     zh = -5
     m0 = np.r_[np.log(sighalf), np.log(sighalf), np.log(sighalf), xc, yc, r, zh]
-    dini = survey.dpred(m0)
+    dini = simulation.dpred(m0)
     mtrue = np.r_[np.log(sighalf), np.log(siglayer), np.log(sigblk), xc, yc, r, zh]
-    dpred = survey.dpred(mtrue)
+    dpred = simulation.dpred(mtrue)
     xi, yi = np.meshgrid(
         np.linspace(xr.min(), xr.max(), 120), np.linspace(1.0, nmax, 100)
     )
@@ -635,10 +636,10 @@ def DC2Dfwdfun(
 
 
 def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
-    dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
+    dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
     DC2Dfwdfun(
         mesh,
-        survey,
+        simulation,
         mapping,
         xr,
         xzlocs,
@@ -683,10 +684,10 @@ def DC2DPseudoWidget():
 
 
 def DC2DfwdWrapper(rhohalf, rhosph, xc, zc, r, predmis, surveyType):
-    dobs, uncert, survey, xzlocs = DC2Dsurvey(surveyType)
+    dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
     DC2Dfwdfun(
         mesh,
-        survey,
+        simulation,
         mapping,
         xr,
         xzlocs,

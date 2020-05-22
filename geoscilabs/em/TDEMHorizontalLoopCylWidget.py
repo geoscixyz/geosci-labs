@@ -3,7 +3,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from ipywidgets import widgets, FloatText
-from SimPEG import Mesh, Maps, EM, Utils
+from discretize import TensorMesh, CylMesh
+from SimPEG import maps, utils
+from SimPEG.electromagnetics import time_domain as tdem
 
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
@@ -55,7 +57,7 @@ class TDEMHorizontalLoopCylWidget(object):
         # TODO: Make it adaptive due to z location
         hx = [(cs, ncx), (cs, npad, 1.3)]
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
-        self.mesh = Mesh.CylMesh([hx, 1, hz], "00C")
+        self.mesh = CylMesh([hx, 1, hz], "00C")
 
     def getCoreDomain(self, mirror=False, xmax=200, zmin=-200, zmax=200.0):
 
@@ -74,7 +76,7 @@ class TDEMHorizontalLoopCylWidget(object):
         # if self.mesh2D is None:
         hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
         hz = self.mesh.hz[yind]
-        self.mesh2D = Mesh.TensorMesh([hx, hz], x0="CC")
+        self.mesh2D = TensorMesh([hx, hz], x0="CC")
 
     def getCoreModel(self, Type):
 
@@ -86,7 +88,7 @@ class TDEMHorizontalLoopCylWidget(object):
             ind2 = (self.mesh2D.vectorCCy < self.z1) & (
                 self.mesh2D.vectorCCy >= self.z2
             )
-            mapping2D = Maps.SurjectVertical1D(self.mesh2D) * Maps.InjectActiveCells(
+            mapping2D = maps.SurjectVertical1D(self.mesh2D) * maps.InjectActiveCells(
                 self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy
             )
             model2D = np.ones(self.mesh2D.nCy) * self.sig3
@@ -106,7 +108,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 <= self.R
             )
 
-            mapping2D = Maps.InjectActiveCells(
+            mapping2D = maps.InjectActiveCells(
                 self.mesh2D, active, self.sig0, nC=self.mesh2D.nC
             )
             model2D = np.ones(self.mesh2D.nC) * self.sigb
@@ -139,7 +141,7 @@ class TDEMHorizontalLoopCylWidget(object):
         active = self.mesh.vectorCCz < self.z0
         ind1 = (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
         ind2 = (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
-        self.mapping = Maps.SurjectVertical1D(self.mesh) * Maps.InjectActiveCells(
+        self.mapping = maps.SurjectVertical1D(self.mesh) * maps.InjectActiveCells(
             self.mesh, active, sig0, nC=self.mesh.nCz
         )
         model = np.ones(self.mesh.nCz) * sig3
@@ -174,7 +176,7 @@ class TDEMHorizontalLoopCylWidget(object):
             <= self.R
         )
 
-        self.mapping = Maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
+        self.mapping = maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
         model = np.ones(self.mesh.nC) * sigb
         model[ind1] = sig1
         model[ind2] = sig2
@@ -185,14 +187,16 @@ class TDEMHorizontalLoopCylWidget(object):
 
     def simulate(self, srcLoc, rxLoc, time, radius=1.0):
 
-        bz = EM.TDEM.Rx.Point_b(rxLoc, time, orientation="z")
+        bz = tdem.receivers.PointMagneticFluxDensity(rxLoc, time, orientation="z")
         # dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation="z")
-        src = EM.TDEM.Src.CircularLoop(
-            [bz], waveform=EM.TDEM.Src.StepOffWaveform(), loc=srcLoc, radius=radius
+        src = tdem.sources.CircularLoop(
+            [bz], waveform=tdem.sources.StepOffWaveform(), loc=srcLoc, radius=radius
         )
         self.srcList = [src]
-        prb = EM.TDEM.Problem3D_b(self.mesh, sigmaMap=self.mapping)
-        prb.timeSteps = [
+        survey = tdem.survey.Survey(self.srcList)
+
+        sim = tdem.simulation.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping)
+        sim.time_steps = [
             (1e-06, 10),
             (5e-06, 10),
             (1e-05, 10),
@@ -201,11 +205,10 @@ class TDEMHorizontalLoopCylWidget(object):
             (5e-4, 10),
             (1e-3, 10),
         ]
-        survey = EM.TDEM.Survey(self.srcList)
-        prb.pair(survey)
-        self.f = prb.fields(self.m)
-        self.prb = prb
-        dpred = survey.dpred(self.m, f=self.f)
+        
+        self.f = sim.fields(self.m)
+        self.sim = sim
+        dpred = sim.dpred(self.m, f=self.f)
         return dpred
 
     @property
@@ -228,22 +231,22 @@ class TDEMHorizontalLoopCylWidget(object):
         src = self.srcList[0]
 
         Ey = self.mesh.aveE2CC * self.f[src, "e", itime]
-        Jy = Utils.sdiag(self.prb.sigma) * Ey
+        Jy = utils.sdiag(self.sim.sigma) * Ey
 
-        self.Ey = Utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
-        self.Jy = Utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
-        self.Bx = Utils.mkvc(
+        self.Ey = utils.mkvc(self.mirrorArray(Ey[self.activeCC], direction="y"))
+        self.Jy = utils.mkvc(self.mirrorArray(Jy[self.activeCC], direction="y"))
+        self.Bx = utils.mkvc(
             self.mirrorArray(self.Pfx * self.f[src, "b", itime], direction="x")
         )
-        self.Bz = Utils.mkvc(
+        self.Bz = utils.mkvc(
             self.mirrorArray(self.Pfz * self.f[src, "b", itime], direction="z")
         )
-        self.dBxdt = Utils.mkvc(
+        self.dBxdt = utils.mkvc(
             self.mirrorArray(
                 -self.Pfx * self.mesh.edgeCurl * self.f[src, "e", itime], direction="x"
             )
         )
-        self.dBzdt = Utils.mkvc(
+        self.dBzdt = utils.mkvc(
             self.mirrorArray(
                 -self.Pfz * self.mesh.edgeCurl * self.f[src, "e", itime], direction="z"
             )
@@ -370,7 +373,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 out = ax.scatter(
                     np.zeros(3) - 1000, np.zeros(3), c=np.linspace(vmin, vmax, 3)
                 )
-                Utils.plot2Ddata(
+                utils.plot2Ddata(
                     self.mesh2D.gridCC,
                     val,
                     vec=vec,
@@ -381,7 +384,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 )
 
             else:
-                out = Utils.plot2Ddata(
+                out = utils.plot2Ddata(
                     self.mesh2D.gridCC,
                     val,
                     vec=vec,
@@ -427,7 +430,7 @@ class TDEMHorizontalLoopCylWidget(object):
             ax.set_xlabel("Distance (m)")
             ax.set_ylabel("Depth (m)")
             title = (
-                title + "\nt = " + "{:.2e}".format(self.prb.times[itime] * 1e3) + " ms"
+                title + "\nt = " + "{:.2e}".format(self.sim.times[itime] * 1e3) + " ms"
             )
             ax.set_title(title)
             ax.set_xlim(-190, 190)
@@ -645,11 +648,11 @@ class TDEMHorizontalLoopCylWidget(object):
 
                 if Scale == "log":
                     val_p, val_n = DisPosNegvalues(val)
-                    ax.plot(self.prb.times[10:] * 1e3, val_p[10:], "k-")
-                    ax.plot(self.prb.times[10:] * 1e3, val_n[10:], "k--")
+                    ax.plot(self.sim.times[10:] * 1e3, val_p[10:], "k-")
+                    ax.plot(self.sim.times[10:] * 1e3, val_n[10:], "k--")
                     ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
                 else:
-                    ax.plot(self.prb.times[10:] * 1e3, val[10:], "k.-")
+                    ax.plot(self.sim.times[10:] * 1e3, val[10:], "k.-")
 
                 ax.set_xscale("log")
                 ax.set_yscale(Scale)
@@ -901,11 +904,11 @@ class TDEMHorizontalLoopCylWidget(object):
 
                 if Scale == "log":
                     val_p, val_n = DisPosNegvalues(val)
-                    ax.plot(self.prb.times[10:] * 1e3, val_p[10:], "k-")
-                    ax.plot(self.prb.times[10:] * 1e3, val_n[10:], "k--")
+                    ax.plot(self.sim.times[10:] * 1e3, val_p[10:], "k-")
+                    ax.plot(self.sim.times[10:] * 1e3, val_n[10:], "k--")
                     ax.legend(("(+)", "(-)"), loc=1, fontsize=10)
                 else:
-                    ax.plot(self.prb.times[10:] * 1e3, val[10:], "k.-")
+                    ax.plot(self.sim.times[10:] * 1e3, val[10:], "k.-")
 
                 ax.set_xscale("log")
                 ax.set_yscale(Scale)

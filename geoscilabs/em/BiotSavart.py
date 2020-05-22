@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as sp
-from SimPEG import Utils
+from SimPEG import utils
 from scipy.constants import mu_0
 
 
@@ -29,7 +29,7 @@ def BiotSavartFun(mesh, r_pts, component="z"):
 
     for i in range(npts):
         if npts == 1:
-            r_rx = np.repeat(Utils.mkvc(r_pts).reshape([1, -1]), mesh.nC, axis=0)
+            r_rx = np.repeat(utils.mkvc(r_pts).reshape([1, -1]), mesh.nC, axis=0)
         else:
             r_rx = np.repeat(r_pts[i, :].reshape([1, -1]), mesh.nC, axis=0)
         r_CC = mesh.gridCC
@@ -38,9 +38,9 @@ def BiotSavartFun(mesh, r_pts, component="z"):
         rxind = r_abs == 0.0
         # r_abs[rxind] = mesh.vol.min()**(1./3.)*0.5
         r_abs[rxind] = 1e20
-        Sx = const * Utils.sdiag(mesh.vol * r[:, 0] / r_abs ** 3)
-        Sy = const * Utils.sdiag(mesh.vol * r[:, 1] / r_abs ** 3)
-        Sz = const * Utils.sdiag(mesh.vol * r[:, 2] / r_abs ** 3)
+        Sx = const * utils.sdiag(mesh.vol * r[:, 0] / r_abs ** 3)
+        Sy = const * utils.sdiag(mesh.vol * r[:, 1] / r_abs ** 3)
+        Sz = const * utils.sdiag(mesh.vol * r[:, 2] / r_abs ** 3)
 
         # G_temp = sp.vstack((sp.hstack(( o.T,     e.T*Sz, -e.T*Sy)), \
         #                       sp.hstack((-e.T*Sz,  o.T,     e.T*Sx)), \

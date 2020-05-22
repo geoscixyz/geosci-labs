@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import deepdish as dd
-from SimPEG import Utils, Mesh
+from discretize import TensorMesh
+from SimPEG import utils
 import tarfile
 import os
 
@@ -21,7 +22,7 @@ def download_and_unzip_data(
     the directory where the data are
     """
     # download the data
-    downloads = Utils.download(url)
+    downloads = utils.download(url)
 
     # directory where the downloaded files are
     directory = downloads.split(".")[0]
@@ -49,7 +50,7 @@ def load_or_run_results(
         fname = os.path.sep.join([directory, fname])
 
     simulation_results = dd.io.load(fname)
-    mesh = Mesh.TensorMesh(
+    mesh = TensorMesh(
         simulation_results["mesh"]["h"], x0=simulation_results["mesh"]["x0"]
     )
     sigma = simulation_results["sigma"]
@@ -82,9 +83,11 @@ def choose_model(model):
 
 
 def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.01):
-    from SimPEG.EM import TDEM, Analytics, mu_0
+    from SimPEG.electromagnetics import time_domain as tdem
+    from SimPEG.electromagnetics.utils import waveform_utils
+    from SimPEG.EM import Analytics, mu_0
     import numpy as np
-    from SimPEG import Mesh, Maps, Utils, EM, Survey
+    from SimPEG import maps, utils, EM, Survey
     from pymatsolver import Pardiso
 
     cs = 20
@@ -93,9 +96,9 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     hx = [(cs, npad, -1.5), (cs, ncx), (cs, npad, 1.5)]
     hy = [(cs, npad, -1.5), (cs, ncy), (cs, npad, 1.5)]
     hz = [(cs, npad, -1.5), (cs, ncz), (cs, npad, 1.5)]
-    mesh = Mesh.TensorMesh([hx, hy, hz], "CCC")
+    mesh = TensorMesh([hx, hy, hz], "CCC")
     sigma = np.ones(mesh.nC) * sigma_halfspace
-    blk_ind = Utils.ModelBuilder.getIndicesBlock(
+    blk_ind = utils.ModelBuilder.getIndicesBlock(
         np.r_[-40, -40, -160], np.r_[40, 40, -80], mesh.gridCC
     )
     sigma[mesh.gridCC[:, 2] > 0.0] = 1e-8
@@ -105,7 +108,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     ymin, ymax = -200.0, 200.0
     x = mesh.vectorCCx[np.logical_and(mesh.vectorCCx > xmin, mesh.vectorCCx < xmax)]
     y = mesh.vectorCCy[np.logical_and(mesh.vectorCCy > ymin, mesh.vectorCCy < ymax)]
-    xyz = Utils.ndgrid(x, y, np.r_[-1.0])
+    xyz = utils.ndgrid(x, y, np.r_[-1.0])
 
     px = np.r_[-200.0, 200.0]
     py = np.r_[0.0, 0.0]
@@ -114,30 +117,29 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
 
     from scipy.interpolate import interp1d
 
-    prb = TDEM.Problem3D_b(mesh, sigma=sigma, verbose=True)
-    prb.Solver = Pardiso
-    prb.solverOpts = {"is_symmetric": False}
-    prb.timeSteps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
-    t0 = 0.01 + 1e-4
-    out = EM.Utils.VTEMFun(prb.times, 0.01, t0, 200)
-    wavefun = interp1d(prb.times, out)
-    waveform = EM.TDEM.Src.RawWaveform(offTime=t0, waveFct=wavefun)
-    input_currents = wavefun(prb.times)
-
     times = np.logspace(-4, -2, 21)
-    rx_ex = TDEM.Rx.Point_e(xyz, times + t0, orientation="x")
-    rx_ey = TDEM.Rx.Point_e(xyz, times + t0, orientation="y")
-    rx_by = TDEM.Rx.Point_e(xyz, times + t0, orientation="y")
+    rx_ex = tdem.receivers.PointElectricField(xyz, times + t0, orientation="x")
+    rx_ey = tdem.receivers.PointElectricField(xyz, times + t0, orientation="y")
+    rx_by = tdem.receivers.PointElectricField(xyz, times + t0, orientation="y")
 
     rxList = [rx_ex, rx_ey, rx_by]
-    src = TDEM.Src.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
-    survey = TDEM.Survey([src])
-    survey.pair(prb)
+    src = tdem.sources.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
+    survey = tdem.survey.Survey([src])
 
-    f = prb.fields(sigma)
+    sim = tdem.simulation.Simulation3DMagneticFluxDensity(mesh, survey=survey, sigma=sigma, verbose=True)
+    sim.Solver = Pardiso
+    sim.solverOpts = {"is_symmetric": False}
+    sim.time_steps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
+    t0 = 0.01 + 1e-4
+    out = waveform_utils.VTEMFun(sim.times, 0.01, t0, 200)
+    wavefun = interp1d(sim.times, out)
+    waveform = tdem.sources.RawWaveform(offTime=t0, waveFct=wavefun)
+    input_currents = wavefun(sim.times)
+
+    f = sim.fields(sigma)
 
     xyzlim = np.array([[xmin, xmax], [ymin, ymax], [-400, 0.0]])
-    actinds, meshCore = Utils.ExtractCoreMesh(xyzlim, mesh)
+    actinds, meshCore = utils.ExtractCoreMesh(xyzlim, mesh)
     Pex = mesh.getInterpolationMat(meshCore.gridCC, locType="Ex")
     Pey = mesh.getInterpolationMat(meshCore.gridCC, locType="Ey")
     Pez = mesh.getInterpolationMat(meshCore.gridCC, locType="Ez")
@@ -150,7 +152,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     def getEBJcore(src0):
         B0 = np.r_[Pfx * f[src0, "b"], Pfy * f[src0, "b"], Pfz * f[src0, "b"]]
         E0 = np.r_[Pex * f[src0, "e"], Pey * f[src0, "e"], Pez * f[src0, "e"]]
-        J0 = Utils.sdiag(np.r_[sigma_core, sigma_core, sigma_core]) * E0
+        J0 = utils.sdiag(np.r_[sigma_core, sigma_core, sigma_core]) * E0
         return E0, B0, J0
 
     E, B, J = getEBJcore(src)
@@ -160,7 +162,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
         "J": J,
         "sigma": sigma_core,
         "mesh": meshCore.serialize(),
-        "time": prb.times - t0,
+        "time": sim.times - t0,
         "input_currents": input_currents,
     }
     dd.io.save(fname, tdem_gs)
@@ -184,7 +186,7 @@ class PlotTDEM(object):
 
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
-        Utils.setKwargs(self, **kwargs)
+        utils.setKwargs(self, **kwargs)
         self.xmin, self.xmax = self.mesh.vectorCCx.min(), self.mesh.vectorCCx.max()
         self.ymin, self.ymax = self.mesh.vectorCCy.min(), self.mesh.vectorCCy.max()
         self.zmin, self.zmax = self.mesh.vectorCCz.min(), self.mesh.vectorCCz.max()
@@ -363,33 +365,33 @@ class PlotTDEM(object):
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
-            xy = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
+            xy = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
             if isz:
-                return Utils.mkvc(vz), xy
+                return utils.mkvc(vz), xy
             else:
-                return np.c_[Utils.mkvc(vx), Utils.mkvc(vy)], xy
+                return np.c_[utils.mkvc(vx), utils.mkvc(vy)], xy
 
         elif normal == "Y":
             ind = np.argmin(abs(mesh.vectorCCx - loc))
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
-            xz = Utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
+            xz = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
             if isz:
-                return Utils.mkvc(vz), xy
+                return utils.mkvc(vz), xy
             else:
-                return np.c_[Utils.mkvc(vx), Utils.mkvc(vz)], xz
+                return np.c_[utils.mkvc(vx), utils.mkvc(vz)], xz
 
         elif normal == "X":
             ind = np.argmin(abs(mesh.vectorCCy - loc))
             vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
             vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
             vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
-            yz = Utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
+            yz = utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
             if isz:
-                return Utils.mkvc(vz), xy
+                return utils.mkvc(vz), xy
             else:
-                return np.c_[Utils.mkvc(vy), Utils.mkvc(vz)], yz
+                return np.c_[utils.mkvc(vy), utils.mkvc(vz)], yz
 
     def plot_electric_currents(self, itime):
         exy, xy = self.getSlices(self.mesh, self.J, itime, normal="Z", loc=-100.5)
@@ -399,11 +401,11 @@ class PlotTDEM(object):
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
         vmin, vmax = abs(np.r_[exz]).min(), abs(np.r_[exz]).max()
-        out_xz = Utils.plot2Ddata(
+        out_xz = utils.plot2Ddata(
             xz, exz, vec=True, ncontour=20, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin, vmax = out_xz[0].get_clim()
-        Utils.plot2Ddata(
+        utils.plot2Ddata(
             xy,
             exy,
             vec=True,
@@ -452,11 +454,11 @@ class PlotTDEM(object):
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
         vmin, vmax = abs(np.r_[byz]).min(), abs(np.r_[byz]).max()
-        out_yz = Utils.plot2Ddata(
+        out_yz = utils.plot2Ddata(
             yz, byz, vec=True, ncontour=20, contourOpts={"cmap": "viridis"}, ax=ax2
         )
         vmin, vmax = out_yz[0].get_clim()
-        Utils.plot2Ddata(
+        utils.plot2Ddata(
             xy,
             bxy,
             vec=True,

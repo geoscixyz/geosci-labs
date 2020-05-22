@@ -24,9 +24,10 @@ from ipywidgets import (
     Widget,
 )
 
-from SimPEG import Mesh, Maps, SolverLU, Utils
-from SimPEG.Utils import ExtractCoreMesh
-from SimPEG.EM.Static import DC
+from discretize import TensorMesh
+from SimPEG import maps, SolverLU, utils
+from SimPEG.utils import ExtractCoreMesh
+from SimPEG.electromagnetics.static import resistivity as DC
 
 from ..base import widgetify
 
@@ -36,8 +37,8 @@ growrate = 2.0
 cs = 20.0
 hx = [(cs, npad, -growrate), (cs, 100), (cs, npad, growrate)]
 hy = [(cs, npad, -growrate), (cs, 50)]
-mesh = Mesh.TensorMesh([hx, hy], "CN")
-expmap = Maps.ExpMap(mesh)
+mesh = TensorMesh([hx, hy], "CN")
+expmap = maps.ExpMap(mesh)
 mapping = expmap
 xmin = -1000.0
 xmax = 1000.0
@@ -105,7 +106,7 @@ def model_valley(
     )
     mtrue[target] = ln_sigtarget * np.ones_like(mtrue[target])
 
-    mtrue = Utils.mkvc(mtrue)
+    mtrue = utils.mkvc(mtrue)
 
     return mtrue, mhalf, mair, mover
 
@@ -133,7 +134,7 @@ def get_Surface(mtrue, A):
             )
         )
         surface.append(mesh.gridCC[idm[-1], 1])
-    return Utils.mkvc(np.r_[idm]), Utils.mkvc(np.r_[surface])
+    return utils.mkvc(np.r_[idm]), utils.mkvc(np.r_[surface])
 
 
 def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
@@ -143,54 +144,50 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
 
     Mx = mesh.gridCC
     # Nx = np.empty(shape =(mesh.nC, 2))
-    rx = DC.Rx.Pole_ky(Mx)
-    # rx = DC.Rx.Dipole(Mx, Nx)
+    rx = DC.receivers.Pole_ky(Mx)
+    # rx = DC.receivers.Dipole(Mx, Nx)
     if B == []:
-        src = DC.Src.Pole([rx], np.r_[A, surfaceA])
+        src = DC.sources.Pole([rx], np.r_[A, surfaceA])
     else:
-        src = DC.Src.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
-    # src = DC.Src.Dipole_ky([rx], np.r_[A, 0.], np.r_[B, 0.])
-    survey = DC.Survey_ky([src])
+        src = DC.sources.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
+    # src = DC.sources.Dipole_ky([rx], np.r_[A, 0.], np.r_[B, 0.])
+    survey = DC.survey.Survey_ky([src])
     # survey = DC.Survey([src])
     # survey_prim = DC.Survey([src])
-    survey_prim = DC.Survey_ky([src])
-    survey_air = DC.Survey_ky([src])
+    survey_prim = DC.survey.Survey_ky([src])
+    survey_air = DC.survey.Survey_ky([src])
     # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem = DC.Problem2D_CC(mesh, sigmaMap=mapping)
+    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping)
     # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Problem2D_CC(mesh, sigmaMap=mapping)
-    problem_air = DC.Problem2D_CC(mesh, sigmaMap=mapping)
+    problem_prim = DC.Simulation2DCellCentered(mesh, survey=survey_prim, sigmaMap=mapping)
+    problem_air = DC.Simulation2DCellCentered(mesh, survey=survey_air, sigmaMap=mapping)
 
     problem.Solver = SolverLU
     problem_prim.Solver = SolverLU
     problem_air.Solver = SolverLU
-
-    problem.pair(survey)
-    problem_prim.pair(survey_prim)
-    problem_air.pair(survey_air)
 
     mesh.setCellGradBC("neumann")
     cellGrad = mesh.cellGrad
     faceDiv = mesh.faceDiv
 
     if whichprimary == "air":
-        phi_primary = survey_prim.dpred(mair)
+        phi_primary = problem_prim.dpred(mair)
     elif whichprimary == "half":
-        phi_primary = survey_prim.dpred(mhalf)
+        phi_primary = problem_prim.dpred(mhalf)
     elif whichprimary == "overburden":
-        phi_primary = survey_prim.dpred(mover)
+        phi_primary = problem_prim.dpred(mover)
     e_primary = -cellGrad * phi_primary
     j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
     q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
     primary_field = {"phi": phi_primary, "e": e_primary, "j": j_primary, "q": q_primary}
 
-    phi_total = survey.dpred(mtrue)
+    phi_total = problem.dpred(mtrue)
     e_total = -cellGrad * phi_total
     j_total = problem.MfRhoI * problem.Grad * phi_total
     q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)
     total_field = {"phi": phi_total, "e": e_total, "j": j_total, "q": q_total}
 
-    phi_air = survey.dpred(mair)
+    phi_air = problem.dpred(mair)
     e_air = -cellGrad * phi_air
     j_air = problem.MfRhoI * problem.Grad * phi_air
     q_air = epsilon_0 * problem.Vol * (faceDiv * e_air)
@@ -209,7 +206,7 @@ def get_Surface_Potentials(mtrue, survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = Utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -285,22 +282,21 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 def getSensitivity(survey, A, B, M, N, model):
 
     if survey == "Dipole-Dipole":
-        rx = DC.Rx.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Dipole":
-        rx = DC.Rx.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
     elif survey == "Dipole-Pole":
-        rx = DC.Rx.Pole_ky(np.r_[M, 0.0])
-        src = DC.Src.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     elif survey == "Pole-Pole":
-        rx = DC.Rx.Pole_ky(np.r_[M, 0.0])
-        src = DC.Src.Pole([rx], np.r_[A, 0.0])
+        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    survey = DC.Survey_ky([src])
-    problem = DC.Problem2D_CC(mesh, sigmaMap=mapping)
+    survey = DC.survey.Survey_ky([src])
+    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, sigmaMap=mapping)
     problem.Solver = SolverLU
-    problem.pair(survey)
     fieldObj = problem.fields(model)
 
     J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
