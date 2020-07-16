@@ -40,7 +40,6 @@ setup(
         "SimPEG>=0.10.4",
         "empymod",
         "jupyter",
-        "ipywidgets",
         "deepdish",
         "Pillow",
         "requests",
