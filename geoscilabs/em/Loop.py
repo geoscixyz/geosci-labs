@@ -14,10 +14,7 @@ from scipy.sparse.linalg import spsolve, splu
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-from SimPEG import Mesh, Utils
-from SimPEG import SolverLU
-from SimPEG.EM import TDEM
-from SimPEG.EM.Analytics.TDEM import hzAnalyticDipoleT, hzAnalyticCentLoopT
+from pymatsolver import Pardiso
 
 
 def rectangular_plane_layout(mesh, corner, closed=False, I=1.0):

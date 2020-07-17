@@ -6,6 +6,7 @@ from ipywidgets import widgets
 from discretize import CylMesh, TensorMesh
 from SimPEG import maps, utils
 from SimPEG.electromagnetics import frequency_domain as fdem
+from pymatsolver import Pardiso
 
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
@@ -191,8 +192,8 @@ class HarmonicVMDCylWidget(object):
         ]
 
         survey = fdem.survey.Survey(self.srcList)
-        sim = fdem.simulation.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu)
-        
+        sim = fdem.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu, solver=Pardiso)
+
         self.f = sim.fields(self.m)
         self.sim = sim
         dpred = sim.dpred(self.m, f=self.f)
@@ -366,18 +367,7 @@ class HarmonicVMDCylWidget(object):
                 ncontour=200,
                 scale=scale,
             )
-            if scale == "linear":
-                # cb = plt.colorbar(
-                #     out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                #     format="%.2e"
-                cb = plt.colorbar(out[0], ax=ax, format="%.2e")
-            elif scale == "log":
-                # cb = plt.colorbar(
-                #     out[0], ax=ax, ticks=np.linspace(val.min(), val.max(), 3),
-                #     format="$10^{%.2f}$"
-                cb = plt.colorbar(out[0], ax=ax, format="$10^{%.1f}$")
-            else:
-                raise Exception("We consider only linear and log scale!")
+            cb = plt.colorbar(out[0], ax=ax, format="%.2e")
             cb.set_label(label)
             xmax = self.mesh2D.gridCC[:, 0].max()
             if Geometry:

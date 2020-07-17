@@ -67,9 +67,9 @@ def choose_source(src_type):
 
 
 def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
-    from SimPEG.EM import TDEM, Analytics, mu_0
+    from SimPEG.electromagnetics import time_domain, mu_0
     import numpy as np
-    from SimPEG import Mesh, Maps, Utils, EM, Survey
+    from SimPEG import maps
     from pymatsolver import Pardiso
 
     cs = 20.0
@@ -91,31 +91,29 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     zmin, zmax = -600, 100.0
 
     times = np.logspace(-5, -2, 21)
-    rxList = EM.TDEM.Rx.Point_dbdt(np.r_[10.0, 0.0, 30.0], times, orientation="z")
+    rxList = time_domain.receivers.PointMagneticFluxTimeDerivative(np.r_[10.0, 0.0, 30.0], times, orientation="z")
     if src_type == "VMD":
-        src = EM.TDEM.Src.CircularLoop(
+        src = time_domain.sources.CircularLoop(
             [rxList],
             loc=np.r_[0.0, 0.0, 30.0],
             orientation="Z",
-            waveform=EM.TDEM.Src.StepOffWaveform(),
+            waveform=time_domain.sources.StepOffWaveform(),
             radius=13.0,
         )
     elif src_type == "HMD":
-        src = EM.TDEM.Src.MagDipole(
+        src = time_domain.sources.MagDipole(
             [rxList],
             loc=np.r_[0.0, 0.0, 30.0],
             orientation="X",
-            waveform=EM.TDEM.Src.StepOffWaveform(),
+            waveform=time_domain.sources.StepOffWaveform(),
         )
     SrcList = [src]
-    survey = EM.TDEM.Survey(SrcList)
+    survey = time_domain.Survey(SrcList)
     sig = 1e-2
     sigma = np.ones(mesh.nC) * sig
     sigma[mesh.gridCC[:, 2] > 0] = 1e-8
-    prb = EM.TDEM.Problem3D_b(mesh, sigmaMap=Maps.IdentityMap(mesh), verbose=True)
-    prb.pair(survey)
-    prb.Solver = Pardiso
-    prb.timeSteps = [
+    prb = time_domain.Simulation3DMagneticFluxDensity(mesh, sigmaMap=maps.IdentityMap(mesh), verbose=True, survey=survey, solver=Pardiso)
+    prb.time_steps = [
         (1e-06, 5),
         (5e-06, 5),
         (1e-05, 10),
