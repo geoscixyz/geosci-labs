@@ -1,13 +1,14 @@
 import numpy as np
-from SimPEG import Mesh
-from SimPEG import Problem
-from SimPEG import Survey
-from SimPEG import DataMisfit
-from SimPEG import Directives
-from SimPEG import Optimization
-from SimPEG import Regularization
-from SimPEG import InvProblem
-from SimPEG import Inversion
+import discretize
+from SimPEG.simulation import LinearSimulation
+from SimPEG.survey import LinearSurvey
+from SimPEG.data import Data
+from SimPEG import data_misfit
+from SimPEG import directives
+from SimPEG import optimization
+from SimPEG import regularization
+from SimPEG import inverse_problem
+from SimPEG import inversion
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -26,8 +27,8 @@ from ipywidgets import (
 import ipywidgets as widgets
 
 
-class LinearInversionCGApp(object):
-    """docstring for LinearInversionApp"""
+class LinearinversionCGApp(object):
+    """docstring for LinearinversionApp"""
 
     # Parameters for sensitivity matrix, G
     N = None
@@ -54,7 +55,7 @@ class LinearInversionCGApp(object):
     save = None
 
     def __init__(self):
-        super(LinearInversionCGApp, self).__init__()
+        super(LinearinversionCGApp, self).__init__()
 
     @property
     def G(self):
@@ -79,7 +80,7 @@ class LinearInversionCGApp(object):
         """
         self.N = N
         self.M = M
-        self._mesh = Mesh.TensorMesh([M])
+        self._mesh = discretize.TensorMesh([M])
         jk = np.linspace(j1, jn, N)
         self._G = np.zeros((N, self.mesh.nC), dtype=float, order="C")
 
@@ -187,14 +188,14 @@ class LinearInversionCGApp(object):
         np.random.seed(1)
 
         if add_noise:
-            survey, _ = self.get_problem_survey()
+            survey, _ = self.get_simulation()
             data = survey.dpred(m)
             noise = (
                 abs(data) * percentage * 0.01 * np.random.randn(self.N)
                 + np.random.randn(self.N) * floor
             )
         else:
-            survey, _ = self.get_problem_survey()
+            survey, _ = self.get_simulation()
             data = survey.dpred(m)
             noise = np.zeros(self.N, float)
 
@@ -259,11 +260,10 @@ class LinearInversionCGApp(object):
                 # ax.yaxis.set_minor_formatter(plt.NullFormatter())
         plt.tight_layout()
 
-    def get_problem_survey(self):
-        prob = Problem.LinearProblem(self.mesh, G=self.G)
-        survey = Survey.LinearSurvey()
-        survey.pair(prob)
-        return survey, prob
+    def get_simulation(self):
+        survey = LinearSurvey()
+        simulation = LinearSimulation(self.mesh, G=self.G, survey=survey)
+        return simulation
 
     def run_inversion_cg(
         self,
@@ -280,51 +280,48 @@ class LinearInversionCGApp(object):
         alpha_x=1.0,
         use_target=False,
     ):
-        survey, prob = self.get_problem_survey()
-        survey.eps = percentage
-        survey.std = floor
-        survey.dobs = self.data.copy()
-        self.uncertainty = percentage * abs(survey.dobs) * 0.01 + floor
+        sim = self.get_simulation()
+        data = Data(sim.survey, dobs=self.data, relative_error=percentage, noise_floor=floor)
+        self.uncertainty = data.uncertainty
 
         m0 = np.ones(self.M) * m0
         mref = np.ones(self.M) * mref
-        reg = Regularization.Tikhonov(
+        reg = regularization.Tikhonov(
             self.mesh, alpha_s=alpha_s, alpha_x=alpha_x, mref=mref
         )
-        dmis = DataMisfit.l2_DataMisfit(survey)
-        dmis.W = 1.0 / self.uncertainty
+        dmis = data_misfit.L2DataMisfit(data=data, simulation=sim)
 
-        opt = Optimization.InexactGaussNewton(maxIter=maxIter, maxIterCG=20)
+        opt = optimization.InexactGaussNewton(maxIter=maxIter, maxIterCG=20)
         opt.remember("xc")
         opt.tolG = 1e-10
         opt.eps = 1e-10
-        invProb = InvProblem.BaseInvProblem(dmis, reg, opt)
-        save = Directives.SaveOutputEveryIteration()
-        beta_schedule = Directives.BetaSchedule(
+        invProb = inverse_problem.BaseInvProblem(dmis, reg, opt)
+        save = directives.SaveOutputEveryIteration()
+        beta_schedule = directives.BetaSchedule(
             coolingFactor=coolingFactor, coolingRate=coolingRate
         )
-        target = Directives.TargetMisfit(chifact=chifact)
+        target = directives.TargetMisfit(chifact=chifact)
 
         if use_target:
-            directives = [
-                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
+            directs = [
+                directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
                 beta_schedule,
                 target,
                 save,
             ]
         else:
-            directives = [
-                Directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
+            directs = [
+                directives.BetaEstimate_ByEig(beta0_ratio=beta0_ratio),
                 beta_schedule,
                 save,
             ]
-        inv = Inversion.BaseInversion(invProb, directiveList=directives)
+        inv = inversion.BaseInversion(invProb, directiveList=directives)
         mopt = inv.run(m0)
         model = opt.recall("xc")
         model.append(mopt)
         pred = []
         for m in model:
-            pred.append(survey.dpred(m))
+            pred.append(sim.dpred(m))
         return model, pred, save
 
     def plot_inversion(

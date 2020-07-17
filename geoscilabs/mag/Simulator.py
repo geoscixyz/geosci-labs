@@ -235,9 +235,6 @@ def PlotFwrSim(
 
 def ViewMagSurvey2D(survey, dobj):
 
-    # survey: a mag.survey.MagneticSurvey object
-    # dobj: a data.Data object
-
     def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
@@ -266,7 +263,7 @@ def ViewMagSurvey2D(survey, dobj):
 
         rxLoc = mag.receivers.Point(rxLoc[ind, :])
         srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=survey.source_field.parameters)
-        surveySim = mag.survey.MagneticSurvey(srcField)
+        surveySim = mag.Survey(srcField)
 
         fig = plt.figure(figsize=(6, 9))
         ax1 = plt.subplot(2, 1, 1)
@@ -542,8 +539,8 @@ def plotObj3D(
     y1, y2 = prism.yn[0] - prism.yc, prism.yn[1] - prism.yc
     z1, z2 = prism.zn[0] - prism.zc, prism.zn[1] - prism.zc
     pinc, pdec = prism.pinc, prism.pdec
-    
-    if isinstance(survey, mag.survey.MagneticSurvey) is False:
+
+    if isinstance(survey, mag.Survey) is False:
         survey = survey[0]
 
     rxLoc = survey.receiver_locations
@@ -733,7 +730,7 @@ def fitline(prism, survey, dobj):
 
         rxLoc = mag.receivers.Point(xyzLoc)
         srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec))
-        survey2D = mag.survey.MagneticSurvey(srcField)
+        survey2D = mag.Survey(srcField)
         sim.survey = survey2D
 
         sim.Q, sim.rinc, sim.rdec = Q, -rinc, rdec

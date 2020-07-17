@@ -285,20 +285,12 @@ class LinearInversionDirectApp(object):
         survey_obj, simulation_obj = self.get_problem_survey()
         data_obj = data.Data(survey_obj, dobs=self.data_vec, noise_floor=self.uncertainty)
         dmis = data_misfit.L2DataMisfit(simulation=simulation_obj, data=data_obj)
-        dmis.W = 1.0 / self.uncertainty
-
-        # survey.eps = percentage
-        # survey.std = floor
-        # survey.dobs = self.data.copy()
-        # self.uncertainty = percentage * abs(survey.dobs) * 0.01 + floor
 
         m0 = np.ones(self.M) * m0
         mref = np.ones(self.M) * mref
         reg = regularization.Tikhonov(
             self.mesh_prop, alpha_s=alpha_s, alpha_x=alpha_x, mref=mref
         )
-        # dmis = data_misfit.L2DataMisfit(survey)
-        # dmis.W = 1.0 / self.uncertainty
 
         betas = np.logspace(np.log10(beta_min), np.log10(beta_max), n_beta)[::-1]
 

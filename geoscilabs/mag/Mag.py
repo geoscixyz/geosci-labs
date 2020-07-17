@@ -321,7 +321,7 @@ def createMagSurvey(xyzd, B):
 
     rxLoc = mag.receivers.Point(xyzd[:, :3])
     source_field = mag.sources.SourceField(receiver_list=[rxLoc], parameters=B)
-    survey = mag.survey.MagneticSurvey(source_field)
+    survey = mag.Survey(source_field)
     dobj = data.Data(survey, xyzd[:, 3])
 
     return survey, dobj
