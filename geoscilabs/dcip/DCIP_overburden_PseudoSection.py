@@ -33,6 +33,7 @@ from SimPEG import maps, SolverLU, utils
 from SimPEG.utils import ExtractCoreMesh
 from SimPEG.electromagnetics.static import resistivity as DC
 from SimPEG.electromagnetics.static import induced_polarization as IP
+from pymatsolver import Pardiso
 
 from ..base import widgetify
 
@@ -67,6 +68,17 @@ indy = (
     & (mesh.gridFy[:, 1] <= ymax)
 )
 indF = np.concatenate((indx, indy))
+
+_cache = {
+    "A": None,
+    "B": None,
+    "mtrue": None,
+    "mhalf": None,
+    "mair": None,
+    "mover": None,
+    "whichprimary": None,
+    "target_wide": None
+}
 
 nmax = 8
 
@@ -151,67 +163,64 @@ def get_Surface(mtrue, A):
 
 
 def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
+    re_run = (
+        _cache["A"] != A
+        or _cache["B"] != B
+        or np.any(_cache["mtrue"] != mtrue)
+        or np.any(_cache["mhalf"] != mhalf)
+        or np.any(_cache["mair"] != mair)
+        or np.any(_cache["mover"] != mover)
+        or _cache["whichprimary"] != whichprimary
+    )
+    if re_run:
 
-    idA, surfaceA = get_Surface(mtrue, A)
-    idB, surfaceB = get_Surface(mtrue, B)
+        idA, surfaceA = get_Surface(mtrue, A)
+        idB, surfaceB = get_Surface(mtrue, B)
+        if B == []:
+            src = DC.sources.Pole([], np.r_[A, surfaceA])
+        else:
+            src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
+        survey = DC.Survey([src])
+        # Create three simulations so the fields object is accurate
+        sim_primary = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        sim_total = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        sim_air = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
 
-    Mx = mesh.gridCC
-    # Nx = np.empty(shape =(mesh.nC, 2))
-    rx = DC.receivers.Pole_ky(Mx)
-    # rx = DC.receivers.Dipole_ky(Mx, Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, surfaceA])
+        mesh.setCellGradBC("neumann")
+
+        if whichprimary == "air":
+            primary_field = sim_primary.fields(mair)
+        elif whichprimary == "half":
+            primary_field = sim_primary.fields(mhalf)
+        elif whichprimary == "overburden":
+            primary_field = sim_primary.fields(mover)
+        air_field = sim_total.fields(mtrue)
+        total_field = sim_air.fields(mair)
+
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["mair"] = mair
+        _cache["mover"] = mover
+        _cache["whichprimary"] = whichprimary
+
+        _cache["src"] = src
+        _cache["primary_field"] = primary_field
+        _cache["air_field"] = air_field
+        _cache["total_field"] = total_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
-    # src = DC.sources.Dipole([rx], np.r_[A, 0.], np.r_[B, 0.])
-    survey = DC.Survey_ky([src])
-    # survey = DC.Survey_ky([src])
-    # survey_prim = DC.Survey_ky([src])
-    survey_prim = DC.Survey_ky([src])
-    survey_air = DC.Survey_ky([src])
-    # problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=mapping)
-    # problem_prim = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_prim, sigmaMap=mapping)
-    problem_air = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_air, sigmaMap=mapping)
-
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-    problem_air.Solver = SolverLU
-
-    mesh.setCellGradBC("neumann")
-    cellGrad = mesh.cellGrad
-    faceDiv = mesh.faceDiv
-
-    if whichprimary == "air":
-        phi_primary = survey_prim.dpred(mair)
-    elif whichprimary == "half":
-        phi_primary = survey_prim.dpred(mhalf)
-    elif whichprimary == "overburden":
-        phi_primary = survey_prim.dpred(mover)
-    e_primary = -cellGrad * phi_primary
-    j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
-    q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
-    primary_field = {"phi": phi_primary, "e": e_primary, "j": j_primary, "q": q_primary}
-
-    phi_total = survey.dpred(mtrue)
-    e_total = -cellGrad * phi_total
-    j_total = problem.MfRhoI * problem.Grad * phi_total
-    q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)
-    total_field = {"phi": phi_total, "e": e_total, "j": j_total, "q": q_total}
-
-    phi_air = survey.dpred(mair)
-    e_air = -cellGrad * phi_air
-    j_air = problem.MfRhoI * problem.Grad * phi_air
-    q_air = epsilon_0 * problem.Vol * (faceDiv * e_air)
-    air_field = {"phi": phi_air, "e": e_air, "j": j_air, "q": q_air}
+        src = _cache["src"]
+        primary_field = _cache["primary_field"]
+        air_field = _cache["air_field"]
+        total_field = _cache["total_field"]
 
     return src, primary_field, air_field, total_field
 
 
 def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
-    phi = field_obj["phi"]
+    phi = field_obj[src, "phi"]
     # CCLoc = mesh.gridCC
     XLoc = np.unique(mesh.gridCC[:, 0])
     surfaceInd, zsurfaceLoc = get_Surface(mtrue, XLoc)
@@ -290,27 +299,21 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 
 
 def getSensitivity(survey, A, B, M, N, model):
+    src_type, rx_type = survey.split('-')
+    if rx_type == "dipole":
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    else:
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
 
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == 'dipole':
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+    else:
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    survey = DC.Survey_ky([src])
-    problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    problem.pair(survey)
-    fieldObj = problem.fields(model)
+    survey = DC.Survey([src])
+    problem = DC.Simulation2DCellCentered(mesh, sigmaMap=mapping, solver=Pardiso, survey=survey)
 
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
+    J = problem.getJ(model)[0]
 
     return J
 
@@ -383,7 +386,7 @@ def getPseudoLocs(xr, ntx, nmax, flag="PoleDipole"):
     return np.c_[xlocvec, ylocvec]
 
 
-def DC2Dsurvey(mtrue, flag="PoleDipole", nmax=8):
+def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
 
     if flag == "PoleDipole":
         ntx = xr.size - 2
@@ -457,18 +460,17 @@ def DC2Dsurvey(mtrue, flag="PoleDipole", nmax=8):
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
 
-        rx = DC.receivers.Dipole_ky(M, N)
+        rx = DC.receivers.Dipole(M, N)
         src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = DC.Survey_ky(txList)
-    problem = DC.simulation_2d.Problem2D_CC(mesh, sigmaMap=mapping)
-    problem.pair(survey)
+    survey = DC.Survey(txList)
+    simulation = DC.Simulation2DCellCentered(mesh, sigmaMap=mapping, survey=survey, solver=Pardiso)
 
-    return survey, xzlocs
+    return simulation, xzlocs
 
 
-def IP2Dsurvey(miptrue, sigmadc, flag="PoleDipole", nmax=8):
+def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
 
     if flag == "PoleDipole":
         ntx = xr.size - 2
@@ -542,15 +544,14 @@ def IP2Dsurvey(miptrue, sigmadc, flag="PoleDipole", nmax=8):
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
 
-        rx = DC.receivers.Dipole_ky(M, N)
+        rx = DC.receivers.Dipole(M, N)
         src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = IP.Survey_ky(txList)
-    problem = IP.simulation_2d.Problem2D_CC(mesh, sigma=sigmadc, etaMap=maps.IdentityMap(mesh))
-    problem.pair(survey)
+    survey = IP.Survey(txList)
+    simulation = IP.Simulation2DCellCentred(mesh, sigma=sigmadc, etaMap=maps.IdentityMap(mesh), survey=survey, solver=Pardiso)
 
-    return survey, xzlocs
+    return simulation, xzlocs
 
 
 def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
@@ -722,7 +723,7 @@ def DipoleDipolefun(i):
     return
 
 
-def PseudoSectionWidget(survey, flag):
+def PseudoSectionWidget(simulation, flag):
     if flag == "PoleDipole":
         ntx, nmax = xr.size - 2, 8
     elif flag == "DipolePole":
@@ -731,7 +732,7 @@ def PseudoSectionWidget(survey, flag):
         ntx, nmax = xr.size - 3, 8
 
     def PseudoSectionPlot(i, j, flag):
-        return PseudoSectionPlotfnc(i, j, survey, flag)
+        return PseudoSectionPlotfnc(i, j, simulation.survey, flag)
 
     return widgetify(
         PseudoSectionPlot,
@@ -810,13 +811,13 @@ def DCIP2Dfwdfun(
         )
 
         sigmadc = 1.0 / (mapping * mdctrue)
-        survey, xzlocs = IP2Dsurvey(mtrue, sigmadc, surveyType, nmax=nmax)
+        simulation, xzlocs = IP2Dsimulation(mtrue, sigmadc, surveyType, nmax=nmax)
 
     else:
-        survey, xzlocs = DC2Dsurvey(mtrue, surveyType, nmax=nmax)
+        simulation, xzlocs = DC2Dsimulation(mtrue, surveyType, nmax=nmax)
 
-    dmover = survey.dpred(mover)
-    dpred = survey.dpred(mtrue)
+    dmover = simulation.dpred(mover)
+    dpred = simulation.dpred(mtrue)
     xi, yi = np.meshgrid(
         np.linspace(xr.min(), xr.max(), 120), np.linspace(1.0, nmax, 100)
     )
@@ -826,11 +827,11 @@ def DCIP2Dfwdfun(
     if which == "IP":
         mtest = 10.0 * np.ones_like(mtrue)
         mtest[mdctrue == np.log(1e-8)] = 0.0
-        dhalf = survey.dpred(mtest)
+        dhalf = simulation.dpred(mtest)
         appresover = 10.0 * (dmover / dhalf)
         apprestrue = 10.0 * (dpred / dhalf)
     else:
-        dmair = survey.dpred(mair)
+        dmair = simulation.dpred(mair)
         appresover = dmover / dmair / np.exp(ln_sigHalf)
         apprestrue = dpred / dmair / np.exp(ln_sigHalf)
 

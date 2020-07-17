@@ -17,6 +17,7 @@ import matplotlib.patches as patches
 from SimPEG import maps, SolverLU, utils
 from SimPEG.utils import ExtractCoreMesh
 from SimPEG.electromagnetics.static import resistivity as DC
+from pymatsolver import Pardiso
 
 from discretize import TensorMesh
 
@@ -58,54 +59,69 @@ indy = (
 )
 indF = np.concatenate((indx, indy))
 
+_cache = {
+    "A": None,
+    "B": None,
+    "zcLayer": None,
+    "dzLayer": None,
+    "xc": None,
+    "zc": None,
+    "r": None,
+    "sigLayer": None,
+    "sigTarget": None,
+    "sigHalf": None,
+}
 
 def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf):
-    # Create halfspace model
-    halfspaceMod = sigHalf * np.ones([mesh.nC])
-    mhalf = np.log(halfspaceMod)
-    # Add layer to model
-    LayerMod = addLayer2Mod(zcLayer, dzLayer, halfspaceMod, sigLayer)
 
-    # Add plate or cylinder
-    # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
-    fullMod = addCylinder2Mod(xc, zc, r, LayerMod, sigTarget)
-    mtrue = np.log(fullMod)
+    re_run = (
+        _cache["A"] != A or _cache["B"] != B or _cache["zcLayer"] != zcLayer
+        or _cache["dzLayer"] != dzLayer or _cache['xc'] != xc or _cache['zc'] != zc
+        or _cache["r"] != r or _cache["sigLayer"] != sigLayer
+        or _cache["sigTarget"] != sigTarget or _cache["sigHalf"] != sigHalf
+    )
+    if re_run:
+        # Create halfspace model
+        halfspaceMod = sigHalf * np.ones([mesh.nC])
+        mhalf = np.log(halfspaceMod)
+        # Add layer to model
+        LayerMod = addLayer2Mod(zcLayer, dzLayer, halfspaceMod, sigLayer)
 
-    Mx = mesh.gridCC
-    # Nx = np.empty(shape=(mesh.nC, 2))
-    rx = DC.receivers.Pole_ky(Mx)
-    # rx = DC.receivers.Dipole(Mx,Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
+        # Add plate or cylinder
+        fullMod = addCylinder2Mod(xc, zc, r, LayerMod, sigTarget)
+        mtrue = np.log(fullMod)
+        if B == []:
+            src = DC.sources.Pole([], np.r_[A, 0.0])
+        else:
+            src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
+        survey = DC.Survey([src])
+        sim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        total_field = sim.fields(mtrue)
+        sim_prim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        primary_field = sim_prim.fields(mhalf)
+
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["zcLayer"] = zcLayer
+        _cache["dzLayer"] = dzLayer
+        _cache['xc'] = xc
+        _cache['zc'] = zc
+        _cache['r'] = r
+        _cache['sigLayer'] = sigLayer
+        _cache['sigTarget'] = sigTarget
+        _cache['sigHalf'] = sigHalf
+
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["src"] = src
+        _cache["total_field"] = total_field
+        _cache["primary_field"] = primary_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    # src = DC.sources.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
-    survey = DC.survey.Survey_ky([src])
-    # survey = DC.Survey([src])
-    # survey_prim = DC.Survey([src])
-    survey_prim = DC.survey.Survey_ky([src])
-    # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping)
-    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey_prim, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-
-    mesh.setCellGradBC("neumann")
-    cellGrad = mesh.cellGrad
-    faceDiv = mesh.faceDiv
-
-    phi_primary = problem_prim.dpred(mhalf)
-    e_primary = -cellGrad * phi_primary
-    j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
-    q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
-    primary_field = {"phi": phi_primary, "e": e_primary, "j": j_primary, "q": q_primary}
-
-    phi_total = problem.dpred(mtrue)
-    e_total = -cellGrad * phi_total
-    j_total = problem.MfRhoI * problem.Grad * phi_total
-    q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)
-    total_field = {"phi": phi_total, "e": e_total, "j": j_total, "q": q_total}
+        mtrue = _cache["mtrue"]
+        mhalf = _cache["mhalf"]
+        src = _cache["src"]
+        total_field = _cache["total_field"]
+        primary_field = _cache["primary_field"]
 
     return mtrue, mhalf, src, primary_field, total_field
 
@@ -120,15 +136,6 @@ def addLayer2Mod(zcLayer, dzLayer, mod, sigLayer):
     belowInd = np.where(CCLocs[:, 1] <= zmax)[0]
     aboveInd = np.where(CCLocs[:, 1] >= zmin)[0]
     layerInds = list(set(belowInd).intersection(aboveInd))
-
-    # # Check selected cell centers by plotting
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # plt.scatter(CCLocs[layerInds,0],CCLocs[layerInds,1])
-    # ax.set_xlim(-40,40)
-    # ax.set_ylim(-35,0)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
 
     mod[layerInds] = sigLayer
     return mod
@@ -251,7 +258,7 @@ def addPlate2Mod(xc, zc, dx, dz, rotAng, modd, sigPlate):
 
 def get_Surface_Potentials(survey, src, field_obj):
 
-    phi = field_obj["phi"]
+    phi = field_obj[src, "phi"]
     CCLoc = mesh.gridCC
     zsurfaceLoc = np.max(CCLoc[:, 1])
     surfaceInd = np.where(CCLoc[:, 1] == zsurfaceLoc)
@@ -331,28 +338,21 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+    src_type, rx_type = survey.split('-')
+    if rx_type == 'Pole':
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
+    else:
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == 'Pole':
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+    else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    survey = DC.Survey_ky([src])
-    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    fieldObj = problem.fields(model)
+    Src = DC.Survey([src])
+    sim = DC.Simulation2DCellCentered(mesh, survey=Src, sigmaMap=mapping, solver=Pardiso)
+    J = sim.getJ(model)
 
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
-
-    return J
+    return J[0]
 
 
 def calculateRhoA(survey, VM, VN, A, B, M, N):
@@ -543,20 +543,20 @@ def PLOT(
             # formatter = LogFormatter(10, labelOnlyBase=False)
             # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
 
-            u = total_field["phi"] - phiScaleTotal
+            u = total_field[src, "phi"] - phiScaleTotal
 
         elif Type == "Primary":
             # formatter = LogFormatter(10, labelOnlyBase=False)
             # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh=10, linscale=0.1)}
 
-            u = primary_field["phi"] - phiScalePrim
+            u = primary_field[src, "phi"] - phiScalePrim
 
         elif Type == "Secondary":
             # formatter = None
             # pcolorOpts = {"cmap":"viridis"}
 
-            uTotal = total_field["phi"] - phiScaleTotal
-            uPrim = primary_field["phi"] - phiScalePrim
+            uTotal = total_field[src, "phi"] - phiScaleTotal
+            uPrim = primary_field[src, "phi"] - phiScalePrim
             u = uTotal - uPrim
 
     elif Field == "E":
@@ -574,14 +574,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["e"]
+            u = total_field[src, "e"]
 
         elif Type == "Primary":
-            u = primary_field["e"]
+            u = primary_field[src, "e"]
 
         elif Type == "Secondary":
-            uTotal = total_field["e"]
-            uPrim = primary_field["e"]
+            uTotal = total_field[src, "e"]
+            uPrim = primary_field[src, "e"]
             u = uTotal - uPrim
 
     elif Field == "J":
@@ -599,14 +599,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["j"]
+            u = total_field[src, "j"]
 
         elif Type == "Primary":
-            u = primary_field["j"]
+            u = primary_field[src, "j"]
 
         elif Type == "Secondary":
-            uTotal = total_field["j"]
-            uPrim = primary_field["j"]
+            uTotal = total_field[src, "j"]
+            uPrim = primary_field[src, "j"]
             u = uTotal - uPrim
 
     elif Field == "Charge":
@@ -628,14 +628,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["q"]
+            u = total_field[src, "charge"]
 
         elif Type == "Primary":
-            u = primary_field["q"]
+            u = primary_field[src, "charge"]
 
         elif Type == "Secondary":
-            uTotal = total_field["q"]
-            uPrim = primary_field["q"]
+            uTotal = total_field[src, "charge"]
+            uPrim = primary_field[src, "charge"]
             u = uTotal - uPrim
 
     elif Field == "Sensitivity":
@@ -677,12 +677,12 @@ def PLOT(
         eps = 0.0
     dat = meshcore.plotImage(
         u[ind] + eps,
-        vType=xtype,
+        v_type=xtype,
         ax=ax[1],
         grid=False,
         view=view,
-        streamOpts=streamOpts,
-        pcolorOpts=pcolorOpts,
+        stream_opts=streamOpts,
+        pcolor_opts=pcolorOpts,
     )  # gridOpts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
@@ -701,8 +701,8 @@ def PLOT(
         ax[1].plot(layerX, layerBottomY, linestyle="dashed", color="k")
 
     if (Field == "Charge") and (Type != "Primary") and (Type != "Total"):
-        qTotal = total_field["q"]
-        qPrim = primary_field["q"]
+        qTotal = total_field[src, "charge"]
+        qPrim = primary_field[src, "charge"]
         qSecondary = qTotal - qPrim
         qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc = sumCylinderCharges(
             xc, zc, r, qSecondary
@@ -843,6 +843,7 @@ def PLOT(
             cb = plt.colorbar(
                 dat[0], ax=cbar_ax, format=formatter, ticks=np.linspace(vmin, vmax, 5)
             )
+
     # t_logloc = matplotlib.ticker.LogLocator(base=10.0, subs=[1.0,2.], numdecs=4, numticks=8)
     # tick_locator = matplotlib.ticker.SymmetricalLogLocator(t_logloc)
     # cb.locator = tick_locator
@@ -860,7 +861,6 @@ def PLOT(
 def ResLayer_app():
     app = widgetify(
         PLOT,
-        manual=True,
         survey=ToggleButtons(
             options=["Dipole-Dipole", "Dipole-Pole", "Pole-Dipole", "Pole-Pole"],
             value="Dipole-Dipole",

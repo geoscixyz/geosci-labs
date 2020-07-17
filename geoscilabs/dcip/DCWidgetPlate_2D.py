@@ -15,6 +15,7 @@ import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
+from pymatsolver import Pardiso
 
 from discretize import TensorMesh
 from SimPEG import maps, SolverLU, utils
@@ -55,33 +56,71 @@ indy = (
 )
 indF = np.concatenate((indx, indy))
 
+_cache = {
+    "A": None,
+    "B": None,
+    "dx": None,
+    "dz": None,
+    "xc": None,
+    "zc": None,
+    "rotAng": None,
+    "sigplate": None,
+    "sighalf": None
+}
 
 def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
-    # Create halfspace model
-    mhalf = np.log(sighalf * np.ones([mesh.nC]))
+    re_run = (
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["dx"] != dx
+        or _cache["dz"] != dz
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
+        or _cache["rotAng"] != rotAng
+        or _cache["sigplate"] != sigplate
+        or _cache["sighalf"] != sighalf
+    )
+    if re_run:
+        # Create halfspace model
+        mhalf = np.log(sighalf * np.ones([mesh.nC]))
 
-    # Create true model with plate
-    mtrue = createPlateMod(xc, zc, dx, dz, rotAng, sigplate, sighalf)
+        # Create true model with plate
+        mtrue = createPlateMod(xc, zc, dx, dz, rotAng, sigplate, sighalf)
+        if B == []:
+            src = DC.sources.Pole([], np.r_[A, 0.0])
+        else:
+            src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
 
-    Mx = np.empty(shape=(0, 2))
-    Nx = np.empty(shape=(0, 2))
-    rx = DC.receivers.Dipole(Mx, Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
+        survey = DC.survey.Survey([src])
+
+        problem = DC.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        problem_prim = DC.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+
+        primary_field = problem_prim.fields(mhalf)
+
+        total_field = problem.fields(mtrue)
+
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["dx"] = dx
+        _cache["dz"] = dz
+        _cache["xc"] = xc
+        _cache["zc"] = zc
+        _cache["rotAng"] = rotAng
+        _cache["sigplate"] = sigplate
+        _cache["sighalf"] = sighalf
+
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["src"] = src
+        _cache["primary_field"] = primary_field
+        _cache["total_field"] = total_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-
-    survey = DC.survey.Survey([src])
-    survey_prim = DC.survey.Survey([src])
-
-    problem = DC.simulation.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping)
-    problem_prim = DC.simulation.Simulation3DCellCentered(mesh, survey=survey_prim, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-
-    primary_field = problem_prim.fields(mhalf)
-
-    total_field = problem.fields(mtrue)
+        mtrue = _cache["mtrue"]
+        mhalf = _cache["mhalf"]
+        src = _cache["src"]
+        primary_field = _cache["primary_field"]
+        total_field = _cache["total_field"]
 
     return mtrue, mhalf, src, primary_field, total_field
 
@@ -237,31 +276,23 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
+    src_type, rx_type = survey.split('-')
+    if rx_type == 'Pole':
         rx = DC.receivers.Pole(np.r_[M, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole(np.r_[M, 0.0])
+    else:
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == 'Pole':
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
+    else:
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     # Model mappings
     expmap = maps.ExpMap(mesh)
     mapping = expmap
 
     survey = DC.Survey([src])
-    problem = DC.Problem3D_CC(mesh, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    problem.pair(survey)
-    fieldObj = problem.fields(model)
-
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
+    sim = DC.Simulation3DCellCentered(mesh, sigmaMap=mapping, solver=Pardiso, survey=survey)
+    J = sim.getJ(model)[0]
 
     return J
 
@@ -607,12 +638,12 @@ def plot_Surface_Potentials(
         eps = 0.0
     dat = meshcore.plotImage(
         u[ind] + eps,
-        vType=xtype,
+        v_type=xtype,
         ax=ax[1],
         grid=False,
         view=view,
-        streamOpts=streamOpts,
-        pcolorOpts=pcolorOpts,
+        stream_opts=streamOpts,
+        pcolor_opts=pcolorOpts,
     )  # gridOpts={'color':'k', 'alpha':0.5}
 
     # Get plate corners

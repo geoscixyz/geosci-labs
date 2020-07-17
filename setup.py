@@ -37,7 +37,7 @@ setup(
         "scipy>=1.0",
         "matplotlib>2.1",
         "ipywidgets",
-        "SimPEG>=0.10.4",
+        "SimPEG>=0.14.0",
         "empymod",
         "jupyter",
         "deepdish",

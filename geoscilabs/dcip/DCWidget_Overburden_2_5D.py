@@ -25,9 +25,11 @@ from ipywidgets import (
 )
 
 from discretize import TensorMesh
-from SimPEG import maps, SolverLU, utils
+from SimPEG import maps, utils
 from SimPEG.utils import ExtractCoreMesh
 from SimPEG.electromagnetics.static import resistivity as DC
+
+from pymatsolver import Pardiso
 
 from ..base import widgetify
 
@@ -60,6 +62,16 @@ indy = (
 )
 indF = np.concatenate((indx, indy))
 
+_cache = {
+    "A": None,
+    "B": None,
+    "mtrue": None,
+    "mhalf": None,
+    "mair": None,
+    "mover": None,
+    "whichprimary": None,
+    "target_wide": None
+}
 
 def model_valley(
     lnsig_air=np.log(1e-8),
@@ -139,66 +151,62 @@ def get_Surface(mtrue, A):
 
 def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
 
-    idA, surfaceA = get_Surface(mtrue, A)
-    idB, surfaceB = get_Surface(mtrue, B)
+    re_run = (
+        _cache["A"] != A
+        or _cache["B"] != B
+        or np.any(_cache["mtrue"] != mtrue)
+        or np.any(_cache["mhalf"] != mhalf)
+        or np.any(_cache["mair"] != mair)
+        or np.any(_cache["mover"] != mover)
+        or _cache["whichprimary"] != whichprimary
+    )
+    if re_run:
 
-    Mx = mesh.gridCC
-    # Nx = np.empty(shape =(mesh.nC, 2))
-    rx = DC.receivers.Pole_ky(Mx)
-    # rx = DC.receivers.Dipole(Mx, Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, surfaceA])
+        idA, surfaceA = get_Surface(mtrue, A)
+        idB, surfaceB = get_Surface(mtrue, B)
+        if B == []:
+            src = DC.sources.Pole([], np.r_[A, surfaceA])
+        else:
+            src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
+        survey = DC.survey.Survey([src])
+        problem = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        problem_prim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        problem_air = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+
+        if whichprimary == "air":
+            primary_field = problem_prim.fields(mair)
+        elif whichprimary == "half":
+            primary_field = problem_prim.fields(mhalf)
+        elif whichprimary == "overburden":
+            primary_field = problem_prim.fields(mover)
+        total_field = problem.fields(mtrue)
+        air_field = problem_air.fields(mair)
+
+
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["mair"] = mair
+        _cache["mover"] = mover
+        _cache["whichprimary"] = whichprimary
+
+        _cache["src"] = src
+        _cache["primary_field"] = primary_field
+        _cache["air_field"] = air_field
+        _cache["total_field"] = total_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, surfaceA], np.r_[B, surfaceB])
-    # src = DC.sources.Dipole_ky([rx], np.r_[A, 0.], np.r_[B, 0.])
-    survey = DC.survey.Survey_ky([src])
-    # survey = DC.Survey([src])
-    # survey_prim = DC.Survey([src])
-    survey_prim = DC.survey.Survey_ky([src])
-    survey_air = DC.survey.Survey_ky([src])
-    # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping)
-    # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
-    problem_prim = DC.Simulation2DCellCentered(mesh, survey=survey_prim, sigmaMap=mapping)
-    problem_air = DC.Simulation2DCellCentered(mesh, survey=survey_air, sigmaMap=mapping)
-
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-    problem_air.Solver = SolverLU
-
-    mesh.setCellGradBC("neumann")
-    cellGrad = mesh.cellGrad
-    faceDiv = mesh.faceDiv
-
-    if whichprimary == "air":
-        phi_primary = problem_prim.dpred(mair)
-    elif whichprimary == "half":
-        phi_primary = problem_prim.dpred(mhalf)
-    elif whichprimary == "overburden":
-        phi_primary = problem_prim.dpred(mover)
-    e_primary = -cellGrad * phi_primary
-    j_primary = problem_prim.MfRhoI * problem_prim.Grad * phi_primary
-    q_primary = epsilon_0 * problem_prim.Vol * (faceDiv * e_primary)
-    primary_field = {"phi": phi_primary, "e": e_primary, "j": j_primary, "q": q_primary}
-
-    phi_total = problem.dpred(mtrue)
-    e_total = -cellGrad * phi_total
-    j_total = problem.MfRhoI * problem.Grad * phi_total
-    q_total = epsilon_0 * problem.Vol * (faceDiv * e_total)
-    total_field = {"phi": phi_total, "e": e_total, "j": j_total, "q": q_total}
-
-    phi_air = problem.dpred(mair)
-    e_air = -cellGrad * phi_air
-    j_air = problem.MfRhoI * problem.Grad * phi_air
-    q_air = epsilon_0 * problem.Vol * (faceDiv * e_air)
-    air_field = {"phi": phi_air, "e": e_air, "j": j_air, "q": q_air}
+        src = _cache["src"]
+        primary_field = _cache["primary_field"]
+        air_field = _cache["air_field"]
+        total_field = _cache["total_field"]
 
     return src, primary_field, air_field, total_field
 
 
 def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
-    phi = field_obj["phi"]
+    phi = field_obj[src, "phi"]
     # CCLoc = mesh.gridCC
     XLoc = np.unique(mesh.gridCC[:, 0])
     surfaceInd, zsurfaceLoc = get_Surface(mtrue, XLoc)
@@ -280,26 +288,19 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+    src_type, rx_type = survey.split('-')
+    if rx_type == 'Pole':
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
+    else:
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == 'Pole':
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+    else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    survey = DC.survey.Survey_ky([src])
-    problem = DC.simulation_2d.Simulation2DCellCentered(mesh, sigmaMap=mapping)
-    problem.Solver = SolverLU
-    fieldObj = problem.fields(model)
-
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
+    Src = DC.Survey([src])
+    sim = DC.Simulation2DCellCentered(mesh, survey=Src, sigmaMap=mapping, solver=Pardiso)
+    J = sim.getJ(model)[0]
 
     return J
 
@@ -534,20 +535,20 @@ def PLOT(
             # formatter = LogFormatter(10, labelOnlyBase =False)
             # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh =10, linscale =0.1)}
 
-            u = total_field["phi"] - phiScaleTotal
+            u = total_field[src, "phi"] - phiScaleTotal
 
         elif Type == "Primary":
             # formatter = LogFormatter(10, labelOnlyBase =False)
             # pcolorOpts = {'norm':matplotlib.colors.SymLogNorm(linthresh =10, linscale =0.1)}
 
-            u = primary_field["phi"] - phiScalePrim
+            u = primary_field[src, "phi"] - phiScalePrim
 
         elif Type == "Secondary":
             # formatter = None
             # pcolorOpts = {"cmap":"viridis"}
 
-            uTotal = total_field["phi"] - phiScaleTotal
-            uPrim = primary_field["phi"] - phiScalePrim
+            uTotal = total_field[src, "phi"] - phiScaleTotal
+            uPrim = primary_field[src, "phi"] - phiScalePrim
             u = uTotal - uPrim
 
     elif Field == "E":
@@ -565,14 +566,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["e"]
+            u = total_field[src, "e"]
 
         elif Type == "Primary":
-            u = primary_field["e"]
+            u = primary_field[src, "e"]
 
         elif Type == "Secondary":
-            uTotal = total_field["e"]
-            uPrim = primary_field["e"]
+            uTotal = total_field[src, "e"]
+            uPrim = primary_field[src, "e"]
             u = uTotal - uPrim
 
     elif Field == "J":
@@ -590,14 +591,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["j"]
+            u = total_field[src, "j"]
 
         elif Type == "Primary":
-            u = primary_field["j"]
+            u = primary_field[src, "j"]
 
         elif Type == "Secondary":
-            uTotal = total_field["j"]
-            uPrim = primary_field["j"]
+            uTotal = total_field[src, "j"]
+            uPrim = primary_field[src, "j"]
             u = uTotal - uPrim
 
     elif Field == "Charge":
@@ -619,14 +620,14 @@ def PLOT(
         formatter = "%.1e"
 
         if Type == "Total":
-            u = total_field["q"]
+            u = total_field[src, "charge"]
 
         elif Type == "Primary":
-            u = primary_field["q"]
+            u = primary_field[src, "charge"]
 
         elif Type == "Secondary":
-            uTotal = total_field["q"]
-            uPrim = primary_field["q"]
+            uTotal = total_field[src, "charge"]
+            uPrim = primary_field[src, "charge"]
             u = uTotal - uPrim
 
     elif Field == "Sensitivity":
@@ -671,12 +672,12 @@ def PLOT(
     # print xtype
     dat = meshcore.plotImage(
         u[ind] + eps,
-        vType=xtype,
+        v_type=xtype,
         ax=ax[1],
         grid=False,
         view=view,
-        streamOpts=streamOpts,
-        pcolorOpts=pcolorOpts,
+        stream_opts=streamOpts,
+        pcolor_opts=pcolorOpts,
     )  # gridOpts ={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
@@ -884,7 +885,6 @@ def PLOT(
 def valley_app():
     app = widgetify(
         PLOT,
-        manual=True,
         survey=ToggleButtons(
             options=["Dipole-Dipole", "Dipole-Pole", "Pole-Dipole", "Pole-Pole"],
             value="Dipole-Dipole",

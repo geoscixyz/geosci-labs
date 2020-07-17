@@ -13,7 +13,8 @@ from matplotlib import rcParams
 
 from discretize import TensorMesh
 
-from SimPEG import maps, utils, SolverLU
+from SimPEG import maps, utils
+from pymatsolver import Pardiso
 
 from ..base import widgetify
 
@@ -175,7 +176,7 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
         * utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
         * mesh.cellGrad
     )
-    Ainv = SolverLU(A)
+    Ainv = Pardiso(A)
 
     V = Ainv * q
     return V
@@ -209,9 +210,9 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
     fontsize = 16.0
     ylim = np.r_[-1.0, 1.0] * rhomax / (5 * 2 * np.pi) * 1.5
 
-    fig, ax = plt.subplots(2, 1, figsize=(9, 7))
+    fig, ax = plt.subplots(2, 1, figsize=(9 * 1.5, 9 * 1.8), sharex=True)
+    fig.subplots_adjust(right=0.8, wspace=0.05, hspace=0.05)
 
-    fig.subplots_adjust(right=0.8)
     x = np.linspace(-40.0, 40.0, 200)
     z = np.linspace(x.min(), 0, 100)
 
@@ -461,7 +462,6 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
     ax[1].annotate("M", xy=xytextM1, xytext=xytextM1, fontsize=fontsize)
     ax[1].annotate("N", xy=xytextN1, xytext=xytextN1, fontsize=fontsize)
 
-    plt.tight_layout()
     plt.show()
     return fig, ax
 
