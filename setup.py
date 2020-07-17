@@ -43,6 +43,7 @@ setup(
         "deepdish",
         "Pillow",
         "requests",
+        "cvxopt"
     ],
     author="GeoSci Developers",
     author_email="lindseyheagy@gmail.com",
