@@ -39,7 +39,7 @@ setup(
         "ipywidgets",
         "SimPEG>=0.14.1",
         "discretize>=0.4.14"
-        "empymod",
+        "empymod>=2.0.0",
         "jupyter",
         "deepdish",
         "Pillow",
