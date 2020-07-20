@@ -83,7 +83,6 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
     if re_run:
         # Create halfspace model
         mhalf = np.log(sighalf * np.ones([mesh.nC]))
-        # mhalf = sighalf*np.ones([mesh.nC,])
 
         # Create true model with plate
         mtrue = createPlateMod(xc, zc, dx, dz, rotAng, sigplate, sighalf)
@@ -91,13 +90,10 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
             src = DC.sources.Pole([], np.r_[A, 0.0])
         else:
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
-        # src = DC.sources.Dipole_ky([rx], np.r_[A,0.], np.r_[B,0.])
         survey = DC.survey.Survey([src])
-        # problem = DC.Problem3D_CC(mesh, sigmaMap = mapping)
         problem = DC.Simulation2DCellCentered(
             mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
-        # problem_prim = DC.Problem3D_CC(mesh, sigmaMap = mapping)
         problem_prim = DC.Simulation2DCellCentered(
             mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )

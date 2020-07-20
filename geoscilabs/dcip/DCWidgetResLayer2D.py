@@ -85,7 +85,6 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
         # Add layer to model
         mLayer = addLayer2Mod(zcLayer, dzLayer, mhalf, sigLayer)
         # Add plate or cylinder
-        # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
         mtrue = addCylinder2Mod(xc, zc, r, mLayer, sigTarget)
 
         Mx = np.empty(shape=(0, 2))

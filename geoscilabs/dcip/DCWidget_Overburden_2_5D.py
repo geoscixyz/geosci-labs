@@ -99,8 +99,6 @@ def model_valley(
     mtrue[ellips] = lnsig_air
     mair = copy.deepcopy(mtrue)
 
-    # overb = (mesh.gridCC[:, 1] >-overburden_thick) & (mesh.gridCC[:, 1]<=0)&(mesh.gridCC[:, 0] >-overburden_wide/2.)&(mesh.gridCC[:, 0] <overburden_wide/2.)
-    # mtrue[overb] = ln_over*np.ones_like(mtrue[overb])
     bottom_valley = mesh.gridCC[ellips, 1].min()
     overb = (
         (mesh.gridCC[:, 1] >= bottom_valley)
