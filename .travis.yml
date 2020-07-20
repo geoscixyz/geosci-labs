@@ -19,9 +19,19 @@ env:
   - TEST=test_gravity.py
   - TEST=style
 
+# Setup anaconda
+before_install:
+# Install packages
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p $HOME/miniconda
+  - export PATH=/home/travis/anaconda/bin:/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+
 install:
-  - pip install -e .
-  - pip install -r requirements-dev.txt
+  - conda env create -f environment-dev.yml
+  - source activate geosci-labs-dev
+  - pip install . -e
 
 
 # Run test
