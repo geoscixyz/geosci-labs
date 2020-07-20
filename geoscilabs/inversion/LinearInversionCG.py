@@ -317,7 +317,7 @@ class LinearinversionCGApp(object):
                 beta_schedule,
                 save,
             ]
-        inv = inversion.BaseInversion(invProb, directiveList=directives)
+        inv = inversion.BaseInversion(invProb, directiveList=directs)
         mopt = inv.run(m0)
         model = opt.recall("xc")
         model.append(mopt)

@@ -275,7 +275,6 @@ def ViewMagSurvey2D(survey, dobj):
             ax2 = plt.subplot(2, 1, 2)
 
             xyz = surveySim.receiver_locations
-            dobs = dobj.dobs
             plotProfile(xyz, dobj.dobs[ind], a, b, Npts, pred=None, fig=fig, ax=ax2)
 
         return surveySim
