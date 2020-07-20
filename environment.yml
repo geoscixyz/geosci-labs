@@ -17,6 +17,7 @@ dependencies:
   - SimPEG>=0.14.1
   - empymod
   - cvxopt
+  - pip
   - pip:
     - deepdish
     - git+https://github.com/geoscixyz/geosci-labs

@@ -31,7 +31,7 @@ before_install:
 install:
   - conda env create -f environment-dev.yml
   - source activate geosci-labs-dev
-  - pip install . -e
+  - pip install -e .
 
 
 # Run test

@@ -17,6 +17,7 @@ dependencies:
   - SimPEG>=0.14.1
   - empymod
   - cvxopt
+  - pip
   - pytest
   - flake8
   - black
