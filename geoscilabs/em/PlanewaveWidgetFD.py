@@ -40,7 +40,7 @@ class PolarEllipse(object):
     def Planewave3D(self, itime):
         fig = plt.figure(figsize=(12 * 1.2, 5 * 1.2))
         ax = fig.add_subplot(111, projection="3d")
-        t = np.linspace(0, 0.02, 1000.0)
+        t = np.linspace(0, 0.02, 1000)
         X1, X2 = t.min(), t.max()
         Y1, Y2 = -1.2, 1.2
         Z1, Z2 = -1.2, 1.2

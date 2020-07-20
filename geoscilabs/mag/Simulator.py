@@ -78,7 +78,7 @@ def PFSimulator(prism, survey):
         RemDec=widgets.FloatSlider(
             min=-90.0, max=90, step=5, value=0, continuous_update=False
         ),
-        Profile_npt=widgets.BoundedFloatText(
+        Profile_npt=widgets.BoundedIntText(
             min=10, max=100, step=1, value=20, continuous_update=False
         ),
         Profile_azm=widgets.FloatSlider(
@@ -319,7 +319,7 @@ def ViewMagSurvey2D(survey, dobj):
         Length=widgets.FloatSlider(
             min=10, max=diag, step=10, value=Ly, continuous_update=False
         ),
-        Npts=widgets.BoundedFloatText(
+        Npts=widgets.BoundedIntText(
             min=10, max=100, step=1, value=20, continuous_update=False
         ),
         Profile=widgets.ToggleButton(description="Profile", value=False),
