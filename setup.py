@@ -38,13 +38,13 @@ setup(
         "matplotlib>2.1",
         "ipywidgets",
         "SimPEG>=0.14.1",
-        "discretize>=0.4.14"
+        "discretize>=0.4.14",
         "empymod>=2.0.0",
         "jupyter",
         "deepdish",
         "Pillow",
         "requests",
-        "cvxopt"
+        "cvxopt",
     ],
     author="GeoSci Developers",
     author_email="lindseyheagy@gmail.com",

@@ -126,7 +126,9 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     src = tdem.sources.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
     survey = tdem.survey.Survey([src])
 
-    sim = tdem.Simulation3DMagneticFluxDensity(mesh, survey=survey, sigma=sigma, verbose=True)
+    sim = tdem.Simulation3DMagneticFluxDensity(
+        mesh, survey=survey, sigma=sigma, verbose=True
+    )
     sim.Solver = Pardiso
     sim.solverOpts = {"is_symmetric": False}
     sim.time_steps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]

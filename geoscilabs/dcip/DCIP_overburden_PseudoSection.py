@@ -77,7 +77,7 @@ _cache = {
     "mair": None,
     "mover": None,
     "whichprimary": None,
-    "target_wide": None
+    "target_wide": None,
 }
 
 nmax = 8
@@ -182,9 +182,15 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
             src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
         survey = DC.Survey([src])
         # Create three simulations so the fields object is accurate
-        sim_primary = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
-        sim_total = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
-        sim_air = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        sim_primary = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
+        sim_total = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
+        sim_air = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
 
         mesh.setCellGradBC("neumann")
 
@@ -299,19 +305,21 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-    src_type, rx_type = survey.split('-')
+    src_type, rx_type = survey.split("-")
     if rx_type == "dipole":
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
     else:
         rx = DC.receivers.Pole(np.r_[M, 0.0])
 
-    if src_type == 'dipole':
+    if src_type == "dipole":
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
     else:
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
     survey = DC.Survey([src])
-    problem = DC.Simulation2DCellCentered(mesh, sigmaMap=mapping, solver=Pardiso, survey=survey)
+    problem = DC.Simulation2DCellCentered(
+        mesh, sigmaMap=mapping, solver=Pardiso, survey=survey
+    )
 
     J = problem.getJ(model)[0]
 
@@ -465,7 +473,9 @@ def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    simulation = DC.Simulation2DCellCentered(mesh, sigmaMap=mapping, survey=survey, solver=Pardiso)
+    simulation = DC.Simulation2DCellCentered(
+        mesh, sigmaMap=mapping, survey=survey, solver=Pardiso
+    )
 
     return simulation, xzlocs
 
@@ -549,7 +559,13 @@ def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
         txList.append(src)
 
     survey = IP.Survey(txList)
-    simulation = IP.Simulation2DCellCentred(mesh, sigma=sigmadc, etaMap=maps.IdentityMap(mesh), survey=survey, solver=Pardiso)
+    simulation = IP.Simulation2DCellCentred(
+        mesh,
+        sigma=sigmadc,
+        etaMap=maps.IdentityMap(mesh),
+        survey=survey,
+        solver=Pardiso,
+    )
 
     return simulation, xzlocs
 
@@ -934,7 +950,9 @@ def DCIP2Dfwdfun(
                 alpha=0.5,
             )
             ax3.plot(xzlocs[:, 0], xzlocs[:, 1], "k.", ms=3)
-            cb3 = plt.colorbar(dat3, ax=ax3, format="%4.0f", boundaries=(dtrue.min(), dtrue.max()))
+            cb3 = plt.colorbar(
+                dat3, ax=ax3, format="%4.0f", boundaries=(dtrue.min(), dtrue.max())
+            )
         cb3.set_label("Apparent\n" + label)
         ax3.text(250, nmax - 1, "Predicted\nwithout Target")
 

@@ -10,8 +10,8 @@ from SimPEG import (
     optimization,
     regularization,
     inverse_problem,
-    inversion
-    )
+    inversion,
+)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -263,7 +263,12 @@ class LinearInversionDirectApp(object):
 
     def get_problem_survey(self):
         survey_obj = survey.LinearSurvey()
-        simulation_obj = simulation.LinearSimulation(survey=survey_obj, mesh=self.mesh_prop, model_map=maps.IdentityMap(), G=self.G)
+        simulation_obj = simulation.LinearSimulation(
+            survey=survey_obj,
+            mesh=self.mesh_prop,
+            model_map=maps.IdentityMap(),
+            G=self.G,
+        )
         return survey_obj, simulation_obj
 
     def run_inversion_direct(
@@ -283,7 +288,9 @@ class LinearInversionDirectApp(object):
         self.uncertainty = percentage * abs(self.data_vec) * 0.01 + floor
 
         survey_obj, simulation_obj = self.get_problem_survey()
-        data_obj = data.Data(survey_obj, dobs=self.data_vec, noise_floor=self.uncertainty)
+        data_obj = data.Data(
+            survey_obj, dobs=self.data_vec, noise_floor=self.uncertainty
+        )
         dmis = data_misfit.L2DataMisfit(simulation=simulation_obj, data=data_obj)
 
         m0 = np.ones(self.M) * m0

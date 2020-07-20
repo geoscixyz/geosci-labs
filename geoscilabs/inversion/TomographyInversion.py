@@ -85,15 +85,18 @@ class TomographyInversionApp(object):
         self._receiver_locations_prop = np.c_[y * 0 + self._mesh_prop.vectorCCx[-1], y]
         rx = survey.BaseRx(self._receiver_locations_prop)
         srcList = [
-            survey.BaseSrc(location=self._source_locations_prop[i, :], receiver_list=[rx])
+            survey.BaseSrc(
+                location=self._source_locations_prop[i, :], receiver_list=[rx]
+            )
             for i in range(y.size)
         ]
         self._survey_prop = seismic.survey.StraightRaySurvey(srcList)
         self._simulation_prop = seismic.simulation.Simulation2DIntegral(
-            survey=self._survey_prop, mesh=self._mesh_prop, slownessMap=maps.IdentityMap(self._mesh_prop)
+            survey=self._survey_prop,
+            mesh=self._mesh_prop,
+            slownessMap=maps.IdentityMap(self._mesh_prop),
         )
         self._data_prop = data.Data(self._survey_prop)
-
 
     @property
     def pred(self):
@@ -171,12 +174,20 @@ class TomographyInversionApp(object):
                 gridOpts={"color": "white", "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
-            ax.plot(self.receiver_locations_prop[:, 0], self.receiver_locations_prop[:, 1], "wv")
-            ax.plot(self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "w*")
+            ax.plot(
+                self.receiver_locations_prop[:, 0],
+                self.receiver_locations_prop[:, 1],
+                "wv",
+            )
+            ax.plot(
+                self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "w*"
+            )
             ax.set_aspect(1)
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
-            ax.set_title(("(%.1fm, %.1fm)") % (self.mesh_prop.hx.min(), self.mesh_prop.hy.min()))
+            ax.set_title(
+                ("(%.1fm, %.1fm)") % (self.mesh_prop.hx.min(), self.mesh_prop.hy.min())
+            )
         else:
 
             if self.mesh_prop is None:
@@ -200,8 +211,14 @@ class TomographyInversionApp(object):
                 gridOpts={"color": "white", "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
-            ax.plot(self.receiver_locations_prop[:, 0], self.receiver_locations_prop[:, 1], "w^")
-            ax.plot(self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "ws")
+            ax.plot(
+                self.receiver_locations_prop[:, 0],
+                self.receiver_locations_prop[:, 1],
+                "w^",
+            )
+            ax.plot(
+                self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "ws"
+            )
             ax.set_aspect(1)
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
@@ -461,7 +478,9 @@ class TomographyInversionApp(object):
                 mref=mref,
                 mapping=maps.IdentityMap(self.mesh_prop),
             )
-        dataObj = data.Data(self.survey_prop, dobs=self.dobs, noise_floor=self.uncertainty)
+        dataObj = data.Data(
+            self.survey_prop, dobs=self.dobs, noise_floor=self.uncertainty
+        )
         dmis = data_misfit.L2DataMisfit(simulation=self.simulation_prop, data=dataObj)
         dmis.W = 1.0 / self.uncertainty
 
@@ -471,7 +490,7 @@ class TomographyInversionApp(object):
         opt.tolG = 1e-10
         opt.eps = 1e-10
         invProb = inverse_problem.BaseInvProblem(dmis, reg, opt)
-        
+
         beta_schedule = directives.BetaSchedule(
             coolingFactor=coolingFactor, coolingRate=n_iter_per_beta
         )
@@ -487,7 +506,7 @@ class TomographyInversionApp(object):
                 max_irls_iterations=40,
                 beta_tol=5e-1,
                 coolEpsFact=1.3,
-                chifact_start=chifact
+                chifact_start=chifact,
             )
 
             if beta_start is None:
@@ -523,7 +542,10 @@ class TomographyInversionApp(object):
         fig, axs = plt.subplots(1, 2)
         if fixed:
             if clim is None:
-                clim = (1.0 / self.slowness_prop).min(), (1.0 / self.slowness_prop).max()
+                clim = (
+                    (1.0 / self.slowness_prop).min(),
+                    (1.0 / self.slowness_prop).max(),
+                )
             else:
                 clim = clim
 
@@ -533,8 +555,14 @@ class TomographyInversionApp(object):
         plt.colorbar(out[0], ax=axs[1], fraction=0.02)
         axs[1].set_aspect(1)
         for ax in axs:
-            ax.plot(self.receiver_locations_prop[:, 0], self.receiver_locations_prop[:, 1], "w^")
-            ax.plot(self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "ws")
+            ax.plot(
+                self.receiver_locations_prop[:, 0],
+                self.receiver_locations_prop[:, 1],
+                "w^",
+            )
+            ax.plot(
+                self.source_locations_prop[:, 0], self.source_locations_prop[:, 1], "ws"
+            )
             ax.set_aspect(1)
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")

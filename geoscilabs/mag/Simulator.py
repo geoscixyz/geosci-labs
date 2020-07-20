@@ -234,7 +234,6 @@ def PlotFwrSim(
 
 
 def ViewMagSurvey2D(survey, dobj):
-
     def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
@@ -262,7 +261,9 @@ def ViewMagSurvey2D(survey, dobj):
         )
 
         rxLoc = mag.receivers.Point(rxLoc[ind, :])
-        srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=survey.source_field.parameters)
+        srcField = mag.sources.SourceField(
+            receiver_list=[rxLoc], parameters=survey.source_field.parameters
+        )
         surveySim = mag.Survey(srcField)
 
         fig = plt.figure(figsize=(6, 9))
@@ -729,7 +730,9 @@ def fitline(prism, survey, dobj):
         xyzLoc[:, 2] += depth
 
         rxLoc = mag.receivers.Point(xyzLoc)
-        srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec))
+        srcField = mag.sources.SourceField(
+            receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec)
+        )
         survey2D = mag.Survey(srcField)
         sim.survey = survey2D
 

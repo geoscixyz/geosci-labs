@@ -65,10 +65,15 @@ _cache = {
     "zc": None,
 }
 
+
 def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
     re_run = (
-        _cache["A"] != A or _cache["B"] != B or _cache["sigcyl"] != sigcyl
-        or _cache["sighalf"] != sighalf or _cache['xc'] != xc or _cache['zc'] != zc
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["sigcyl"] != sigcyl
+        or _cache["sighalf"] != sighalf
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
     )
 
     if re_run:
@@ -97,8 +102,8 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
         _cache["B"] = B
         _cache["sigcyl"] = sigcyl
         _cache["sighalf"] = sighalf
-        _cache['xc'] = xc
-        _cache['zc'] = zc
+        _cache["xc"] = xc
+        _cache["zc"] = zc
 
         _cache["mtrue"] = mtrue
         _cache["mhalf"] = mhalf
@@ -192,18 +197,20 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-    src_type, rx_type = survey.split('-')
-    if rx_type == 'Pole':
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
     else:
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-    if src_type == 'Pole':
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     Src = DC.Survey([src])
-    sim = DC.Simulation2DCellCentered(mesh, survey=Src, sigmaMap=sigmaMap, solver=Pardiso)
+    sim = DC.Simulation2DCellCentered(
+        mesh, survey=Src, sigmaMap=sigmaMap, solver=Pardiso
+    )
     J = sim.getJ(model)[0]
 
     return J
@@ -308,7 +315,9 @@ def plot_Surface_Potentials(
 
         posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
         xytextM = (M + 0.5, posVM + 0.5)
-        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
+        ax[0].annotate(
+            "%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize
+        )
 
     else:
         ax[0].plot(M, VM, "o", color="k")
@@ -320,8 +329,12 @@ def plot_Surface_Potentials(
         xytextM = (M + 0.5, posVM + 0.5)
         xytextN = (N + 0.5, posVN - 0.5)
 
-        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
-        ax[0].annotate("%2.1e" % (posVN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
+        ax[0].annotate(
+            "%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize
+        )
+        ax[0].annotate(
+            "%2.1e" % (posVN), xy=xytextN, xytext=xytextN, fontsize=labelsize
+        )
 
     ax[0].tick_params(axis="both", which="major", labelsize=ticksize)
 

@@ -72,13 +72,20 @@ _cache = {
     "sigHalf": None,
 }
 
+
 def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf):
 
     re_run = (
-        _cache["A"] != A or _cache["B"] != B or _cache["zcLayer"] != zcLayer
-        or _cache["dzLayer"] != dzLayer or _cache['xc'] != xc or _cache['zc'] != zc
-        or _cache["r"] != r or _cache["sigLayer"] != sigLayer
-        or _cache["sigTarget"] != sigTarget or _cache["sigHalf"] != sigHalf
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["zcLayer"] != zcLayer
+        or _cache["dzLayer"] != dzLayer
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
+        or _cache["r"] != r
+        or _cache["sigLayer"] != sigLayer
+        or _cache["sigTarget"] != sigTarget
+        or _cache["sigHalf"] != sigHalf
     )
     if re_run:
         # Create halfspace model
@@ -95,21 +102,25 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
         else:
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.Survey([src])
-        sim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        sim = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
         total_field = sim.fields(mtrue)
-        sim_prim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        sim_prim = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
         primary_field = sim_prim.fields(mhalf)
 
         _cache["A"] = A
         _cache["B"] = B
         _cache["zcLayer"] = zcLayer
         _cache["dzLayer"] = dzLayer
-        _cache['xc'] = xc
-        _cache['zc'] = zc
-        _cache['r'] = r
-        _cache['sigLayer'] = sigLayer
-        _cache['sigTarget'] = sigTarget
-        _cache['sigHalf'] = sigHalf
+        _cache["xc"] = xc
+        _cache["zc"] = zc
+        _cache["r"] = r
+        _cache["sigLayer"] = sigLayer
+        _cache["sigTarget"] = sigTarget
+        _cache["sigHalf"] = sigHalf
 
         _cache["mtrue"] = mtrue
         _cache["mhalf"] = mhalf
@@ -338,18 +349,20 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-    src_type, rx_type = survey.split('-')
-    if rx_type == 'Pole':
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
     else:
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-    if src_type == 'Pole':
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     Src = DC.Survey([src])
-    sim = DC.Simulation2DCellCentered(mesh, survey=Src, sigmaMap=mapping, solver=Pardiso)
+    sim = DC.Simulation2DCellCentered(
+        mesh, survey=Src, sigmaMap=mapping, solver=Pardiso
+    )
     J = sim.getJ(model)
 
     return J[0]

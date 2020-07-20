@@ -281,7 +281,9 @@ class LinearinversionCGApp(object):
         use_target=False,
     ):
         sim = self.get_simulation()
-        data = Data(sim.survey, dobs=self.data, relative_error=percentage, noise_floor=floor)
+        data = Data(
+            sim.survey, dobs=self.data, relative_error=percentage, noise_floor=floor
+        )
         self.uncertainty = data.uncertainty
 
         m0 = np.ones(self.M) * m0

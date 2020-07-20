@@ -65,8 +65,9 @@ _cache = {
     "zc": None,
     "rotAng": None,
     "sigplate": None,
-    "sighalf": None
+    "sighalf": None,
 }
+
 
 def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
     re_run = (
@@ -93,8 +94,12 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
 
         survey = DC.survey.Survey([src])
 
-        problem = DC.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
-        problem_prim = DC.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        problem = DC.Simulation3DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
+        problem_prim = DC.Simulation3DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
 
         primary_field = problem_prim.fields(mhalf)
 
@@ -276,12 +281,12 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-    src_type, rx_type = survey.split('-')
-    if rx_type == 'Pole':
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
     else:
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-    if src_type == 'Pole':
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
@@ -291,7 +296,9 @@ def getSensitivity(survey, A, B, M, N, model):
     mapping = expmap
 
     survey = DC.Survey([src])
-    sim = DC.Simulation3DCellCentered(mesh, sigmaMap=mapping, solver=Pardiso, survey=survey)
+    sim = DC.Simulation3DCellCentered(
+        mesh, sigmaMap=mapping, solver=Pardiso, survey=survey
+    )
     J = sim.getJ(model)[0]
 
     return J

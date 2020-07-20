@@ -184,15 +184,21 @@ class HarmonicVMDCylWidget(object):
         return self.m
 
     def simulate(self, srcLoc, rxLoc, freqs):
-        bzr = fdem.receivers.PointMagneticFluxDensitySecondary(rxLoc, orientation="z", component="real")
-        bzi = fdem.receivers.PointMagneticFluxDensitySecondary(rxLoc, orientation="z", component="imag")
+        bzr = fdem.receivers.PointMagneticFluxDensitySecondary(
+            rxLoc, orientation="z", component="real"
+        )
+        bzi = fdem.receivers.PointMagneticFluxDensitySecondary(
+            rxLoc, orientation="z", component="imag"
+        )
         self.srcList = [
             fdem.sources.MagDipole([bzr, bzi], freq, srcLoc, orientation="Z")
             for freq in freqs
         ]
 
         survey = fdem.survey.Survey(self.srcList)
-        sim = fdem.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu, solver=Pardiso)
+        sim = fdem.Simulation3DMagneticFluxDensity(
+            self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu, solver=Pardiso
+        )
 
         self.f = sim.fields(self.m)
         self.sim = sim

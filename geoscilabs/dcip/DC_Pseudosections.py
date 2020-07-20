@@ -169,7 +169,9 @@ def DC2Dsurvey(flag="PolePole"):
         txList.append(src)
 
     survey = DC.Survey(txList)
-    simulation = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+    simulation = DC.Simulation2DCellCentered(
+        mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+    )
 
     sigblk, sighalf, siglayer = 2e-2, 2e-3, 1e-3
     xc, yc, r, zh = -15, -8, 4, -5
@@ -640,7 +642,7 @@ def DC2Dfwdfun(
 
 
 def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
-    if 'surveyType' not in _cache or _cache["surveyType"] != surveyType:
+    if "surveyType" not in _cache or _cache["surveyType"] != surveyType:
         dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
         _cache["surveyType"] = surveyType
         _cache["dobs"] = dobs
@@ -700,7 +702,7 @@ def DC2DPseudoWidget():
 
 
 def DC2DfwdWrapper(rhohalf, rhosph, xc, zc, r, predmis, surveyType):
-    if 'surveyType' not in _cache or _cache["surveyType"] != surveyType:
+    if "surveyType" not in _cache or _cache["surveyType"] != surveyType:
         dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
         _cache["surveyType"] = surveyType
         _cache["dobs"] = dobs

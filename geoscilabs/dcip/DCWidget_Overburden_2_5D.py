@@ -70,8 +70,9 @@ _cache = {
     "mair": None,
     "mover": None,
     "whichprimary": None,
-    "target_wide": None
+    "target_wide": None,
 }
+
 
 def model_valley(
     lnsig_air=np.log(1e-8),
@@ -169,9 +170,15 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
         else:
             src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
         survey = DC.survey.Survey([src])
-        problem = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
-        problem_prim = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
-        problem_air = DC.Simulation2DCellCentered(mesh, survey=survey, sigmaMap=mapping, solver=Pardiso)
+        problem = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
+        problem_prim = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
+        problem_air = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        )
 
         if whichprimary == "air":
             primary_field = problem_prim.fields(mair)
@@ -181,7 +188,6 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
             primary_field = problem_prim.fields(mover)
         total_field = problem.fields(mtrue)
         air_field = problem_air.fields(mair)
-
 
         _cache["A"] = A
         _cache["B"] = B
@@ -288,18 +294,20 @@ def getPlateCorners(target_thick, target_wide, cylinderPoints):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-    src_type, rx_type = survey.split('-')
-    if rx_type == 'Pole':
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
     else:
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-    if src_type == 'Pole':
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     Src = DC.Survey([src])
-    sim = DC.Simulation2DCellCentered(mesh, survey=Src, sigmaMap=mapping, solver=Pardiso)
+    sim = DC.Simulation2DCellCentered(
+        mesh, survey=Src, sigmaMap=mapping, solver=Pardiso
+    )
     J = sim.getJ(model)[0]
 
     return J

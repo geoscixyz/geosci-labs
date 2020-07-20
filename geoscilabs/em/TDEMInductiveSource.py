@@ -80,9 +80,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     hx = [(cs, npad, -pad_rate), (cs, ncx), (cs, npad, pad_rate)]
     hy = [(cs, npad, -pad_rate), (cs, ncy), (cs, npad, pad_rate)]
     hz = utils.meshTensor([(cs, npadz, -1.3), (cs / 2.0, ncz), (cs, 5, 2)])
-    mesh = TensorMesh(
-        [hx, hy, hz], x0=["C", "C", -hz[: int(npadz + ncz / 2)].sum()]
-    )
+    mesh = TensorMesh([hx, hy, hz], x0=["C", "C", -hz[: int(npadz + ncz / 2)].sum()])
     sigma = np.ones(mesh.nC) * sigma_halfspace
     sigma[mesh.gridCC[:, 2] > 0.0] = 1e-8
 
@@ -91,7 +89,9 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     zmin, zmax = -600, 100.0
 
     times = np.logspace(-5, -2, 21)
-    rxList = time_domain.receivers.PointMagneticFluxTimeDerivative(np.r_[10.0, 0.0, 30.0], times, orientation="z")
+    rxList = time_domain.receivers.PointMagneticFluxTimeDerivative(
+        np.r_[10.0, 0.0, 30.0], times, orientation="z"
+    )
     if src_type == "VMD":
         src = time_domain.sources.CircularLoop(
             [rxList],
@@ -112,7 +112,13 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     sig = 1e-2
     sigma = np.ones(mesh.nC) * sig
     sigma[mesh.gridCC[:, 2] > 0] = 1e-8
-    prb = time_domain.Simulation3DMagneticFluxDensity(mesh, sigmaMap=maps.IdentityMap(mesh), verbose=True, survey=survey, solver=Pardiso)
+    prb = time_domain.Simulation3DMagneticFluxDensity(
+        mesh,
+        sigmaMap=maps.IdentityMap(mesh),
+        verbose=True,
+        survey=survey,
+        solver=Pardiso,
+    )
     prb.time_steps = [
         (1e-06, 5),
         (5e-06, 5),

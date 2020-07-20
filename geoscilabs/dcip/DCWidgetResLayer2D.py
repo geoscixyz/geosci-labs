@@ -65,12 +65,19 @@ _cache = {
     "sigHalf": None,
 }
 
+
 def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf):
     re_run = (
-        _cache["A"] != A or _cache["B"] != B or _cache["zcLayer"] != zcLayer
-        or _cache["dzLayer"] != dzLayer or _cache['xc'] != xc or _cache['zc'] != zc
-        or _cache["r"] != r or _cache["sigLayer"] != sigLayer
-        or _cache["sigTarget"] != sigTarget or _cache["sigHalf"] != sigHalf
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["zcLayer"] != zcLayer
+        or _cache["dzLayer"] != dzLayer
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
+        or _cache["r"] != r
+        or _cache["sigLayer"] != sigLayer
+        or _cache["sigTarget"] != sigTarget
+        or _cache["sigHalf"] != sigHalf
     )
     if re_run:
         # Create halfspace model
@@ -91,8 +98,12 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
 
         survey = DC.Survey([src])
 
-        problem = DC.Simulation3DCellCentered(mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey)
-        problem_prim = DC.Simulation3DCellCentered(mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey)
+        problem = DC.Simulation3DCellCentered(
+            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+        )
+        problem_prim = DC.Simulation3DCellCentered(
+            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+        )
 
         primary_field = problem_prim.fields(mhalf)
 
@@ -102,12 +113,12 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
         _cache["B"] = B
         _cache["zcLayer"] = zcLayer
         _cache["dzLayer"] = dzLayer
-        _cache['xc'] = xc
-        _cache['zc'] = zc
-        _cache['r'] = r
-        _cache['sigLayer'] = sigLayer
-        _cache['sigTarget'] = sigTarget
-        _cache['sigHalf'] = sigHalf
+        _cache["xc"] = xc
+        _cache["zc"] = zc
+        _cache["r"] = r
+        _cache["sigLayer"] = sigLayer
+        _cache["sigTarget"] = sigTarget
+        _cache["sigHalf"] = sigHalf
 
         _cache["mtrue"] = mtrue
         _cache["mhalf"] = mhalf
@@ -332,17 +343,19 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
 def getSensitivity(survey, A, B, M, N, model):
     src_type, rx_type = survey.split("-")
-    if rx_type == 'Pole':
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
     else:
         rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-    if src_type == 'Pole':
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
     else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     survey = DC.survey.Survey([src])
-    problem = DC.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso)
+    problem = DC.Simulation3DCellCentered(
+        mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+    )
     J = problem.getJ(model)
 
     return J[0]
