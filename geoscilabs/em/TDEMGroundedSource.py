@@ -85,7 +85,7 @@ def choose_model(model):
 def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.01):
     from SimPEG.electromagnetics import time_domain as tdem
     from SimPEG.electromagnetics.utils import waveform_utils
-    from SimPEG.electromagnetics import mu_0
+    from scipy.constants import mu_0
     import numpy as np
     from SimPEG import maps, utils
     from pymatsolver import Pardiso
