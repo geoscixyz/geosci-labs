@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
-from SimPEG import EM
+from SimPEG import electromagnetics as EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
@@ -104,7 +104,7 @@ class DipoleWidget1D(object):
                 fvec,
                 orientation,
                 normal,
-                EM.Analytics.E_from_ElectricDipoleWholeSpace,
+                EM.analytics.E_from_ElectricDipoleWholeSpace,
             )  # evaluate
 
             plt.figure(figsize=(6.5 * 3, 5))

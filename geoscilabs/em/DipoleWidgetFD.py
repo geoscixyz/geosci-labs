@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import numpy as np
+
 # from SimPEG.electromagnetics import frequency_domain as EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker

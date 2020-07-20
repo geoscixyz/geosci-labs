@@ -21,10 +21,12 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 
 from discretize import TensorMesh
+from pymatsolver import Pardiso
 
 from SimPEG import maps, SolverLU, utils
 from SimPEG.electromagnetics.static import resistivity as DC
 from SimPEG.maps import IdentityMap
+from SimPEG.electromagnetics.static.utils import static_utils
 
 from ..base import widgetify
 
@@ -162,12 +164,14 @@ def DC2Dsurvey(flag="PolePole"):
                     np.ones(ntx - i) * mesh.vectorCCx.max(), np.ones(ntx - i) * zloc
                 ]
 
-        rx = DC.receivers.Dipole_ky(M, N)
+        rx = DC.receivers.Dipole(M, N)
         src = DC.sources.Dipole([rx], A, B)
         txList.append(src)
 
-    survey = DC.Survey_ky(txList)
-    simulation = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=mapping)
+    survey = DC.Survey(txList)
+    simulation = DC.Simulation2DCellCentered(
+        mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+    )
 
     sigblk, sighalf, siglayer = 2e-2, 2e-3, 1e-3
     xc, yc, r, zh = -15, -8, 4, -5
@@ -256,9 +260,9 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
     xr = np.arange(-40, 41, dx)
     ntx = xr.size - 2
     # dxr = np.diff(xr)
-    TxObj = survey.srcList
+    TxObj = survey.source_list
     TxLoc = TxObj[i].loc
-    RxLoc = TxObj[i].rxList[0].locs
+    RxLoc = TxObj[i].receiver_list[0].locs
     fig = plt.figure(figsize=(10, 3))
     ax = fig.add_subplot(
         111, autoscale_on=False, xlim=(xr.min() - 5, xr.max() + 5), ylim=(nmax + 1, -2)
@@ -470,6 +474,9 @@ def MidpointPseudoSectionWidget():
     return widgetify(DipoleDipolefun, i=IntSlider(min=0, max=ntx - 1, step=1, value=0))
 
 
+_cache = {}
+
+
 def DC2Dfwdfun(
     mesh,
     simulation,
@@ -513,18 +520,17 @@ def DC2Dfwdfun(
     sighalf, sigblk = 1.0 / rhohalf, 1.0 / rhoblk
     siglayer = 1e-3
     zh = -5
-    m0 = np.r_[np.log(sighalf), np.log(sighalf), np.log(sighalf), xc, yc, r, zh]
-    dini = simulation.dpred(m0)
     mtrue = np.r_[np.log(sighalf), np.log(siglayer), np.log(sigblk), xc, yc, r, zh]
     dpred = simulation.dpred(mtrue)
+
     xi, yi = np.meshgrid(
         np.linspace(xr.min(), xr.max(), 120), np.linspace(1.0, nmax, 100)
     )
-    # extent = (xi.min(), xi.max(), yi.min(), yi.max())
-    # Cheat to compute a geometric factor
-    # define as G = dV_halfspace / rho_halfspace
-    appres = dpred / dini / sighalf
-    appresobs = dobs / dini / sighalf
+    survey = simulation.survey
+    G = static_utils.geometric_factor(survey, survey_type=survey.survey_type)
+    appres = np.abs(dpred * (1.0 / G))
+    appresobs = np.abs(dobs * (1.0 / G))
+
     std = np.std(appres)
     pred = griddata(xzlocs, appres, (xi, yi), method="linear")
 
@@ -636,7 +642,19 @@ def DC2Dfwdfun(
 
 
 def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
-    dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
+    if "surveyType" not in _cache or _cache["surveyType"] != surveyType:
+        dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
+        _cache["surveyType"] = surveyType
+        _cache["dobs"] = dobs
+        _cache["uncert"] = uncert
+        _cache["simulation"] = simulation
+        _cache["xzlocs"] = xzlocs
+    else:
+        dobs = _cache["dobs"]
+        uncert = _cache["uncert"]
+        simulation = _cache["simulation"]
+        xzlocs = _cache["xzlocs"]
+
     DC2Dfwdfun(
         mesh,
         simulation,
@@ -684,7 +702,18 @@ def DC2DPseudoWidget():
 
 
 def DC2DfwdWrapper(rhohalf, rhosph, xc, zc, r, predmis, surveyType):
-    dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
+    if "surveyType" not in _cache or _cache["surveyType"] != surveyType:
+        dobs, uncert, simulation, xzlocs = DC2Dsurvey(surveyType)
+        _cache["surveyType"] = surveyType
+        _cache["dobs"] = dobs
+        _cache["uncert"] = uncert
+        _cache["simulation"] = simulation
+        _cache["xzlocs"] = xzlocs
+    else:
+        dobs = _cache["dobs"]
+        uncert = _cache["uncert"]
+        simulation = _cache["simulation"]
+        xzlocs = _cache["xzlocs"]
     DC2Dfwdfun(
         mesh,
         simulation,
@@ -717,7 +746,7 @@ def DC2DfwdWidget():
         rhosph=FloatText(
             min=10,
             max=1000,
-            value=1000,
+            value=500,
             continuous_update=False,
             description="$\\rho_2$",
         ),

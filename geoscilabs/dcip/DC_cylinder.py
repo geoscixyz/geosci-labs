@@ -56,45 +56,66 @@ indy = (
 )
 indF = np.concatenate((indx, indy))
 
+_cache = {
+    "A": None,
+    "B": None,
+    "sigcyl": None,
+    "sighalf": None,
+    "xc": None,
+    "zc": None,
+}
+
 
 def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
+    re_run = (
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["sigcyl"] != sigcyl
+        or _cache["sighalf"] != sighalf
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
+    )
 
-    circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, zc, r]
-    circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, zc, r]
+    if re_run:
+        circhalf = np.r_[np.log(sighalf), np.log(sighalf), xc, zc, r]
+        circtrue = np.r_[np.log(sigcyl), np.log(sighalf), xc, zc, r]
 
-    mhalf = circmap * circhalf
-    mtrue = circmap * circtrue
+        mhalf = circmap * circhalf
+        mtrue = circmap * circtrue
+        if B == []:
+            src = DC.sources.Pole([], np.r_[A, 0.0])
+        else:
+            src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
+        survey = DC.Survey([src])
 
-    Mx = np.empty(shape=(0, 2))
-    Nx = np.empty(shape=(0, 2))
-    # rx = DC.receivers.Dipole_ky_ky(Mx,Nx)
-    rx = DC.receivers.Dipole_ky(Mx, Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
+        # make two simulations for the seperate field objects
+        sim_primary = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+        )
+        sim_total = DC.Simulation2DCellCentered(
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+        )
+
+        primary_field = sim_primary.fields(mhalf)
+        total_field = sim_total.fields(mtrue)
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["sigcyl"] = sigcyl
+        _cache["sighalf"] = sighalf
+        _cache["xc"] = xc
+        _cache["zc"] = zc
+
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["src"] = src
+        _cache["total_field"] = total_field
+        _cache["primary_field"] = primary_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    # survey = DC.Survey_ky_ky([src])
-    survey = DC.Survey_ky([src])
-    survey_prim = DC.Survey_ky([src])
-    # problem = DC.Problem2D_CC(mesh, sigmaMap = sigmaMap)
-    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=survey, sigmaMap=sigmaMap)
-    problem_prim = DC.simulation_2d.Problem2D_CC(mesh, survey=survey_prim, sigmaMap=sigmaMap)
-    problem.Solver = Pardiso
-    problem_prim.Solver = Pardiso
-
-    f = problem_prim.fields(mhalf)
-    primary_field = problem_prim.fields_to_space(f)
-    # phihalf = f[src, 'phi', 15]
-    # ehalf = f[src, 'e']
-    # jhalf = f[src, 'j']
-    # charge = f[src, 'charge']
-
-    f = problem.fields(mtrue)
-    total_field = problem.fields_to_space(f)
-    # phi = f[src, 'phi', 15]
-    # e = f[src, 'e']
-    # j = f[src, 'j']
-    # charge = f[src, 'charge']
+        mtrue = _cache["mtrue"]
+        mhalf = _cache["mhalf"]
+        src = _cache["src"]
+        total_field = _cache["total_field"]
+        primary_field = _cache["primary_field"]
 
     return mtrue, mhalf, src, total_field, primary_field
 
@@ -132,9 +153,6 @@ def get_Surface_Potentials(survey, src, field_obj):
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
         refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
-        # refPoint =  CCLoc[refInd]
-        # refSurfaceInd = np.where(xSurface == refPoint[0])
-        # phiScale = np.median(phiSurface)
         phiScale = phi[refInd]
         phiSurface = phiSurface - phiScale
 
@@ -175,50 +193,25 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
     qPosSum = np.sum(qPos)
     qNegSum = np.sum(qNeg)
 
-    # # Check things by plotting
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # platePatch = patches.PathPatch(platePath, facecolor='none', lw=2)
-    # ax.add_patch(platePatch)
-    # chargeRegionPatch = patches.PathPatch(chargeRegionPath, facecolor='none', lw=2)
-    # ax.add_patch(chargeRegionPatch)
-    # plt.scatter(qNegAvgLoc[0],qNegAvgLoc[1],color='b')
-    # plt.scatter(qPosAvgLoc[0],qPosAvgLoc[1],color='r')
-    # ax.set_xlim(-15,5)
-    # ax.set_ylim(-25,-5)
-    # plt.axes().set_aspect('equal')
-    # plt.show()
-
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
 
-# Inline functions for computing apparent resistivity
-# eps = 1e-9 #to stabilize division
-# G = lambda A, B, M, N: 1. / ( 1./(np.abs(A-M)+eps) - 1./(np.abs(M-B)+eps) - 1./(np.abs(N-A)+eps) + 1./(np.abs(N-B)+eps) )
-# rho_a = lambda VM,VN, A,B,M,N: (VM-VN)*2.*np.pi*G(A,B,M,N)
-
-
 def getSensitivity(survey, A, B, M, N, model):
-
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole_ky(np.r_[M, 0.0], np.r_[N, 0.0])
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
+        rx = DC.receivers.Pole(np.r_[M, 0.0])
+    else:
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
+    else:
         src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole_ky(np.r_[M, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
 
-    Srv = DC.Survey_ky([src])
-    problem = DC.simulation_2d.Problem2D_CC(mesh, survey=Srv, sigmaMap=sigmaMap)
-    problem.Solver = Pardiso
-    fieldObj = problem.fields(model)
-
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
+    Src = DC.Survey([src])
+    sim = DC.Simulation2DCellCentered(
+        mesh, survey=Src, sigmaMap=sigmaMap, solver=Pardiso
+    )
+    J = sim.getJ(model)[0]
 
     return J
 
@@ -322,7 +315,9 @@ def plot_Surface_Potentials(
 
         posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
         xytextM = (M + 0.5, posVM + 0.5)
-        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
+        ax[0].annotate(
+            "%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize
+        )
 
     else:
         ax[0].plot(M, VM, "o", color="k")
@@ -334,8 +329,12 @@ def plot_Surface_Potentials(
         xytextM = (M + 0.5, posVM + 0.5)
         xytextN = (N + 0.5, posVN - 0.5)
 
-        ax[0].annotate("%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
-        ax[0].annotate("%2.1e" % (posVN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
+        ax[0].annotate(
+            "%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize
+        )
+        ax[0].annotate(
+            "%2.1e" % (posVN), xy=xytextN, xytext=xytextN, fontsize=labelsize
+        )
 
     ax[0].tick_params(axis="both", which="major", labelsize=ticksize)
 
@@ -536,12 +535,12 @@ def plot_Surface_Potentials(
         eps = 0.0
     dat = meshcore.plotImage(
         u[ind] + eps,
-        vType=xtype,
+        v_type=xtype,
         ax=ax[1],
         grid=False,
         view=view,
-        streamOpts=streamOpts,
-        pcolorOpts=pcolorOpts,
+        stream_opts=streamOpts,
+        pcolor_opts=pcolorOpts,
     )  # gridOpts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
