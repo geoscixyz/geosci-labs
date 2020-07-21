@@ -85,9 +85,9 @@ def choose_model(model):
 def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.01):
     from SimPEG.electromagnetics import time_domain as tdem
     from SimPEG.electromagnetics.utils import waveform_utils
-    from SimPEG.EM import Analytics, mu_0
+    from scipy.constants import mu_0
     import numpy as np
-    from SimPEG import maps, utils, EM, Survey
+    from SimPEG import maps, utils
     from pymatsolver import Pardiso
 
     cs = 20
@@ -117,16 +117,15 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
 
     from scipy.interpolate import interp1d
 
+    t0 = 0.01 + 1e-4
     times = np.logspace(-4, -2, 21)
     rx_ex = tdem.receivers.PointElectricField(xyz, times + t0, orientation="x")
     rx_ey = tdem.receivers.PointElectricField(xyz, times + t0, orientation="y")
     rx_by = tdem.receivers.PointElectricField(xyz, times + t0, orientation="y")
 
     rxList = [rx_ex, rx_ey, rx_by]
-    src = tdem.sources.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
-    survey = tdem.survey.Survey([src])
 
-    sim = tdem.simulation.Simulation3DMagneticFluxDensity(mesh, survey=survey, sigma=sigma, verbose=True)
+    sim = tdem.Simulation3DMagneticFluxDensity(mesh, sigma=sigma, verbose=True)
     sim.Solver = Pardiso
     sim.solverOpts = {"is_symmetric": False}
     sim.time_steps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
@@ -134,6 +133,10 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     out = waveform_utils.VTEMFun(sim.times, 0.01, t0, 200)
     wavefun = interp1d(sim.times, out)
     waveform = tdem.sources.RawWaveform(offTime=t0, waveFct=wavefun)
+
+    src = tdem.sources.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
+    survey = tdem.survey.Survey([src])
+    sim.survey = survey
     input_currents = wavefun(sim.times)
 
     f = sim.fields(sigma)

@@ -195,7 +195,9 @@ class TDEMHorizontalLoopCylWidget(object):
         self.srcList = [src]
         survey = tdem.survey.Survey(self.srcList)
 
-        sim = tdem.simulation.Simulation3DMagneticFluxDensity(self.mesh, survey=survey, sigmaMap=self.mapping)
+        sim = tdem.Simulation3DMagneticFluxDensity(
+            self.mesh, survey=survey, sigmaMap=self.mapping
+        )
         sim.time_steps = [
             (1e-06, 10),
             (5e-06, 10),
@@ -205,7 +207,7 @@ class TDEMHorizontalLoopCylWidget(object):
             (5e-4, 10),
             (1e-3, 10),
         ]
-        
+
         self.f = sim.fields(self.m)
         self.sim = sim
         dpred = sim.dpred(self.m, f=self.f)

@@ -15,6 +15,7 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
+from pymatsolver import Pardiso
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
@@ -51,38 +52,84 @@ indy = (
     & (mesh.gridFy[:, 1] <= ymax)
 )
 indF = np.concatenate((indx, indy))
+_cache = {
+    "A": None,
+    "B": None,
+    "zcLayer": None,
+    "dzLayer": None,
+    "xc": None,
+    "zc": None,
+    "r": None,
+    "sigLayer": None,
+    "sigTarget": None,
+    "sigHalf": None,
+}
 
 
 def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf):
-    # Create halfspace model
-    mhalf = sigHalf * np.ones([mesh.nC])
-    # Add layer to model
-    mLayer = addLayer2Mod(zcLayer, dzLayer, mhalf, sigLayer)
-    # Add plate or cylinder
-    # fullMod = addPlate2Mod(xc,zc,dx,dz,rotAng,LayerMod,sigTarget)
-    mtrue = addCylinder2Mod(xc, zc, r, mLayer, sigTarget)
+    re_run = (
+        _cache["A"] != A
+        or _cache["B"] != B
+        or _cache["zcLayer"] != zcLayer
+        or _cache["dzLayer"] != dzLayer
+        or _cache["xc"] != xc
+        or _cache["zc"] != zc
+        or _cache["r"] != r
+        or _cache["sigLayer"] != sigLayer
+        or _cache["sigTarget"] != sigTarget
+        or _cache["sigHalf"] != sigHalf
+    )
+    if re_run:
+        # Create halfspace model
+        mhalf = sigHalf * np.ones([mesh.nC])
+        # Add layer to model
+        mLayer = addLayer2Mod(zcLayer, dzLayer, mhalf, sigLayer)
+        # Add plate or cylinder
+        mtrue = addCylinder2Mod(xc, zc, r, mLayer, sigTarget)
 
-    Mx = np.empty(shape=(0, 2))
-    Nx = np.empty(shape=(0, 2))
-    rx = DC.receivers.Dipole(Mx, Nx)
-    if B == []:
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
+        Mx = np.empty(shape=(0, 2))
+        Nx = np.empty(shape=(0, 2))
+        rx = DC.receivers.Dipole(Mx, Nx)
+        if B == []:
+            src = DC.sources.Pole([rx], np.r_[A, 0.0])
+        else:
+            src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
+
+        survey = DC.Survey([src])
+
+        problem = DC.Simulation3DCellCentered(
+            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+        )
+        problem_prim = DC.Simulation3DCellCentered(
+            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+        )
+
+        primary_field = problem_prim.fields(mhalf)
+
+        total_field = problem.fields(mtrue)
+
+        _cache["A"] = A
+        _cache["B"] = B
+        _cache["zcLayer"] = zcLayer
+        _cache["dzLayer"] = dzLayer
+        _cache["xc"] = xc
+        _cache["zc"] = zc
+        _cache["r"] = r
+        _cache["sigLayer"] = sigLayer
+        _cache["sigTarget"] = sigTarget
+        _cache["sigHalf"] = sigHalf
+
+        _cache["mtrue"] = mtrue
+        _cache["mhalf"] = mhalf
+        _cache["src"] = src
+        _cache["total_field"] = total_field
+        _cache["primary_field"] = primary_field
     else:
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-
-    survey = DC.Survey([src])
-    survey_prim = DC.Survey([src])
-
-    problem = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
-    problem_prim = DC.Problem3D_CC(mesh, sigmaMap=sigmaMap)
-    problem.Solver = SolverLU
-    problem_prim.Solver = SolverLU
-    problem.pair(survey)
-    problem_prim.pair(survey_prim)
-
-    primary_field = problem_prim.fields(mhalf)
-
-    total_field = problem.fields(mtrue)
+        mtrue = _cache["mtrue"]
+        mhalf = _cache["mhalf"]
+        src = _cache["src"]
+        total_field = _cache["total_field"]
+        primary_field = _cache["primary_field"]
 
     return mtrue, mhalf, src, primary_field, total_field
 
@@ -294,28 +341,23 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
 
 
 def getSensitivity(survey, A, B, M, N, model):
-
-    if survey == "Dipole-Dipole":
-        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Dipole":
-        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
-        src = DC.sources.Pole([rx], np.r_[A, 0.0])
-    elif survey == "Dipole-Pole":
+    src_type, rx_type = survey.split("-")
+    if rx_type == "Pole":
         rx = DC.receivers.Pole(np.r_[M, 0.0])
-        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
-    elif survey == "Pole-Pole":
-        rx = DC.receivers.Pole(np.r_[M, 0.0])
+    else:
+        rx = DC.receivers.Dipole(np.r_[M, 0.0], np.r_[N, 0.0])
+    if src_type == "Pole":
         src = DC.sources.Pole([rx], np.r_[A, 0.0])
+    else:
+        src = DC.sources.Dipole([rx], np.r_[A, 0.0], np.r_[B, 0.0])
 
     survey = DC.survey.Survey([src])
-    problem = DC.simulation.Simulation3DCellCentered(mesh, survey=survey, sigmaMap=sigmaMap)
-    problem.Solver = SolverLU
-    fieldObj = problem.fields(model)
+    problem = DC.Simulation3DCellCentered(
+        mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+    )
+    J = problem.getJ(model)
 
-    J = problem.Jtvec(model, np.array([1.0]), f=fieldObj)
-
-    return J
+    return J[0]
 
 
 def calculateRhoA(survey, VM, VN, A, B, M, N):
@@ -646,12 +688,12 @@ def plot_Surface_Potentials(
         eps = 0.0
     dat = meshcore.plotImage(
         u[ind] + eps,
-        vType=xtype,
+        v_type=xtype,
         ax=ax[1],
         grid=False,
         view=view,
-        streamOpts=streamOpts,
-        pcolorOpts=pcolorOpts,
+        stream_opts=streamOpts,
+        pcolor_opts=pcolorOpts,
     )  # gridOpts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline

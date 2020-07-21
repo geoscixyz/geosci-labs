@@ -78,7 +78,7 @@ def PFSimulator(prism, survey):
         RemDec=widgets.FloatSlider(
             min=-90.0, max=90, step=5, value=0, continuous_update=False
         ),
-        Profile_npt=widgets.BoundedFloatText(
+        Profile_npt=widgets.BoundedIntText(
             min=10, max=100, step=1, value=20, continuous_update=False
         ),
         Profile_azm=widgets.FloatSlider(
@@ -234,10 +234,6 @@ def PlotFwrSim(
 
 
 def ViewMagSurvey2D(survey, dobj):
-
-    # survey: a mag.survey.MagneticSurvey object
-    # dobj: a data.Data object
-
     def MagSurvey2D(East, North, Width, Height, Azimuth, Length, Npts, Profile):
 
         # Get the line extent from the 2D survey for now
@@ -265,8 +261,10 @@ def ViewMagSurvey2D(survey, dobj):
         )
 
         rxLoc = mag.receivers.Point(rxLoc[ind, :])
-        srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=survey.source_field.parameters)
-        surveySim = mag.survey.MagneticSurvey(srcField)
+        srcField = mag.sources.SourceField(
+            receiver_list=[rxLoc], parameters=survey.source_field.parameters
+        )
+        surveySim = mag.Survey(srcField)
 
         fig = plt.figure(figsize=(6, 9))
         ax1 = plt.subplot(2, 1, 1)
@@ -277,7 +275,6 @@ def ViewMagSurvey2D(survey, dobj):
             ax2 = plt.subplot(2, 1, 2)
 
             xyz = surveySim.receiver_locations
-            dobs = dobj.dobs
             plotProfile(xyz, dobj.dobs[ind], a, b, Npts, pred=None, fig=fig, ax=ax2)
 
         return surveySim
@@ -322,7 +319,7 @@ def ViewMagSurvey2D(survey, dobj):
         Length=widgets.FloatSlider(
             min=10, max=diag, step=10, value=Ly, continuous_update=False
         ),
-        Npts=widgets.BoundedFloatText(
+        Npts=widgets.BoundedIntText(
             min=10, max=100, step=1, value=20, continuous_update=False
         ),
         Profile=widgets.ToggleButton(description="Profile", value=False),
@@ -542,8 +539,8 @@ def plotObj3D(
     y1, y2 = prism.yn[0] - prism.yc, prism.yn[1] - prism.yc
     z1, z2 = prism.zn[0] - prism.zc, prism.zn[1] - prism.zc
     pinc, pdec = prism.pinc, prism.pdec
-    
-    if isinstance(survey, mag.survey.MagneticSurvey) is False:
+
+    if isinstance(survey, mag.Survey) is False:
         survey = survey[0]
 
     rxLoc = survey.receiver_locations
@@ -732,8 +729,10 @@ def fitline(prism, survey, dobj):
         xyzLoc[:, 2] += depth
 
         rxLoc = mag.receivers.Point(xyzLoc)
-        srcField = mag.sources.SourceField(receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec))
-        survey2D = mag.survey.MagneticSurvey(srcField)
+        srcField = mag.sources.SourceField(
+            receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec)
+        )
+        survey2D = mag.Survey(srcField)
         sim.survey = survey2D
 
         sim.Q, sim.rinc, sim.rdec = Q, -rinc, rdec

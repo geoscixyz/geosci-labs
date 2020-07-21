@@ -132,12 +132,7 @@ class DipoleWidgetTD(object):
     ):
         nx, ny = npts2D, npts2D
         x, y = linefun(x1, x2, y1, y2, npts)
-        if scale == "log":
-            logamp = True
-        elif scale == "linear":
-            logamp = False
-        else:
-            raise NotImplementedError()
+        logamp = scale == "log"
 
         self.SetDataview(
             srcLoc, sig, t, orientation, normal, functype, na=nx, nb=ny, loc=loc

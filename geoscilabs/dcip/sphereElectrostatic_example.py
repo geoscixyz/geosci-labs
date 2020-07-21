@@ -154,7 +154,7 @@ def get_Setup(XYZ, sig0, sig1, R, E0, ax, label, colorsphere):
                 fontsize=14.0,
             )
             ax.annotate(
-                ("$\mathbf{E_0} = {1.0f} \mathbf{\hat{x}}$ V/m".format(E0)),
+                ("$\mathbf{{E}}_0 = {:1.0f} \mathbf{{\hat{{x}}}}$ V/m".format(E0)),
                 xy=(xr.min() + np.abs(xr.max() - xr.min()) / 20.0, 0),
                 xycoords="data",
                 xytext=(xr.min() + np.abs(xr.max() - xr.min()) / 20.0, 0),

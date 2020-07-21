@@ -131,10 +131,6 @@ def csem_layered_earth(
         rx = [rxlocs[:, 0], rxlocs[:, 1], rxlocs[:, 2], 0.0, 90.0]
     else:
         raise Exception("rx_direction should be x, y, or z")
-    if rx_type == "electric":
-        rx_type = None
-    if src_type == "electric":
-        src_type = None
     if len(np.unique(np.array(res))) == 1:
         xdirect = True
     else:
@@ -148,8 +144,8 @@ def csem_layered_earth(
         "aniso": aniso,
         "verb": verb,
         "xdirect": xdirect,
-        "mrec": rx_type,
-        "msrc": src_type,
+        "mrec": "electric" != rx_type,
+        "msrc": "electric" != src_type,
     }
     out = bipole(**inpdat)
     return utils.EMArray(out)
@@ -605,12 +601,12 @@ def csem_data_app(
             val = abs(data) ** 2 / (2 * frequency * np.pi * mu_0)
             val_bg = abs(data_bg) ** 2 / (2 * frequency_bg * np.pi * mu_0)
         else:
-            val = data.amp
-            val_bg = data_bg.amp
+            val = data.amp()
+            val_bg = data_bg.amp()
     elif Complex == "Phase":
         label = "Phase (degree)"
-        val = data.pha
-        val_bg = data_bg.pha
+        val = data.pha()
+        val_bg = data_bg.pha()
 
     plt.figure(figsize=(8 * 1.4, 3 * 1.4))
     ax = plt.subplot(111)
