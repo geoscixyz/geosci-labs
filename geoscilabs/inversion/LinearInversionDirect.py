@@ -28,7 +28,8 @@ from ipywidgets import (
     RadioButtons,
 )
 import ipywidgets as widgets
-
+import warnings
+warnings.filterwarnings("ignore")
 
 class LinearInversionDirectApp(object):
     """docstring for LinearInversionApp"""
@@ -242,9 +243,9 @@ class LinearInversionDirectApp(object):
                             color="k",
                             lw=1,
                         )
-                        ax.plot(self.jk, self.data, "ko")
+                        ax.plot(self.jk, self.data_vec, "ko")
                     else:
-                        ax.plot(self.jk, self.data, "ko-")
+                        ax.plot(self.jk, self.data_vec, "ko-")
                     ax.set_ylabel("$d_j$")
                     ax.set_title("Data")
                     ax.set_xlabel("$k_j$")
