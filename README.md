@@ -1,7 +1,6 @@
 # GeoSci Labs
 
 [![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipynb)
-[![azure](https://notebooks.azure.com/launch.png)](https://notebooks.azure.com/import/gh/geoscixyz/geosci-labs)
 [![pypi](https://img.shields.io/pypi/v/geoscilabs.svg)](https://pypi.python.org/pypi/geoscilabs)
 [![travis](https://travis-ci.org/geoscixyz/geosci-labs.svg?branch=master)](https://travis-ci.org/geoscixyz/geosci-labs)
 [![License](https://img.shields.io/github/license/geoscixyz/geosci-labs.svg)](https://github.com/geoscixyz/geosci-labs/blob/master/LICENSE)
