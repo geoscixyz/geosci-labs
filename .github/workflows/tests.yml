@@ -30,7 +30,7 @@ jobs:
       shell: bash
       run: |
         python --version
-        conda create -f environment-dev.yml
+        conda env create -f environment-dev.yml
 
     - name: Install Our Package
       shell: bash
