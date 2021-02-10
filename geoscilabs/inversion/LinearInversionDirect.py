@@ -66,14 +66,18 @@ class LinearInversionDirectApp(object):
         return self._G
 
     @property
-    def jk(self):
-        return self._jk
+    def p_values(self):
+        return self._p_values
+
+    @property
+    def q_values(self):
+        return self._q_values
 
     @property
     def mesh_prop(self):
         return self._mesh_prop
 
-    def set_G(self, N=20, M=100, p=-0.25, q=0.25, j1=1, jn=60):
+    def set_G(self, N=20, M=100, pmin=-0.25, pmax=-15, qmin=0.25, qmax=15):
         """
         Parameters
         ----------
@@ -85,32 +89,34 @@ class LinearInversionDirectApp(object):
         self.N = N
         self.M = M
         self._mesh_prop = TensorMesh([M])
-        jk = np.linspace(j1, jn, N)
+        p_values = np.linspace(pmin, pmax, N)
+        q_values = np.linspace(qmin, qmax, N)
         self._G = np.zeros((N, self.mesh_prop.nC), dtype=float, order="C")
 
         def g(k):
-            return np.exp(p * jk[k] * self.mesh_prop.vectorCCx) * np.cos(
-                np.pi * q * jk[k] * self.mesh_prop.vectorCCx
+            return np.exp(p_values[k] * self.mesh_prop.vectorCCx) * np.cos(
+                np.pi * q_values[k] * self.mesh_prop.vectorCCx
             )
 
         for i in range(N):
             self._G[i, :] = g(i) * self.mesh_prop.hx
-        self._jk = jk
+        self._p_values = p_values
+        self._q_values = q_values
 
     def plot_G(
         self,
         N=20,
         M=100,
-        p=-0.25,
-        q=0.25,
-        j1=1,
-        jn=60,
+        pmin=-0.25,
+        pmax=1,
+        qmin=0.25,
+        qmax=1,
         scale="log",
         fixed=False,
         ymin=-0.001,
         ymax=0.011,
     ):
-        self.set_G(N=N, M=M, p=p, q=q, j1=j1, jn=jn)
+        self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
 
         _, s, _ = np.linalg.svd(self.G, full_matrices=False)
 
@@ -213,21 +219,21 @@ class LinearInversionDirectApp(object):
         option_bools = [False, False, False]
         for item in option:
             if item == "kernel":
-                option_bools[0] = True
-            elif item == "model":
                 option_bools[1] = True
+            elif item == "model":
+                option_bools[0] = True
             elif item == "data":
                 option_bools[2] = True
 
         fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
         for i, ax in enumerate(axes):
             if option_bools[i]:
-                if i == 0:
+                if i == 1:
                     ax.plot(self.mesh_prop.vectorCCx, self.G.T)
                     ax.set_title("Rows of matrix G")
                     ax.set_xlabel("x")
                     ax.set_ylabel("g(x)")
-                elif i == 1:
+                elif i == 0:
                     ax.plot(self.mesh_prop.vectorCCx, m)
                     ax.set_ylim([-2.5, 2.5])
                     ax.set_title("Model")
@@ -237,15 +243,15 @@ class LinearInversionDirectApp(object):
                     if add_noise:
                         # this is just for visualization of uncertainty
                         ax.errorbar(
-                            x=self.jk,
+                            x=np.arange(self.N),
                             y=self.data_vec,
                             yerr=self.uncertainty,
                             color="k",
                             lw=1,
                         )
-                        ax.plot(self.jk, self.data_vec, "ko")
+                        ax.plot(np.arange(self.N), self.data_vec, "ko")
                     else:
-                        ax.plot(self.jk, self.data_vec, "ko-")
+                        ax.plot(np.arange(self.N), self.data_vec, "ko-")
                     ax.set_ylabel("$d_j$")
                     ax.set_title("Data")
                     ax.set_xlabel("$k_j$")
@@ -372,9 +378,9 @@ class LinearInversionDirectApp(object):
             axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         if data_option == "obs/pred":
-            axes[1].plot(self.jk, self.data_vec, "ko")
+            axes[1].plot(np.arange(self.N), self.data_vec, "ko")
             if mode == "Run":
-                axes[1].plot(self.jk, self.pred[i_target], "bx")
+                axes[1].plot(np.arange(self.N), self.pred[i_target], "bx")
             axes[1].legend(("Observed", "Predicted"))
             axes[1].set_title("Data")
             axes[1].set_xlabel("$k_j$")
@@ -385,7 +391,7 @@ class LinearInversionDirectApp(object):
             else:
                 misfit = (self.pred[i_beta] - self.data_vec) / self.uncertainty
 
-            axes[1].plot(self.jk, misfit, "ko")
+            axes[1].plot(np.arange(self.N), misfit, "ko")
             axes[1].set_title("Normalized misfit")
             axes[1].set_xlabel("$k_j$")
             axes[1].set_ylabel("$\epsilon_j$")
@@ -463,12 +469,10 @@ class LinearInversionDirectApp(object):
             self.plot_G,
             N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
             M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
-            p=FloatSlider(
-                min=-1, max=0, step=0.05, value=-0.15, continuous_update=False
-            ),
-            q=FloatSlider(min=0, max=1, step=0.05, value=0.25, continuous_update=False),
-            j1=FloatText(value=1.0),
-            jn=FloatText(value=19.0),
+            pmin=FloatText(-0.25),
+            pmax=FloatText(-5),
+            qmin=FloatText(0.25),
+            qmax=FloatText(5),
             scale=ToggleButtons(options=["linear", "log"], value="log"),
             fixed=False,
             ymin=FloatText(value=-0.005),
@@ -536,7 +540,7 @@ class LinearInversionDirectApp(object):
                 description="m2$_{sigma}$",
             ),
             option=SelectMultiple(
-                options=["kernel", "model", "data"],
+                options=["model", "kernel", "data"],
                 value=["model"],
                 description="option",
             ),
