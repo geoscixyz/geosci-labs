@@ -26,8 +26,11 @@ from ipywidgets import (
     IntText,
     SelectMultiple,
     RadioButtons,
+    VBox,
+    HBox,
+    Checkbox,
+    interactive_output
 )
-import ipywidgets as widgets
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -44,6 +47,7 @@ class LinearInversionDirectApp(object):
     seed = None
 
     # Parameters for Model
+    m = None
     m_background = None
     m1 = None
     m2 = None
@@ -57,6 +61,7 @@ class LinearInversionDirectApp(object):
 
     data_vec = None
     save = None
+    return_axis = False
 
     def __init__(self):
         super(LinearInversionDirectApp, self).__init__()
@@ -145,7 +150,9 @@ class LinearInversionDirectApp(object):
         ax2.xaxis.set_minor_formatter(plt.NullFormatter())
 
         plt.tight_layout()
-        plt.show()
+        # plt.show()
+        if self.return_axis:
+            return [ax1, ax2]
 
     def set_model(
         self,
@@ -163,12 +170,94 @@ class LinearInversionDirectApp(object):
             self.mesh_prop.vectorCCx < m1_center + dm1 / 2.0,
         )
         m[m1_inds] = m1
-
         def gaussian(x, x0, sigma):
             return np.exp(-np.power((x - x0) / sigma, 2.0) / 2.0)
 
         m += gaussian(self.mesh_prop.vectorCCx, m2_center, sigma_2) * m2
+        self.m = m
         return m
+
+    def plot_model_only(
+        self,
+        m_background=0.0,
+        m1=1.0,
+        m1_center=0.2,
+        dm1=0.2,
+        m2=-1.0,
+        m2_center=0.5,
+        sigma_2=1.0,
+        M=100
+        ):
+
+        self.M = M
+        self._mesh_prop = TensorMesh([self.M])
+        m = self.set_model(
+            m_background=m_background,
+            m1=m1,
+            m2=m2,
+            m1_center=m1_center,
+            dm1=dm1,
+            m2_center=m2_center,
+            sigma_2=sigma_2,
+        )
+
+        fig = plt.figure()
+        ax  = plt.subplot(111)
+        ax.plot(self.mesh_prop.vectorCCx, m)
+        ax.set_ylim([-2.5, 2.5])
+        ax.set_title("Model")
+        ax.set_xlabel("x")
+        ax.set_ylabel("m(x)")
+        if self.return_axis:
+            return ax
+
+    def plot_data_only(
+        self,
+        add_noise=True,
+        percentage=10,
+        floor=1e-1,
+        ):
+        np.random.seed(1)
+
+        m = self.m
+        fig, ax = plt.subplots(1,1)
+        if add_noise:
+            survey_obj, simulation_obj = self.get_problem_survey()
+            d = simulation_obj.dpred(m)
+            noise = (
+                abs(d) * percentage * 0.01 * np.random.randn(self.N)
+                + np.random.randn(self.N) * floor
+            )
+        else:
+            survey_obj, simulation_obj = self.get_problem_survey()
+            d = simulation_obj.dpred(m)
+            noise = np.zeros(self.N, float)
+
+        d += noise
+        self.data_vec = d.copy()
+        self.m = m.copy()
+        self.uncertainty = abs(self.data_vec) * percentage * 0.01 + floor
+        self.percentage = percentage
+        self.floor = floor
+
+        if add_noise:
+            # this is just for visualization of uncertainty
+            ax.errorbar(
+                x=np.arange(self.N),
+                y=self.data_vec,
+                yerr=self.uncertainty,
+                color="k",
+                lw=1,
+            )
+            ax.plot(np.arange(self.N), self.data_vec, "ko")
+        else:
+            ax.plot(np.arange(self.N), self.data_vec, "ko-")
+        ax.set_ylabel("$d_j$")
+        ax.set_title("Data")
+        ax.set_xlabel("$j$")
+
+        if self.return_axis:
+            return ax
 
     def plot_model(
         self,
@@ -183,6 +272,10 @@ class LinearInversionDirectApp(object):
         add_noise=True,
         percentage=10,
         floor=1e-1,
+        pmin=-0.25,
+        pmax=1,
+        qmin=0.25,
+        qmax=1,
     ):
 
         m = self.set_model(
@@ -194,7 +287,7 @@ class LinearInversionDirectApp(object):
             m2_center=m2_center,
             sigma_2=sigma_2,
         )
-
+        self.set_G(N=self.N, M=self.M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
         np.random.seed(1)
 
         if add_noise:
@@ -267,6 +360,9 @@ class LinearInversionDirectApp(object):
                 # ax.yaxis.set_major_formatter(plt.NullFormatter())
                 # ax.yaxis.set_minor_formatter(plt.NullFormatter())
         plt.tight_layout()
+
+        if self.return_axis:
+            return axes
 
     def get_problem_survey(self):
         survey_obj = survey.LinearSurvey()
@@ -463,26 +559,13 @@ class LinearInversionDirectApp(object):
             )
         axes[2].set_title(title, fontsize=14)
         plt.tight_layout()
+        if self.return_axis:
+            return axes
 
-    def interact_plot_G(self):
-        Q = interact(
-            self.plot_G,
-            N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
-            M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
-            pmin=FloatText(-0.25),
-            pmax=FloatText(-5),
-            qmin=FloatText(0.25),
-            qmax=FloatText(5),
-            scale=ToggleButtons(options=["linear", "log"], value="log"),
-            fixed=False,
-            ymin=FloatText(value=-0.005),
-            ymax=FloatText(value=0.011),
-        )
-        return Q
 
     def interact_plot_model(self):
         Q = interact(
-            self.plot_model,
+            self.plot_model_only,
             m_background=FloatSlider(
                 min=-2,
                 max=2,
@@ -539,15 +622,139 @@ class LinearInversionDirectApp(object):
                 continuous_update=False,
                 description="m2$_{sigma}$",
             ),
-            option=SelectMultiple(
-                options=["model", "kernel", "data"],
-                value=["model"],
-                description="option",
-            ),
-            percentage=FloatText(value=5),
-            floor=FloatText(value=0.02),
+            M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
         )
         return Q
+
+    def interact_plot_G(self):
+        Q = interact(
+            self.plot_G,
+            N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
+            M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
+            pmin=FloatText(-0.25),
+            pmax=FloatText(-5),
+            qmin=FloatText(0.25),
+            qmax=FloatText(5),
+            scale=ToggleButtons(options=["linear", "log"], value="log"),
+            fixed=False,
+            ymin=FloatText(value=-0.005),
+            ymax=FloatText(value=0.011),
+        )
+        return Q
+
+    def interact_plot_data(self):
+        Q = interact(
+            self.plot_data_only,
+            percentage=FloatText(value=10, description="percentage"),
+            floor=FloatText(value=0, description="floor"),
+            add_noise=Checkbox(value=False, description="add_noise"),
+        )
+        return Q
+
+    def interact_plot_all_three_together(self, kwargs):
+
+        m_background=FloatSlider(
+            min=-2,
+            max=2,
+            step=0.05,
+            value=kwargs['m_background'],
+            continuous_update=False,
+            description="m$_{background}$",
+        )
+        m1=FloatSlider(
+            min=-2,
+            max=2,
+            step=0.05,
+            value=kwargs['m1'],
+            continuous_update=False,
+            description="m1",
+        )
+        m2=FloatSlider(
+            min=-2,
+            max=2,
+            step=0.05,
+            value=kwargs['m2'],
+            continuous_update=False,
+            description="m2",
+        )
+        m1_center=FloatSlider(
+            min=-2,
+            max=2,
+            step=0.05,
+            value=kwargs['m1_center'],
+            continuous_update=False,
+            description="m1$_{center}$",
+        )
+        dm1=FloatSlider(
+            min=0,
+            max=0.5,
+            step=0.05,
+            value=kwargs['dm1'],
+            continuous_update=False,
+            description="m1$_{width}$",
+        )
+        m2_center=FloatSlider(
+            min=-2,
+            max=2,
+            step=0.05,
+            value=kwargs['m2_center'],
+            continuous_update=False,
+            description="m2$_{center}$",
+        )
+        sigma_2=FloatSlider(
+            min=0.01,
+            max=0.1,
+            step=0.01,
+            value=kwargs['sigma_2'],
+            continuous_update=False,
+            description="m2$_{sigma}$",
+        )
+        pmin=FloatText(kwargs['pmin'], description="pmin")
+        pmax=FloatText(kwargs['pmax'], description="pmax")
+        qmin=FloatText(kwargs['qmin'], description="qmin")
+        qmax=FloatText(kwargs['qmax'], description="qmin")
+        option=SelectMultiple(
+            options=["model", "kernel", "data"],
+            value=["model"],
+            description="option",
+        )
+        percentage=FloatText(value=kwargs['percentage'], description="percentage")
+        floor=FloatText(value=kwargs['floor'], description="floor")
+        add_noise=Checkbox(value=kwargs['add_noise'], description="add_noise")
+
+        out = interactive_output(
+            self.plot_model,
+            {
+                "m_background": m_background,
+                "m1": m1,
+                "m1_center": m1_center,
+                "dm1": dm1,
+                "m2": m2,
+                "m2_center": m2_center,
+                "sigma_2": sigma_2,
+                "option": option,
+                "add_noise": add_noise,
+                "percentage": percentage,
+                "floor": floor,
+                "pmin": pmin,
+                "pmax": pmax,
+                "qmin": qmin,
+                "qmax": qmax,
+            },
+        )
+
+        return VBox(
+                [
+                    HBox(
+                            [
+                                VBox([m_background, m1, m1_center, dm1, m2, m2_center, sigma_2, pmin, pmax, qmin, qmax]),
+                                VBox([]),
+                                VBox([option, add_noise, percentage, floor])
+                            ]
+                        ),
+                    HBox([out])
+                ]
+            )
 
     def interact_plot_inversion(self, n_beta=81):
         interact(
