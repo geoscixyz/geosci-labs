@@ -748,7 +748,6 @@ class LinearInversionDirectApp(object):
                     HBox(
                             [
                                 VBox([m_background, m1, m1_center, dm1, m2, m2_center, sigma_2, pmin, pmax, qmin, qmax]),
-                                VBox([]),
                                 VBox([option, add_noise, percentage, floor])
                             ]
                         ),
