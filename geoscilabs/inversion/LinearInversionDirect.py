@@ -316,46 +316,42 @@ class LinearInversionDirectApp(object):
         option_bools = [show_model, show_model, show_data]
 
         fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
-        for i, ax in enumerate(axes):
-            if option_bools[i]:
-                if i == 1:
-                    ax.plot(self.mesh_prop.vectorCCx, self.G.T)
-                    ax.set_title("Rows of matrix G")
-                    ax.set_xlabel("x")
-                    ax.set_ylabel("g(x)")
-                elif i == 0:
-                    ax.plot(self.mesh_prop.vectorCCx, m)
-                    ax.set_ylim([-2.5, 2.5])
-                    ax.set_title("Model")
-                    ax.set_xlabel("x")
-                    ax.set_ylabel("m(x)")
-                elif i == 2:
-                    if add_noise:
-                        # this is just for visualization of uncertainty
-                        ax.errorbar(
-                            x=np.arange(self.N),
-                            y=self.data_vec,
-                            yerr=self.uncertainty,
-                            color="k",
-                            lw=1,
-                        )
-                        ax.plot(np.arange(self.N), self.data_vec, "ko")
-                    else:
-                        ax.plot(np.arange(self.N), self.data_vec, "ko-")
-                    ax.set_ylabel("$d_j$")
-                    ax.set_title("Data")
-                    ax.set_xlabel("$k_j$")
+        ax1, ax2, ax3 = axes
+        if show_model:
+            ax1.plot(self.mesh_prop.vectorCCx, self.G.T)
+            ax1.set_title("Rows of matrix G")
+            ax1.set_xlabel("x")
+            ax1.set_ylabel("g(x)")
 
+        if show_kernel:
+                ax2.plot(self.mesh_prop.vectorCCx, m)
+                ax2.set_ylim([-2.5, 2.5])
+                ax2.set_title("Model")
+                ax2.set_xlabel("x")
+                ax2.set_ylabel("m(x)")
+
+        if show_data:
+            if add_noise:
+                # this is just for visualization of uncertainty
+                ax3.errorbar(
+                    x=np.arange(self.N),
+                    y=self.data_vec,
+                    yerr=self.uncertainty,
+                    color="k",
+                    lw=1,
+                )
+                ax3.plot(np.arange(self.N), self.data_vec, "ko")
+            else:
+                ax3.plot(np.arange(self.N), self.data_vec, "ko-")
+            ax3.set_ylabel("$d_j$")
+            ax3.set_title("Data")
+            ax3.set_xlabel("$k_j$")
+
+        option_bools = [show_model, show_kernel, show_data]
         for i, ax in enumerate(axes):
             if not option_bools[i]:
                 ax.axis("off")
-                # ax.xaxis.set_minor_locator(plt.NullLocator())
-                # ax.xaxis.set_major_formatter(plt.NullFormatter())
-                # ax.xaxis.set_minor_formatter(plt.NullFormatter())
-                # ax.yaxis.set_major_locator(plt.NullLocator())
-                # ax.yaxis.set_minor_locator(plt.NullLocator())
-                # ax.yaxis.set_major_formatter(plt.NullFormatter())
-                # ax.yaxis.set_minor_formatter(plt.NullFormatter())
+
         plt.tight_layout()
 
         if self.return_axis:
