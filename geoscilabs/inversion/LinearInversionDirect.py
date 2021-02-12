@@ -29,7 +29,9 @@ from ipywidgets import (
     VBox,
     HBox,
     Checkbox,
-    interactive_output
+    interactive_output,
+    Button,
+    Layout
 )
 import warnings
 warnings.filterwarnings("ignore")
@@ -269,7 +271,6 @@ class LinearInversionDirectApp(object):
         m2=-1.0,
         m2_center=0.5,
         sigma_2=1.0,
-        option="model",
         add_noise=True,
         percentage=10,
         floor=1e-1,
@@ -277,6 +278,9 @@ class LinearInversionDirectApp(object):
         pmax=1,
         qmin=0.25,
         qmax=1,
+        show_model=True,
+        show_data=True,
+        show_kernel=True,
     ):
 
         m = self.set_model(
@@ -309,15 +313,7 @@ class LinearInversionDirectApp(object):
         self.uncertainty = abs(self.data_vec) * percentage * 0.01 + floor
         self.percentage = percentage
         self.floor = floor
-
-        option_bools = [False, False, False]
-        for item in option:
-            if item == "kernel":
-                option_bools[1] = True
-            elif item == "model":
-                option_bools[0] = True
-            elif item == "data":
-                option_bools[2] = True
+        option_bools = [show_model, show_model, show_data]
 
         fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
         for i, ax in enumerate(axes):
@@ -714,11 +710,9 @@ class LinearInversionDirectApp(object):
         pmax=FloatText(kwargs['pmax'], description="pmax")
         qmin=FloatText(kwargs['qmin'], description="qmin")
         qmax=FloatText(kwargs['qmax'], description="qmin")
-        option=SelectMultiple(
-            options=["model", "kernel", "data"],
-            value=["model"],
-            description="option",
-        )
+        show_model = Checkbox(value=True, description="")
+        show_kernel = Checkbox(value=True)
+        show_data = Checkbox(value=True)
         percentage=FloatText(value=kwargs['percentage'], description="percentage")
         floor=FloatText(value=kwargs['floor'], description="floor")
         add_noise=Checkbox(value=kwargs['add_noise'], description="add_noise")
@@ -733,7 +727,9 @@ class LinearInversionDirectApp(object):
                 "m2": m2,
                 "m2_center": m2_center,
                 "sigma_2": sigma_2,
-                "option": option,
+                "show_model": show_model,
+                "show_data": show_data,
+                "show_kernel": show_kernel,
                 "add_noise": add_noise,
                 "percentage": percentage,
                 "floor": floor,
@@ -743,14 +739,23 @@ class LinearInversionDirectApp(object):
                 "qmax": qmax,
             },
         )
+        a = Button(description='Model',
+                   layout=Layout(width='50%', height='30px'))
+        b = Button(description='Sensitivity',
+                   layout=Layout(width='50%', height='30px'))
+        c = Button(description='Noise',
+                   layout=Layout(width='50%', height='30px'))
+        d = Button(description='Plotting options',
+                   layout=Layout(width='100%', height='30px'))
 
         return VBox(
                 [
+                    HBox([a, b, c]),
                     HBox(
                             [
-                                VBox([m_background, m1, m1_center, dm1, m2, m2_center, sigma_2]),
-                                VBox([pmin, pmax, qmin, qmax]),
-                                VBox([option, add_noise, percentage, floor])
+                                VBox([m_background, m1, m1_center, dm1, m2, m2_center, sigma_2, show_model]),
+                                VBox([pmin, pmax, qmin, qmax, show_kernel]),
+                                VBox([add_noise, percentage, floor, show_data])
                             ]
                         ),
                     HBox([out])
