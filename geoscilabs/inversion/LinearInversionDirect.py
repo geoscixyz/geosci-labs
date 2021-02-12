@@ -506,7 +506,7 @@ class LinearInversionDirectApp(object):
             if mode == "Explore":
                 axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
                 if data_option == "obs/pred":
-                    axes[1].plot(self.jk, self.pred[i_beta], "bx")
+                    axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
                 axes[2].plot(self.betas[i_beta], self.phi_d[i_beta], "go", ms=10)
 
@@ -525,7 +525,7 @@ class LinearInversionDirectApp(object):
             if mode == "Explore":
                 axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
                 if data_option == "obs/pred":
-                    axes[1].plot(self.jk, self.pred[i_beta], "bx")
+                    axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
                 axes[0].legend(("True", "Pred"))
                 axes[2].plot(self.phi_m[i_beta], self.phi_d[i_beta], "go", ms=10)
