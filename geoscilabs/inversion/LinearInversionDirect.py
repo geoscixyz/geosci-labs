@@ -100,7 +100,7 @@ class LinearInversionDirectApp(object):
 
         def g(k):
             return np.exp(p_values[k] * self.mesh_prop.vectorCCx) * np.cos(
-                2 * np.pi * q_values[k] * self.mesh_prop.vectorCCx
+                2*np.pi * q_values[k] * self.mesh_prop.vectorCCx
             )
 
         for i in range(N):
@@ -170,6 +170,7 @@ class LinearInversionDirectApp(object):
             self.mesh_prop.vectorCCx < m1_center + dm1 / 2.0,
         )
         m[m1_inds] = m1 + m_background
+
         def gaussian(x, x0, sigma):
             return np.exp(-np.power((x - x0) / sigma, 2.0) / 2.0)
 
