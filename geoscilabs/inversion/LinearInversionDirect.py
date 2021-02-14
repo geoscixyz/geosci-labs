@@ -219,7 +219,7 @@ class LinearInversionDirectApp(object):
         add_noise=True,
         percentage=10,
         floor=1e-1,
-        ):
+    ):
         np.random.seed(1)
 
         m = self.m
@@ -279,8 +279,8 @@ class LinearInversionDirectApp(object):
         qmin=0.25,
         qmax=1,
         show_model=True,
-        show_data=True,
         show_kernel=True,
+        show_data=True,
     ):
 
         m = self.set_model(
@@ -319,11 +319,11 @@ class LinearInversionDirectApp(object):
         ax1, ax2, ax3 = axes
 
         if show_model:
-                ax1.plot(self.mesh_prop.vectorCCx, m)
-                ax1.set_ylim([-2.5, 2.5])
-                ax1.set_title("Model")
-                ax1.set_xlabel("x")
-                ax1.set_ylabel("m(x)")
+            ax1.plot(self.mesh_prop.vectorCCx, m)
+            ax1.set_ylim([-2.5, 2.5])
+            ax1.set_title("Model")
+            ax1.set_xlabel("x")
+            ax1.set_ylabel("m(x)")
 
         if show_kernel:
             ax2.plot(self.mesh_prop.vectorCCx, self.G.T)
