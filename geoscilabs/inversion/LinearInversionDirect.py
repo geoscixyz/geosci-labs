@@ -317,18 +317,19 @@ class LinearInversionDirectApp(object):
 
         fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
         ax1, ax2, ax3 = axes
+
         if show_model:
-            ax1.plot(self.mesh_prop.vectorCCx, self.G.T)
-            ax1.set_title("Rows of matrix G")
-            ax1.set_xlabel("x")
-            ax1.set_ylabel("g(x)")
+                ax1.plot(self.mesh_prop.vectorCCx, m)
+                ax1.set_ylim([-2.5, 2.5])
+                ax1.set_title("Model")
+                ax1.set_xlabel("x")
+                ax1.set_ylabel("m(x)")
 
         if show_kernel:
-                ax2.plot(self.mesh_prop.vectorCCx, m)
-                ax2.set_ylim([-2.5, 2.5])
-                ax2.set_title("Model")
-                ax2.set_xlabel("x")
-                ax2.set_ylabel("m(x)")
+            ax2.plot(self.mesh_prop.vectorCCx, self.G.T)
+            ax2.set_title("Rows of matrix G")
+            ax2.set_xlabel("x")
+            ax2.set_ylabel("g(x)")
 
         if show_data:
             if add_noise:
