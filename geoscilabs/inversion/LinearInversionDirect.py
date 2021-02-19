@@ -14,6 +14,7 @@ from SimPEG import (
 )
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import properties
 
 # from pymatsolver import Pardiso
 import matplotlib
@@ -36,37 +37,148 @@ from ipywidgets import (
 import warnings
 warnings.filterwarnings("ignore")
 
-class LinearInversionDirectApp(object):
+class LinearInversionDirectApp(properties.HasProperties):
     """docstring for LinearInversionApp"""
 
-    # Parameters for sensitivity matrix, G
-    N = None
-    M = None
-    j_start = None
-    j_end = None
-    p = None
-    q = None
-    seed = None
-
     # Parameters for Model
-    m = None
-    m_background = None
-    m1 = None
-    m2 = None
-    m1_center = None
-    dm1 = None
-    m2_center = None
-    dm2 = None
-    sigma = None
-    m_min = None
-    m_max = None
 
+    m = None
+
+    m_background = properties.Float(
+        "backgroound model", default=0., required=True
+    )
+    m1 = properties.Float(
+        "m1", default=1., required=True
+    )
+    m1_center = properties.Float(
+        "m1_center", default=0.2, required=True
+    )
+    dm1 = properties.Float(
+        "dm1", default=0.2, required=True
+    )
+    m2 = properties.Float(
+        "m2", default=2., required=True
+    )
+    m2_center = properties.Float(
+        "m2_center", default=0.75, required=True
+    )
+    dm2 = properties.Float(
+        "dm2", default=0.07, required=True
+    )
+    sigma_2 = properties.Float(
+        "sigma_2", default=0.07, required=True
+    )
+
+    # Parameters for Sensitivity
+    N = properties.Integer(
+        "N", default=20, required=True
+    )
+    M = properties.Integer(
+        "M", default=100, required=True
+    )
+    pmin = properties.Float(
+        "pmin", default=-0.25, required=True
+    )
+    pmax = properties.Float(
+        "pmax", default=-3, required=True
+    )
+    qmin = properties.Float(
+        "qmin", default=0, required=True
+    )
+    qmax = properties.Float(
+        "qmax", default=5, required=True
+    )
+    scale = properties.StringChoice(
+        "scale",
+        default="log",
+        choices=["linear", "log"],
+    )
+    fixed = properties.Bool(
+        "add_noise", default=False, required=True
+    )
+    ymin = properties.Float(
+        "ymin", default=-0.005, required=True
+    )
+    ymax =properties.Float(
+        "ymax", default=0.011, required=True
+    )
+    # Parameters for Data
+    add_noise = properties.Bool(
+        "add_noise", default=False, required=True
+    )
+    percentage = properties.Float(
+        "percentage", default=0., required=True
+    )
+    floor = properties.Float(
+        "floor", default=0.03, required=True
+    )
+
+    # Parameters for Inversion
+    mode = properties.StringChoice(
+        "mode",
+        default="Run",
+        choices=["Run", "Explore"],
+        required=True
+    )
+    mref =properties.Float(
+        "mref", default=0.0, required=True
+    )
+    chifact =properties.Float(
+        "chifact", default=1.0, required=True
+    )
+    data_option = properties.StringChoice(
+        "data_option",
+        default="obs & pred",
+        choices=["obs & pred", "normalized misfit"],
+        required=True
+    )
+    beta_min =properties.Float(
+        "beta_min", default=1e-4, required=True
+    )
+    beta_max =properties.Float(
+        "beta_max", default=1e5, required=True
+    )
+    n_beta = properties.Integer(
+        "n_beta", default=31, required=True
+    )
+    alpha_s = properties.Integer(
+        "alpha_s", default=1, required=True
+    )
+    alpha_x = properties.Integer(
+        "alpha_x", default=0., required=True
+    )
+    tikhonov =properties.StringChoice(
+        "tikhonov",
+        default="phi_d & phi_m",
+        choices=["phi_d & phi_m", "phi_d vs phi_m"],
+        required=True
+    )
+    i_beta = properties.Integer(
+        "i_beta", default=0, required=True
+    )
+    scale_inv = properties.StringChoice(
+        "scale_inv",
+        default="log",
+        choices=["linear", "log"],
+    )
+
+    # Other parameters
+    show_model = properties.Bool(
+        "show_model", default=True, required=True
+    )
+    show_data = properties.Bool(
+        "show_data", default=True, required=True
+    )
+    show_kernel = properties.Bool(
+        "show_kernel", default=True, required=True
+    )
+    seed = None
     data_vec = None
     save = None
     return_axis = False
 
-    def __init__(self):
-        super(LinearInversionDirectApp, self).__init__()
+    def __init__(self, **kwargs):
+        super(LinearInversionDirectApp, self).__init__(**kwargs)
 
     @property
     def G(self):
@@ -83,6 +195,19 @@ class LinearInversionDirectApp(object):
     @property
     def mesh_prop(self):
         return self._mesh_prop
+
+    def reset_to_defaults(self, **kwargs):
+        for name in kwargs.keys():
+            if name not in self._props:
+                raise AttributeError(
+                    "Input name '{}' is not a known " "property or attribute".format(name)
+                )
+        for key in self._props:
+            if key in kwargs.keys():
+                val = kwargs[key]
+            else:
+                val = self._props[key].default
+            setattr(self, key, val)
 
     def set_G(self, N=20, M=100, pmin=-0.25, pmax=-15, qmin=0.25, qmax=15):
         """
@@ -112,8 +237,8 @@ class LinearInversionDirectApp(object):
 
     def plot_G(
         self,
-        N=20,
-        M=100,
+        N=None,
+        M=None,
         pmin=-0.25,
         pmax=1,
         qmin=0.25,
@@ -123,6 +248,16 @@ class LinearInversionDirectApp(object):
         ymin=-0.001,
         ymax=0.011,
     ):
+
+        self.N = N
+        self.M = M
+        self.pmin = pmin
+        self.pmax = pmax
+        self.scale = scale
+        self.fixed = fixed
+        self.ymin = ymin
+        self.ymax = ymax
+
         self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
 
         _, s, _ = np.linalg.svd(self.G, full_matrices=False)
@@ -160,12 +295,13 @@ class LinearInversionDirectApp(object):
         self,
         m_background=0.0,
         m1=1.0,
-        m2=-1.0,
         m1_center=0.2,
         dm1=0.2,
-        m2_center=0.5,
-        sigma_2=1.0,
+        m2=2.0,
+        m2_center=0.75,
+        sigma_2=0.07
     ):
+
         m = np.zeros(self.mesh_prop.nC) + m_background
         m1_inds = np.logical_and(
             self.mesh_prop.vectorCCx > m1_center - dm1 / 2.0,
@@ -186,13 +322,21 @@ class LinearInversionDirectApp(object):
         m1=1.0,
         m1_center=0.2,
         dm1=0.2,
-        m2=-1.0,
-        m2_center=0.5,
-        sigma_2=1.0,
+        m2=2.0,
+        m2_center=0.75,
+        sigma_2=0.07,
         M=100
         ):
 
         self.M = M
+        self.m_background = m_background
+        self.m1 = m1
+        self.m2 = m2
+        self.m1_center = m1_center
+        self.dm1 = dm1
+        self.m2_center = m2_center
+        self.sigma_2 = sigma_2
+
         self._mesh_prop = TensorMesh([self.M])
         m = self.set_model(
             m_background=m_background,
@@ -216,11 +360,15 @@ class LinearInversionDirectApp(object):
 
     def plot_data_only(
         self,
-        add_noise=True,
-        percentage=10,
-        floor=1e-1,
+        add_noise=False,
+        percentage=0,
+        floor=3e-2,
     ):
+
         np.random.seed(1)
+        self.add_noise = add_noise
+        self.percentage = percentage
+        self.floor = floor
 
         m = self.m
         fig, ax = plt.subplots(1,1)
@@ -268,16 +416,18 @@ class LinearInversionDirectApp(object):
         m1=1.0,
         m1_center=0.2,
         dm1=0.2,
-        m2=-1.0,
-        m2_center=0.5,
-        sigma_2=1.0,
-        add_noise=True,
-        percentage=10,
-        floor=1e-1,
+        m2=2.0,
+        m2_center=0.75,
+        sigma_2=0.07,
+        M=100,
         pmin=-0.25,
         pmax=1,
         qmin=0.25,
         qmax=1,
+        N=20,
+        add_noise=False,
+        percentage=0,
+        floor=3e-2,
         show_model=True,
         show_kernel=True,
         show_data=True,
@@ -292,7 +442,7 @@ class LinearInversionDirectApp(object):
             m2_center=m2_center,
             sigma_2=sigma_2,
         )
-        self.set_G(N=self.N, M=self.M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
+        self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
         np.random.seed(1)
 
         if add_noise:
@@ -372,14 +522,14 @@ class LinearInversionDirectApp(object):
         self,
         m0=0.0,
         mref=0.0,
-        percentage=5,
-        floor=0.1,
+        percentage=0,
+        floor=3e-2,
         chi_fact=1.0,
         beta_min=1e-4,
-        beta_max=1e0,
-        n_beta=31,
+        beta_max=1e5,
+        n_beta=81,
         alpha_s=1.0,
-        alpha_x=1.0,
+        alpha_x=0,
     ):
 
         self.uncertainty = percentage * abs(self.data_vec) * 0.01 + floor
@@ -418,18 +568,18 @@ class LinearInversionDirectApp(object):
 
     def plot_inversion(
         self,
-        mode=True,
+        mode="Run",
         mref=0.0,
-        percentage=5,
-        floor=0.1,
+        percentage=10,
+        floor=3e-2,
         chifact=1,
-        data_option="obs/pred",
+        data_option="obs & pred",
         beta_min=1e-4,
-        beta_max=1e0,
-        n_beta=31,
+        beta_max=1e5,
+        n_beta=81,
         alpha_s=1.0,
-        alpha_x=1.0,
-        option="model",
+        alpha_x=0.,
+        tikhonov="phi_d & phi_m",
         i_beta=1,
         scale="log",
     ):
@@ -467,7 +617,7 @@ class LinearInversionDirectApp(object):
         if mode == "Run":
             axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
-        if data_option == "obs/pred":
+        if data_option == "obs & pred":
             axes[1].plot(np.arange(self.N), self.data_vec, "ko")
             if mode == "Run":
                 axes[1].plot(np.arange(self.N), self.pred[i_target], "bx")
@@ -496,10 +646,10 @@ class LinearInversionDirectApp(object):
         axes[0].set_xlabel("x")
         axes[0].set_ylabel("m(x)")
 
-        if option == "misfit":
+        if tikhonov == "phi_d & phi_m":
             if mode == "Explore":
                 axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
-                if data_option == "obs/pred":
+                if data_option == "obs & pred":
                     axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
                 axes[2].plot(self.betas[i_beta], self.phi_d[i_beta], "go", ms=10)
@@ -515,10 +665,10 @@ class LinearInversionDirectApp(object):
                 tl.set_color("r")
 
             xmin, xmax = beta_max, beta_min
-        elif option == "tikhonov":
+        elif tikhonov == "phi_d vs phi_m":
             if mode == "Explore":
                 axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
-                if data_option == "obs/pred":
+                if data_option == "obs & pred":
                     axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))
                 axes[0].legend(("True", "Pred"))
@@ -564,7 +714,7 @@ class LinearInversionDirectApp(object):
                 min=-2,
                 max=2,
                 step=0.05,
-                value=0.0,
+                value=self.m_background,
                 continuous_update=False,
                 description="m$_{background}$",
             ),
@@ -572,7 +722,7 @@ class LinearInversionDirectApp(object):
                 min=-2,
                 max=2,
                 step=0.05,
-                value=1.0,
+                value=self.m1,
                 continuous_update=False,
                 description="m1",
             ),
@@ -580,7 +730,7 @@ class LinearInversionDirectApp(object):
                 min=-2,
                 max=2,
                 step=0.05,
-                value=2.0,
+                value=self.m2,
                 continuous_update=False,
                 description="m2",
             ),
@@ -588,7 +738,7 @@ class LinearInversionDirectApp(object):
                 min=-2,
                 max=2,
                 step=0.05,
-                value=0.2,
+                value=self.m1_center,
                 continuous_update=False,
                 description="m1$_{center}$",
             ),
@@ -596,7 +746,7 @@ class LinearInversionDirectApp(object):
                 min=0,
                 max=0.5,
                 step=0.05,
-                value=0.2,
+                value=self.dm1,
                 continuous_update=False,
                 description="m1$_{width}$",
             ),
@@ -604,7 +754,7 @@ class LinearInversionDirectApp(object):
                 min=-2,
                 max=2,
                 step=0.05,
-                value=0.75,
+                value=self.m2_center,
                 continuous_update=False,
                 description="m2$_{center}$",
             ),
@@ -612,46 +762,46 @@ class LinearInversionDirectApp(object):
                 min=0.01,
                 max=0.1,
                 step=0.01,
-                value=0.07,
+                value=self.sigma_2,
                 continuous_update=False,
                 description="m2$_{sigma}$",
             ),
-            M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
+            M=IntSlider(min=1, max=100, step=1, value=self.M, continuous_update=False),
         )
         return Q
 
     def interact_plot_G(self):
         Q = interact(
             self.plot_G,
-            N=IntSlider(min=1, max=100, step=1, value=20, continuous_update=False),
-            M=IntSlider(min=1, max=100, step=1, value=100, continuous_update=False),
-            pmin=FloatText(-0.25),
-            pmax=FloatText(-5),
-            qmin=FloatText(0.25),
-            qmax=FloatText(5),
-            scale=ToggleButtons(options=["linear", "log"], value="log"),
-            fixed=False,
-            ymin=FloatText(value=-0.005),
-            ymax=FloatText(value=0.011),
+            N=IntSlider(min=1, max=100, step=1, value=self.N, continuous_update=False),
+            M=IntSlider(min=1, max=100, step=1, value=self.M, continuous_update=False),
+            pmin=FloatText(self.pmin),
+            pmax=FloatText(self.pmax),
+            qmin=FloatText(self.qmin),
+            qmax=FloatText(self.qmax),
+            scale=ToggleButtons(options=["linear", "log"], value=self.scale),
+            fixed=self.fixed,
+            ymin=FloatText(value=self.ymin),
+            ymax=FloatText(value=self.ymax),
         )
         return Q
 
     def interact_plot_data(self):
         Q = interact(
             self.plot_data_only,
-            percentage=FloatText(value=10, description="percentage"),
-            floor=FloatText(value=0, description="floor"),
-            add_noise=Checkbox(value=False, description="add_noise"),
+            percentage=FloatText(value=self.percentage, description="percentage"),
+            floor=FloatText(value=self.floor, description="floor"),
+            add_noise=Checkbox(value=self.add_noise, description="add_noise"),
         )
         return Q
 
-    def interact_plot_all_three_together(self, kwargs):
+    def interact_plot_all_three_together(self):
 
         m_background=FloatSlider(
             min=-2,
             max=2,
             step=0.05,
-            value=kwargs['m_background'],
+            value=self.m_background,
             continuous_update=False,
             description="m$_{background}$",
         )
@@ -659,7 +809,7 @@ class LinearInversionDirectApp(object):
             min=-2,
             max=2,
             step=0.05,
-            value=kwargs['m1'],
+            value=self.m1,
             continuous_update=False,
             description="m1",
         )
@@ -667,7 +817,7 @@ class LinearInversionDirectApp(object):
             min=-2,
             max=2,
             step=0.05,
-            value=kwargs['m2'],
+            value=self.m2,
             continuous_update=False,
             description="m2",
         )
@@ -675,7 +825,7 @@ class LinearInversionDirectApp(object):
             min=-2,
             max=2,
             step=0.05,
-            value=kwargs['m1_center'],
+            value=self.m1_center,
             continuous_update=False,
             description="m1$_{center}$",
         )
@@ -683,7 +833,7 @@ class LinearInversionDirectApp(object):
             min=0,
             max=0.5,
             step=0.05,
-            value=kwargs['dm1'],
+            value=self.dm1,
             continuous_update=False,
             description="m1$_{width}$",
         )
@@ -691,7 +841,7 @@ class LinearInversionDirectApp(object):
             min=-2,
             max=2,
             step=0.05,
-            value=kwargs['m2_center'],
+            value=self.m2_center,
             continuous_update=False,
             description="m2$_{center}$",
         )
@@ -699,20 +849,22 @@ class LinearInversionDirectApp(object):
             min=0.01,
             max=0.1,
             step=0.01,
-            value=kwargs['sigma_2'],
+            value=self.sigma_2,
             continuous_update=False,
             description="m2$_{sigma}$",
         )
-        pmin=FloatText(kwargs['pmin'], description="pmin")
-        pmax=FloatText(kwargs['pmax'], description="pmax")
-        qmin=FloatText(kwargs['qmin'], description="qmin")
-        qmax=FloatText(kwargs['qmax'], description="qmin")
-        show_model = Checkbox(value=True, description="")
-        show_kernel = Checkbox(value=True)
-        show_data = Checkbox(value=True)
-        percentage=FloatText(value=kwargs['percentage'], description="percentage")
-        floor=FloatText(value=kwargs['floor'], description="floor")
-        add_noise=Checkbox(value=kwargs['add_noise'], description="add_noise")
+        pmin=FloatText(self.pmin, description="pmin")
+        pmax=FloatText(self.pmax, description="pmax")
+        qmin=FloatText(self.qmin, description="qmin")
+        qmax=FloatText(self.qmax, description="qmin")
+        show_model = Checkbox(value=self.show_model, description="")
+        show_kernel = Checkbox(value=self.show_kernel)
+        show_data = Checkbox(value=self.show_data)
+        percentage=FloatText(value=self.percentage, description="percentage")
+        floor=FloatText(value=self.floor, description="floor")
+        add_noise=Checkbox(value=self.add_noise, description="add_noise")
+        M=IntSlider(min=1, max=100, step=1, value=self.M, continuous_update=False, description="M")
+        N=IntSlider(min=1, max=100, step=1, value=self.N, continuous_update=False, description="N")
 
         out = interactive_output(
             self.plot_model,
@@ -734,54 +886,104 @@ class LinearInversionDirectApp(object):
                 "pmax": pmax,
                 "qmin": qmin,
                 "qmax": qmax,
+                "M":M,
+                "N":N,
             },
         )
         a = Button(description='Model',
-                   layout=Layout(width='50%', height='30px'))
+                   layout=Layout(width='100%', height='30px'))
         b = Button(description='Sensitivity',
-                   layout=Layout(width='50%', height='30px'))
+                   layout=Layout(width='100%', height='30px'))
         c = Button(description='Noise',
-                   layout=Layout(width='50%', height='30px'))
-        d = Button(description='Plotting options',
                    layout=Layout(width='100%', height='30px'))
 
         return VBox(
                 [
-                    HBox([a, b, c]),
                     HBox(
                             [
-                                VBox([m_background, m1, m1_center, dm1, m2, m2_center, sigma_2, show_model]),
-                                VBox([pmin, pmax, qmin, qmax, show_kernel]),
-                                VBox([add_noise, percentage, floor, show_data])
+                                VBox([a, M, m_background, m1, m1_center, dm1, m2, m2_center, sigma_2, show_model]),
+                                VBox([b, N, pmin, pmax, qmin, qmax, show_kernel]),
+                                VBox([c, add_noise, percentage, floor, show_data])
                             ]
                         ),
                     HBox([out])
                 ]
             )
 
-    def interact_plot_inversion(self, n_beta=81):
-        interact(
-            self.plot_inversion,
-            mode=RadioButtons(
-                description="mode", options=["Run", "Explore"], value="Run"
-            ),
-            mref=FloatSlider(
-                min=-2, max=2, step=0.05, value=0.0, continuous_update=False
-            ),
-            percentage=FloatText(value=self.percentage),
-            floor=FloatText(value=self.floor),
-            beta_min=FloatText(value=1e-3),
-            beta_max=FloatText(value=1e5),
-            n_beta=IntText(value=n_beta, min=10, max=100),
-            alpha_s=FloatText(value=1.0),
-            alpha_x=FloatText(value=0),
-            option=ToggleButtons(options=["misfit", "tikhonov"], value="tikhonov"),
-            data_option=ToggleButtons(
-                options=["obs/pred", "misfit"], value="obs/pred", description="data"
-            ),
-            scale=ToggleButtons(options=["linear", "log"], value="log"),
-            i_beta=IntSlider(
-                min=0, max=n_beta - 1, step=1, value=0, continuous_update=False
-            ),
-            chifact=FloatText(value=1.0),
+    def interact_plot_inversion(self):
+
+        mode=RadioButtons(
+            description="mode", options=["Run", "Explore"], value=self.mode
         )
+        mref=FloatSlider(
+            min=-2, max=2, step=0.05, value=self.mref, continuous_update=False, description="mref"
+        )
+        percentage=FloatText(value=self.percentage, description="percentage")
+        floor=FloatText(value=self.floor, description="floor")
+        beta_min=FloatText(value=self.beta_min, description="beta_min")
+        beta_max=FloatText(value=self.beta_max, description="beta_min")
+        n_beta=IntText(value=self.n_beta, min=10, max=100, description="n_beta")
+        alpha_s=FloatText(value=self.alpha_s, description="alpha_s")
+        alpha_x=FloatText(value=self.alpha_x, description="alpha_x")
+        tikhonov=RadioButtons(
+            options=["phi_d & phi_m", "phi_d vs phi_m"], value=self.tikhonov,
+            description='tikhonov'
+        )
+        data_option=RadioButtons(
+            options=["obs & pred", "normalized misfit"], value="obs & pred", description="data"
+        )
+        scale=RadioButtons(options=["linear", "log"], value=self.scale_inv, description='scale')
+        i_beta=IntSlider(
+            min=0, max=self.n_beta - 1, step=1, value=self.i_beta, continuous_update=False,
+            description='i_beta'
+        )
+        chifact=FloatText(value=self.chifact, description='chifact')
+        out = interactive_output(
+            self.plot_inversion,
+            {
+                "mode": mode,
+                "mref": mref,
+                "percentage": percentage,
+                "floor": floor,
+                "beta_min": beta_min,
+                "beta_max": beta_max,
+                "n_beta": n_beta,
+                "alpha_s": alpha_s,
+                "alpha_x": alpha_x,
+                "tikhonov": tikhonov,
+                "i_beta": i_beta,
+                "chifact": chifact,
+                "floor": floor,
+                "data_option":data_option,
+                "tikhonov":tikhonov,
+                "scale":scale
+            },
+        )
+        a = Button(description='Misfit',
+                   layout=Layout(width='100%', height='30px'))
+        b = Button(description='Model norm',
+                   layout=Layout(width='100%', height='30px'))
+        c = Button(description='Beta',
+                   layout=Layout(width='100%', height='30px'))
+        d = Button(description='Plotting options',
+                   layout=Layout(width='92%', height='30px'))
+
+        return VBox(
+                [
+                    HBox([mode]),
+                    HBox(
+                            [
+                                VBox([a, percentage, floor, chifact]),
+                                VBox([b, mref, alpha_s, alpha_x]),
+                                VBox([c, beta_min, beta_max, n_beta, i_beta])
+                            ]
+                        ),
+                    VBox(
+                            [
+                                d,
+                                HBox([data_option, tikhonov, scale]),
+                            ]
+                        ),
+                    HBox([out])
+                ]
+            )
