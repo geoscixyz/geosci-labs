@@ -370,21 +370,34 @@ class LinearInversionDirectApp(properties.HasProperties):
         self.percentage = percentage
         self.floor = floor
 
-        m = self.m
-        fig, ax = plt.subplots(1,1)
+        self.set_G(N=self.N, M=self.M, pmin=self.pmin, pmax=self.pmax, qmin=self.qmin, qmax=self.qmax)
+
+        m = self.set_model(
+            m_background=self.m_background,
+            m1=self.m1,
+            m2=self.m2,
+            m1_center=self.m1_center,
+            dm1=self.dm1,
+            m2_center=self.m2_center,
+            sigma_2=self.sigma_2,
+        )
+
+        fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
+        ax1, ax2, ax3 = axes
+
         if add_noise:
             survey_obj, simulation_obj = self.get_problem_survey()
-            d = simulation_obj.dpred(m)
+            d_clean = simulation_obj.dpred(m)
             noise = (
-                abs(d) * percentage * 0.01 * np.random.randn(self.N)
+                abs(d_clean) * percentage * 0.01 * np.random.randn(self.N)
                 + np.random.randn(self.N) * floor
             )
         else:
             survey_obj, simulation_obj = self.get_problem_survey()
-            d = simulation_obj.dpred(m)
+            d_clean = simulation_obj.dpred(m)
             noise = np.zeros(self.N, float)
 
-        d += noise
+        d = d_clean + noise
         self.data_vec = d.copy()
         self.m = m.copy()
         self.uncertainty = abs(self.data_vec) * percentage * 0.01 + floor
@@ -393,19 +406,33 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         if add_noise:
             # this is just for visualization of uncertainty
-            ax.errorbar(
+            ax3.errorbar(
                 x=np.arange(self.N),
-                y=self.data_vec,
+                y=d,
                 yerr=self.uncertainty,
                 color="k",
                 lw=1,
             )
-            ax.plot(np.arange(self.N), self.data_vec, "ko")
+            ax3.plot(np.arange(self.N), d, "ko")
+            ax1.plot(np.arange(self.N), d_clean, "ko-")
+            ax2.plot(np.arange(self.N), noise, "kx")
+            ylim = ax3.get_ylim()
+            for ii, ax in enumerate([ax1, ax2, ax3]):
+                ax.set_ylim(ylim)
+                if ii !=0:
+                    ax.set_yticklabels([])
+                else:
+                    ax.set_xlabel("$j$")
+            ax2.set_title("Noise")
+            ax3.set_title("Noisy data")
+
         else:
-            ax.plot(np.arange(self.N), self.data_vec, "ko-")
-        ax.set_ylabel("$d_j$")
-        ax.set_title("Data")
-        ax.set_xlabel("$j$")
+            ax1.plot(np.arange(self.N), d_clean, "ko-")
+            ax2.axis('off')
+            ax3.axis('off')
+        ax1.set_ylabel("$d_j$")
+        ax1.set_title("Clean data")
+        ax1.set_xlabel("$j$")
 
         if self.return_axis:
             return ax
