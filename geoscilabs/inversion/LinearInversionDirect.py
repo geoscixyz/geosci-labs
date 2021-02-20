@@ -162,6 +162,12 @@ class LinearInversionDirectApp(properties.HasProperties):
         choices=["linear", "log"],
     )
 
+    noise_option = properties.StringChoice(
+        "noise_option",
+        default="error contaminated",
+        choices=["error contaminated", "clean data"],
+    )
+
     # Other parameters
     show_model = properties.Bool(
         "show_model", default=True, required=True
@@ -174,6 +180,7 @@ class LinearInversionDirectApp(properties.HasProperties):
     )
     seed = None
     data_vec = None
+    data_clen_vec = None
     save = None
     return_axis = False
 
@@ -399,6 +406,7 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         d = d_clean + noise
         self.data_vec = d.copy()
+        self.data_clen_vec = d_clean.copy()
         self.m = m.copy()
         self.uncertainty = abs(self.data_vec) * percentage * 0.01 + floor
         self.percentage = percentage
@@ -412,6 +420,7 @@ class LinearInversionDirectApp(properties.HasProperties):
                 yerr=self.uncertainty,
                 color="k",
                 lw=1,
+                capsize=2
             )
             ax3.plot(np.arange(self.N), d, "ko")
             ax1.plot(np.arange(self.N), d_clean, "ko-")
@@ -517,6 +526,7 @@ class LinearInversionDirectApp(properties.HasProperties):
                     yerr=self.uncertainty,
                     color="k",
                     lw=1,
+                    capsize=2
                 )
                 ax3.plot(np.arange(self.N), self.data_vec, "ko")
             else:
@@ -609,9 +619,25 @@ class LinearInversionDirectApp(properties.HasProperties):
         tikhonov="phi_d & phi_m",
         i_beta=1,
         scale="log",
+        noise_option="error contaminated"
     ):
         m0 = 0.0
         if mode == "Run":
+            if noise_option == "error contaminated":
+                survey_obj, simulation_obj = self.get_problem_survey()
+                d = simulation_obj.dpred(self.m)
+                noise = (
+                    abs(d) * percentage * 0.01 * np.random.randn(self.N)
+                    + np.random.randn(self.N) * floor
+
+                )
+            elif noise_option == "clean data":
+                survey_obj, simulation_obj = self.get_problem_survey()
+                d = simulation_obj.dpred(self.m)
+                noise = np.zeros(self.N, float)
+
+            self.data_vec = d + noise
+
             (
                 self.phi_d,
                 self.phi_m,
@@ -629,7 +655,9 @@ class LinearInversionDirectApp(properties.HasProperties):
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
             )
+
         nD = self.data_vec.size
+
         i_target = np.argmin(abs(self.phi_d - nD * chifact))
 
         if i_beta > n_beta - 1:
@@ -645,10 +673,13 @@ class LinearInversionDirectApp(properties.HasProperties):
             axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         if data_option == "obs & pred":
-            axes[1].plot(np.arange(self.N), self.data_vec, "ko")
+            if self.noise_option == "error contaminated":
+                axes[1].errorbar(np.arange(self.N), self.data_vec, yerr=self.uncertainty, color="k", lw=1, capsize=2, label="Observed")
+            else:
+                axes[1].plot(np.arange(self.N), self.data_vec, "ko", label="Observed")
             if mode == "Run":
-                axes[1].plot(np.arange(self.N), self.pred[i_target], "bx")
-            axes[1].legend(("Observed", "Predicted"))
+                axes[1].plot(np.arange(self.N), self.pred[i_target], "bx", label="Predicted")
+            axes[1].legend()
             axes[1].set_title("Data")
             axes[1].set_xlabel("$k_j$")
             axes[1].set_ylabel("$d_j$")
@@ -677,8 +708,8 @@ class LinearInversionDirectApp(properties.HasProperties):
             if mode == "Explore":
                 axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
                 if data_option == "obs & pred":
-                    axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
-                    axes[1].legend(("Observed", "Predicted"))
+                    axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx", label="Predicted")
+                    axes[1].legend()
                 axes[2].plot(self.betas[i_beta], self.phi_d[i_beta], "go", ms=10)
 
             ax_1 = axes[2].twinx()
@@ -965,6 +996,9 @@ class LinearInversionDirectApp(properties.HasProperties):
             description='i_beta'
         )
         chifact=FloatText(value=self.chifact, description='chifact')
+        noise_option=RadioButtons(
+            options=["error contaminated", "clean data"], value=self.noise_option, description = 'noise option'
+        )
         out = interactive_output(
             self.plot_inversion,
             {
@@ -983,7 +1017,8 @@ class LinearInversionDirectApp(properties.HasProperties):
                 "floor": floor,
                 "data_option":data_option,
                 "tikhonov":tikhonov,
-                "scale":scale
+                "scale":scale,
+                "noise_option":noise_option
             },
         )
         a = Button(description='Misfit',
@@ -997,7 +1032,7 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         return VBox(
                 [
-                    HBox([mode]),
+                    HBox([mode, noise_option]),
                     HBox(
                             [
                                 VBox([a, percentage, floor, chifact]),
