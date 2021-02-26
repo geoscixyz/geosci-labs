@@ -102,6 +102,10 @@ class LinearInversionDirectApp(properties.HasProperties):
     ymax =properties.Float(
         "ymax", default=0.011, required=True
     )
+    show_singular = properties.Bool(
+        "show_singular", default=False, required=True
+    )
+
     # Parameters for Data
     add_noise = properties.Bool(
         "add_noise", default=False, required=True
@@ -111,6 +115,9 @@ class LinearInversionDirectApp(properties.HasProperties):
     )
     floor = properties.Float(
         "floor", default=0.03, required=True
+    )
+    show_relative_noise = properties.Bool(
+        "show_relative_noise", default=False, required=True
     )
 
     # Parameters for Inversion
@@ -139,7 +146,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         "beta_max", default=1e5, required=True
     )
     n_beta = properties.Integer(
-        "n_beta", default=31, required=True
+        "n_beta", default=81, required=True
     )
     alpha_s = properties.Integer(
         "alpha_s", default=1, required=True
@@ -254,6 +261,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         fixed=False,
         ymin=-0.001,
         ymax=0.011,
+        show_singular=False
     ):
 
         self.N = N
@@ -264,6 +272,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         self.fixed = fixed
         self.ymin = ymin
         self.ymax = ymax
+        self.show_singular = show_singular
 
         self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
 
@@ -283,16 +292,18 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax1.set_xlabel("x")
         ax1.set_ylabel("g(x)")
 
-        ax2.plot(np.arange(self.N) + 1, s, "ro")
-        ax2.set_xlabel("")
-        ax2.set_title("singular values", fontsize=12)
-        ax2.set_xscale(scale)
-        ax2.set_yscale(scale)
-        ax2.xaxis.set_major_locator(plt.NullLocator())
-        ax2.xaxis.set_minor_locator(plt.NullLocator())
-        ax2.xaxis.set_major_formatter(plt.NullFormatter())
-        ax2.xaxis.set_minor_formatter(plt.NullFormatter())
-
+        if show_singular:
+            ax2.plot(np.arange(self.N) + 1, s, "ro")
+            ax2.set_xlabel("")
+            ax2.set_title("singular values", fontsize=12)
+            ax2.set_xscale(scale)
+            ax2.set_yscale(scale)
+            ax2.xaxis.set_major_locator(plt.NullLocator())
+            ax2.xaxis.set_minor_locator(plt.NullLocator())
+            ax2.xaxis.set_major_formatter(plt.NullFormatter())
+            ax2.xaxis.set_minor_formatter(plt.NullFormatter())
+        else:
+            ax2.axis('off')
         plt.tight_layout()
         # plt.show()
         if self.return_axis:
@@ -370,12 +381,14 @@ class LinearInversionDirectApp(properties.HasProperties):
         add_noise=False,
         percentage=0,
         floor=3e-2,
+        show_relative_noise=False
     ):
 
         np.random.seed(1)
         self.add_noise = add_noise
         self.percentage = percentage
         self.floor = floor
+        self.show_relative_noise = show_relative_noise
 
         self.set_G(N=self.N, M=self.M, pmin=self.pmin, pmax=self.pmax, qmin=self.qmin, qmax=self.qmax)
 
@@ -389,7 +402,7 @@ class LinearInversionDirectApp(properties.HasProperties):
             sigma_2=self.sigma_2,
         )
 
-        fig, axes = plt.subplots(1, 3, figsize=(12 * 1.2, 3 * 1.2))
+        fig, axes = plt.subplots(1, 3, figsize=(13 * 1.2, 3 * 1.2))
         ax1, ax2, ax3 = axes
 
         if add_noise:
@@ -424,15 +437,23 @@ class LinearInversionDirectApp(properties.HasProperties):
             )
             ax3.plot(np.arange(self.N), d, "ko")
             ax1.plot(np.arange(self.N), d_clean, "ko-")
-            ax2.plot(np.arange(self.N), noise, "kx")
+            if self.show_relative_noise:
+                eps =  np.percentile(abs(d_clean), 1)
+                ax2.plot(np.arange(self.N), noise/(d + eps), "kx")
+                ax2.set_title("Noise / data")
+            else:
+                ax2.plot(np.arange(self.N), noise, "kx")
+                ax2.set_title("Noise")
             ylim = ax3.get_ylim()
             for ii, ax in enumerate([ax1, ax2, ax3]):
-                ax.set_ylim(ylim)
-                if ii !=0:
-                    ax.set_yticklabels([])
+                if self.show_relative_noise:
+                    if ii != 1:
+                        ax.set_ylim(ylim)
                 else:
-                    ax.set_xlabel("$j$")
-            ax2.set_title("Noise")
+                    ax.set_ylim(ylim)
+                    if ii !=0:
+                        ax.set_yticklabels([])
+
             ax3.set_title("Noisy data")
 
         else:
@@ -441,7 +462,8 @@ class LinearInversionDirectApp(properties.HasProperties):
             ax3.axis('off')
         ax1.set_ylabel("$d_j$")
         ax1.set_title("Clean data")
-        ax1.set_xlabel("$j$")
+        for ax in axes:
+            ax.set_xlabel("$j$")
 
         if self.return_axis:
             return ax
@@ -529,10 +551,11 @@ class LinearInversionDirectApp(properties.HasProperties):
                     capsize=2
                 )
                 ax3.plot(np.arange(self.N), self.data_vec, "ko")
+                ax3.set_title("Noisy data")
             else:
                 ax3.plot(np.arange(self.N), self.data_vec, "ko-")
+                ax3.set_title("Clen data")
             ax3.set_ylabel("$d_j$")
-            ax3.set_title("Data")
             ax3.set_xlabel("$k_j$")
 
         option_bools = [show_model, show_kernel, show_data]
@@ -606,22 +629,39 @@ class LinearInversionDirectApp(properties.HasProperties):
     def plot_inversion(
         self,
         mode="Run",
-        mref=0.0,
-        percentage=10,
-        floor=3e-2,
+        noise_option="error contaminated",
+        percentage=0,
+        floor=0.03,
         chifact=1,
-        data_option="obs & pred",
+        mref=0.0,
+        alpha_s=1.0,
+        alpha_x=0.,
         beta_min=1e-4,
         beta_max=1e5,
         n_beta=81,
-        alpha_s=1.0,
-        alpha_x=0.,
+        i_beta=0,
+        data_option="obs & pred",
         tikhonov="phi_d & phi_m",
-        i_beta=1,
-        scale="log",
-        noise_option="error contaminated"
+        scale="log"
     ):
-        m0 = 0.0
+        self.mode = mode
+        self.noise_option = noise_option
+        self.percentage = percentage
+        self.floor = floor
+        self.chifact = chifact
+        self.mref = mref
+        self.alpha_s = alpha_s
+        self.alpha_x = alpha_x
+        self.beta_min = beta_min
+        self.beta_max = beta_max
+        self.n_beta = n_beta
+        self.i_beta = i_beta
+        self.data_option = data_option
+        self.tikhonov = tikhonov
+        self.scale = scale
+
+        m0 = 0.
+
         if mode == "Run":
             if noise_option == "error contaminated":
                 survey_obj, simulation_obj = self.get_problem_survey()
@@ -841,6 +881,7 @@ class LinearInversionDirectApp(properties.HasProperties):
             fixed=self.fixed,
             ymin=FloatText(value=self.ymin),
             ymax=FloatText(value=self.ymax),
+            show_singular=Checkbox(value=self.show_singular)
         )
         return Q
 
@@ -850,6 +891,7 @@ class LinearInversionDirectApp(properties.HasProperties):
             percentage=FloatText(value=self.percentage, description="percentage"),
             floor=FloatText(value=self.floor, description="floor"),
             add_noise=Checkbox(value=self.add_noise, description="add_noise"),
+            show_relative_noise=Checkbox(value=self.show_relative_noise, description="show_relative_noise"),
         )
         return Q
 
@@ -915,9 +957,9 @@ class LinearInversionDirectApp(properties.HasProperties):
         pmax=FloatText(self.pmax, description="pmax")
         qmin=FloatText(self.qmin, description="qmin")
         qmax=FloatText(self.qmax, description="qmin")
-        show_model = Checkbox(value=self.show_model, description="")
-        show_kernel = Checkbox(value=self.show_kernel)
-        show_data = Checkbox(value=self.show_data)
+        show_model = Checkbox(value=self.show_model, description="show model")
+        show_kernel = Checkbox(value=self.show_kernel, description="show sensitivity")
+        show_data = Checkbox(value=self.show_data, description="show data")
         percentage=FloatText(value=self.percentage, description="percentage")
         floor=FloatText(value=self.floor, description="floor")
         add_noise=Checkbox(value=self.add_noise, description="add_noise")
