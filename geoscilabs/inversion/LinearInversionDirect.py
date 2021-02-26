@@ -554,7 +554,7 @@ class LinearInversionDirectApp(properties.HasProperties):
                 ax3.set_title("Noisy data")
             else:
                 ax3.plot(np.arange(self.N), self.data_vec, "ko-")
-                ax3.set_title("Clen data")
+                ax3.set_title("Clean data")
             ax3.set_ylabel("$d_j$")
             ax3.set_xlabel("$k_j$")
 
