@@ -699,6 +699,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         nD = self.data_vec.size
 
         i_target = np.argmin(abs(self.phi_d - nD * chifact))
+        self.i_beta = i_target
 
         if i_beta > n_beta - 1:
             print(
