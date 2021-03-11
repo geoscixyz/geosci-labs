@@ -596,23 +596,30 @@ class TomographyInversionApp(object):
     def plot_tikhonov_curves(self, save):
         fig, ax = plt.subplots(1, 3, figsize=(12, 4))
 
-        ax[0].semilogx(save.beta, save.phi_d)
-        ax[0].set_xlim(np.hstack(save.beta).max(), np.hstack(save.beta).min())
+        beta = np.array(save.beta)
+        # account for the 1/2 so phi_d* = nD
+        phi_d = 2*np.array(save.phi_d)
+        phi_m = 2*np.array(save.phi_m)
+        nD = save.survey[0].nD
+
+        ax[0].semilogx(beta, phi_d)
+        ax[0].semilogx(beta, np.ones_like(beta)*nD, '--k')
+        ax[0].set_xlim(np.hstack(beta).max(), np.hstack(beta).min())
         ax[0].set_xlabel("$\\beta$", fontsize=14)
         ax[0].set_ylabel("$\phi_d$", fontsize=14)
-        ax[0].plot(save.beta[save.i_target], save.phi_d[save.i_target], "k*", ms=10)
+        ax[0].plot(beta[save.i_target], phi_d[save.i_target], "k*", ms=10)
 
-        ax[1].semilogx(save.beta, save.phi_m)
-        ax[1].set_xlim(np.hstack(save.beta).max(), np.hstack(save.beta).min())
+        ax[1].semilogx(beta, phi_m)
+        ax[1].set_xlim(np.hstack(beta).max(), np.hstack(beta).min())
         ax[1].set_xlabel("$\\beta$", fontsize=14)
         ax[1].set_ylabel("$\phi_m$", fontsize=14)
-        ax[1].plot(save.beta[save.i_target], save.phi_m[save.i_target], "k*", ms=10)
+        ax[1].plot(beta[save.i_target], phi_m[save.i_target], "k*", ms=10)
 
-        ax[2].plot(save.phi_m, save.phi_d)
-        ax[2].set_xlim(np.hstack(save.phi_m).min(), np.hstack(save.phi_m).max())
+        ax[2].plot(phi_m, phi_d)
+        ax[2].set_xlim(np.hstack(phi_m).min(), np.hstack(phi_m).max())
         ax[2].set_xlabel("$\phi_m$", fontsize=14)
         ax[2].set_ylabel("$\phi_d$", fontsize=14)
-        ax[2].plot(save.phi_m[save.i_target], save.phi_d[save.i_target], "k*", ms=10)
+        ax[2].plot(phi_m[save.i_target], phi_d[save.i_target], "k*", ms=10)
 
         plt.tight_layout()
         return ax
@@ -623,7 +630,7 @@ class TomographyInversionApp(object):
 
         interact(
             foo,
-            ii=IntSlider(min=0, max=len(model) - 1, step=1, value=len(model) - 1),
+            ii=IntSlider(min=0, max=len(model) - 1, step=1, value=0),
             continuous_update=False,
         )
 
@@ -637,7 +644,7 @@ class TomographyInversionApp(object):
                 min=0,
                 max=len(pred) - 1,
                 step=1,
-                value=len(pred) - 1,
+                value=0,
                 continuous_update=False,
             ),
         )
