@@ -148,11 +148,11 @@ class LinearInversionDirectApp(properties.HasProperties):
     n_beta = properties.Integer(
         "n_beta", default=81, required=True
     )
-    alpha_s = properties.Integer(
-        "alpha_s", default=1, required=True
+    alpha_s = properties.Float(
+        "alpha_s", default=1, min=0, required=True
     )
-    alpha_x = properties.Integer(
-        "alpha_x", default=0., required=True
+    alpha_x = properties.Float(
+        "alpha_x", default=0., min=0, required=True
     )
     tikhonov =properties.StringChoice(
         "tikhonov",
