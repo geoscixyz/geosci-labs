@@ -608,6 +608,12 @@ class TomographyInversionApp(object):
         ax[0].set_xlabel("$\\beta$", fontsize=14)
         ax[0].set_ylabel("$\phi_d$", fontsize=14)
         ax[0].plot(beta[save.i_target], phi_d[save.i_target], "k*", ms=10)
+        ax[0].text(
+            beta[save.i_target], nD+20,
+            f"iter {save.i_target}",
+            ha="left",
+            fontsize=16
+        )
 
         ax[1].semilogx(beta, phi_m)
         ax[1].set_xlim(np.hstack(beta).max(), np.hstack(beta).min())
