@@ -661,7 +661,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         self.scale = scale
 
         m0 = 0.
-
+        np.random.seed(1)
         if mode == "Run":
             if noise_option == "error contaminated":
                 survey_obj, simulation_obj = self.get_problem_survey()
