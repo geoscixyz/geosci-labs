@@ -263,4 +263,4 @@ If you have any trouble, leave a comment in the PR or
 
  ## Credit
 
- This contributor guide is adapted from the [Contributor guide in the Fatiando a Terra project](https://github.com/fatiando/verde/blob/main/CONTRIBUTING.md).
+ This contributor guide is adapted from the [Contributor guide in the Fatiando a Terra project](https://github.com/fatiando/verde/blob/master/CONTRIBUTING.md).
