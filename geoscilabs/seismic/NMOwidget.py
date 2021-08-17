@@ -265,7 +265,7 @@ def InteractClean(cleanDataFile, cleanTimeFile):
     return clean
 
 
-def InteractNosiy(noisyDataFile, noisyTimeFile):
+def InteractNoisy(noisyDataFile, noisyTimeFile):
     noisy = interactive(
         NoisyNMOWidget,
         t0=FloatSlider(min=0.1, max=0.6, step=0.01, continuous_update=False),
