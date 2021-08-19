@@ -76,3 +76,4 @@ target/
 
 *.tar
 notebooks/inversion/*.txt
+*.h5
