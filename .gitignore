@@ -73,3 +73,6 @@ target/
 */.ipynb_checkpoints/*
 
 *.pklb
+
+*.tar
+notebooks/inversion/*.txt
