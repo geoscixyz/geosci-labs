@@ -2,7 +2,7 @@
 
 :tada: **First of all, thank you for considering contributing to this project!** :tada:
 
-This is a community-driven project, so it's people like you that make it useful and successful. 
+This is a community-driven project, so it's people like you that make it useful and successful.
 There are a number of ways fo contribute:
 
 * :bug: Submitting bug reports and feature requests
@@ -10,8 +10,8 @@ There are a number of ways fo contribute:
 * :memo: Writing new notebook apps
 * :bulb: Improving the underlying code or writing new code
 
-If you get stuck at any point you can create an issue on GitHub (look for the 
-[*Issues*](https://github.com/geoscixyz/geosci-labs/issues) tab in the repository) 
+If you get stuck at any point you can create an issue on GitHub (look for the
+[*Issues*](https://github.com/geoscixyz/geosci-labs/issues) tab in the repository)
  or contact us at one of the other channels mentioned below.
 
 For more information on contributing to open source projects,
@@ -52,13 +52,13 @@ read it carefully.
   case.
 * Contribute code or notebooks you already have. It doesn't need to be perfect! We will help you
   clean things up, test it, etc.
- 
+
  ## How Can I Talk to You?
 
 Discussion often happens in the issues and pull requests.
 In addition, there is a [Slack chat room](http://slack.geosci.xyz) for the
 GeoSci.xyz project where you can ask questions.
- 
+
 
 ## Reporting bugs or typos
 
@@ -92,7 +92,7 @@ make changes to our codebase.
 Every change made goes through a pull request, even our own, so that our
 [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) services
 have a change to check that the code is up to standards and passes all our tests.
-This way, the *master* branch is always stable.
+This way, the *main* branch is always stable.
 
 General guidelines for pull requests (PRs):
 
@@ -115,7 +115,7 @@ General guidelines for pull requests (PRs):
   other users' code, so care must be taken not to introduce bugs.
 * Be aware that the pull request review process is not immediate, and is generally
   proportional to the size of the pull request.
-  
+
 ### Setting up your environment
 
 We highly recommend using [Anaconda](https://www.anaconda.com/download/) and the `conda`
@@ -160,7 +160,7 @@ directory).
 
 ### Notebook structure
 
-To maintain consistency of the notebook-apps, please use the following structure 
+To maintain consistency of the notebook-apps, please use the following structure
 
 - **Title**: title of the notebook that include the geophysical method name
 - **Purpose**: Motivation and key concepts to be addressed in this notebook. Can include links to relevant background material (e.g. from https://gpg.geosci.xyz or https://em.geosci.xyz)
@@ -171,15 +171,15 @@ To maintain consistency of the notebook-apps, please use the following structure
   package names that are being used in the notebook and should be acknowledged:
   ```
   # Acknowledgements
-  
-  This app is a part of the [GeoSci.xyz](https://geosci.xyz) project and relies on [SimPEG](https://simpeg.xyz). Thanks to all of the [contributors](https://github.com/geoscixyz/geosci-labs/graphs/contributors) for their work! 
-  
+
+  This app is a part of the [GeoSci.xyz](https://geosci.xyz) project and relies on [SimPEG](https://simpeg.xyz). Thanks to all of the [contributors](https://github.com/geoscixyz/geosci-labs/graphs/contributors) for their work!
+
   # License
-  
+
   <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
   ```
 
-Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state. 
+Prior to creating a pull request with a new notebook, please make sure you restart the kernel and clear output so that it always starts from a clean state.
 
 If you create a new notebook, please add it to the list in [index.ipynb](notebooks/index.ipynb)
 
@@ -218,7 +218,7 @@ formatted code.
 
 We also use [flake8](http://flake8.pycqa.org/en/latest/) to check the quality of the code and quickly catch
 common errors.
-The [`Makefile`](Makefile) contains rules for running this check: 
+The [`Makefile`](Makefile) contains rules for running this check:
 
 ```bash
 make check   # Runs flake8 and black (in check mode)
@@ -262,5 +262,5 @@ If you have any trouble, leave a comment in the PR or
 [get in touch](#how-can-i-talk-to-you).
 
  ## Credit
- 
+
  This contributor guide is adapted from the [Contributor guide in the Fatiando a Terra project](https://github.com/fatiando/verde/blob/master/CONTRIBUTING.md).
