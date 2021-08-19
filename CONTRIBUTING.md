@@ -92,7 +92,7 @@ make changes to our codebase.
 Every change made goes through a pull request, even our own, so that our
 [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) services
 have a change to check that the code is up to standards and passes all our tests.
-This way, the *master* branch is always stable.
+This way, the *main* branch is always stable.
 
 General guidelines for pull requests (PRs):
 
@@ -263,4 +263,4 @@ If you have any trouble, leave a comment in the PR or
 
  ## Credit
  
- This contributor guide is adapted from the [Contributor guide in the Fatiando a Terra project](https://github.com/fatiando/verde/blob/master/CONTRIBUTING.md).
+ This contributor guide is adapted from the [Contributor guide in the Fatiando a Terra project](https://github.com/fatiando/verde/blob/main/CONTRIBUTING.md).

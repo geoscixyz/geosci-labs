@@ -1,8 +1,8 @@
 # GeoSci Labs
 
-[![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipynb)
+[![binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/main?filepath=notebooks%2Findex.ipynb)
 [![pypi](https://img.shields.io/pypi/v/geoscilabs.svg)](https://pypi.python.org/pypi/geoscilabs)
-[![License](https://img.shields.io/github/license/geoscixyz/geosci-labs.svg)](https://github.com/geoscixyz/geosci-labs/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/geoscixyz/geosci-labs.svg)](https://github.com/geoscixyz/geosci-labs/blob/main/LICENSE)
 [![SimPEG](https://img.shields.io/badge/powered%20by-SimPEG-blue.svg)](http://simpeg.xyz)
 
 This is a repository of code used to power the notebooks and interactive examples for https://em.geosci.xyz and https://gpg.geosci.xyz.
@@ -23,9 +23,9 @@ The notebooks can be run online through [Binder](#Binder), or [downloaded and ru
 
 ### Binder
 
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipyn)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/geoscixyz/geosci-labs/main?filepath=notebooks%2Findex.ipyn)
 
-1. Launch the binder by clicking on the badge above or going to: https://mybinder.org/v2/gh/geoscixyz/geosci-labs/master?filepath=notebooks%2Findex.ipynb.
+1. Launch the binder by clicking on the badge above or going to: https://mybinder.org/v2/gh/geoscixyz/geosci-labs/main?filepath=notebooks%2Findex.ipynb.
    This can sometimes take a couple minutes, so be patient...
 
 2. Select the notebook of interest from the contents
