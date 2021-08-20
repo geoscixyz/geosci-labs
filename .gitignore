@@ -67,14 +67,6 @@ target/
 *.sublime-project
 *.sublime-workspace
 
-# Data files downloaded for apps
-notebooks/**/*.txt
-notebooks/**/*.dat
-notebooks/**/*.npy
-notebooks/**/*.tar
-notebooks/**/*.gz
-notebooks/**/*.h5
-
 # Jupyter Notebook
 .ipynb_checkpoints
 *.ipynb_checkpoints
