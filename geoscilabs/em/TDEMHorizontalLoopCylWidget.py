@@ -190,7 +190,7 @@ class TDEMHorizontalLoopCylWidget(object):
         bz = tdem.receivers.PointMagneticFluxDensity(rxLoc, time, orientation="z")
         # dbzdt = EM.TDEM.Rx.Point_dbdt(rxLoc, time, orientation="z")
         src = tdem.sources.CircularLoop(
-            [bz], waveform=tdem.sources.StepOffWaveform(), loc=srcLoc, radius=radius
+            [bz], waveform=tdem.sources.StepOffWaveform(), location=srcLoc, radius=radius
         )
         self.srcList = [src]
         survey = tdem.survey.Survey(self.srcList)

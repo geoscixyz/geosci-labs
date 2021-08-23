@@ -160,24 +160,10 @@ def addLayer2Mod(zcLayer, dzLayer, modd, sigLayer):
 
 
 def getCylinderPoints(xc, zc, r):
-    xLocOrig1 = np.arange(-r, r + r / 10.0, r / 10.0)
-    xLocOrig2 = np.arange(r, -r - r / 10.0, -r / 10.0)
-    # Top half of cylinder
-    zLoc1 = np.sqrt(-(xLocOrig1 ** 2.0) + r ** 2.0) + zc
-    # Bottom half of cylinder
-    zLoc2 = -np.sqrt(-(xLocOrig2 ** 2.0) + r ** 2.0) + zc
-    # Shift from x = 0 to xc
-    xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
-    xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
-
-    topHalf = np.vstack([xLoc1, zLoc1]).T
-    topHalf = topHalf[0:-1, :]
-    bottomhalf = np.vstack([xLoc2, zLoc2]).T
-    bottomhalf = bottomhalf[0:-1, :]
-
-    cylinderPoints = np.vstack([topHalf, bottomhalf])
-    cylinderPoints = np.vstack([cylinderPoints, topHalf[0, :]])
-    return cylinderPoints
+    angle = np.linspace(-np.pi, np.pi, 250)
+    xs = np.cos(angle) * r + xc
+    zs = np.sin(angle) * r + zc
+    return np.c_[xs, zs]
 
 
 def addCylinder2Mod(xc, zc, r, modd, sigCylinder):

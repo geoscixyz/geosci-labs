@@ -92,10 +92,10 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.survey.Survey([src])
         problem = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type='Dirichlet'
         )
         problem_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type='Dirichlet'
         )
 
         total_field = problem.fields(mtrue)

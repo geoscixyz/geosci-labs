@@ -96,7 +96,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     if src_type == "VMD":
         src = time_domain.sources.CircularLoop(
             [rxList],
-            loc=np.r_[0.0, 0.0, 30.0],
+            location=np.r_[0.0, 0.0, 30.0],
             orientation="Z",
             waveform=time_domain.sources.StepOffWaveform(),
             radius=13.0,
@@ -104,7 +104,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     elif src_type == "HMD":
         src = time_domain.sources.MagDipole(
             [rxList],
-            loc=np.r_[0.0, 0.0, 30.0],
+            location=np.r_[0.0, 0.0, 30.0],
             orientation="X",
             waveform=time_domain.sources.StepOffWaveform(),
         )

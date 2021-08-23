@@ -169,13 +169,13 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
             src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
         survey = DC.survey.Survey([src])
         problem = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
         )
         problem_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
         )
         problem_air = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
         )
 
         if whichprimary == "air":
@@ -229,20 +229,27 @@ def get_Surface_Potentials(mtrue, survey, src, field_obj):
 
 
 def getCylinderPoints(xc, zc, a, b):
-    xLocOrig1 = np.arange(-a, a + a / 10.0, a / 10.0)
-    xLocOrig2 = np.arange(a, -a - a / 10.0, -a / 10.0)
-    # Top half of cylinder
-    zLoc1 = b * np.sqrt(1.0 - (xLocOrig1 / a) ** 2) + zc
-    # Bottom half of cylinder
-    zLoc2 = -b * np.sqrt(1.0 - (xLocOrig2 / a) ** 2) + zc
-    # Shift from x = 0 to xc
-    xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
-    xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
 
-    cylinderPoints = np.vstack(
-        [np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T]
-    )
-    return cylinderPoints
+    angle = np.linspace(-np.pi, np.pi, 250)
+    r_angle = a * b / (np.sqrt((b * np.cos(angle))**2 + (a * np.sin(angle))**2))
+    xs = np.cos(angle) * r_angle + xc
+    zs = np.sin(angle) * r_angle + zc
+    return np.c_[xs, zs]
+
+    # xLocOrig1 = np.arange(-a, a + a / 10.0, a / 10.0)
+    # xLocOrig2 = np.arange(a, -a - a / 10.0, -a / 10.0)
+    # # Top half of cylinder
+    # zLoc1 = b * np.sqrt(1.0 - (xLocOrig1 / a) ** 2) + zc
+    # # Bottom half of cylinder
+    # zLoc2 = -b * np.sqrt(1.0 - (xLocOrig2 / a) ** 2) + zc
+    # # Shift from x = 0 to xc
+    # xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
+    # xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
+    #
+    # cylinderPoints = np.vstack(
+    #     [np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T]
+    # )
+    # return cylinderPoints
 
 
 def get_OverburdenPoints(cylinderPoints, overburden_thick):
@@ -902,10 +909,10 @@ def valley_app():
             min=-1000.0, max=1000.0, step=10.0, value=250.0
         ),  # , continuous_update=False),
         ellips_a=FloatSlider(
-            min=10.0, max=10000.0, step=100.0, value=1000.0
+            min=10.0, max=4000.0, step=50.0, value=1000.0
         ),  # , continuous_update=False),
         ellips_b=FloatSlider(
-            min=10.0, max=10000.0, step=100.0, value=500.0
+            min=10.0, max=2000.0, step=50.0, value=500.0
         ),  # , continuous_update=False),
         rhohalf=FloatText(
             min=1e-8, max=1e8, value=1000.0, description="$\\rho_1$"
@@ -917,7 +924,7 @@ def valley_app():
             min=1e-8, max=1e8, value=500.0, description="$\\rho_3$"
         ),  # , continuous_update=False, description='$\\rho_3$'),
         overburden_thick=FloatSlider(
-            min=0.0, max=1000.0, step=10.0, value=200.0
+            min=0.0, max=1000.0, step=10.0, value=200.0,
         ),  # , continuous_update=False),
         overburden_wide=fixed(2000.0),  # , continuous_update=False),
         target_thick=FloatSlider(

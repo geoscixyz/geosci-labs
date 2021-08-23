@@ -605,7 +605,7 @@ class TomographyInversionApp(object):
         i_target = None
 
         i_target = 0
-        while phi_d[i_target] > nD:
+        while i_target < len(phi_d) and phi_d[i_target] > nD:
             i_target += 1
 
         ax[0].semilogx(beta, phi_d)
@@ -613,25 +613,23 @@ class TomographyInversionApp(object):
         ax[0].set_xlim(np.hstack(beta).max(), np.hstack(beta).min())
         ax[0].set_xlabel("$\\beta$", fontsize=14)
         ax[0].set_ylabel("$\phi_d$", fontsize=14)
-        ax[0].plot(beta[i_target], phi_d[i_target], "k*", ms=10)
-        ax[0].text(
-            beta[i_target], nD+20,
-            f"iter {i_target}",
-            ha="left",
-            fontsize=16
-        )
+        if i_target < len(phi_d):
+            ax[0].plot(beta[i_target], phi_d[i_target], "k*", ms=10, label=f"iter {i_target}")
+            ax[0].legend(loc='best')
 
         ax[1].semilogx(beta, phi_m)
         ax[1].set_xlim(np.hstack(beta).max(), np.hstack(beta).min())
         ax[1].set_xlabel("$\\beta$", fontsize=14)
         ax[1].set_ylabel("$\phi_m$", fontsize=14)
-        ax[1].plot(beta[i_target], phi_m[i_target], "k*", ms=10)
+        if i_target < len(phi_d):
+            ax[1].plot(beta[i_target], phi_m[i_target], "k*", ms=10)
 
         ax[2].plot(phi_m, phi_d)
         ax[2].set_xlim(np.hstack(phi_m).min(), np.hstack(phi_m).max())
         ax[2].set_xlabel("$\phi_m$", fontsize=14)
         ax[2].set_ylabel("$\phi_d$", fontsize=14)
-        ax[2].plot(phi_m[i_target], phi_d[i_target], "k*", ms=10)
+        if i_target < len(phi_d):
+            ax[2].plot(phi_m[i_target], phi_d[i_target], "k*", ms=10)
 
         plt.tight_layout()
         return ax

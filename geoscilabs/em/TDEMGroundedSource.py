@@ -134,7 +134,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     wavefun = interp1d(sim.times, out)
     waveform = tdem.sources.RawWaveform(offTime=t0, waveFct=wavefun)
 
-    src = tdem.sources.LineCurrent(rxList, loc=srcLoc, waveform=waveform)
+    src = tdem.sources.LineCurrent(rxList, location=srcLoc, waveform=waveform)
     survey = tdem.survey.Survey([src])
     sim.survey = survey
     input_currents = wavefun(sim.times)

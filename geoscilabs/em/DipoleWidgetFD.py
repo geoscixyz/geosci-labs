@@ -217,6 +217,7 @@ class DipoleWidgetFD(object):
             unit = " (rad)"
         label = fieldname + unit
         # label_cb = tempstr[0] + view + "-field from " + tempstr[2]
+
         cb.set_label(label)
         ax1.set_title(title)
 

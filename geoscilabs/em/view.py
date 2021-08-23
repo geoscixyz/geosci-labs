@@ -251,12 +251,15 @@ class DataView(object):
             ylabel = "Y (m)"
 
         if clim is None:
-            vmin, vmax = val.min(), val.max()
-        else:
-            vmin, vmax = clim[0], clim[1]
+            clim = (val.min(), val.max())
+        vmin, vmax = clim
+        if vmin == vmax:
+            vmin = vmin - 0.01*np.abs(vmin)
+            vmax = vmax + 0.01*np.abs(vmax)
+            clim = (vmin, vmax)
 
         dat = ax.contourf(
-            a, b, val, ncontour, clim=(vmin, vmax), vmin=vmin, vmax=vmax, cmap=cmap
+            a, b, val, ncontour, vmin=vmin, vmax=vmax, cmap=cmap
         )
 
         if showcontour:
@@ -350,7 +353,7 @@ class DataView(object):
             vmin, vmax = clim[0], clim[1]
 
         dat = ax.contourf(
-            a, b, val, ncontour, clim=(vmin, vmax), vmin=vmin, vmax=vmax, cmap=cmap
+            a, b, val, ncontour, vmin=vmin, vmax=vmax, cmap=cmap
         )
 
         if showcontour:

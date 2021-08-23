@@ -103,11 +103,11 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.Survey([src])
         sim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
         )
         total_field = sim.fields(mtrue)
         sim_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
         )
         primary_field = sim_prim.fields(mhalf)
 
@@ -153,20 +153,10 @@ def addLayer2Mod(zcLayer, dzLayer, mod, sigLayer):
 
 
 def getCylinderPoints(xc, zc, r):
-    xLocOrig1 = np.arange(-r, r + r / 10.0, r / 10.0)
-    xLocOrig2 = np.arange(r, -r - r / 10.0, -r / 10.0)
-    # Top half of cylinder
-    zLoc1 = np.sqrt(-(xLocOrig1 ** 2.0) + r ** 2.0) + zc
-    # Bottom half of cylinder
-    zLoc2 = -np.sqrt(-(xLocOrig2 ** 2.0) + r ** 2.0) + zc
-    # Shift from x = 0 to xc
-    xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
-    xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
-
-    cylinderPoints = np.vstack(
-        [np.vstack([xLoc1, zLoc1]).T, np.vstack([xLoc2, zLoc2]).T]
-    )
-    return cylinderPoints
+    angle = np.linspace(-np.pi, np.pi, 250)
+    xs = np.cos(angle) * r + xc
+    zs = np.sin(angle) * r + zc
+    return np.c_[xs, zs]
 
 
 def addCylinder2Mod(xc, zc, r, modd, sigCylinder):
