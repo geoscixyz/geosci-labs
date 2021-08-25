@@ -223,6 +223,7 @@ class TomographyInversionApp(object):
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
             ax.set_title("Velocity")
+        plt.show()
 
     def plot_survey_data(self, percentage, floor, seed, add_noise, plot_type, update):
         self._percentage = percentage
@@ -265,6 +266,7 @@ class TomographyInversionApp(object):
             axs[1].set_xlabel("Travel time (s)")
             axs[0].set_aspect(1)
         plt.tight_layout()
+        plt.show()
 
     def interact_plot_model(self):
         dx = widgets.FloatSlider(
@@ -567,6 +569,7 @@ class TomographyInversionApp(object):
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
         plt.tight_layout()
+        plt.show()
 
     def plot_data_inversion(self, ii, pred, fixed=False):
         titles = ["Observed", "Predicted", "Normalized misfit"]
@@ -592,6 +595,7 @@ class TomographyInversionApp(object):
             ax.set_xlabel("Rx")
             ax.set_ylabel("Tx")
         plt.tight_layout()
+        plt.show()
 
     def plot_tikhonov_curves(self, save):
         fig, ax = plt.subplots(1, 3, figsize=(12, 4))
@@ -632,6 +636,7 @@ class TomographyInversionApp(object):
             ax[2].plot(phi_m[i_target], phi_d[i_target], "k*", ms=10)
 
         plt.tight_layout()
+        plt.show()
         return ax
 
     def interact_model_inversion(self, model, clim=None):

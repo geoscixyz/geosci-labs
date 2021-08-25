@@ -91,4 +91,4 @@ def PowerReflection(sig1, sig2, f, Type):
 
     plt.xlabel("Incident angle ($\\theta_i$)")
     plt.ylabel(ylabel)
-    pass
+    plt.show()

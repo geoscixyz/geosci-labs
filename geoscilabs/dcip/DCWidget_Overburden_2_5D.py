@@ -459,15 +459,15 @@ def PLOT(
     if survey == "Dipole-Pole" or survey == "Pole-Pole":
         ax[0].plot(M, VM, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 0.5)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
 
     else:
         ax[0].plot(M, VM, "o", color="k")
         ax[0].plot(N, VN, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
-        xytextN = (N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 0.5)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 0.5)
+        xytextN = (N + 0.5, max(min(VN, ylim.max()), ylim.min()) + 0.5)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
         ax[0].annotate("%2.1e" % (VN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
 
@@ -485,7 +485,7 @@ def PLOT(
 
     ax[0].legend(["Reference Potential", "Model Potential"], loc=3, fontsize=labelsize)
     if Scale == "Log":
-        ax[0].set_yscale("symlog", linthreshy=1e-5)
+        ax[0].set_yscale("symlog", linthresh=1e-5)
 
     if Field == "Model":
 

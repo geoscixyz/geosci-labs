@@ -163,6 +163,13 @@ class IndEx:
 
         k = 4 * a1 * s / (Z ** 2 + (a1 + s) ** 2)
 
+        bot = Z ** 2 + (s - a1) ** 2
+
+        try:
+            bot[bot==0] = np.NaN
+        except:
+            pass
+
         Bpx = (
             mu0
             * np.sign(X)
@@ -170,7 +177,7 @@ class IndEx:
             * (1 / np.sqrt(Z ** 2 + (a1 + s) ** 2))
             * (
                 -sp.ellipk(k)
-                + ((a1 ** 2 + Z ** 2 + s ** 2) / (Z ** 2 + (s - a1) ** 2))
+                + (a1 ** 2 + Z ** 2 + s ** 2) / bot
                 * sp.ellipe(k)
             )
         )
@@ -180,7 +187,7 @@ class IndEx:
             * (1 / np.sqrt(Z ** 2 + (a1 + s) ** 2))
             * (
                 sp.ellipk(k)
-                + ((a1 ** 2 - Z ** 2 - s ** 2) / (Z ** 2 + (s - a1) ** 2))
+                + (a1 ** 2 - Z ** 2 - s ** 2) / bot
                 * sp.ellipe(k)
             )
         )
@@ -220,6 +227,12 @@ class IndEx:
 
         k = 4 * a1 * s / (z ** 2 + (a1 + s) ** 2)
 
+        bot = z ** 2 + (s - a1) ** 2
+        try:
+            bot[bot == 0.0] = np.NaN
+        except:
+            pass
+
         Bpx = (
             mu0
             * np.sign(x)
@@ -227,7 +240,7 @@ class IndEx:
             * (1 / np.sqrt(z ** 2 + (a1 + s) ** 2))
             * (
                 -sp.ellipk(k)
-                + ((a1 ** 2 + z ** 2 + s ** 2) / (z ** 2 + (s - a1) ** 2))
+                + (a1 ** 2 + z ** 2 + s ** 2) / bot
                 * sp.ellipe(k)
             )
         )
@@ -237,7 +250,7 @@ class IndEx:
             * (1 / np.sqrt(z ** 2 + (a1 + s) ** 2))
             * (
                 sp.ellipk(k)
-                + ((a1 ** 2 - z ** 2 - s ** 2) / (z ** 2 + (s - a1) ** 2))
+                + (a1 ** 2 - z ** 2 - s ** 2) / bot
                 * sp.ellipe(k)
             )
         )
@@ -421,6 +434,7 @@ class IndEx:
         ax.plot(xRx, zRx, color="black", linewidth=6)
         ax.plot(xRx, zRx, color=((0.4, 0.4, 0.4)), linewidth=4)
         # Cplot = ax.contourf(X,Z,np.log10(Babs),40,cmap='ocean_r')
+        Babs[Babs == 0.0] = np.NaN
         Cplot = ax.contourf(X, Z, np.log10(1e9 * Babs), 40, cmap="viridis")
         cbar = plt.colorbar(Cplot, ax=ax, pad=0.02)
         cbar.set_label(

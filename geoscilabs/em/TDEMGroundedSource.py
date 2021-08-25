@@ -223,7 +223,7 @@ class PlotTDEM(object):
         polyplane(verts, color="grey")
 
         fig = plt.figure(figsize=(8, 8))
-        ax = fig.gca(projection="3d")
+        ax = fig.add_subplot(projection='3d')
         ax.plot3D(np.r_[-200, 200], np.r_[0, 0], np.r_[1, 1] * 0.0, "r-", lw=3)
         ax.plot3D(
             self.mesh.gridCC[:, 0],
@@ -360,6 +360,7 @@ class PlotTDEM(object):
         plt.xlabel("Time (ms)")
         plt.ylabel("Normalized current")
         plt.xscale(scale)
+        plt.show()
 
     def getSlices(self, mesh, vec, itime, normal="Z", loc=0.0, isz=False):
         VEC = vec[:, itime].reshape((mesh.nC, 3), order="F")
@@ -448,6 +449,7 @@ class PlotTDEM(object):
         title = ("Time at %.2f ms") % ((self.times[itime]) * 1e3)
         ax1.set_title(title)
         plt.tight_layout()
+        plt.show()
 
     def plot_magnetic_flux(self, itime):
         bxy, xy = self.getSlices(self.mesh, self.B, itime, normal="Z", loc=-100.5)
@@ -500,3 +502,4 @@ class PlotTDEM(object):
         title = ("Time at %.2f ms") % ((self.times[itime]) * 1e3)
         ax1.set_title(title)
         plt.tight_layout()
+        plt.show()

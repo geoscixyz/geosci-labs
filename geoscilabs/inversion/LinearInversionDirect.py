@@ -305,7 +305,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         else:
             ax2.axis('off')
         plt.tight_layout()
-        # plt.show()
+        plt.show()
         if self.return_axis:
             return [ax1, ax2]
 
@@ -373,6 +373,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax.set_title("Model")
         ax.set_xlabel("x")
         ax.set_ylabel("m(x)")
+        plt.show()
         if self.return_axis:
             return ax
 
@@ -464,7 +465,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax1.set_title("Clean data")
         for ax in axes:
             ax.set_xlabel("$j$")
-
+        plt.show()
         if self.return_axis:
             return ax
 
@@ -491,6 +492,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         show_data=True,
     ):
 
+        self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
         m = self.set_model(
             m_background=m_background,
             m1=m1,
@@ -500,7 +502,6 @@ class LinearInversionDirectApp(properties.HasProperties):
             m2_center=m2_center,
             sigma_2=sigma_2,
         )
-        self.set_G(N=N, M=M, pmin=pmin, pmax=pmax, qmin=qmin, qmax=qmax)
         np.random.seed(1)
 
         if add_noise:
@@ -564,6 +565,7 @@ class LinearInversionDirectApp(properties.HasProperties):
                 ax.axis("off")
 
         plt.tight_layout()
+        plt.show()
 
         if self.return_axis:
             return axes
@@ -802,6 +804,7 @@ class LinearInversionDirectApp(properties.HasProperties):
             )
         axes[2].set_title(title, fontsize=14)
         plt.tight_layout()
+        plt.show()
         if self.return_axis:
             return axes
 
