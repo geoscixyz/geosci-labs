@@ -58,7 +58,7 @@ def drawfunction(delta_rho, z1, z2, b, beta, stationSpacing, B):
     minG = 100
     if B:
         for each in plotdata:
-            ax0.plot(each[0], each[1], "k.-", color=each[2])
+            ax0.plot(each[0], each[1], ".-", color=each[2])
             textShow.append(each[3])
             colors.append(each[2])
             if each[4] > maxG:
@@ -70,7 +70,7 @@ def drawfunction(delta_rho, z1, z2, b, beta, stationSpacing, B):
         index = 0
         maxG = -100
         minG = 100
-    ax0.plot(Y[:, 0], respNS, "k.-", color=colorList[index])
+    ax0.plot(Y[:, 0], respNS, ".-", color=colorList[index])
     currentResult = [Y[:, 0], respNS]
     showText = (
         r"$\Delta\rho$"

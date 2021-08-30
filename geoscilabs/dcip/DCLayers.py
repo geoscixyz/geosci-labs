@@ -263,8 +263,8 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
 
     txtsp = 1
 
-    xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 0.5)
-    xytextN = (N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 0.5)
+    xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 0.5)
+    xytextN = (N + 0.5, max(min(VN, ylim.max()), ylim.min()) + 0.5)
 
     props = dict(boxstyle="round", facecolor="grey", alpha=0.4)
 
@@ -288,7 +288,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
         model = rho2 * np.ones(pltgrid.shape[0])
         model[pltgrid[:, 1] >= -h] = rho1
         model = model.reshape(x.size, z.size, order="F")
-        cb = ax[1].pcolor(xplt, zplt, model, norm=LogNorm())
+        cb = ax[1].pcolor(xplt, zplt, model, norm=LogNorm(), shading='nearest')
         ax[1].plot(
             [xplt.min(), xplt.max()],
             -h * np.r_[1.0, 1],
@@ -331,7 +331,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
             / Vplt[0, 0]
         )
 
-        cb = ax[1].pcolor(xplt, zplt, Vplt * fudgeFactor, cmap="viridis")
+        cb = ax[1].pcolor(xplt, zplt, Vplt * fudgeFactor, cmap="viridis", shading='nearest')
         ax[1].plot(
             [xplt.min(), xplt.max()],
             -h * np.r_[1.0, 1],
@@ -368,7 +368,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
         ez = fudgeFactor * ez.reshape(x.size, z.size, order="F")
         e = np.sqrt(ex ** 2.0 + ez ** 2.0)
 
-        cb = ax[1].pcolor(xplt, zplt, e, cmap="viridis", norm=LogNorm())
+        cb = ax[1].pcolor(xplt, zplt, e, cmap="viridis", norm=LogNorm(), shading='nearest')
         ax[1].plot(
             [xplt.min(), xplt.max()],
             -h * np.r_[1.0, 1],
@@ -416,7 +416,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
 
         J = np.sqrt(Jx ** 2.0 + Jz ** 2.0)
 
-        cb = ax[1].pcolor(xplt, zplt, J, cmap="viridis", norm=LogNorm())
+        cb = ax[1].pcolor(xplt, zplt, J, cmap="viridis", norm=LogNorm(), shading='nearest')
         ax[1].plot(
             [xplt.min(), xplt.max()],
             -h * np.r_[1.0, 1],

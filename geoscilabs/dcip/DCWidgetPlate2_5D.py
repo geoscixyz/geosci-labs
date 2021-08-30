@@ -92,10 +92,10 @@ def plate_fields(A, B, dx, dz, xc, zc, rotAng, sigplate, sighalf):
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.survey.Survey([src])
         problem = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type='Dirichlet'
         )
         problem_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type='Dirichlet'
         )
 
         total_field = problem.fields(mtrue)
@@ -400,15 +400,15 @@ def PLOT(
     if survey == "Dipole-Pole" or survey == "Pole-Pole":
         ax[0].plot(M, VM, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 10)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 10)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
 
     else:
         ax[0].plot(M, VM, "o", color="k")
         ax[0].plot(N, VN, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 10)
-        xytextN = (N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 10)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 10)
+        xytextN = (N + 0.5, max(min(VN, ylim.max()), ylim.min()) + 10)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
         ax[0].annotate("%2.1e" % (VN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
 

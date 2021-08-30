@@ -266,6 +266,7 @@ def plotAnomalyXYplane(Ax, f, X, Y, Z, H, Comp, Phase):
     H = np.abs(H)
     MAX = np.max(H)
 
+    H[H == 0] = np.NaN
     H = np.log10(tol * H / MAX)
 
     Sign[H < 0] = 0.0
@@ -556,6 +557,11 @@ class SphereFEM:
         my = 4 * np.pi * a ** 3 * chi * Hpy / 3
         mz = 4 * np.pi * a ** 3 * chi * Hpz / 3
         R = np.sqrt((X - x0) ** 2 + (Y - y0) ** 2 + (Z - z0) ** 2)
+        try:
+            # Don't throw divide by 0 warning for 0 R
+            R[R == 0] = 1.0
+        except:
+            pass
 
         Hx = (1 / (4 * np.pi)) * (
             3 * (X - x0) * (mx * (X - x0) + my * (Y - y0) + mz * (Z - z0)) / R ** 5

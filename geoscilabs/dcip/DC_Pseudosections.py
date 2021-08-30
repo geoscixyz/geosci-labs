@@ -527,7 +527,7 @@ def DC2Dfwdfun(
         np.linspace(xr.min(), xr.max(), 120), np.linspace(1.0, nmax, 100)
     )
     survey = simulation.survey
-    G = static_utils.geometric_factor(survey, survey_type=survey.survey_type)
+    G = static_utils.geometric_factor(survey)
     appres = np.abs(dpred * (1.0 / G))
     appresobs = np.abs(dobs * (1.0 / G))
 
