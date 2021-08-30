@@ -401,15 +401,15 @@ def plot_Surface_Potentials(
     if survey == "Dipole-Pole" or survey == "Pole-Pole":
         ax[0].plot(M, VM, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 1)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 1)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
 
     else:
         ax[0].plot(M, VM, "o", color="k")
         ax[0].plot(N, VN, "o", color="k")
 
-        xytextM = (M + 0.5, np.max([np.min([VM, ylim.max()]), ylim.min()]) + 1)
-        xytextN = (N + 0.5, np.max([np.min([VN, ylim.max()]), ylim.min()]) + 1)
+        xytextM = (M + 0.5, max(min(VM, ylim.max()), ylim.min()) + 1)
+        xytextN = (N + 0.5, max(min(VN, ylim.max()), ylim.min()) + 1)
         ax[0].annotate("%2.1e" % (VM), xy=xytextM, xytext=xytextM, fontsize=labelsize)
         ax[0].annotate("%2.1e" % (VN), xy=xytextN, xytext=xytextN, fontsize=labelsize)
 

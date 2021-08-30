@@ -191,7 +191,7 @@ class HarmonicVMDCylWidget(object):
             rxLoc, orientation="z", component="imag"
         )
         self.srcList = [
-            fdem.sources.MagDipole([bzr, bzi], freq, srcLoc, orientation="Z")
+            fdem.sources.MagDipole([bzr, bzi], frequency=freq, location=srcLoc, orientation="Z")
             for freq in freqs
         ]
 

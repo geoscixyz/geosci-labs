@@ -63,6 +63,7 @@ _cache = {
     "sighalf": None,
     "xc": None,
     "zc": None,
+    "r": None
 }
 
 
@@ -74,6 +75,7 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
         or _cache["sighalf"] != sighalf
         or _cache["xc"] != xc
         or _cache["zc"] != zc
+        or _cache["r"] != r
     )
 
     if re_run:
@@ -90,10 +92,10 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
 
         # make two simulations for the seperate field objects
         sim_primary = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso, bc_type='Dirichlet'
         )
         sim_total = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso, bc_type='Dirichlet'
         )
 
         primary_field = sim_primary.fields(mhalf)
@@ -104,6 +106,7 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
         _cache["sighalf"] = sighalf
         _cache["xc"] = xc
         _cache["zc"] = zc
+        _cache["r"] = r
 
         _cache["mtrue"] = mtrue
         _cache["mhalf"] = mhalf
@@ -121,24 +124,10 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
 
 
 def getCylinderPoints(xc, zc, r):
-    xLocOrig1 = np.arange(-r, r + r / 10.0, r / 10.0)
-    xLocOrig2 = np.arange(r, -r - r / 10.0, -r / 10.0)
-    # Top half of cylinder
-    zLoc1 = np.sqrt(-(xLocOrig1 ** 2.0) + r ** 2.0) + zc
-    # Bottom half of cylinder
-    zLoc2 = -np.sqrt(-(xLocOrig2 ** 2.0) + r ** 2.0) + zc
-    # Shift from x = 0 to xc
-    xLoc1 = xLocOrig1 + xc * np.ones_like(xLocOrig1)
-    xLoc2 = xLocOrig2 + xc * np.ones_like(xLocOrig2)
-
-    topHalf = np.vstack([xLoc1, zLoc1]).T
-    topHalf = topHalf[0:-1, :]
-    bottomHalf = np.vstack([xLoc2, zLoc2]).T
-    bottomHalf = bottomHalf[0:-1, :]
-
-    cylinderPoints = np.vstack([topHalf, bottomHalf])
-    cylinderPoints = np.vstack([cylinderPoints, topHalf[0, :]])
-    return cylinderPoints
+    angle = np.linspace(-np.pi, np.pi, 250)
+    xs = np.cos(angle) * r + xc
+    zs = np.sin(angle) * r + zc
+    return np.c_[xs, zs]
 
 
 def get_Surface_Potentials(survey, src, field_obj):
@@ -313,7 +302,7 @@ def plot_Surface_Potentials(
     if survey == "Dipole-Pole" or survey == "Pole-Pole":
         ax[0].plot(M, VM, "o", color="k")
 
-        posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
+        posVM = max(min(max(mkvc(VM), key=abs), ylim.max()), ylim.min())
         xytextM = (M + 0.5, posVM + 0.5)
         ax[0].annotate(
             "%2.1e" % (posVM), xy=xytextM, xytext=xytextM, fontsize=labelsize
@@ -323,8 +312,8 @@ def plot_Surface_Potentials(
         ax[0].plot(M, VM, "o", color="k")
         ax[0].plot(N, VN, "o", color="k")
 
-        posVM = np.max([np.min([max(mkvc(VM), key=abs), ylim.max()]), ylim.min()])
-        posVN = np.max([np.min([max(mkvc(VN), key=abs), ylim.max()]), ylim.min()])
+        posVM = max(min(max(mkvc(VM), key=abs), ylim.max()), ylim.min())
+        posVN = max(min(max(mkvc(VN), key=abs), ylim.max()), ylim.min())
 
         xytextM = (M + 0.5, posVM + 0.5)
         xytextN = (N + 0.5, posVN - 0.5)

@@ -210,6 +210,7 @@ def interact_refraction(v1, v2, v3, z1, z2, x_loc, t_star, show):
     ax2.set_xlabel("Offset (m)")
     ax2.set_ylabel("Time (s)")
     ax2.set_xlim(0, 100)
+    plt.show()
 
 
 def seismic_app():

@@ -246,6 +246,7 @@ def viz_plane(
     elif plane == "XY":
         ax.plot(0, 0, "ro")
         ax.text(-100, -200.0, "HED")
+    plt.show()
     #     plt.gca().set_aspect("equal")
     return out
 

@@ -261,7 +261,7 @@ def Plot_Primary_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     xcirc = xr[np.abs(xr) <= R]
 
-    Pplot = ax.pcolor(xr, yr, Vp.reshape(xr.size, yr.size))
+    Pplot = ax.pcolor(xr, yr, Vp.reshape(xr.size, yr.size), shading="nearest")
     ax.plot(
         xcirc,
         np.sqrt(R ** 2 - xcirc ** 2),
@@ -293,7 +293,7 @@ def Plot_Total_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     xcirc = xr[np.abs(xr) <= R]
 
-    Pplot = ax.pcolor(xr, yr, Vt.reshape(xr.size, yr.size))
+    Pplot = ax.pcolor(xr, yr, Vt.reshape(xr.size, yr.size), shading="nearest")
     ax.plot(
         xcirc,
         np.sqrt(R ** 2 - xcirc ** 2),
@@ -325,7 +325,7 @@ def Plot_Secondary_Potential(XYZ, sig0, sig1, R, E0, ax):
 
     xcirc = xr[np.abs(xr) <= R]
 
-    Pplot = ax.pcolor(xr, yr, Vs.reshape(xr.size, yr.size))
+    Pplot = ax.pcolor(xr, yr, Vs.reshape(xr.size, yr.size), shading="nearest")
     ax.plot(
         xcirc,
         np.sqrt(R ** 2 - xcirc ** 2),
@@ -429,7 +429,7 @@ def Plot_Total_ElectricField(XYZ, sig0, sig1, R, E0, ax):
     ax.tick_params(labelsize=ftsize_axis)
     ax.set_aspect("equal")
 
-    Eplot = ax.pcolor(xr, yr, EtAmp)
+    Eplot = ax.pcolor(xr, yr, EtAmp, shading="nearest")
     cb = plt.colorbar(Eplot, ax=ax)
     cb.set_label(label="Amplitude ($V/m$)", size=ftsize_label)  # weight='bold')
     cb.ax.tick_params(labelsize=ftsize_axis)
@@ -471,7 +471,7 @@ def Plot_Secondary_ElectricField(XYZ, sig0, sig1, R, E0, ax):
     ax.tick_params(labelsize=ftsize_axis)
     ax.set_aspect("equal")
 
-    Eplot = ax.pcolor(xr, yr, EsAmp)
+    Eplot = ax.pcolor(xr, yr, EsAmp, shading="nearest")
     cb = plt.colorbar(Eplot, ax=ax)
     cb.set_label(label="Amplitude ($V/m$)", size=ftsize_label)  # weight='bold')
     cb.ax.tick_params(labelsize=ftsize_axis)
@@ -551,7 +551,7 @@ def Plot_Total_Currents(XYZ, sig0, sig1, R, E0, ax):
     ax.tick_params(labelsize=ftsize_axis)
     ax.set_aspect("equal")
 
-    Jplot = ax.pcolor(xr, yr, JtAmp.reshape(xr.size, yr.size))
+    Jplot = ax.pcolor(xr, yr, JtAmp.reshape(xr.size, yr.size), shading="nearest")
     cb = plt.colorbar(Jplot, ax=ax)
     cb.set_label(label="Current Density ($A/m^2$)", size=ftsize_label)  # weight='bold')
     cb.ax.tick_params(labelsize=ftsize_axis)
@@ -593,7 +593,7 @@ def Plot_Secondary_Currents(XYZ, sig0, sig1, R, E0, ax):
     ax.tick_params(labelsize=ftsize_axis)
     ax.set_aspect("equal")
 
-    Jplot = ax.pcolor(xr, yr, JsAmp.reshape(xr.size, yr.size))
+    Jplot = ax.pcolor(xr, yr, JsAmp.reshape(xr.size, yr.size), shading="nearest")
     cb = plt.colorbar(Jplot, ax=ax)
     cb.set_label(label="Current Density ($A/m^2$)", size=ftsize_label)  # weight='bold')
     cb.ax.tick_params(labelsize=ftsize_axis)
@@ -651,7 +651,7 @@ def Plot_ChargesDensity(XYZ, sig0, sig1, R, E0, ax):
     ax.set_xlim([xr.min(), xr.max()])
     ax.set_ylim([yr.min(), yr.max()])
     ax.set_aspect("equal")
-    Cplot = ax.pcolor(xr, yr, rho.reshape(xr.size, yr.size))
+    Cplot = ax.pcolor(xr, yr, rho.reshape(xr.size, yr.size), shading="nearest")
     cb1 = plt.colorbar(Cplot, ax=ax)
     cb1.set_label(label="Charge Density ($C/m^2$)", size=ftsize_label)  # weight='bold')
     cb1.ax.tick_params(labelsize=ftsize_axis)
@@ -951,7 +951,7 @@ def interact_conductiveSphere(
         elif Figure2b == "ChargesDensity":
             ax[1] = Plot_ChargesDensity(XYZ, sig0, sig1, R, E0, ax[1])
 
-    plt.tight_layout(True)
+    plt.tight_layout(pad=True)
     plt.show()
 
 
@@ -1022,7 +1022,7 @@ def interactive_two_configurations_comparison(
             PlotOpt,
         )
 
-    plt.tight_layout(True)
+    plt.tight_layout(pad=True)
     plt.show()
 
 

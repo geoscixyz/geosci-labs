@@ -327,7 +327,7 @@ class MagneticDipoleApp(object):
         ax2.yaxis.tick_right()
         ax2.plot(self.mesh.vectorCCx, self.data_profile, "k", lw=2)
         ax2.plot(
-            self.mesh.vectorCCx, np.zeros(self.mesh.nCx), "k--", color="grey", lw=1
+            self.mesh.vectorCCx, np.zeros(self.mesh.nCx), "--", color="grey", lw=1
         )
 
         ax2.set_xlim(-self.length / 2.0, self.length / 2.0)
@@ -346,6 +346,7 @@ class MagneticDipoleApp(object):
             ax2.remove()
         else:
             ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], "w")
+        plt.show()
 
     def get_half_width(self, n_points=200):
         ind_max = np.argmax(abs(self.data_profile))

@@ -96,7 +96,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     if src_type == "VMD":
         src = time_domain.sources.CircularLoop(
             [rxList],
-            loc=np.r_[0.0, 0.0, 30.0],
+            location=np.r_[0.0, 0.0, 30.0],
             orientation="Z",
             waveform=time_domain.sources.StepOffWaveform(),
             radius=13.0,
@@ -104,7 +104,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     elif src_type == "HMD":
         src = time_domain.sources.MagDipole(
             [rxList],
-            loc=np.r_[0.0, 0.0, 30.0],
+            location=np.r_[0.0, 0.0, 30.0],
             orientation="X",
             waveform=time_domain.sources.StepOffWaveform(),
         )
@@ -208,7 +208,7 @@ class PlotTDEM(object):
         y = np.r_[Y1, Y1, Y2, Y2, Y1]
 
         fig = plt.figure(figsize=(8, 8))
-        ax = fig.gca(projection="3d")
+        ax = fig.add_subplot(projection='3d')
         ax.plot3D(np.r_[0, 0], np.r_[0, 0], np.r_[1, 1] * 30.0, "ro", ms=5)
         ax.legend(("Tx",), loc=1)
         ax.plot3D(np.r_[X1, X2], np.r_[0, 0], np.r_[0, 0], "k-")
@@ -235,6 +235,7 @@ class PlotTDEM(object):
         plt.xlabel("Time (ms)")
         plt.ylabel("Normalized current")
         plt.xscale(scale)
+        plt.show()
 
     def getSlices(self, mesh, vec, itime, normal="Z", loc=0.0, isz=False, isy=False):
         VEC = vec[:, itime].reshape((mesh.nC, 3), order="F")
@@ -327,6 +328,7 @@ class PlotTDEM(object):
         title = ("Time at %.2f ms") % ((self.times[itime]) * 1e3)
         ax1.set_title(title)
         plt.tight_layout()
+        plt.show()
 
     def plot_magnetic_flux(self, itime):
         bxy, xy = self.getSlices(
@@ -380,3 +382,4 @@ class PlotTDEM(object):
         title = ("Time at %.2f ms") % ((self.times[itime]) * 1e3)
         ax1.set_title(title)
         plt.tight_layout()
+        plt.show()
