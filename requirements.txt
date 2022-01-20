@@ -1,10 +1,10 @@
 numpy>=1.21
 scipy>=1.7
-matplotlib>=3.4
+matplotlib<3.5
 ipywidgets>=0.6.0
-SimPEG>=0.15.0
+SimPEG=0.15.0
 discretize>=0.7.0
-empymod>=2.0.0
+empymod=2.0.0
 jupyter
 ipywidgets
 deepdish
