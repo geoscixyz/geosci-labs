@@ -9,6 +9,7 @@ from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
+from scipy.constants import mu_0
 
 ##############################################
 #   PLOTTING FUNCTIONS FOR WIDGETS
@@ -238,7 +239,7 @@ def fcn_TDEM_InductionSphereProfileEM61Widget(
 def fcn_ComputeExcitation_TEM(t, sig, mur, a, Type):
     """Compute Excitation Factor (TEM)"""
 
-    beta = np.sqrt(4 * np.pi * 1e-7 * sig) * a
+    beta = np.sqrt(mu_0 * sig) * a
     N = 2000
     nvec = np.linspace(1, N, N)
 
@@ -669,18 +670,23 @@ class SphereTEM:
         mz = 4 * np.pi * a ** 3 * chi * Hpz / 3
         R = np.sqrt((X - x0) ** 2 + (Y - y0) ** 2 + (Z - z0) ** 2)
 
-        Bx = (1e-9) * (
+        Hx = (1 / (4 * np.pi)) * (
             3 * (X - x0) * (mx * (X - x0) + my * (Y - y0) + mz * (Z - z0)) / R ** 5
             - mx / R ** 3
         )
-        By = (1e-9) * (
+        Hy = (1 / (4 * np.pi)) * (
             3 * (Y - y0) * (mx * (X - x0) + my * (Y - y0) + mz * (Z - z0)) / R ** 5
             - my / R ** 3
         )
-        Bz = (1e-9) * (
+        Hz = (1 / (4 * np.pi)) * (
             3 * (Z - z0) * (mx * (X - x0) + my * (Y - y0) + mz * (Z - z0)) / R ** 5
             - mz / R ** 3
         )
-        Babs = np.sqrt(Bx ** 2 + By ** 2 + Bz ** 2)
-
+        Habs = np.sqrt(Hx ** 2 + Hy ** 2 + Hz ** 2)
+        
+        Bx = mu_0 * Hx
+        By = mu_0 * Hy
+        Bz = mu_0 * Hz
+        Babs = mu_0 * Habs
+        
         return Bx, By, Bz, Babs
