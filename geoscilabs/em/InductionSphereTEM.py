@@ -682,7 +682,7 @@ class SphereTEM:
             3 * (Z - z0) * (mx * (X - x0) + my * (Y - y0) + mz * (Z - z0)) / R ** 5
             - mz / R ** 3
         )
-        Habs = np.sqrt(Bx ** 2 + By ** 2 + Bz ** 2)
+        Habs = np.sqrt(Hx ** 2 + Hy ** 2 + Hz ** 2)
         
         Bx = mu_0 * Hx
         By = mu_0 * Hy
