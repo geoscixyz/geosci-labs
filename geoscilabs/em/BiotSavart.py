@@ -54,3 +54,5 @@ def BiotSavartFun(mesh, r_pts, component="z"):
         G[i, :] = G_temp
 
     return G
+
+
