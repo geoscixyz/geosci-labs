@@ -79,12 +79,12 @@ class HarmonicVMDCylWidget(object):
     def getCoreModel(self, Type):
 
         if Type == "Layer":
-            active = self.mesh2D.cell_centers_y < self.z0
-            ind1 = (self.mesh2D.cell_centers_y < self.z0) & (
-                self.mesh2D.cell_centers_y >= self.z1
+            active = self.mesh2D.vectorCCy < self.z0
+            ind1 = (self.mesh2D.vectorCCy < self.z0) & (
+                self.mesh2D.vectorCCy >= self.z1
             )
-            ind2 = (self.mesh2D.cell_centers_y < self.z1) & (
-                self.mesh2D.cell_centers_y >= self.z2
+            ind2 = (self.mesh2D.vectorCCy < self.z1) & (
+                self.mesh2D.vectorCCy >= self.z2
             )
             mapping2D = maps.SurjectVertical1D(self.mesh2D) * maps.InjectActiveCells(
                 self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy
