@@ -30,7 +30,7 @@ import matplotlib.patches as patches
 from discretize import TensorMesh
 
 from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import ExtractCoreMesh
+from SimPEG.utils import extract_core_mesh
 from SimPEG.electromagnetics.static import resistivity as DC
 from SimPEG.electromagnetics.static import induced_polarization as IP
 from pymatsolver import Pardiso
@@ -54,7 +54,7 @@ dx = 60.0
 xr = np.arange(xmin, xmax + 1.0, dx)
 dxr = np.diff(xr)
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = extract_core_mesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)

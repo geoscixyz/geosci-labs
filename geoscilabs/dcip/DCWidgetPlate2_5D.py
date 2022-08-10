@@ -20,7 +20,7 @@ from pymatsolver import Pardiso
 
 from discretize import TensorMesh
 from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import ExtractCoreMesh
+from SimPEG.utils import extract_core_mesh
 from SimPEG.electromagnetics.static import resistivity as DC
 from ..base import widgetify
 
@@ -41,7 +41,7 @@ xmax = 40.0
 ymin = -40.0
 ymax = 8.0
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = extract_core_mesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)
