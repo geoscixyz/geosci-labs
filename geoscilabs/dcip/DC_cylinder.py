@@ -18,7 +18,7 @@ from SimPEG import maps, utils
 from SimPEG.utils import ExtractCoreMesh, mkvc
 from SimPEG.electromagnetics.static import resistivity as DC
 
-from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons, BoundedFloatText
 
 from ..base import widgetify
 
@@ -706,14 +706,14 @@ def cylinder_app():
             options=["Dipole-Dipole", "Dipole-Pole", "Pole-Dipole", "Pole-Pole"],
             value="Dipole-Dipole",
         ),
-        rhocyl=FloatText(
+        rhocyl=BoundedFloatText(
             min=1e-8,
             max=1e8,
             value=500.0,
             continuous_update=False,
             description="$\\rho_2$",
         ),
-        rhohalf=FloatText(
+        rhohalf=BoundedFloatText(
             min=1e-8,
             max=1e8,
             value=500.0,
