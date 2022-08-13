@@ -106,8 +106,8 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
 
     xmin, xmax = -200.0, 200.0
     ymin, ymax = -200.0, 200.0
-    x = mesh.vectorCCx[np.logical_and(mesh.vectorCCx > xmin, mesh.vectorCCx < xmax)]
-    y = mesh.vectorCCy[np.logical_and(mesh.vectorCCy > ymin, mesh.vectorCCy < ymax)]
+    x = mesh.cell_centers_x[np.logical_and(mesh.cell_centers_x > xmin, mesh.cell_centers_x < xmax)]
+    y = mesh.cell_centers_y[np.logical_and(mesh.cell_centers_y > ymin, mesh.cell_centers_y < ymax)]
     xyz = utils.ndgrid(x, y, np.r_[-1.0])
 
     px = np.r_[-200.0, 200.0]
@@ -190,9 +190,9 @@ class PlotTDEM(object):
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
         utils.setKwargs(self, **kwargs)
-        self.xmin, self.xmax = self.mesh.vectorCCx.min(), self.mesh.vectorCCx.max()
-        self.ymin, self.ymax = self.mesh.vectorCCy.min(), self.mesh.vectorCCy.max()
-        self.zmin, self.zmax = self.mesh.vectorCCz.min(), self.mesh.vectorCCz.max()
+        self.xmin, self.xmax = self.mesh.cell_centers_x.min(), self.mesh.cell_centers_x.max()
+        self.ymin, self.ymax = self.mesh.cell_centers_y.min(), self.mesh.cell_centers_y.max()
+        self.zmin, self.zmax = self.mesh.cell_centers_z.min(), self.mesh.cell_centers_z.max()
 
     def show_3d_survey_geometry(self, elev, azim, show_block=False):
         X1, X2 = -250.0, 250.0
@@ -365,33 +365,33 @@ class PlotTDEM(object):
     def getSlices(self, mesh, vec, itime, normal="Z", loc=0.0, isz=False):
         VEC = vec[:, itime].reshape((mesh.nC, 3), order="F")
         if normal == "Z":
-            ind = np.argmin(abs(mesh.vectorCCz - loc))
-            vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
-            vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
-            vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, :, ind]
-            xy = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCy)
+            ind = np.argmin(abs(mesh.cell_centers_z - loc))
+            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
+            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
+            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
+            xy = utils.ndgrid(mesh.cell_centers_x, mesh.cell_centers_y)
             if isz:
                 return utils.mkvc(vz), xy
             else:
                 return np.c_[utils.mkvc(vx), utils.mkvc(vy)], xy
 
         elif normal == "Y":
-            ind = np.argmin(abs(mesh.vectorCCx - loc))
-            vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
-            vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
-            vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[:, ind, :]
-            xz = utils.ndgrid(mesh.vectorCCx, mesh.vectorCCz)
+            ind = np.argmin(abs(mesh.cell_centers_x - loc))
+            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
+            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
+            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
+            xz = utils.ndgrid(mesh.cell_centers_x, mesh.cell_centers_z)
             if isz:
                 return utils.mkvc(vz), xy
             else:
                 return np.c_[utils.mkvc(vx), utils.mkvc(vz)], xz
 
         elif normal == "X":
-            ind = np.argmin(abs(mesh.vectorCCy - loc))
-            vx = VEC[:, 0].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
-            vy = VEC[:, 1].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
-            vz = VEC[:, 2].reshape((mesh.nCx, mesh.nCy, mesh.nCz), order="F")[ind, :, :]
-            yz = utils.ndgrid(mesh.vectorCCy, mesh.vectorCCz)
+            ind = np.argmin(abs(mesh.cell_centers_y - loc))
+            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
+            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
+            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
+            yz = utils.ndgrid(mesh.cell_centers_y, mesh.cell_centers_z)
             if isz:
                 return utils.mkvc(vz), xy
             else:

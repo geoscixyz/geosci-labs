@@ -17,7 +17,6 @@ from discretize import TensorMesh
 from SimPEG import maps, utils
 from SimPEG.utils import ExtractCoreMesh, mkvc
 from SimPEG.electromagnetics.static import resistivity as DC
-
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 from ..base import widgetify

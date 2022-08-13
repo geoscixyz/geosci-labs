@@ -115,7 +115,7 @@ def DC2Dsurvey(flag="PolePole"):
     for i in range(ntx):
         if flag == "PoleDipole":
             A = np.r_[xr[i], zloc]
-            B = np.r_[mesh.vectorCCx.min(), zloc]
+            B = np.r_[mesh.cell_centers_x.min(), zloc]
             if i < ntx - nmax + 1:
                 M = np.c_[xr[i + 1 : i + 1 + nmax], np.ones(nmax) * zloc]
                 N = np.c_[xr[i + 2 : i + 2 + nmax], np.ones(nmax) * zloc]
@@ -127,11 +127,11 @@ def DC2Dsurvey(flag="PolePole"):
             B = np.r_[xr[i + 1], zloc]
             if i < ntx - nmax + 1:
                 M = np.c_[xr[i + 2 : i + 2 + nmax], np.ones(nmax) * zloc]
-                N = np.c_[np.ones(nmax) * mesh.vectorCCx.max(), np.ones(nmax) * zloc]
+                N = np.c_[np.ones(nmax) * mesh.cell_centers_x.max(), np.ones(nmax) * zloc]
             else:
                 M = np.c_[xr[i + 2 : ntx + 2], np.ones(ntx - i) * zloc]
                 N = np.c_[
-                    np.ones(ntx - i) * mesh.vectorCCx.max(), np.ones(ntx - i) * zloc
+                    np.ones(ntx - i) * mesh.cell_centers_x.max(), np.ones(ntx - i) * zloc
                 ]
         elif flag == "DipoleDipole":
             A = np.r_[xr[i], zloc]
@@ -153,15 +153,15 @@ def DC2Dsurvey(flag="PolePole"):
                 N = np.c_[xr[i + 3 : len(xr)], np.ones(len(xr[i + 3 : len(xr)])) * zloc]
         elif flag == "PolePole":
             A = np.r_[xr[i], zloc]
-            B = np.r_[mesh.vectorCCx.min(), zloc]
+            B = np.r_[mesh.cell_centers_x.min(), zloc]
 
             if i < ntx - nmax + 1:
                 M = np.c_[xr[i + 2 : i + 2 + nmax], np.ones(nmax) * zloc]
-                N = np.c_[np.ones(nmax) * mesh.vectorCCx.max(), np.ones(nmax) * zloc]
+                N = np.c_[np.ones(nmax) * mesh.cell_centers_x.max(), np.ones(nmax) * zloc]
             else:
                 M = np.c_[xr[i + 2 : ntx + 2], np.ones(ntx - i) * zloc]
                 N = np.c_[
-                    np.ones(ntx - i) * mesh.vectorCCx.max(), np.ones(ntx - i) * zloc
+                    np.ones(ntx - i) * mesh.cell_centers_x.max(), np.ones(ntx - i) * zloc
                 ]
 
         rx = DC.receivers.Dipole(M, N)

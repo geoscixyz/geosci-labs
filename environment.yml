@@ -2,17 +2,16 @@ name: geosci-labs
 
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - cvxopt
   - deepdish
-  - discretize=0.7.0
+  - discretize
   - empymod=2.0.0
   - ipywidgets>=0.6.0
   - jupyter
   - matplotlib<3.5
   - mkl>=2021.3.0
-  - numpy>=1.21
+  - numpy=1.21
   - Pillow
   - pip
   - pymatsolver
@@ -20,6 +19,6 @@ dependencies:
   - requests
   - scipy>=1.7
   - scikit-learn<1.0
-  - SimPEG=0.15.0
+  - SimPEG
   - pip:
     - git+https://github.com/geoscixyz/geosci-labs

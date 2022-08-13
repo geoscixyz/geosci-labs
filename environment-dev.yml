@@ -6,21 +6,21 @@ channels:
 dependencies:
   - cvxopt
   - deepdish
-  - discretize=0.7.0
-  - empymod=2.0.0
+  - discretize
+  - empymod
   - ipywidgets>=0.6.0
   - jupyter
-  - matplotlib<3.5
+  - matplotlib=3.4.3
   - mkl>=2021.3.0
-  - numpy>=1.21
+  - numpy=1.21
   - Pillow
   - pip
   - pymatsolver
-  - python=3.8
+  - python=3.9
   - requests
   - scipy>=1.7
   - scikit-learn<1.0
-  - SimPEG=0.15.0
+  - SimPEG
   - pytest
   - flake8
   - black
