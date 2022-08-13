@@ -11,8 +11,8 @@ import matplotlib.gridspec as gridspec
 
 from ipywidgets import ToggleButtons, FloatSlider
 
-from ..base import widgetify
-from .view import DataView
+from geoscilabs.base import widgetify
+from SimPEG.view import DataView
 
 matplotlib.rcParams["font.size"] = 12
 

@@ -77,21 +77,21 @@ class MagneticDipoleApp(object):
             md = em.static.MagneticDipoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z)
             b_vec = md.magnetic_flux_density(xyz)
 
         elif self.target == "Monopole (+)":
             md = em.static.MagneticPoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z)
             b_vec = md.magnetic_flux_density(xyz)
 
         elif self.target == "Monopole (-)":
             md = em.static.MagneticPoleWholeSpace(
                 location=np.r_[0, 0, -depth], orientation=orientation, moment=moment
             )
-            xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+            xyz = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z)
             b_vec = -md.magnetic_flux_density(xyz)
 
         # Project to the direction  of earth field
@@ -99,7 +99,7 @@ class MagneticDipoleApp(object):
             rx_orientation = orientation.copy()
         elif component == "Bg":
             rx_orientation = orientation.copy()
-            xyz_up = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
+            xyz_up = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z + 1.0)
             b_vec -= md.magnetic_flux_density(xyz_up)
 
         elif component == "Bx":
@@ -113,11 +113,11 @@ class MagneticDipoleApp(object):
 
         # Compute profile
         if (profile == "North") or (profile == "None"):
-            self.xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
+            self.xy_profile = np.c_[np.zeros(self.mesh.shape_cells[0]), self.mesh.cell_centers_x]
 
         elif profile == "East":
-            self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
-        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
+            self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
+        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def simulate_two_monopole(
@@ -160,7 +160,7 @@ class MagneticDipoleApp(object):
         md_p = em.static.MagneticPoleWholeSpace(
             location=np.r_[0, 0, -depth_p], orientation=orientation, moment=moment
         )
-        xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+        xyz = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z)
         b_vec = -md_n.magnetic_flux_density(xyz) + md_p.magnetic_flux_density(xyz)
 
         # Project to the direction  of earth field
@@ -174,7 +174,7 @@ class MagneticDipoleApp(object):
             rx_orientation = self.id_to_cartesian(90, 0)
         elif component == "Bg":
             rx_orientation = orientation.copy()
-            xyz_up = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z + 1.0)
+            xyz_up = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z + 1.0)
             b_vec -= -md_n.magnetic_flux_density(xyz_up)
             b_vec -= md_p.magnetic_flux_density(xyz_up)
 
@@ -182,12 +182,12 @@ class MagneticDipoleApp(object):
 
         # Compute profile
         if (profile == "North") or (profile == "None"):
-            self.xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
+            self.xy_profile = np.c_[np.zeros(self.mesh.shape_cells[0]), self.mesh.cell_centers_x]
 
         elif profile == "East":
-            self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
+            self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
 
-        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
+        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def get_prism(self, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec):
@@ -198,7 +198,7 @@ class MagneticDipoleApp(object):
         return prism
 
     def plot_prism(self, prism, dip=30, azim=310):
-        return plotObj3D(prism, self.survey, dip, azim, self.mesh.vectorCCx.max())
+        return plotObj3D(prism, self.survey, dip, azim, self.mesh.cell_centers_x.max())
 
     def simulate_prism(
         self,
@@ -263,7 +263,7 @@ class MagneticDipoleApp(object):
         elif component == "Bz":
             uType = "bz"
 
-        xyz = utils.ndgrid(self.mesh.vectorCCx, self.mesh.vectorCCy, z)
+        xyz = utils.ndgrid(self.mesh.cell_centers_x, self.mesh.cell_centers_y, z)
         out = createMagSurvey(np.c_[xyz, np.ones(self.mesh.nC)], B)
         self.survey = out[0]
         self.dobs = out[1]
@@ -278,11 +278,11 @@ class MagneticDipoleApp(object):
 
         # Compute profile
         if (profile == "North") or (profile == "None"):
-            self.xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
+            self.xy_profile = np.c_[np.zeros(self.mesh.shape_cells[0]), self.mesh.vectcell_centers_xorCCx]
 
         elif profile == "East":
-            self.xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
-        self.inds_profile = utils.closestPoints(self.mesh, self.xy_profile)
+            self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
+        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def plot_map(self):
@@ -297,8 +297,8 @@ class MagneticDipoleApp(object):
         if (self.clim is None) or (not self.fixed_scale):
             self.clim = data.min(), data.max()
 
-        out = self.mesh.plotImage(
-            self.data, pcolorOpts={"cmap": "jet"}, ax=ax1, clim=self.clim
+        out = self.mesh.plot_image(
+            self.data, pcolor_opts={"cmap": "jet"}, ax=ax1, clim=self.clim
         )
         cax = fig.add_axes([0.75, 0.45, 0.02, 0.5])
         ratio = abs(self.clim[0] / self.clim[1])
@@ -313,11 +313,11 @@ class MagneticDipoleApp(object):
         ax1.set_ylabel("Northing")
         ax1.set_xlabel("Easting")
         if profile == "North":
-            # xy_profile = np.c_[np.zeros(self.mesh.nCx), self.mesh.vectorCCx]
+            # xy_profile = np.c_[np.zeros(self.mesh.shape_cells[0]), self.mesh.cell_centers_x]
             ax1.text(1, length / 2 - length / 2 * 0.1, "B", color="w")
             ax1.text(1, -length / 2, "A", color="w")
         elif profile == "East":
-            # xy_profile = np.c_[self.mesh.vectorCCx, np.zeros(self.mesh.nCx)]
+            # xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
             ax1.text(length / 2 - length / 2 * 0.1, 1, "B", color="w")
             ax1.text(-length / 2, 1, "A", color="w")
 
@@ -325,9 +325,9 @@ class MagneticDipoleApp(object):
         ax1.set_yticks([])
 
         ax2.yaxis.tick_right()
-        ax2.plot(self.mesh.vectorCCx, self.data_profile, "k", lw=2)
+        ax2.plot(self.mesh.cell_centers_x, self.data_profile, "k", lw=2)
         ax2.plot(
-            self.mesh.vectorCCx, np.zeros(self.mesh.nCx), "--", color="grey", lw=1
+            self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0]), "--", color="grey", lw=1
         )
 
         ax2.set_xlim(-self.length / 2.0, self.length / 2.0)

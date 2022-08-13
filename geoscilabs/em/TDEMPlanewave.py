@@ -17,7 +17,7 @@ def e_field_from_sheet_current(
             Add description of parameters
     """
 
-    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -54,7 +54,7 @@ def h_field_from_sheet_current(
         Plane wave propagating downward (negative z (depth))
     """
 
-    XYZ = utils.asArray_N_x_Dim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from ipywidgets import widgets, FloatText
-from discretize import TensorMesh, CylMesh
+from discretize import TensorMesh, CylindricalMesh
 from SimPEG import maps, utils
 from SimPEG.electromagnetics import time_domain as tdem
 
@@ -57,7 +57,7 @@ class TDEMHorizontalLoopCylWidget(object):
         # TODO: Make it adaptive due to z location
         hx = [(cs, ncx), (cs, npad, 1.3)]
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
-        self.mesh = CylMesh([hx, 1, hz], "00C")
+        self.mesh = CylindricalMesh([hx, 1, hz], "00C")
 
     def getCoreDomain(self, mirror=False, xmax=200, zmin=-200, zmax=200.0):
 
@@ -68,14 +68,14 @@ class TDEMHorizontalLoopCylWidget(object):
         )
         self.gridCCactive = self.mesh.gridCC[self.activeCC, :][:, [0, 2]]
 
-        xind = self.mesh.vectorCCx <= xmax
-        yind = np.logical_and(self.mesh.vectorCCz >= zmin, self.mesh.vectorCCz <= zmax)
+        xind = self.mesh.cell_centers_x <= xmax
+        yind = np.logical_and(self.mesh.cell_centers_z >= zmin, self.mesh.cell_centers_z <= zmax)
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 
         # if self.mesh2D is None:
-        hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
-        hz = self.mesh.hz[yind]
+        hx = np.r_[self.mesh.h[0][xind][::-1], self.mesh.h[0][xind]]
+        hz = self.mesh.h[2][yind]
         self.mesh2D = TensorMesh([hx, hz], x0="CC")
 
     def getCoreModel(self, Type):

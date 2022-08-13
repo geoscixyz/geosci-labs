@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from ipywidgets import widgets
-from discretize import CylMesh, TensorMesh
+from discretize import CylindricalMesh, TensorMesh
 from SimPEG import maps, utils
 from SimPEG.electromagnetics import frequency_domain as fdem
 from pymatsolver import Pardiso
@@ -55,7 +55,7 @@ class HarmonicVMDCylWidget(object):
         # TODO: Make it adaptive due to z location
         hx = [(cs, ncx), (cs, npad, 1.3)]
         hz = [(cs, npad, -1.3), (cs, ncz), (cs, npad, 1.3)]
-        self.mesh = CylMesh([hx, 1, hz], "00C")
+        self.mesh = CylindricalMesh([hx, 1, hz], "00C")
 
     def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.0):
 
@@ -66,14 +66,14 @@ class HarmonicVMDCylWidget(object):
         )
         self.gridCCactive = self.mesh.gridCC[self.activeCC, :][:, [0, 2]]
 
-        xind = self.mesh.vectorCCx <= xmax
-        yind = np.logical_and(self.mesh.vectorCCz >= zmin, self.mesh.vectorCCz <= zmax)
+        xind = self.mesh.cell_centers_x <= xmax
+        yind = np.logical_and(self.mesh.cell_centers_x >= zmin, self.mesh.cell_centers_x <= zmax)
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 
         # if self.mesh2D is None:
-        hx = np.r_[self.mesh.hx[xind][::-1], self.mesh.hx[xind]]
-        hz = self.mesh.hz[yind]
+        hx = np.r_[self.mesh.h[0][xind][::-1], self.mesh.h[0][xind]]
+        hz = self.mesh.h[2][yind]
         self.mesh2D = TensorMesh([hx, hz], x0="CC")
 
     def getCoreModel(self, Type):
@@ -136,9 +136,9 @@ class HarmonicVMDCylWidget(object):
         self.sig2 = sig2  # 2nd layer \sigma
         self.sig3 = sig3  # 3rd layer \sigma
 
-        active = self.mesh.vectorCCz < self.z0
-        ind1 = (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
-        ind2 = (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
+        active = self.mesh.cell_centers_z < self.z0
+        ind1 = (self.mesh.cell_centers_z < self.z0) & (self.mesh.cell_centers_z >= self.z1)
+        ind2 = (self.mesh.cell_centers_z < self.z1) & (self.mesh.cell_centers_z >= self.z2)
         self.mapping = maps.SurjectVertical1D(self.mesh) * maps.InjectActiveCells(
             self.mesh, active, sig0, nC=self.mesh.nCz
         )
