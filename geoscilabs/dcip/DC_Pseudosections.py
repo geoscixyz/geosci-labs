@@ -10,6 +10,7 @@ from ipywidgets import (
     IntSlider,
     FloatSlider,
     FloatText,
+    BoundedFloatText,
     ToggleButtons,
     VBox,
 )
@@ -55,7 +56,7 @@ class ParametricCircleLayerMap(IdentityMap):
             sig1, sig2, sig3 = np.exp(sig1), np.exp(sig2), np.exp(sig3)
         sigma = np.ones(mesh.nC) * sig1
         sigma[mesh.gridCC[:, 1] < zh] = sig2
-        blkind = utils.ModelBuilder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
+        blkind = utils.model_builder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
         sigma[blkind] = sig3
         return sigma
 
@@ -677,14 +678,14 @@ def DC2DPseudoWidgetWrapper(rhohalf, rhosph, xc, zc, r, surveyType):
 def DC2DPseudoWidget():
     return interactive(
         DC2DPseudoWidgetWrapper,
-        rhohalf=FloatText(
+        rhohalf=BoundedFloatText(
             min=10,
             max=1000,
             value=1000,
             continuous_update=False,
             description="$\\rho_1$",
         ),
-        rhosph=FloatText(
+        rhosph=BoundedFloatText(
             min=10,
             max=1000,
             value=1000,
@@ -736,14 +737,14 @@ def DC2DfwdWidget():
     return widgetify(
         DC2DfwdWrapper,
         manual=False,
-        rhohalf=FloatText(
+        rhohalf=BoundedFloatText(
             min=10,
             max=1000,
             value=1000,
             continuous_update=False,
             description="$\\rho_1$",
         ),
-        rhosph=FloatText(
+        rhosph=BoundedFloatText(
             min=10,
             max=1000,
             value=500,

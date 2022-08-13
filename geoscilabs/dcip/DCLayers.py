@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import numpy as np
 from scipy.constants import epsilon_0
 
-from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons, BoundedFloatText
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -28,7 +28,7 @@ hy = [(cs, npad, -1.3), (cs, 100)]
 mesh = TensorMesh([hx, hy], "CN")
 
 # bounds on electrical resistivity
-rhomin = 1e2
+rhomin = 1e1
 rhomax = 1e3
 
 eps = 1e-9  # to stabilize division
@@ -484,14 +484,14 @@ def plot_layer_potentials_app():
         N=FloatSlider(
             min=-40.0, max=40.0, step=1.0, value=10.0, continuous_update=False
         ),
-        rho1=FloatText(
+        rho1=BoundedFloatText(
             min=rhomin,
             max=rhomax,
             value=500.0,
             continuous_update=False,
             description="$\\rho_1$",
         ),
-        rho2=FloatText(
+        rho2=BoundedFloatText(
             min=rhomin,
             max=rhomax,
             value=500.0,
