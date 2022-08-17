@@ -1,10 +1,7 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from __future__ import division
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erfc, erf
+from discretize.utils import as_array_n_by_dim
 from SimPEG import utils
 
 # TODO:
@@ -36,7 +33,7 @@ def E_from_ElectricDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -142,7 +139,7 @@ def H_from_ElectricDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -203,7 +200,7 @@ def dHdt_from_ElectricDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -304,7 +301,7 @@ def E_from_MagneticDipoleWholeSpace(
 
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -404,7 +401,7 @@ def H_from_MagneticDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(
@@ -472,7 +469,7 @@ def dHdt_from_MagneticDipoleWholeSpace(
     mu = mu_0 * (1 + kappa)
     # epsilon = epsilon_0 * epsr
 
-    XYZ = utils.as_array_n_by_dim(XYZ, 3)
+    XYZ = as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & t.shape[0] > 1:
         raise Exception(

@@ -1,13 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 09 10:43:37 2016
-
-@author: Devin
-"""
 import numpy as np
 import scipy.special as sp
 import matplotlib.pyplot as plt
