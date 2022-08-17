@@ -1,7 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 from ipywidgets import widgets
 from discretize import CylindricalMesh, TensorMesh
 from SimPEG import maps, utils
@@ -67,7 +63,7 @@ class HarmonicVMDCylWidget(object):
         self.gridCCactive = self.mesh.gridCC[self.activeCC, :][:, [0, 2]]
 
         xind = self.mesh.cell_centers_x <= xmax
-        yind = np.logical_and(self.mesh.cell_centers_x >= zmin, self.mesh.cell_centers_x <= zmax)
+        yind = np.logical_and(self.mesh.cell_centers_z >= zmin, self.mesh.cell_centers_z <= zmax)
         self.nx_core = xind.sum()
         self.ny_core = yind.sum()
 

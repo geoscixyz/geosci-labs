@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from discretize import TensorMesh
+from discretize.utils import closest_points_index
 from SimPEG import utils
 from geoana import em
 from ipywidgets import widgets
@@ -117,7 +118,7 @@ class MagneticDipoleApp(object):
 
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
-        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
+        self.inds_profile = closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def simulate_two_monopole(
@@ -187,7 +188,7 @@ class MagneticDipoleApp(object):
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
 
-        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
+        self.inds_profile = closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def get_prism(self, dx, dy, dz, x0, y0, elev, prism_inc, prism_dec):
@@ -282,7 +283,7 @@ class MagneticDipoleApp(object):
 
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
-        self.inds_profile = utils.closest_points_index(self.mesh, self.xy_profile)
+        self.inds_profile = closest_points_index(self.mesh, self.xy_profile)
         self.data_profile = self.data[self.inds_profile]
 
     def plot_map(self):

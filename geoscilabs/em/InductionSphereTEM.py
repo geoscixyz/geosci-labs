@@ -1,7 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
@@ -683,10 +679,10 @@ class SphereTEM:
             - mz / R ** 3
         )
         Habs = np.sqrt(Hx ** 2 + Hy ** 2 + Hz ** 2)
-        
+
         Bx = mu_0 * Hx
         By = mu_0 * Hy
         Bz = mu_0 * Hz
         Babs = mu_0 * Habs
-        
+
         return Bx, By, Bz, Babs
