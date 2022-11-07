@@ -165,13 +165,13 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="air"):
             src = DC.sources.Dipole([], np.r_[A, surfaceA], np.r_[B, surfaceB])
         survey = DC.survey.Survey([src])
         problem = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
         problem_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
         problem_air = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
 
         if whichprimary == "air":

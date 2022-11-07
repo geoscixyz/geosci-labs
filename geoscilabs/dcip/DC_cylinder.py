@@ -88,10 +88,10 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
 
         # make two simulations for the seperate field objects
         sim_primary = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso, bc_type='Dirichlet'
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
         )
         sim_total = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso, bc_type='Dirichlet'
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
         )
 
         primary_field = sim_primary.fields(mhalf)
