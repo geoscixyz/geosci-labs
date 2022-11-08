@@ -99,11 +99,11 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.Survey([src])
         sim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
         total_field = sim.fields(mtrue)
         sim_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso, bc_type="Dirichlet"
+            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
         )
         primary_field = sim_prim.fields(mhalf)
 
