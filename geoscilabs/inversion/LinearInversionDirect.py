@@ -407,14 +407,16 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax1, ax2, ax3 = axes
 
         if add_noise:
-            survey_obj, simulation_obj = self.get_problem_survey()
+            # survey_obj, simulation_obj = self.get_problem_survey()
+            simulation_obj = self.get_problem_survey()
             d_clean = simulation_obj.dpred(m)
             noise = (
                 abs(d_clean) * percentage * 0.01 * np.random.randn(self.N)
                 + np.random.randn(self.N) * floor
             )
         else:
-            survey_obj, simulation_obj = self.get_problem_survey()
+            # survey_obj, simulation_obj = self.get_problem_survey()
+            simulation_obj = self.get_problem_survey()
             d_clean = simulation_obj.dpred(m)
             noise = np.zeros(self.N, float)
 
@@ -505,14 +507,16 @@ class LinearInversionDirectApp(properties.HasProperties):
         np.random.seed(1)
 
         if add_noise:
-            survey_obj, simulation_obj = self.get_problem_survey()
+            # survey_obj, simulation_obj = self.get_problem_survey()
+            simulation_obj = self.get_problem_survey()
             d = simulation_obj.dpred(m)
             noise = (
                 abs(d) * percentage * 0.01 * np.random.randn(self.N)
                 + np.random.randn(self.N) * floor
             )
         else:
-            survey_obj, simulation_obj = self.get_problem_survey()
+            # survey_obj, simulation_obj = self.get_problem_survey()
+            simulation_obj = self.get_problem_survey()
             d = simulation_obj.dpred(m)
             noise = np.zeros(self.N, float)
 
@@ -571,14 +575,15 @@ class LinearInversionDirectApp(properties.HasProperties):
             return axes
 
     def get_problem_survey(self):
-        survey_obj = survey.LinearSurvey()
+        # survey_obj = survey.BaseSurvey()
         simulation_obj = simulation.LinearSimulation(
-            survey=survey_obj,
+            # survey=survey_obj,
             mesh=self.mesh_prop,
             model_map=maps.IdentityMap(),
             G=self.G,
         )
-        return survey_obj, simulation_obj
+        # return survey_obj, simulation_obj
+        return simulation_obj
 
     def run_inversion_direct(
         self,
@@ -596,16 +601,20 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         self.uncertainty = percentage * abs(self.data_vec) * 0.01 + floor
 
-        survey_obj, simulation_obj = self.get_problem_survey()
+        # survey_obj, simulation_obj = self.get_problem_survey()
+        simulation_obj = self.get_problem_survey()
+        survey_obj = survey.BaseSurvey([])
+        survey_obj._vnD = np.r_[len(self.data_vec)]
         data_obj = data.Data(
-            survey_obj, dobs=self.data_vec, noise_floor=self.uncertainty
+            survey_obj,
+            dobs=self.data_vec, noise_floor=self.uncertainty
         )
         dmis = data_misfit.L2DataMisfit(simulation=simulation_obj, data=data_obj)
 
         m0 = np.ones(self.M) * m0
         mref = np.ones(self.M) * mref
         reg = regularization.Tikhonov(
-            self.mesh_prop, alpha_s=alpha_s, alpha_x=alpha_x, mref=mref
+            self.mesh_prop, alpha_s=alpha_s, alpha_x=alpha_x, reference_model=mref
         )
 
         betas = np.logspace(np.log10(beta_min), np.log10(beta_max), n_beta)[::-1]
@@ -666,7 +675,8 @@ class LinearInversionDirectApp(properties.HasProperties):
         np.random.seed(1)
         if mode == "Run":
             if noise_option == "error contaminated":
-                survey_obj, simulation_obj = self.get_problem_survey()
+                # survey_obj, simulation_obj = self.get_problem_survey()
+                simulation_obj = self.get_problem_survey()
                 d = simulation_obj.dpred(self.m)
                 noise = (
                     abs(d) * percentage * 0.01 * np.random.randn(self.N)
@@ -674,7 +684,8 @@ class LinearInversionDirectApp(properties.HasProperties):
 
                 )
             elif noise_option == "clean data":
-                survey_obj, simulation_obj = self.get_problem_survey()
+                # survey_obj, simulation_obj = self.get_problem_survey()
+                simulation_obj = self.get_problem_survey()
                 d = simulation_obj.dpred(self.m)
                 noise = np.zeros(self.N, float)
 
