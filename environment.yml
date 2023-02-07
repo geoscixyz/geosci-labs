@@ -11,14 +11,13 @@ dependencies:
   - jupyter
   - matplotlib<3.5
   - mkl>=2021.3.0
-  - numpy=1.21
+  - numpy
   - Pillow
   - pip
   - pymatsolver
   - python=3.10
   - requests
-  - scipy>=1.7
-  - scikit-learn<1.0
+  - scipy
   - SimPEG
   - pip:
     - git+https://github.com/geoscixyz/geosci-labs
