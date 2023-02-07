@@ -30,7 +30,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="geoscilabs",
-    version="0.3.1",
+    version="0.3.2",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         "numpy>=1.21",
