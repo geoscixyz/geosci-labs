@@ -261,8 +261,11 @@ def ViewMagSurvey2D(survey, dobj):
         )
 
         rxLoc = mag.receivers.Point(rxLoc[ind, :])
-        srcField = mag.sources.SourceField(
-            receiver_list=[rxLoc], parameters=survey.source_field.parameters
+        srcField = mag.sources.UniformBackgroundField(
+            receiver_list=[rxLoc],
+            amplitude=survey.source_field.amplitude,
+            inclination=survey.source_field.inclination,
+            declination=survey.source_field.declination
         )
         surveySim = mag.Survey(srcField)
 

@@ -35,7 +35,7 @@ def E_from_ElectricDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     sig_hat = sig + 1j * omega(f) * epsilon
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -96,7 +96,7 @@ def E_galvanic_from_ElectricDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     sig_hat = sig + 1j * omega(f) * epsilon
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -157,7 +157,7 @@ def E_inductive_from_ElectricDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     sig_hat = sig + 1j * omega(f) * epsilon
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -327,7 +327,7 @@ def H_from_ElectricDipoleWholeSpace(
     """
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -426,7 +426,7 @@ def A_from_ElectricDipoleWholeSpace(
     """
     mu = mu_0 * (1 + kappa)
     epsilon = epsilon_0 * epsr
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -483,7 +483,7 @@ def E_from_MagneticDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     m = current * loopArea
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -581,7 +581,7 @@ def H_from_MagneticDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     m = current * loopArea
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
@@ -679,7 +679,7 @@ def F_from_MagneticDipoleWholeSpace(
     epsilon = epsilon_0 * epsr
     m = current * loopArea
 
-    XYZ = utils.as_array_n_by_ndim(XYZ, 3)
+    XYZ = utils.as_array_n_by_dim(XYZ, 3)
     # Check
     if XYZ.shape[0] > 1 & f.shape[0] > 1:
         raise Exception(
