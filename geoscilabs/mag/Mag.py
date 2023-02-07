@@ -30,8 +30,8 @@ class Simulation(object):
     def Mind(self):
         # Define magnetization direction as sum of induced and remanence
         mind = MagUtils.dipazm_2_xyz(
-            self.survey.source_field.parameters[1],
-            self.survey.source_field.parameters[2],
+            self.survey.source_field.inclination,
+            self.survey.source_field.declination,
         )
         R = MagUtils.rotationMatrix(-self.prism.pinc, -self.prism.pdec, normal=False)
         Mind = self.susc * self.Higrf * R.dot(mind.T)
@@ -50,7 +50,7 @@ class Simulation(object):
 
     @property
     def Higrf(self):
-        Higrf = self.survey.source_field.parameters[0] * 1e-9 / mu_0
+        Higrf = self.survey.source_field.amplitude * 1e-9 / mu_0
 
         return Higrf
 
@@ -122,8 +122,8 @@ class Simulation(object):
         if self.uType == "tf":
             # Projection matrix
             Ptmi = MagUtils.dipazm_2_xyz(
-                self.survey.source_field.parameters[1],
-                self.survey.source_field.parameters[2],
+                self.survey.source_field.inclination,
+                self.survey.source_field.declination,
             )
 
             u = utils.mkvc(Ptmi.dot(bvec))

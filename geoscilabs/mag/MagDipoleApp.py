@@ -219,6 +219,7 @@ class MagneticDipoleApp(object):
         prism_dz,
         prism_inclination,
         prism_declination,
+        fit_model=False
     ):
         self.component = component
         self.inclination = -inclination  # -ve accounts for LH modeling in SimPEG
@@ -233,7 +234,7 @@ class MagneticDipoleApp(object):
         self.show_halfwidth = show_halfwidth
 
         # prism parameter
-        self.prism = self.get_prism(
+        prism = self.get_prism(
             prism_dx,
             prism_dy,
             prism_dz,
@@ -268,14 +269,14 @@ class MagneticDipoleApp(object):
         out = createMagSurvey(np.c_[xyz, np.ones(self.mesh.nC)], B)
         self.survey = out[0]
         self.dobs = out[1]
-        self.sim = Simulation()
+        sim = Simulation()
 
-        self.sim.prism = self.prism
-        self.sim.survey = self.survey
-        self.sim.susc = kappa
-        self.sim.uType, self.sim.mType = uType, "induced"
+        sim.prism = prism
+        sim.survey = self.survey
+        sim.susc = kappa
+        sim.uType, sim.mType = uType, "induced"
 
-        self.data = self.sim.fields()[0]
+        data = sim.fields()[0]
 
         # Compute profile
         if (profile == "North") or (profile == "None"):
@@ -284,7 +285,14 @@ class MagneticDipoleApp(object):
         elif profile == "East":
             self.xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
         self.inds_profile = closest_points_index(self.mesh, self.xy_profile)
-        self.data_profile = self.data[self.inds_profile]
+        data_profile = data[self.inds_profile]
+
+        if fit_model is False:
+            self.data = data
+            self.data_profile = data_profile
+        elif fit_model is True:
+            self.data_true = data
+            self.data_profile_true = data_profile
 
     def plot_map(self):
         length = self.length
@@ -330,6 +338,76 @@ class MagneticDipoleApp(object):
         ax2.plot(
             self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0]), "--", color="grey", lw=1
         )
+
+        ax2.set_xlim(-self.length / 2.0, self.length / 2.0)
+        ymin, ymax = ax2.get_ylim()
+        ax2.text(-self.length / 2.0, ymax, "A")
+        ax2.text(self.length / 2.0 - self.length / 2 * 0.05, ymax, "B")
+        ax2.set_yticks([self.clim[0], self.clim[1]])
+        if self.show_halfwidth:
+            x_half, data_half = self.get_half_width()
+            ax2.plot(x_half, data_half, "bo--")
+            ax2.set_xlabel(("Halfwidth: %.1fm") % (abs(np.diff(x_half))))
+        else:
+            ax2.set_xlabel(" ")
+        # plt.tight_layout()
+        if profile == "None":
+            ax2.remove()
+        else:
+            ax1.plot(self.xy_profile[:, 0], self.xy_profile[:, 1], "w")
+        plt.show()
+
+    def plot_map_fit(self, view=None):
+        length = self.length
+        data = self.data
+        data_true = self.data_true
+        profile = self.profile
+
+        fig = plt.figure(figsize=(5, 9))
+        ax0 = plt.subplot2grid((13, 4), (0, 0), rowspan=4, colspan=3)
+        ax1 = plt.subplot2grid((13, 4), (5, 0), rowspan=4, colspan=3)
+        ax2 = plt.subplot2grid((13, 4), (10, 0), rowspan=2, colspan=3)
+
+        for a, d in zip([ax0, ax1], [data_true, data]):
+            if (self.clim is None) or (not self.fixed_scale):
+                self.clim = d.min(), d.max()
+
+            out = self.mesh.plot_image(
+                d, pcolor_opts={"cmap": "Spectral_r"}, ax=a, clim=self.clim
+            )
+            ratio = abs(self.clim[0] / self.clim[1])
+            if ratio < 0.05:
+                ticks = [self.clim[0], self.clim[1]]
+            else:
+                ticks = [self.clim[0], 0, self.clim[1]]
+
+            cb = plt.colorbar(out[0], ticks=ticks, format="%.3f", ax=a)
+            cb.set_label("nT", labelpad=-40, y=-0.05, rotation=0)
+            a.set_aspect(1)
+            a.set_ylabel("Northing")
+            a.set_xlabel("Easting")
+            if profile == "North":
+                # xy_profile = np.c_[np.zeros(self.mesh.shape_cells[0]), self.mesh.cell_centers_x]
+                a.text(1, length / 2 - length / 2 * 0.1, "B", color="w")
+                a.text(1, -length / 2, "A", color="w")
+            elif profile == "East":
+                # xy_profile = np.c_[self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0])]
+                a.text(length / 2 - length / 2 * 0.1, 1, "B", color="w")
+                a.text(-length / 2, 1, "A", color="w")
+
+            a.set_xticks([])
+            a.set_yticks([])
+
+        ax0.set_title("Observed Data")
+        ax1.set_title("Predicted Data")
+
+        ax2.yaxis.tick_right()
+        ax2.plot(self.mesh.cell_centers_x, self.data_profile_true, "ro", ms=4, label="observed")
+        ax2.plot(self.mesh.cell_centers_x, self.data_profile, "k", lw=2, label="predicted")
+        ax2.plot(
+            self.mesh.cell_centers_x, np.zeros(self.mesh.shape_cells[0]), "--", color="grey", lw=1
+        )
+        ax2.legend()
 
         ax2.set_xlim(-self.length / 2.0, self.length / 2.0)
         ymin, ymax = ax2.get_ylim()
@@ -479,6 +557,87 @@ class MagneticDipoleApp(object):
                 prism_declination,
             )
             self.plot_prism(self.prism)
+
+    def magnetic_prism_fit_applet(
+        self,
+        plot,
+        component,
+        inclination,
+        declination,
+        length,
+        dx,
+        B0,
+        kappa,
+        depth,
+        profile,
+        fixed_scale,
+        show_halfwidth,
+        prism_dx,
+        prism_dy,
+        prism_dz,
+        prism_inclination,
+        prism_declination,
+    ):
+        # true model
+        true_depth = 200
+        true_prism_dx = 200
+        true_prism_dy = 800
+        true_prism_dz = 800
+        true_prism_inclination = 45
+        true_prism_declination = 60
+        true_susc = 0.07
+        if plot == "field":
+            self.simulate_prism(
+                component,
+                inclination,
+                declination,
+                length,
+                dx,
+                B0,
+                kappa,
+                depth,
+                profile,
+                fixed_scale,
+                show_halfwidth,
+                prism_dx,
+                prism_dy,
+                prism_dz,
+                prism_inclination,
+                prism_declination,
+            )
+            self.simulate_prism(
+                component,
+                inclination,
+                declination,
+                length,
+                dx,
+                B0,
+                true_susc,
+                true_depth,
+                profile,
+                fixed_scale,
+                show_halfwidth,
+                true_prism_dx,
+                true_prism_dy,
+                true_prism_dz,
+                true_prism_inclination,
+                true_prism_declination,
+                fit_model=True,
+            )
+            self.plot_map_fit()
+        elif plot == "model":
+            self.prism = self.get_prism(
+                prism_dx,
+                prism_dy,
+                prism_dz,
+                0,
+                0,
+                -depth,
+                prism_inclination,
+                prism_declination,
+            )
+            self.plot_prism(self.prism)
+
 
     def interact_plot_model_dipole(self):
         component = widgets.RadioButtons(
@@ -678,7 +837,15 @@ class MagneticDipoleApp(object):
         )
         return widgets.HBox([left, out, right])
 
-    def interact_plot_model_prism(self):
+    def interact_plot_model_prism(
+        self,
+        length_min=2,
+        length_max=200,
+        dx_min=0.1,
+        dx_max=15,
+        depth_min=0,
+        depth_max=50,
+    ):
         plot = widgets.RadioButtons(
             options=["field", "model"],
             value="field",
@@ -701,28 +868,28 @@ class MagneticDipoleApp(object):
         length = widgets.FloatSlider(
             description="length",
             continuous_update=False,
-            min=2,
-            max=200,
+            min=length_min,
+            max=length_max,
             step=1,
-            value=72,
+            value=length_max/2,
         )
         dx = widgets.FloatSlider(
             description="data spacing",
             continuous_update=False,
-            min=0.1,
-            max=15,
-            step=0.1,
-            value=2,
+            min=dx_min,
+            max=dx_max,
+            step=dx_min,
+            value=20*dx_min,
         )
         kappa = widgets.FloatText(description="$\kappa$", value=0.1)
         B0 = widgets.FloatText(description="B$_0$", value=56000)
         depth = widgets.FloatSlider(
             description="depth",
             continuous_update=False,
-            min=0,
-            max=50,
+            min=depth_min,
+            max=depth_max,
             step=1,
-            value=10,
+            value=depth_max/5,
         )
         profile = widgets.RadioButtons(
             options=["East", "North", "None"],
@@ -759,6 +926,169 @@ class MagneticDipoleApp(object):
 
         out = widgets.interactive_output(
             self.magnetic_prism_applet,
+            {
+                "plot": plot,
+                "component": component,
+                "inclination": inclination,
+                "declination": declination,
+                "length": length,
+                "dx": dx,
+                "kappa": kappa,
+                "B0": B0,
+                "depth": depth,
+                "profile": profile,
+                "fixed_scale": fixed_scale,
+                "show_halfwidth": show_halfwidth,
+                "prism_dx": prism_dx,
+                "prism_dy": prism_dy,
+                "prism_dz": prism_dz,
+                "prism_inclination": prism_inclination,
+                "prism_declination": prism_declination,
+            },
+        )
+        left = widgets.VBox(
+            [plot, component, profile],
+            layout=Layout(width="20%", height="400px", margin="60px 0px 0px 0px"),
+        )
+        right = widgets.VBox(
+            [
+                inclination,
+                declination,
+                length,
+                dx,
+                B0,
+                kappa,
+                depth,
+                prism_dx,
+                prism_dy,
+                prism_dz,
+                prism_inclination,
+                prism_declination,
+                fixed_scale,
+                show_halfwidth,
+            ],
+            layout=Layout(width="50%", height="400px", margin="20px 0px 0px 0px"),
+        )
+        widgets.VBox(
+            [out], layout=Layout(width="70%", height="400px", margin="0px 0px 0px 0px")
+        )
+        return widgets.HBox([left, out, right])
+
+
+    def interact_plot_model_prism_fit(
+        self,
+        length_min=100,
+        length_max=5000,
+        dx_min=1,
+        dx_max=200,
+        depth_min=0,
+        depth_max=1500,
+    ):
+        plot = widgets.RadioButtons(
+            options=["field", "model"],
+            value="field",
+            description="plot",
+            disabled=False,
+        )
+        component = widgets.RadioButtons(
+            options=["Bt", "Bx", "By", "Bz"],
+            value="Bt",
+            description="field",
+            disabled=False,
+        )
+
+        inclination = widgets.FloatSlider(
+            description="I", continuous_update=False, min=-90, max=90, step=1, value=70
+        )
+        declination = widgets.FloatSlider(
+            description="D", continuous_update=False, min=-180, max=180, step=1, value=15
+        )
+        length = widgets.FloatSlider(
+            description="length",
+            continuous_update=False,
+            min=length_min,
+            max=length_max,
+            step=1,
+            value=length_max/2,
+        )
+        dx = widgets.FloatSlider(
+            description="data spacing",
+            continuous_update=False,
+            min=dx_min,
+            max=dx_max,
+            step=dx_min,
+            value=50,
+        )
+        kappa = widgets.FloatSlider(
+            description="$\kappa$",
+            continuous_update=False,
+            min=0,
+            max=0.5,
+            value=0.1,
+            step=0.01
+        )
+        B0 = widgets.FloatText(description="B$_0$", value=56000)
+        depth = widgets.FloatSlider(
+            description="depth",
+            continuous_update=False,
+            min=depth_min,
+            max=depth_max,
+            step=1,
+            value=100,
+        )
+        profile = widgets.RadioButtons(
+            options=["East", "North", "None"],
+            value="East",
+            description="profile",
+            disabled=False,
+        )
+        fixed_scale = widgets.Checkbox(
+            value=False, description="fixed scale", disabled=False
+        )
+
+        show_halfwidth = widgets.Checkbox(
+            value=False, description="half width", disabled=False
+        )
+        prism_dx = widgets.FloatSlider(
+            description="$\\triangle x$",
+            min=10,
+            max=1500,
+            value=100,
+            step=10,
+        )
+        prism_dy = widgets.FloatSlider(
+            description="$\\triangle y$",
+            min=10,
+            max=1500,
+            value=100,
+            step=10,
+        )
+        prism_dz = widgets.FloatSlider(
+            description="$\\triangle z$",
+            min=10,
+            max=1500,
+            value=100,
+            step=10,
+        )
+        prism_inclination = widgets.FloatSlider(
+            description="I$_{prism}$",
+            continuous_update=False,
+            min=-90,
+            max=90,
+            step=1,
+            value=0,
+        )
+        prism_declination = widgets.FloatSlider(
+            description="D$_{prism}$",
+            continuous_update=False,
+            min=0,
+            max=180,
+            step=1,
+            value=0,
+        )
+
+        out = widgets.interactive_output(
+            self.magnetic_prism_fit_applet,
             {
                 "plot": plot,
                 "component": component,
