@@ -467,7 +467,7 @@ class TomographyInversionApp(object):
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
                 alpha_y=alpha_z,
-                mref=mref,
+                reference_model=mref,
                 mapping=maps.IdentityMap(self.mesh_prop),
                 cell_weights=self.mesh_prop.vol,
             )
@@ -477,7 +477,7 @@ class TomographyInversionApp(object):
                 alpha_s=alpha_s,
                 alpha_x=alpha_x,
                 alpha_y=alpha_z,
-                mref=mref,
+                reference_model=mref,
                 mapping=maps.IdentityMap(self.mesh_prop),
             )
         dataObj = data.Data(
