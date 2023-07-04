@@ -461,7 +461,7 @@ def calculateEHzt(F, H, sig, chg, taux, c, mu, eps, n, zsample, tsample):
 
     topc = top(H)
 
-    layer = np.zeros(len(zsample), dtype=np.int) - 1
+    layer = np.zeros(len(zsample), dtype=int) - 1
 
     Exzt = np.matrix(
         np.zeros((len(zsample), len(tsample)), dtype="complex_"), dtype="complex_"
