@@ -20,15 +20,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: environment-dev.yml
-          init-shell: >-
-            bash
-            powershell
-          create-args: >-
-            python=${{ matrix.python-version }}
-          cache-environment: true
-          post-cleanup: 'all'
+      with:
+        environment-file: environment-dev.yml
+        init-shell: >-
+          bash
+          powershell
+        create-args: >-
+          python=${{ matrix.python-version }}
+        cache-environment: true
+        post-cleanup: 'all'
     - name: Run Tests
       shell: micromamba-shell {0}
       run: |
