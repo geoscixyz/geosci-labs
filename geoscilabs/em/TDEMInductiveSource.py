@@ -132,7 +132,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     f = prb.fields(sigma)
 
     xyzlim = np.array([[xmin, xmax], [ymin, ymax], [zmin, zmax]])
-    actinds, meshCore = utils.ExtractCoreMesh(xyzlim, mesh)
+    actinds, meshCore = utils.extract_core_mesh(xyzlim, mesh)
     Pex = mesh.getInterpolationMat(meshCore.gridCC, locType="Ex")
     Pey = mesh.getInterpolationMat(meshCore.gridCC, locType="Ey")
     Pez = mesh.getInterpolationMat(meshCore.gridCC, locType="Ez")
