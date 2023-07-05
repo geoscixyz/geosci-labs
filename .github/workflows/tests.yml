@@ -33,4 +33,5 @@ jobs:
       shell: micromamba-shell {0}
       run: |
         mamba activate geosci-labs-dev
+        pip install -e . --no-deps
         pytest .
