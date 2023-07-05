@@ -679,7 +679,7 @@ def PLOT(
     # print ind.shape
     # print u.shape
     # print xtype
-    dat = meshcore.plotImage(
+    dat = meshcore.plot_image(
         u[ind] + eps,
         v_type=xtype,
         ax=ax[1],

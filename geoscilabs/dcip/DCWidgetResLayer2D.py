@@ -668,7 +668,7 @@ def plot_Surface_Potentials(
         eps = 1e-16
     else:
         eps = 0.0
-    dat = meshcore.plotImage(
+    dat = meshcore.plot_image(
         u[ind] + eps,
         v_type=xtype,
         ax=ax[1],

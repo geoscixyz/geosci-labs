@@ -81,8 +81,8 @@ class TomographyInversionApp(object):
         hy = np.ones(ny) * dy
         self._mesh_prop = TensorMesh([hx, hy])
         y = np.linspace(0, 400, 10)
-        self._source_locations_prop = np.c_[y * 0 + self._mesh_prop.vectorCCx[0], y]
-        self._receiver_locations_prop = np.c_[y * 0 + self._mesh_prop.vectorCCx[-1], y]
+        self._source_locations_prop = np.c_[y * 0 + self._mesh_prop.cell_centers_x[0], y]
+        self._receiver_locations_prop = np.c_[y * 0 + self._mesh_prop.cell_centers_x[-1], y]
         rx = survey.BaseRx(self._receiver_locations_prop)
         srcList = [
             survey.BaseSrc(
@@ -167,7 +167,7 @@ class TomographyInversionApp(object):
             self.get_problem_survey(nx=nx, ny=ny, dx=lx / nx, dy=ly / ny)
             fig, ax = plt.subplots(1, 1)
             self._slowness_prop = 1.0 / v1 * np.ones(self.mesh_prop.nC)
-            out = self.mesh_prop.plotImage(
+            out = self.mesh_prop.plot_image(
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
@@ -204,7 +204,7 @@ class TomographyInversionApp(object):
                     if self.slowness_prop is None:
                         self._slowness_prop = np.ones(self.mesh_prop.nC) * 1.0 / v0
                     self.slowness_prop[index] = 1.0 / v1
-            out = self.mesh_prop.plotImage(
+            out = self.mesh_prop.plot_image(
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
@@ -233,7 +233,7 @@ class TomographyInversionApp(object):
         self._data_prop.dobs = self._dobs.copy()
 
         fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-        out = self.mesh_prop.plotImage(1.0 / self.slowness_prop, ax=axs[0])
+        out = self.mesh_prop.plot_image(1.0 / self.slowness_prop, ax=axs[0])
         cb = plt.colorbar(out[0], ax=axs[0], fraction=0.02)
         cb.set_label("Velocity (m/s)")
         self.survey_prop.plot(ax=axs[0])
@@ -469,7 +469,7 @@ class TomographyInversionApp(object):
                 alpha_y=alpha_z,
                 reference_model=mref,
                 mapping=maps.IdentityMap(self.mesh_prop),
-                cell_weights=self.mesh_prop.vol,
+                # weights=self.mesh_prop.cell_volumes,
             )
         else:
             reg = regularization.Tikhonov(
@@ -551,9 +551,9 @@ class TomographyInversionApp(object):
             else:
                 clim = clim
 
-        out = self.mesh_prop.plotImage(1.0 / model[ii], ax=axs[0], clim=clim)
+        out = self.mesh_prop.plot_image(1.0 / model[ii], ax=axs[0], clim=clim)
         plt.colorbar(out[0], ax=axs[0], fraction=0.02)
-        out = self.mesh_prop.plotImage(1.0 / self.slowness_prop, ax=axs[1], clim=clim)
+        out = self.mesh_prop.plot_image(1.0 / self.slowness_prop, ax=axs[1], clim=clim)
         plt.colorbar(out[0], ax=axs[1], fraction=0.02)
         axs[1].set_aspect(1)
         for ax in axs:

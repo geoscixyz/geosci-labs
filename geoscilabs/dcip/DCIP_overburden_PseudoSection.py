@@ -855,7 +855,7 @@ def DCIP2Dfwdfun(
         u = np.ma.masked_where(mdctrue <= np.log(1e-8), mtrue)
     else:
         u = np.ma.masked_where(mtrue <= np.log(1e-8), np.log10(1.0 / (mapping * mtrue)))
-    dat1 = mesh.plotImage(
+    dat1 = mesh.plot_image(
         u,
         ax=ax1,
         clim=(u.min(), u.max()),

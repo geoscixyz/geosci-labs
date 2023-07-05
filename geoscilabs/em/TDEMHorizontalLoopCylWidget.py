@@ -307,7 +307,7 @@ class TDEMHorizontalLoopCylWidget(object):
                 clim = (np.log10(vmin), np.log10(vmax))
             else:
                 clim = None
-            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax, clim=clim)
+            out = self.mesh2D.plot_image(np.log10(mapping2D * model2D), ax=ax, clim=clim)
             cb = plt.colorbar(out[0], ax=ax, format="$10^{%.1f}$")
             cb.set_label("$\sigma$ (S/m)")
             ax.set_xlabel("Distance (m)")

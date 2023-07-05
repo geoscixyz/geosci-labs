@@ -536,7 +536,7 @@ def DC2Dfwdfun(
         ax1 = plt.subplot(211)
         ax2 = plt.subplot(212)
 
-        dat1 = mesh.plotImage(
+        dat1 = mesh.plot_image(
             np.log10(1.0 / (mapping * mtrue)),
             ax=ax1,
             clim=(1, 3),
@@ -576,7 +576,7 @@ def DC2Dfwdfun(
         obs = griddata(xzlocs, appresobs, (xi, yi), method="linear")
         plt.figure(figsize=(12, 9))
         ax1 = plt.subplot(311)
-        dat1 = mesh.plotImage(
+        dat1 = mesh.plot_image(
             np.log10(1.0 / (mapping * mtrue)),
             ax=ax1,
             clim=(1, 3),
