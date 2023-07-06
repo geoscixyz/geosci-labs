@@ -272,7 +272,7 @@ class HarmonicVMDCylWidget(object):
             elif Scenario == "Layer":
                 model2D, mapping2D = self.getCoreModel("Layer")
 
-            out = self.mesh2D.plotImage(np.log10(mapping2D * model2D), ax=ax)
+            out = self.mesh2D.plot_image(np.log10(mapping2D * model2D), ax=ax)
             cb = plt.colorbar(out[0], ax=ax, format="$10^{%.1f}$")
             cb.set_label("$\sigma$ (S/m)")
             ax.set_xlabel("Distance (m)")

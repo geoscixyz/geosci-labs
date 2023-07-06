@@ -11,7 +11,7 @@ from pymatsolver import Pardiso
 from discretize import TensorMesh
 
 from SimPEG import maps, utils
-from SimPEG.utils import ExtractCoreMesh, mkvc
+from SimPEG.utils import extract_core_mesh, mkvc
 from SimPEG.electromagnetics.static import resistivity as DC
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons, BoundedFloatText
@@ -37,7 +37,7 @@ xmax = 40.0
 ymin = -40.0
 ymax = 8.0
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = extract_core_mesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)
@@ -518,7 +518,7 @@ def plot_Surface_Potentials(
         eps = 1e-16
     else:
         eps = 0.0
-    dat = meshcore.plotImage(
+    dat = meshcore.plot_image(
         u[ind] + eps,
         v_type=xtype,
         ax=ax[1],

@@ -74,7 +74,7 @@ xmax = 40.0
 ymin = -40.0
 ymax = 5.0
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = utils.ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = utils.extract_core_mesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)
@@ -536,7 +536,7 @@ def DC2Dfwdfun(
         ax1 = plt.subplot(211)
         ax2 = plt.subplot(212)
 
-        dat1 = mesh.plotImage(
+        dat1 = mesh.plot_image(
             np.log10(1.0 / (mapping * mtrue)),
             ax=ax1,
             clim=(1, 3),
@@ -576,7 +576,7 @@ def DC2Dfwdfun(
         obs = griddata(xzlocs, appresobs, (xi, yi), method="linear")
         plt.figure(figsize=(12, 9))
         ax1 = plt.subplot(311)
-        dat1 = mesh.plotImage(
+        dat1 = mesh.plot_image(
             np.log10(1.0 / (mapping * mtrue)),
             ax=ax1,
             clim=(1, 3),
