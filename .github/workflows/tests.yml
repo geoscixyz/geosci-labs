@@ -9,13 +9,14 @@ on:
       - '*'
 jobs:
   setup-build:
-    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.test-file }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
         python-version: [3.7, "3.10"]
+        test-file: ["tests/test_dcip.py", "tests/test_em.py", "tests/test_gpr.py tests/test_seismic.py", "tests/test_inversion.py", "tests/test_gravity.py tests/test_mag.py"]
 
     steps:
     - uses: actions/checkout@v2
@@ -33,4 +34,4 @@ jobs:
       shell: micromamba-shell {0}
       run: |
         pip install -e . --no-deps
-        pytest . -v
+        pytest ${{ matrix.test-file }} -v
