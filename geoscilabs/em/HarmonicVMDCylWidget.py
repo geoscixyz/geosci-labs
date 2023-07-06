@@ -55,12 +55,12 @@ class HarmonicVMDCylWidget(object):
 
     def getCoreDomain(self, mirror=False, xmax=100, zmin=-100, zmax=100.0):
 
-        self.activeCC = (self.mesh.gridCC[:, 0] <= xmax) & (
+        self.activeCC = (self.mesh.cell_centers[:, 0] <= xmax) & (
             np.logical_and(
-                self.mesh.gridCC[:, 2] >= zmin, self.mesh.gridCC[:, 2] <= zmax
+                self.mesh.cell_centers[:, 2] >= zmin, self.mesh.cell_centers[:, 2] <= zmax
             )
         )
-        self.gridCCactive = self.mesh.gridCC[self.activeCC, :][:, [0, 2]]
+        self.gridCCactive = self.mesh.cell_centers[self.activeCC, :][:, [0, 2]]
 
         xind = self.mesh.cell_centers_x <= xmax
         yind = np.logical_and(self.mesh.cell_centers_z >= zmin, self.mesh.cell_centers_z <= zmax)
@@ -136,14 +136,14 @@ class HarmonicVMDCylWidget(object):
         ind1 = (self.mesh.cell_centers_z < self.z0) & (self.mesh.cell_centers_z >= self.z1)
         ind2 = (self.mesh.cell_centers_z < self.z1) & (self.mesh.cell_centers_z >= self.z2)
         self.mapping = maps.SurjectVertical1D(self.mesh) * maps.InjectActiveCells(
-            self.mesh, active, sig0, nC=self.mesh.nCz
+            self.mesh, active, sig0, nC=self.mesh.shape_cells[2]
         )
-        model = np.ones(self.mesh.nCz) * sig3
+        model = np.ones(self.mesh.shape_cells[2]) * sig3
         model[ind1] = sig1
         model[ind2] = sig2
         self.m = model[active]
-        self.mu = np.ones(self.mesh.nC) * mu_0
-        self.mu[self.mesh.gridCC[:, 2] < 0.0] = (1.0 + chi) * mu_0
+        self.mu = np.ones(self.mesh.n_cells) * mu_0
+        self.mu[self.mesh.cell_centers[:, 2] < 0.0] = (1.0 + chi) * mu_0
         return self.m
 
     def setLayerSphereParam(
@@ -159,13 +159,13 @@ class HarmonicVMDCylWidget(object):
         self.sig1 = sig1  # Layer conductivity
         self.sig2 = sig2  # Sphere conductivity
 
-        active = self.mesh.gridCC[:, 2] < self.z0
-        ind1 = (self.mesh.gridCC[:, 2] < self.z1) & (
-            self.mesh.gridCC[:, 2] >= self.z1 - self.h
+        active = self.mesh.cell_centers[:, 2] < self.z0
+        ind1 = (self.mesh.cell_centers[:, 2] < self.z1) & (
+            self.mesh.cell_centers[:, 2] >= self.z1 - self.h
         )
         ind2 = (
             np.sqrt(
-                (self.mesh.gridCC[:, 0]) ** 2 + (self.mesh.gridCC[:, 2] - self.z2) ** 2
+                (self.mesh.cell_centers[:, 0]) ** 2 + (self.mesh.cell_centers[:, 2] - self.z2) ** 2
             )
             <= self.R
         )
@@ -176,7 +176,7 @@ class HarmonicVMDCylWidget(object):
         model[ind2] = sig2
         self.m = model[active]
         self.mu = np.ones(self.mesh.nC) * mu_0
-        self.mu[self.mesh.gridCC[:, 2] < 0.0] = (1.0 + chi) * mu_0
+        self.mu[self.mesh.cell_centers[:, 2] < 0.0] = (1.0 + chi) * mu_0
         return self.m
 
     def simulate(self, srcLoc, rxLoc, freqs):
@@ -205,11 +205,11 @@ class HarmonicVMDCylWidget(object):
 
     def getFields(self, bType="b", ifreq=0):
         src = self.srcList[ifreq]
-        Pfx = self.mesh.getInterpolationMat(
-            self.mesh.gridCC[self.activeCC, :], locType="Fx"
+        Pfx = self.mesh.get_interpolation_matrix(
+            self.mesh.cell_centers[self.activeCC, :], location_type="Fx"
         )
-        Pfz = self.mesh.getInterpolationMat(
-            self.mesh.gridCC[self.activeCC, :], locType="Fz"
+        Pfz = self.mesh.get_interpolation_matrix(
+            self.mesh.cell_centers[self.activeCC, :], location_type="Fz"
         )
         Ey = self.mesh.aveE2CC * self.f[src, "e"]
         Jy = utils.sdiag(self.sim.sigma) * Ey
@@ -221,9 +221,9 @@ class HarmonicVMDCylWidget(object):
 
     def getData(self, bType="b"):
 
-        Pfx = self.mesh.getInterpolationMat(self.rxLoc, locType="Fx")
-        Pfz = self.mesh.getInterpolationMat(self.rxLoc, locType="Fz")
-        Pey = self.mesh.getInterpolationMat(self.rxLoc, locType="Ey")
+        Pfx = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Fx")
+        Pfz = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Fz")
+        Pey = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Ey")
 
         self.Ey = (Pey * self.f[:, "e"]).flatten()
         self.Bx = (Pfx * self.f[:, bType]).flatten()
