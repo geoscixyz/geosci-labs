@@ -240,12 +240,12 @@ class LinearInversionDirectApp(properties.HasProperties):
         self._G = np.zeros((N, self.mesh_prop.nC), dtype=float, order="C")
 
         def g(k):
-            return np.exp(p_values[k] * self.mesh_prop.vectorCCx) * np.cos(
-                2*np.pi * q_values[k] * self.mesh_prop.vectorCCx
+            return np.exp(p_values[k] * self.mesh_prop.cell_centers_x) * np.cos(
+                2*np.pi * q_values[k] * self.mesh_prop.cell_centers_x
             )
 
         for i in range(N):
-            self._G[i, :] = g(i) * self.mesh_prop.hx
+            self._G[i, :] = g(i) * self.mesh_prop.h[0]
         self._p_values = p_values
         self._q_values = q_values
 
@@ -286,7 +286,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax1 = plt.subplot(gs1[0, :3])
         ax2 = plt.subplot(gs1[0, 3:])
 
-        ax1.plot(self.mesh_prop.vectorCCx, self.G.T)
+        ax1.plot(self.mesh_prop.cell_centers_x, self.G.T)
         if fixed:
             ax1.set_ylim(ymin, ymax)
         ax1.set_xlabel("x")
@@ -322,15 +322,15 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         m = np.zeros(self.mesh_prop.nC) + m_background
         m1_inds = np.logical_and(
-            self.mesh_prop.vectorCCx > m1_center - dm1 / 2.0,
-            self.mesh_prop.vectorCCx < m1_center + dm1 / 2.0,
+            self.mesh_prop.cell_centers_x > m1_center - dm1 / 2.0,
+            self.mesh_prop.cell_centers_x < m1_center + dm1 / 2.0,
         )
         m[m1_inds] = m1 + m_background
 
         def gaussian(x, x0, sigma):
             return np.exp(-np.power((x - x0) / sigma, 2.0) / 2.0)
 
-        m += gaussian(self.mesh_prop.vectorCCx, m2_center, sigma_2) * m2
+        m += gaussian(self.mesh_prop.cell_centers_x, m2_center, sigma_2) * m2
         self.m = m
         return m
 
@@ -368,7 +368,7 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         fig = plt.figure()
         ax  = plt.subplot(111)
-        ax.plot(self.mesh_prop.vectorCCx, m)
+        ax.plot(self.mesh_prop.cell_centers_x, m)
         ax.set_ylim([-2.5, 2.5])
         ax.set_title("Model")
         ax.set_xlabel("x")
@@ -532,14 +532,14 @@ class LinearInversionDirectApp(properties.HasProperties):
         ax1, ax2, ax3 = axes
 
         if show_model:
-            ax1.plot(self.mesh_prop.vectorCCx, m)
+            ax1.plot(self.mesh_prop.cell_centers_x, m)
             ax1.set_ylim([-2.5, 2.5])
             ax1.set_title("Model")
             ax1.set_xlabel("x")
             ax1.set_ylabel("m(x)")
 
         if show_kernel:
-            ax2.plot(self.mesh_prop.vectorCCx, self.G.T)
+            ax2.plot(self.mesh_prop.cell_centers_x, self.G.T)
             ax2.set_title("Rows of matrix G")
             ax2.set_xlabel("x")
             ax2.set_ylabel("g(x)")
@@ -722,9 +722,9 @@ class LinearInversionDirectApp(properties.HasProperties):
             i_beta = n_beta - 1
 
         fig, axes = plt.subplots(1, 3, figsize=(14 * 1.2, 3 * 1.2))
-        axes[0].plot(self.mesh_prop.vectorCCx, self.m)
+        axes[0].plot(self.mesh_prop.cell_centers_x, self.m)
         if mode == "Run":
-            axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_target])
+            axes[0].plot(self.mesh_prop.cell_centers_x, self.model[i_target])
         axes[0].set_ylim([-2.5, 2.5])
         if data_option == "obs & pred":
             if self.noise_option == "error contaminated":
@@ -760,7 +760,7 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         if tikhonov == "phi_d & phi_m":
             if mode == "Explore":
-                axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
+                axes[0].plot(self.mesh_prop.cell_centers_x, self.model[i_beta])
                 if data_option == "obs & pred":
                     axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx", label="Predicted")
                     axes[1].legend()
@@ -779,7 +779,7 @@ class LinearInversionDirectApp(properties.HasProperties):
             xmin, xmax = beta_max, beta_min
         elif tikhonov == "phi_d vs phi_m":
             if mode == "Explore":
-                axes[0].plot(self.mesh_prop.vectorCCx, self.model[i_beta])
+                axes[0].plot(self.mesh_prop.cell_centers_x, self.model[i_beta])
                 if data_option == "obs & pred":
                     axes[1].plot(np.arange(self.N), self.pred[i_beta], "bx")
                     axes[1].legend(("Observed", "Predicted"))

@@ -22,7 +22,7 @@ from ipywidgets import (
 
 from discretize import TensorMesh
 from SimPEG import maps, utils
-from SimPEG.utils import ExtractCoreMesh
+from SimPEG.utils import extract_core_mesh
 from SimPEG.electromagnetics.static import resistivity as DC
 
 from pymatsolver import Pardiso
@@ -43,7 +43,7 @@ xmax = 1000.0
 ymin = -1000.0
 ymax = 100.0
 xylim = np.c_[[xmin, ymin], [xmax, ymax]]
-indCC, meshcore = ExtractCoreMesh(xylim, mesh)
+indCC, meshcore = extract_core_mesh(xylim, mesh)
 indx = (
     (mesh.gridFx[:, 0] >= xmin)
     & (mesh.gridFx[:, 0] <= xmax)
@@ -679,7 +679,7 @@ def PLOT(
     # print ind.shape
     # print u.shape
     # print xtype
-    dat = meshcore.plotImage(
+    dat = meshcore.plot_image(
         u[ind] + eps,
         v_type=xtype,
         ax=ax[1],

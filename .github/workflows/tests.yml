@@ -9,38 +9,29 @@ on:
       - '*'
 jobs:
   setup-build:
-    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.test-file }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.7, 3.8, 3.9, "3.10"]
+        python-version: [3.7, "3.10"]
+        test-file: ["tests/test_dcip.py", "tests/test_em.py", "tests/test_gpr.py tests/test_seismic.py", "tests/test_inversion.py", "tests/test_gravity.py tests/test_mag.py"]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Conda
-      uses: s-weigand/setup-conda@v1
+    - uses: mamba-org/setup-micromamba@v1
       with:
-        update-conda: true
-        conda-channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install Env
-      shell: bash
-      run: |
-        python --version
-        conda env create -f environment-dev.yml
-
-    - name: Install Our Package
-      shell: bash
-      run: |
-        source activate geosci-labs-dev
-        pip install -e .
-        conda list
-
+        environment-file: environment-dev.yml
+        init-shell: >-
+          bash
+          powershell
+        create-args: >-
+          python=${{ matrix.python-version }}
+        cache-environment: true
+        post-cleanup: 'all'
     - name: Run Tests
-      shell: bash
+      shell: micromamba-shell {0}
       run: |
-        source activate geosci-labs-dev
-        pytest .
+        pip install -e . --no-deps
+        pytest ${{ matrix.test-file }} -v

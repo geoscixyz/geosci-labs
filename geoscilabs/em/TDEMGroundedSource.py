@@ -142,7 +142,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     f = sim.fields(sigma)
 
     xyzlim = np.array([[xmin, xmax], [ymin, ymax], [-400, 0.0]])
-    actinds, meshCore = utils.ExtractCoreMesh(xyzlim, mesh)
+    actinds, meshCore = utils.extract_core_mesh(xyzlim, mesh)
     Pex = mesh.getInterpolationMat(meshCore.gridCC, locType="Ex")
     Pey = mesh.getInterpolationMat(meshCore.gridCC, locType="Ey")
     Pez = mesh.getInterpolationMat(meshCore.gridCC, locType="Ez")
