@@ -762,8 +762,8 @@ def fitline(prism, survey, dobj):
         Bdec=widgets.FloatSlider(
             min=-90.0, max=90, step=5, value=0, continuous_update=False
         ),
-        Bigrf=widgets.FloatSlider(
-            min=54000.0, max=55000, step=10, value=54500, continuous_update=False
+        Bigrf=widgets.FloatText(
+            value=53500
         ),
         depth=widgets.FloatSlider(min=0.0, max=5.0, step=0.05, value=0.5),
         susc=widgets.FloatSlider(min=0.0, max=800.0, step=5.0, value=1.0),
