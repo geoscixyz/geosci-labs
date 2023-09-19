@@ -732,8 +732,11 @@ def fitline(prism, survey, dobj):
         xyzLoc[:, 2] += depth
 
         rxLoc = mag.receivers.Point(xyzLoc)
-        srcField = mag.sources.SourceField(
-            receiver_list=[rxLoc], parameters=(Bigrf, -Binc, Bdec)
+        srcField = mag.sources.UniformBackgroundField(
+            receiver_list=[rxLoc],
+            amplitude=Bigrf,
+            inclination=-Binc,
+            declination=Bdec,
         )
         survey2D = mag.Survey(srcField)
         sim.survey = survey2D
