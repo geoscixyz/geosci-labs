@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.7, "3.10"]
+        python-version: ["3.8", "3.10"]
         test-file: ["tests/test_dcip.py", "tests/test_em.py", "tests/test_gpr.py tests/test_seismic.py", "tests/test_inversion.py", "tests/test_gravity.py tests/test_mag.py"]
 
     steps:
