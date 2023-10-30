@@ -264,7 +264,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], grid_loc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
