@@ -865,7 +865,7 @@ def ResLayer_app():
             value="Dipole-Dipole",
         ),
         zcLayer=FloatSlider(
-            min=-10.0,
+            min=-40.0,
             max=0.0,
             step=1.0,
             value=-10.0,
@@ -874,7 +874,7 @@ def ResLayer_app():
         ),
         dzLayer=FloatSlider(
             min=0.5,
-            max=5.0,
+            max=40.0,
             step=0.5,
             value=1.0,
             continuous_update=False,
@@ -883,7 +883,7 @@ def ResLayer_app():
         rholayer=FloatText(
             min=1e-8,
             max=1e8,
-            value=5000.0,
+            value=500.0,
             continuous_update=False,
             description="$\\rho_{2}$",
         ),
