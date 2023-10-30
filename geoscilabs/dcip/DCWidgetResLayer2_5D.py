@@ -32,7 +32,7 @@ expmap = maps.ExpMap(mesh)
 # actmap = maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
 mapping = expmap
 # mapping = maps.IdentityMap(mesh)
-dx = 5
+dx = 0.5
 xr = np.arange(-40, 41, dx)
 dxr = np.diff(xr)
 xmin = -40.0
@@ -264,7 +264,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], grid_loc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 1000.0, 0.0], grid_loc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
