@@ -435,8 +435,8 @@ def PLOT(
         VNprim = 0.0
 
     else:
-        MInd = np.where(xSurface == M)
-        NInd = np.where(xSurface == N)
+        MInd = np.abs(xSurface - M).argmin(axis=0)
+        NInd = np.abs(xSurface - N).argmin(axis=0)
 
         VM = phiTotalSurface[MInd[0]]
         VN = phiTotalSurface[NInd[0]]
