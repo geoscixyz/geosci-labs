@@ -162,15 +162,15 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
     a = utils.closestPoints(mesh, A[:2])
     b = utils.closestPoints(mesh, B[:2])
 
-    q[a] = 1.0 / mesh.vol[a]
-    q[b] = -1.0 / mesh.vol[b]
+    q[a] = 1.0 / mesh.cell_volumes[a]
+    q[b] = -1.0 / mesh.cell_volumes[b]
 
-    # q = q * 1./mesh.vol
+    # q = q * 1./mesh.cell_volumes
 
     A = (
-        mesh.cellGrad.T
+        mesh.cell_gradient.T
         * utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
-        * mesh.cellGrad
+        * mesh.cell_gradient
     )
     Ainv = Pardiso(A)
 
@@ -184,7 +184,7 @@ def solve_2D_E(rho1, rho2, h, A, B):
     """
 
     V = solve_2D_potentials(rho1, rho2, h, A, B)
-    E = -mesh.cellGrad * V
+    E = -mesh.cell_gradient * V
     E = mesh.aveF2CCV * E
     ex = E[: mesh.nC]
     ez = E[mesh.nC :]
