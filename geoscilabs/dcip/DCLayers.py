@@ -305,7 +305,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
     #     clabel = 'Potential (V)'
 
     elif imgplt == "Potential":
-        Pc = mesh.getInterpolationMat(pltgrid, "CC")
+        Pc = mesh.get_interpolation_matrix(pltgrid, "CC")
 
         V = solve_2D_potentials(rho1, rho2, h, np.r_[A, 0.0, 0.0], np.r_[B, 0.0, 0.0])
 
@@ -341,7 +341,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
 
     elif imgplt == "E":
 
-        Pc = mesh.getInterpolationMat(pltgrid, "CC")
+        Pc = mesh.get_interpolation_matrix(pltgrid, "CC")
 
         ex, ez, V = solve_2D_E(rho1, rho2, h, np.r_[A, 0.0, 0.0], np.r_[B, 0.0, 0.0])
 
@@ -388,7 +388,7 @@ def plot_layer_potentials(rho1, rho2, h, A, B, M, N, imgplt="Model"):
 
     elif imgplt == "J":
 
-        Pc = mesh.getInterpolationMat(pltgrid, "CC")
+        Pc = mesh.get_interpolation_matrix(pltgrid, "CC")
 
         Jx, Jz, V = solve_2D_J(rho1, rho2, h, np.r_[A, 0.0, 0.0], np.r_[B, 0.0, 0.0])
 
