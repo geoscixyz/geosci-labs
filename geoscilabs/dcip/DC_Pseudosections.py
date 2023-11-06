@@ -58,7 +58,7 @@ class ParametricCircleLayerMap(IdentityMap):
 
 
 # Mesh, mapping can be globals
-npad = 15
+npad = 40
 cs = 1.25
 hx = [(cs, npad, -1.3), (cs, 100), (cs, npad, 1.3)]
 hy = [(cs, npad, -1.3), (cs, 50)]
