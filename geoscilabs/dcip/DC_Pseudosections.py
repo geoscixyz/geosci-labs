@@ -675,14 +675,14 @@ def DC2DPseudoWidget():
     return interactive(
         DC2DPseudoWidgetWrapper,
         rhohalf=BoundedFloatText(
-            min=10,
+            min=0.1,
             max=1000,
             value=1000,
             continuous_update=False,
             description="$\\rho_1$",
         ),
         rhosph=BoundedFloatText(
-            min=10,
+            min=0.1,
             max=1000,
             value=1000,
             continuous_update=False,
