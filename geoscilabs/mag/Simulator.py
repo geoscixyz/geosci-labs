@@ -769,13 +769,7 @@ def fitline(prism, survey, dobj):
             value=53500
         ),
         depth=widgets.FloatSlider(min=0.0, max=5.0, step=0.05, value=0.5),
-        susc=widgets.FloatSlider(
-            min=0.0,
-            max=1.0,
-            step=0.001,
-            value=0.0,
-            readout_format=".2e",
-        ),
+        susc=widgets.FloatSlider(min=0.0, max=800.0, step=5.0, value=1.0),
         comp=widgets.ToggleButtons(options=["tf", "bx", "by", "bz"]),
         irt=widgets.ToggleButtons(options=["induced", "remanent", "total"]),
         Q=widgets.FloatSlider(min=0.0, max=10.0, step=0.1, value=0.0),
