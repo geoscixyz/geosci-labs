@@ -408,7 +408,7 @@ def plot_Surface_Potentials(
         label = "Electric Field (V/m)"
         xtype = "F"
         view = "vec"
-        streamOpts = {"color": "w"}
+        streamOpts = {"color": "w", "broken_streamlines": False, "density": 0.3}
         ind = indF
 
         # formatter = LogFormatter(10, labelOnlyBase=False)
@@ -433,7 +433,7 @@ def plot_Surface_Potentials(
         label = "Current density ($A/m^2$)"
         xtype = "F"
         view = "vec"
-        streamOpts = {"color": "w"}
+        streamOpts = {"color": "w", "broken_streamlines": False, "density": 0.3}
         ind = indF
 
         # formatter = LogFormatter(10, labelOnlyBase=False)
