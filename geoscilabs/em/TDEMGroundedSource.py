@@ -100,7 +100,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     hz = [(cs, npad, -1.5), (cs, ncz), (cs, npad, 1.5)]
     mesh = TensorMesh([hx, hy, hz], "CCC")
     sigma = np.ones(mesh.nC) * sigma_halfspace
-    blk_ind = utils.ModelBuilder.getIndicesBlock(
+    blk_ind = utils.ModelBuilder.get_indices_block(
         np.r_[-40, -40, -160], np.r_[40, 40, -80], mesh.gridCC
     )
     sigma[mesh.gridCC[:, 2] > 0.0] = 1e-8

@@ -53,7 +53,7 @@ class ParametricCircleLayerMap(IdentityMap):
             sig1, sig2, sig3 = np.exp(sig1), np.exp(sig2), np.exp(sig3)
         sigma = np.ones(mesh.nC) * sig1
         sigma[mesh.gridCC[:, 1] < zh] = sig2
-        blkind = utils.model_builder.getIndicesSphere(np.r_[x, zc], r, mesh.gridCC)
+        blkind = utils.model_builder.get_indices_sphere(np.r_[x, zc], r, mesh.gridCC)
         sigma[blkind] = sig3
         return sigma
 
