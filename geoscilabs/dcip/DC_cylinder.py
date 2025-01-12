@@ -10,9 +10,9 @@ import matplotlib.patches as patches
 from pymatsolver import Pardiso
 from discretize import TensorMesh
 
-from SimPEG import maps, utils
-from SimPEG.utils import extract_core_mesh, mkvc
-from SimPEG.electromagnetics.static import resistivity as DC
+from simpeg import maps, utils
+from simpeg.utils import extract_core_mesh, mkvc
+from simpeg.electromagnetics.static import resistivity as DC
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons, BoundedFloatText
 

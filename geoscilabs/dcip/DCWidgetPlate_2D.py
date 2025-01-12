@@ -14,9 +14,9 @@ import matplotlib.patches as patches
 from pymatsolver import Pardiso
 
 from discretize import TensorMesh
-from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import extract_core_mesh
-from SimPEG.electromagnetics.static import resistivity as DC
+from simpeg import maps, SolverLU, utils
+from simpeg.utils import extract_core_mesh
+from simpeg.electromagnetics.static import resistivity as DC
 
 from ..base import widgetify
 

@@ -20,10 +20,10 @@ import matplotlib.patches as patches
 from discretize import TensorMesh
 from pymatsolver import Pardiso
 
-from SimPEG import maps, SolverLU, utils
-from SimPEG.electromagnetics.static import resistivity as DC
-from SimPEG.maps import IdentityMap
-from SimPEG.electromagnetics.static.utils import static_utils
+from simpeg import maps, SolverLU, utils
+from simpeg.electromagnetics.static import resistivity as DC
+from simpeg.maps import IdentityMap
+from simpeg.electromagnetics.static.utils import static_utils
 
 from ..base import widgetify
 
@@ -248,7 +248,7 @@ def PseudoSectionPlotfnc(i, j, survey, flag="PoleDipole"):
 
     :param int i: source index
     :param int j: receiver index
-    :param SimPEG.survey survey: SimPEG survey object
+    :param simpeg.survey survey: simpeg survey object
     :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
     """
     matplotlib.rcParams["font.size"] = 14
@@ -436,7 +436,7 @@ def PseudoSectionWidget(survey, flag):
     associated with a particular survey
     for each pair source-receiver
 
-    :param SimPEG.survey survey: Survey object
+    :param simpeg.survey survey: Survey object
     :param str flag: Survey Type 'PoleDipole', 'DipoleDipole', 'DipolePole'
     """
     dx = 5
@@ -496,8 +496,8 @@ def DC2Dfwdfun(
     over a known geological model
 
     :param TensorMesh mesh: discretization of the model
-    :param SimPEG.Simulation sim: simulation object
-    :param SimPEG.SigmaMap mapping: sigmamap of the model
+    :param simpeg.Simulation sim: simulation object
+    :param simpeg.SigmaMap mapping: sigmamap of the model
     :param numpy.array xr: electrodes positions
     :param numpy.array xzlocs: pseudolocations
     :param float rhohalf: Resistivity of the half-space

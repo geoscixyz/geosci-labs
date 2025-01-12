@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import linalg
-from SimPEG import mkvc
+from simpeg import mkvc
 import scipy.optimize as op
 from ..base import widgetify
 from ipywidgets import (

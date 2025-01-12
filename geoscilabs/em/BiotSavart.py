@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from SimPEG import utils
+from simpeg import utils
 from scipy.constants import mu_0
 
 

@@ -1,7 +1,7 @@
 from ipywidgets import widgets
 from discretize import CylindricalMesh, TensorMesh
-from SimPEG import maps, utils
-from SimPEG.electromagnetics import frequency_domain as fdem
+from simpeg import maps, utils
+from simpeg.electromagnetics import frequency_domain as fdem
 from pymatsolver import Pardiso
 
 # from pymatsolver import PardisoSolver

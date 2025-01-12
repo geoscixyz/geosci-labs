@@ -1,14 +1,14 @@
 import numpy as np
 import discretize
-from SimPEG.simulation import LinearSimulation
-from SimPEG.survey import LinearSurvey
-from SimPEG.data import Data
-from SimPEG import data_misfit
-from SimPEG import directives
-from SimPEG import optimization
-from SimPEG import regularization
-from SimPEG import inverse_problem
-from SimPEG import inversion
+from simpeg.simulation import LinearSimulation
+from simpeg.survey import LinearSurvey
+from simpeg.data import Data
+from simpeg import data_misfit
+from simpeg import directives
+from simpeg import optimization
+from simpeg import regularization
+from simpeg import inverse_problem
+from simpeg import inversion
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 

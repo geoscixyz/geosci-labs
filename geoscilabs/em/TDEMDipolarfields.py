@@ -2,7 +2,7 @@ import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erfc, erf
 from discretize.utils import as_array_n_by_dim
-from SimPEG import utils
+from simpeg import utils
 
 # TODO:
 # r = lambda dx, dy, dz: np.sqrt( dx**2. + dy**2. + dz**2.)

@@ -1,7 +1,7 @@
 from ipywidgets import widgets, FloatText
 from discretize import TensorMesh, CylindricalMesh
-from SimPEG import maps, utils
-from SimPEG.electromagnetics import time_domain as tdem
+from simpeg import maps, utils
+from simpeg.electromagnetics import time_domain as tdem
 
 # from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt

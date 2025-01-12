@@ -1,6 +1,6 @@
 import numpy as np
 from discretize import TensorMesh
-from SimPEG import (
+from simpeg import (
     maps,
     utils,
     simulation,
@@ -28,7 +28,7 @@ from ipywidgets import (
     SelectMultiple,
 )
 import ipywidgets as widgets
-import SimPEG.seismic.straight_ray_tomography as seismic
+import simpeg.seismic.straight_ray_tomography as seismic
 from pylab import hist
 
 

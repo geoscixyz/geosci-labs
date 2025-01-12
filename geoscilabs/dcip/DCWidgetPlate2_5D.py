@@ -15,9 +15,9 @@ import matplotlib.patches as patches
 from pymatsolver import Pardiso
 
 from discretize import TensorMesh
-from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import extract_core_mesh
-from SimPEG.electromagnetics.static import resistivity as DC
+from simpeg import maps, SolverLU, utils
+from simpeg.utils import extract_core_mesh
+from simpeg.electromagnetics.static import resistivity as DC
 from ..base import widgetify
 
 # Mesh, mapping can be globals global
@@ -272,7 +272,7 @@ def sumPlateCharges(xc, zc, dx, dz, rotAng, qSecondary):
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
 
-# The only thing we need to make it work is a 2.5D field object in SimPEG
+# The only thing we need to make it work is a 2.5D field object in simpeg
 
 
 def getSensitivity(survey, A, B, M, N, model):

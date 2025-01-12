@@ -9,7 +9,7 @@ from matplotlib import rcParams
 
 from discretize import TensorMesh
 
-from SimPEG import maps, utils
+from simpeg import maps, utils
 from pymatsolver import Pardiso
 
 from ..base import widgetify
@@ -153,7 +153,7 @@ def rho_a(VM, VN, A, B, M, N):
 
 def solve_2D_potentials(rho1, rho2, h, A, B):
     """
-    Here we solve the 2D DC problem for potentials (using SimPEG Mesg Class)
+    Here we solve the 2D DC problem for potentials (using simpeg Mesg Class)
     """
     sigma = 1.0 / rho2 * np.ones(mesh.nC)
     sigma[mesh.gridCC[:, 1] >= -h] = 1.0 / rho1  # since the model is 2D

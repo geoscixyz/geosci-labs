@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import deepdish as dd
 from discretize import TensorMesh
-from SimPEG import utils
+from simpeg import utils
 import tarfile
 import os
 
@@ -67,10 +67,10 @@ def choose_source(src_type):
 
 
 def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
-    from SimPEG.electromagnetics import time_domain
+    from simpeg.electromagnetics import time_domain
     from scipy.constants import mu_0
     import numpy as np
-    from SimPEG import maps
+    from simpeg import maps
     from pymatsolver import Pardiso
 
     cs = 20.0

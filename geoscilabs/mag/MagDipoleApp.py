@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 from discretize import TensorMesh
 from discretize.utils import closest_points_index
-from SimPEG import utils
+from simpeg import utils
 from geoana import em
 from ipywidgets import widgets
 from ipywidgets import Layout
@@ -222,7 +222,7 @@ class MagneticDipoleApp(object):
         fit_model=False
     ):
         self.component = component
-        self.inclination = -inclination  # -ve accounts for LH modeling in SimPEG
+        self.inclination = -inclination  # -ve accounts for LH modeling in simpeg
         self.declination = declination
         self.length = length
         self.dx = dx
@@ -253,7 +253,7 @@ class MagneticDipoleApp(object):
         z = np.r_[1.0]
         B = np.r_[
             B0, -inclination, declination
-        ]  # -ve accounts for LH modeling in SimPEG
+        ]  # -ve accounts for LH modeling in simpeg
 
         # Project to the direction  of earth field
         if component == "Bt":

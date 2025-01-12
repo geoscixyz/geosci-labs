@@ -2,8 +2,8 @@ from . import MagUtils
 from scipy.constants import mu_0
 import re
 import numpy as np
-from SimPEG import utils, data
-from SimPEG.potential_fields import magnetics as mag
+from simpeg import utils, data
+from simpeg.potential_fields import magnetics as mag
 
 
 class Simulation(object):
@@ -316,7 +316,7 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
 def createMagSurvey(xyzd, B):
     """
-        Create SimPEG magnetic survey pbject
+        Create simpeg magnetic survey pbject
 
         INPUT
         :param array: xyzd, n-by-4 array of observation points and data

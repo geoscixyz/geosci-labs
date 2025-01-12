@@ -1,6 +1,6 @@
 import numpy as np
 from discretize import TensorMesh
-from SimPEG import (
+from simpeg import (
     maps,
     simulation,
     survey,
