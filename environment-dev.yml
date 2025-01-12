@@ -6,6 +6,7 @@ dependencies:
   - cvxopt
   - deepdish
   - discretize
+  - empymod
   - ipywidgets>=0.6.0
   - jupyter
   - matplotlib=3.4.3

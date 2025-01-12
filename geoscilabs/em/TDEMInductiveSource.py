@@ -180,7 +180,7 @@ class PlotTDEM(object):
 
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
-        utils.setKwargs(self, **kwargs)
+        utils.set_kwargs(self, **kwargs)
         self.xmin, self.xmax = self.mesh.cell_centers_x.min(), self.mesh.cell_centers_x.max()
         self.ymin, self.ymax = self.mesh.cell_centers_y.min(), self.mesh.cell_centers_y.max()
         self.zmin, self.zmax = self.mesh.cell_centers_z.min(), self.mesh.cell_centers_z.max()
