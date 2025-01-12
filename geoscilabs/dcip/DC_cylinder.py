@@ -7,7 +7,7 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 from discretize import TensorMesh
 
 from simpeg import maps, utils
@@ -17,6 +17,8 @@ from simpeg.electromagnetics.static import resistivity as DC
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons, BoundedFloatText
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -88,10 +90,10 @@ def cylinder_fields(A, B, r, sigcyl, sighalf, xc=0.0, zc=-20.0):
 
         # make two simulations for the seperate field objects
         sim_primary = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Solver
         )
         sim_total = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+            mesh, survey=survey, sigmaMap=sigmaMap, solver=Solver
         )
 
         primary_field = sim_primary.fields(mhalf)
@@ -194,7 +196,7 @@ def getSensitivity(survey, A, B, M, N, model):
 
     Src = DC.Survey([src])
     sim = DC.Simulation2DCellCentered(
-        mesh, survey=Src, sigmaMap=sigmaMap, solver=Pardiso
+        mesh, survey=Src, sigmaMap=sigmaMap, solver=Solver
     )
     J = sim.getJ(model)[0]
 

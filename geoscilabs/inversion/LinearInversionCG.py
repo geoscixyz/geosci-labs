@@ -12,7 +12,6 @@ from simpeg import inversion
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-# from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
     interact,

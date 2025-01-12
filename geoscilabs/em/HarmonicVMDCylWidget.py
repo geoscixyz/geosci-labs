@@ -2,9 +2,8 @@ from ipywidgets import widgets
 from discretize import CylindricalMesh, TensorMesh
 from simpeg import maps, utils
 from simpeg.electromagnetics import frequency_domain as fdem
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 
-# from pymatsolver import PardisoSolver
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
@@ -16,6 +15,7 @@ from ..base import widgetify
 from .DipoleWidgetFD import DisPosNegvalues
 from .BiotSavart import BiotSavartFun
 
+Solver = get_default_solver()
 
 class HarmonicVMDCylWidget(object):
     """FDEMCylWidgete"""
@@ -193,7 +193,7 @@ class HarmonicVMDCylWidget(object):
 
         survey = fdem.survey.Survey(self.srcList)
         sim = fdem.Simulation3DMagneticFluxDensity(
-            self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu, solver=Pardiso
+            self.mesh, survey=survey, sigmaMap=self.mapping, mu=self.mu, solver=Solver
         )
 
         self.f = sim.fields(self.m)

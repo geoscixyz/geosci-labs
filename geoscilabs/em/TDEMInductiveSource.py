@@ -71,7 +71,9 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
     from scipy.constants import mu_0
     import numpy as np
     from simpeg import maps
-    from pymatsolver import Pardiso
+    from simpeg.utils.solver_utils import get_default_solver
+
+    Solver = get_default_solver()
 
     cs = 20.0
     ncx, ncy, ncz = 5, 3, 4
@@ -118,7 +120,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
         sigmaMap=maps.IdentityMap(mesh),
         verbose=True,
         survey=survey,
-        solver=Pardiso,
+        solver=Solver,
     )
     prb.time_steps = [
         (1e-06, 5),

@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import properties
 
-# from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
     interact,

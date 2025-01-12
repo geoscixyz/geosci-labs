@@ -18,7 +18,7 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 
 from discretize import TensorMesh
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 
 from simpeg import maps, SolverLU, utils
 from simpeg.electromagnetics.static import resistivity as DC
@@ -27,6 +27,7 @@ from simpeg.electromagnetics.static.utils import static_utils
 
 from ..base import widgetify
 
+Solver = get_default_solver()
 
 class ParametricCircleLayerMap(IdentityMap):
 
@@ -167,7 +168,7 @@ def DC2Dsurvey(flag="PolePole"):
 
     survey = DC.Survey(txList)
     simulation = DC.Simulation2DCellCentered(
-        mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+        mesh, survey=survey, sigmaMap=mapping, solver=Solver
     )
 
     sigblk, sighalf, siglayer = 2e-2, 2e-3, 1e-3

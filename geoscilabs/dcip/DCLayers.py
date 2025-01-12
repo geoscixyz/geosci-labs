@@ -10,9 +10,11 @@ from matplotlib import rcParams
 from discretize import TensorMesh
 
 from simpeg import maps, utils
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 rcParams["font.size"] = 16
 
@@ -172,7 +174,7 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
         * utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
         * mesh.cell_gradient
     )
-    Ainv = Pardiso(A)
+    Ainv = Solver(A)
 
     V = Ainv * q
     return V

@@ -88,7 +88,9 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     from scipy.constants import mu_0
     import numpy as np
     from simpeg import maps, utils
-    from pymatsolver import Pardiso
+    from simpeg.utils.solver_utils import get_default_solver
+
+    Solver = get_default_solver()
 
     cs = 20
     ncx, ncy, ncz = 20, 20, 20
@@ -126,7 +128,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     rxList = [rx_ex, rx_ey, rx_by]
 
     sim = tdem.Simulation3DMagneticFluxDensity(mesh, sigma=sigma, verbose=True)
-    sim.Solver = Pardiso
+    sim.Solver = Solver
     sim.solverOpts = {"is_symmetric": False}
     sim.time_steps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
     t0 = 0.01 + 1e-4

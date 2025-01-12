@@ -29,9 +29,11 @@ from simpeg import maps, SolverLU, utils
 from simpeg.utils import extract_core_mesh
 from simpeg.electromagnetics.static import resistivity as DC
 from simpeg.electromagnetics.static import induced_polarization as IP
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 # Mesh, sigmaMap can be globals global
 npad = 12
@@ -179,13 +181,13 @@ def model_fields(A, B, mtrue, mhalf, mair, mover, whichprimary="overburden"):
         survey = DC.Survey([src])
         # Create three simulations so the fields object is accurate
         sim_primary = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Solver
         )
         sim_total = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Solver
         )
         sim_air = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Solver
         )
 
         if whichprimary == "air":
@@ -302,7 +304,7 @@ def getSensitivity(survey, A, B, M, N, model):
 
     survey = DC.Survey([src])
     problem = DC.Simulation2DCellCentered(
-        mesh, sigmaMap=mapping, solver=Pardiso, survey=survey
+        mesh, sigmaMap=mapping, solver=Solver, survey=survey
     )
 
     J = problem.getJ(model)[0]
@@ -458,7 +460,7 @@ def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
 
     survey = DC.Survey(txList)
     simulation = DC.Simulation2DCellCentered(
-        mesh, sigmaMap=mapping, survey=survey, solver=Pardiso
+        mesh, sigmaMap=mapping, survey=survey, solver=Solver
     )
 
     return simulation, xzlocs
@@ -548,7 +550,7 @@ def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
         sigma=sigmadc,
         etaMap=maps.IdentityMap(mesh),
         survey=survey,
-        solver=Pardiso,
+        solver=Solver,
     )
 
     return simulation, xzlocs
