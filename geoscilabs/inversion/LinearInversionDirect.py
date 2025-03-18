@@ -1,6 +1,6 @@
 import numpy as np
 from discretize import TensorMesh
-from SimPEG import (
+from simpeg import (
     maps,
     simulation,
     survey,
@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import properties
 
-# from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
     interact,

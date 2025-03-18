@@ -1,8 +1,8 @@
 from discretize import TensorMesh
-from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import extract_core_mesh
+from simpeg import maps, SolverLU, utils
+from simpeg.utils import extract_core_mesh
 import numpy as np
-from SimPEG.electromagnetics.static import resistivity as DC
+from simpeg.electromagnetics.static import resistivity as DC
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
@@ -11,11 +11,13 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 from scipy.constants import epsilon_0
 import copy
-from pymatsolver import Pardiso
+from simpeg.utils.solver_utils import get_default_solver
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -94,10 +96,10 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
         survey = DC.Survey([src])
 
         problem = DC.Simulation3DCellCentered(
-            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+            mesh, sigmaMap=sigmaMap, solver=Solver, survey=survey
         )
         problem_prim = DC.Simulation3DCellCentered(
-            mesh, sigmaMap=sigmaMap, solver=Pardiso, survey=survey
+            mesh, sigmaMap=sigmaMap, solver=Solver, survey=survey
         )
 
         primary_field = problem_prim.fields(mhalf)
@@ -335,7 +337,7 @@ def getSensitivity(survey, A, B, M, N, model):
 
     survey = DC.survey.Survey([src])
     problem = DC.Simulation3DCellCentered(
-        mesh, survey=survey, sigmaMap=sigmaMap, solver=Pardiso
+        mesh, survey=survey, sigmaMap=sigmaMap, solver=Solver
     )
     J = problem.getJ(model)
 

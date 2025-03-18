@@ -1,5 +1,5 @@
 import numpy as np
-from SimPEG import electromagnetics as EM
+from simpeg import electromagnetics as EM
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
@@ -8,7 +8,7 @@ import matplotlib.gridspec as gridspec
 from ipywidgets import ToggleButtons, FloatSlider
 
 from geoscilabs.base import widgetify
-from SimPEG.view import DataView
+from simpeg.view import DataView
 
 matplotlib.rcParams["font.size"] = 12
 

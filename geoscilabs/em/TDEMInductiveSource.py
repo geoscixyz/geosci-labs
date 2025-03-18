@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import deepdish as dd
 from discretize import TensorMesh
-from SimPEG import utils
+from simpeg import utils
 import tarfile
 import os
 
@@ -67,11 +67,13 @@ def choose_source(src_type):
 
 
 def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
-    from SimPEG.electromagnetics import time_domain
+    from simpeg.electromagnetics import time_domain
     from scipy.constants import mu_0
     import numpy as np
-    from SimPEG import maps
-    from pymatsolver import Pardiso
+    from simpeg import maps
+    from simpeg.utils.solver_utils import get_default_solver
+
+    Solver = get_default_solver()
 
     cs = 20.0
     ncx, ncy, ncz = 5, 3, 4
@@ -118,7 +120,7 @@ def run_simulation(fname="tdem_vmd.h5", sigma_halfspace=0.01, src_type="VMD"):
         sigmaMap=maps.IdentityMap(mesh),
         verbose=True,
         survey=survey,
-        solver=Pardiso,
+        solver=Solver,
     )
     prb.time_steps = [
         (1e-06, 5),
@@ -178,7 +180,7 @@ class PlotTDEM(object):
 
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
-        utils.setKwargs(self, **kwargs)
+        utils.set_kwargs(self, **kwargs)
         self.xmin, self.xmax = self.mesh.cell_centers_x.min(), self.mesh.cell_centers_x.max()
         self.ymin, self.ymax = self.mesh.cell_centers_y.min(), self.mesh.cell_centers_y.max()
         self.zmin, self.zmax = self.mesh.cell_centers_z.min(), self.mesh.cell_centers_z.max()

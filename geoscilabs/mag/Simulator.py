@@ -9,8 +9,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.interpolate import griddata, interp1d
 
-from SimPEG.potential_fields import magnetics as mag
-from SimPEG import utils, data
+from simpeg.potential_fields import magnetics as mag
+from simpeg import utils, data
 from scipy.constants import mu_0
 
 

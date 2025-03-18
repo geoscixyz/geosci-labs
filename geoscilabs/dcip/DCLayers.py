@@ -9,10 +9,12 @@ from matplotlib import rcParams
 
 from discretize import TensorMesh
 
-from SimPEG import maps, utils
-from pymatsolver import Pardiso
+from simpeg import maps, utils
+from simpeg.utils.solver_utils import get_default_solver
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 rcParams["font.size"] = 16
 
@@ -153,7 +155,7 @@ def rho_a(VM, VN, A, B, M, N):
 
 def solve_2D_potentials(rho1, rho2, h, A, B):
     """
-    Here we solve the 2D DC problem for potentials (using SimPEG Mesg Class)
+    Here we solve the 2D DC problem for potentials (using simpeg Mesg Class)
     """
     sigma = 1.0 / rho2 * np.ones(mesh.nC)
     sigma[mesh.gridCC[:, 1] >= -h] = 1.0 / rho1  # since the model is 2D
@@ -172,7 +174,7 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
         * utils.sdiag(1.0 / (mesh.dim * mesh.aveF2CC.T * (1.0 / sigma)))
         * mesh.cell_gradient
     )
-    Ainv = Pardiso(A)
+    Ainv = Solver(A)
 
     V = Ainv * q
     return V

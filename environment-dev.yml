@@ -6,6 +6,7 @@ dependencies:
   - cvxopt
   - deepdish
   - discretize
+  - empymod
   - ipywidgets>=0.6.0
   - jupyter
   - matplotlib=3.4.3
@@ -13,7 +14,7 @@ dependencies:
   - pip
   - pymatsolver
   - requests
-  - SimPEG==0.19.0
+  - SimPEG==0.23.0
   - pytest
   - flake8
   - black

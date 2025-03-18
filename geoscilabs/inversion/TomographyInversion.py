@@ -1,6 +1,6 @@
 import numpy as np
 from discretize import TensorMesh
-from SimPEG import (
+from simpeg import (
     maps,
     utils,
     simulation,
@@ -16,7 +16,6 @@ from SimPEG import (
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-# from pymatsolver import Pardiso
 import matplotlib
 from ipywidgets import (
     interact,
@@ -28,7 +27,7 @@ from ipywidgets import (
     SelectMultiple,
 )
 import ipywidgets as widgets
-import SimPEG.seismic.straight_ray_tomography as seismic
+import simpeg.seismic.straight_ray_tomography as seismic
 from pylab import hist
 
 
@@ -131,7 +130,7 @@ class TomographyInversionApp(object):
     def get_block_index(self, xc=50, yc=50, dx=20, dy=20):
         p0 = np.array([xc - dx / 2.0, yc + dy / 2])
         p1 = np.array([xc + dx / 2.0, yc - dy / 2])
-        index = utils.model_builder.getIndicesBlock(p0, p1, self.mesh_prop.gridCC)
+        index = utils.model_builder.get_indices_block(p0, p1, self.mesh_prop.gridCC)
         return index
 
     def get_block_points(self, xc=50, yc=50, dx=20, dy=20):
