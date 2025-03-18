@@ -8,13 +8,13 @@ from simpeg.potential_fields import magnetics as mag
 
 class Simulation(object):
     """
-            Earth's field:
-            - Binc, Bdec : inclination and declination of Earth's mag field
-            - Bigrf : amplitude of earth's field in units of nT
+        Earth's field:
+        - Binc, Bdec : inclination and declination of Earth's mag field
+        - Bigrf : amplitude of earth's field in units of nT
 
-        Remnance:
-            - Q : Koenigsberger ratio
-            - Rinc, Rdec : inclination and declination of remnance in block
+    Remnance:
+        - Q : Koenigsberger ratio
+        - Rinc, Rdec : inclination and declination of remnance in block
 
     """
 
@@ -154,7 +154,7 @@ def calcRow(Xn, Yn, Zn, rxLoc):
 
     @author: dominiquef
 
-     """
+    """
 
     eps = 1e-8  # add a small value to the locations to avoid /0
 
@@ -174,14 +174,14 @@ def calcRow(Xn, Yn, Zn, rxLoc):
     dx2 = Xn[:, 1] - rxLoc[0] + eps
     dx1 = Xn[:, 0] - rxLoc[0] + eps
 
-    dx2dx2 = dx2 ** 2.0
-    dx1dx1 = dx1 ** 2.0
+    dx2dx2 = dx2**2.0
+    dx1dx1 = dx1**2.0
 
-    dy2dy2 = dy2 ** 2.0
-    dy1dy1 = dy1 ** 2.0
+    dy2dy2 = dy2**2.0
+    dy1dy1 = dy1**2.0
 
-    dz2dz2 = dz2 ** 2.0
-    dz1dz1 = dz1 ** 2.0
+    dz2dz2 = dz2**2.0
+    dz1dz1 = dz1**2.0
 
     R1 = dy2dy2 + dx2dx2
     R2 = dy2dy2 + dx1dx1
@@ -275,7 +275,6 @@ def calcRow(Xn, Yn, Zn, rxLoc):
 
 
 def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
-
     """
 
     Magnetic forward operator in integral form
@@ -289,7 +288,7 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
     Return
     _G = Linear forward modeling operation
 
-     """
+    """
 
     yn2, xn2, zn2 = np.meshgrid(yn[1:], xn[1:], zn[1:])
     yn1, xn1, zn1 = np.meshgrid(yn[0:-1], xn[0:-1], zn[0:-1])
@@ -316,15 +315,21 @@ def Intrgl_Fwr_Op(xn, yn, zn, rxLoc):
 
 def createMagSurvey(xyzd, B):
     """
-        Create simpeg magnetic survey pbject
+    Create SimPEG magnetic survey object
 
-        INPUT
-        :param array: xyzd, n-by-4 array of observation points and data
-        :param array: B, 1-by-3 array of inducing field param [|B|, Inc, Dec]
+    INPUT
+    :param array: xyzd, n-by-4 array of observation points and data
+    :param array: B, 1-by-3 array of inducing field param [|B|, Inc, Dec]
     """
 
     rxLoc = mag.receivers.Point(xyzd[:, :3])
-    source_field = mag.sources.SourceField(receiver_list=[rxLoc], parameters=B)
+    amplitude, inclination, declination = B[:]
+    source_field = mag.sources.UniformBackgroundField(
+        receiver_list=[rxLoc],
+        amplitude=amplitude,
+        inclination=inclination,
+        declination=declination,
+    )
     survey = mag.Survey(source_field)
     dobj = data.Data(survey, xyzd[:, 3])
 
