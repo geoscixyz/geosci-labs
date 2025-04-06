@@ -34,7 +34,7 @@ expmap = maps.ExpMap(mesh)
 # actmap = maps.InjectActiveCells(mesh, ~airInd, np.log(1e-8))
 mapping = expmap
 # mapping = maps.IdentityMap(mesh)
-dx = 5
+dx = 0.5
 xr = np.arange(-40, 41, dx)
 dxr = np.diff(xr)
 xmin = -40.0
@@ -266,7 +266,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = utils.closestPoints(mesh, [xmax + 1000.0, 0.0], grid_loc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -437,8 +437,8 @@ def PLOT(
         VNprim = 0.0
 
     else:
-        MInd = np.where(xSurface == M)
-        NInd = np.where(xSurface == N)
+        MInd = np.abs(xSurface - M).argmin(axis=0)
+        NInd = np.abs(xSurface - N).argmin(axis=0)
 
         VM = phiTotalSurface[MInd[0]]
         VN = phiTotalSurface[NInd[0]]
@@ -867,7 +867,7 @@ def ResLayer_app():
             value="Dipole-Dipole",
         ),
         zcLayer=FloatSlider(
-            min=-10.0,
+            min=-40.0,
             max=0.0,
             step=1.0,
             value=-10.0,
@@ -876,7 +876,7 @@ def ResLayer_app():
         ),
         dzLayer=FloatSlider(
             min=0.5,
-            max=5.0,
+            max=40.0,
             step=0.5,
             value=1.0,
             continuous_update=False,
@@ -885,7 +885,7 @@ def ResLayer_app():
         rholayer=FloatText(
             min=1e-8,
             max=1e8,
-            value=5000.0,
+            value=500.0,
             continuous_update=False,
             description="$\\rho_{2}$",
         ),
