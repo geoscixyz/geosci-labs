@@ -170,7 +170,7 @@ class TomographyInversionApp(object):
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
-                gridOpts={"color": "white", "alpha": 0.5},
+                grid_opts={"color": "white", "linewidth":0.5} #, "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
             ax.plot(
@@ -185,7 +185,7 @@ class TomographyInversionApp(object):
             ax.set_xlabel("x (m)")
             ax.set_ylabel("z (m)")
             ax.set_title(
-                ("(%.1fm, %.1fm)") % (self.mesh_prop.hx.min(), self.mesh_prop.hy.min())
+                ("(%.1fm, %.1fm)") % (self.mesh_prop.h[0].min(), self.mesh_prop.h[1].min())
             )
         else:
 
@@ -207,7 +207,7 @@ class TomographyInversionApp(object):
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
-                gridOpts={"color": "white", "alpha": 0.5},
+                grid_opts={"color": "white", "linewidth":0.5} #, "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
             ax.plot(
