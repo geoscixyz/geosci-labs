@@ -276,6 +276,6 @@ def seismic_app():
     )
     image = widgets.VBox(
         [out, x_loc],
-        layout=widgets.Layout(width="70%", height="600px", margin="0px 0px 0px 0px"),
+        layout=widgets.Layout(width="70%", height="1000px", margin="0px 0px 0px 0px"),
     )
     return widgets.HBox([left, image, right])
