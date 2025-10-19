@@ -9,7 +9,7 @@ on:
       - '*'
 jobs:
   setup-build:
-    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.test-file }})
+    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
