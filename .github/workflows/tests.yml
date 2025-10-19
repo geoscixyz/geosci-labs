@@ -22,16 +22,18 @@ jobs:
     - uses: actions/checkout@v2
     - uses: mamba-org/setup-micromamba@v1
       with:
+        auto-update-conda: true
+        activate-environment: geosci-labs
+        channels: conda-forge
         environment-file: environment-dev.yml
-        init-shell: >-
-          bash
-          powershell
-        create-args: >-
-          python=${{ matrix.python-version }}
-        cache-environment: true
-        post-cleanup: 'all'
-    - name: Run Tests
-      shell: micromamba-shell {0}
+        python-version: ${{ matrix.python-version }}
+    - name: Install Env
       run: |
-        pip install -e . --no-deps
-        pytest ${{ matrix.test-file }} -v
+        conda info
+        conda config --show
+        conda install -y pytest
+        pip install testipynb
+        conda list
+    - name: Run Tests
+      run: |
+        pytest -v ${{ matrix.test_file }}
