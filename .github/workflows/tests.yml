@@ -23,7 +23,7 @@ jobs:
     - uses: mamba-org/setup-micromamba@v1
       with:
         auto-update-conda: true
-        activate-environment: geosci-labs
+        activate-environment: geosci-labs-dev
         channels: conda-forge
         environment-file: environment-dev.yml
         python-version: ${{ matrix.python-version }}

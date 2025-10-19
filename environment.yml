@@ -14,6 +14,6 @@ dependencies:
   - pymatsolver
   - python=3.10
   - requests
-  - SimPEG
+  - simpeg
   - pip:
     - git+https://github.com/geoscixyz/geosci-labs
