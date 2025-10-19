@@ -10,16 +10,18 @@ from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from SimPEG import maps, SolverLU, utils
-from SimPEG.utils import extract_core_mesh
-from SimPEG.electromagnetics.static import resistivity as DC
-from pymatsolver import Pardiso
+from simpeg import maps, SolverLU, utils
+from simpeg.utils import extract_core_mesh
+from simpeg.electromagnetics.static import resistivity as DC
+from simpeg.utils.solver_utils import get_default_solver
 
 from discretize import TensorMesh
 
 from ipywidgets import interact, IntSlider, FloatSlider, FloatText, ToggleButtons
 
 from ..base import widgetify
+
+Solver = get_default_solver()
 
 # Mesh, sigmaMap can be globals global
 npad = 15
@@ -99,11 +101,11 @@ def model_fields(A, B, zcLayer, dzLayer, xc, zc, r, sigLayer, sigTarget, sigHalf
             src = DC.sources.Dipole([], np.r_[A, 0.0], np.r_[B, 0.0])
         survey = DC.Survey([src])
         sim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Solver
         )
         total_field = sim.fields(mtrue)
         sim_prim = DC.Simulation2DCellCentered(
-            mesh, survey=survey, sigmaMap=mapping, solver=Pardiso
+            mesh, survey=survey, sigmaMap=mapping, solver=Solver
         )
         primary_field = sim_prim.fields(mhalf)
 
@@ -331,7 +333,7 @@ def sumCylinderCharges(xc, zc, r, qSecondary):
     return qPosSum, qNegSum, qPosAvgLoc, qNegAvgLoc
 
 
-# The only thing we need to make it work is a 2.5D field object in SimPEG
+# The only thing we need to make it work is a 2.5D field object in simpeg
 
 
 def getSensitivity(survey, A, B, M, N, model):
@@ -347,7 +349,7 @@ def getSensitivity(survey, A, B, M, N, model):
 
     Src = DC.Survey([src])
     sim = DC.Simulation2DCellCentered(
-        mesh, survey=Src, sigmaMap=mapping, solver=Pardiso
+        mesh, survey=Src, sigmaMap=mapping, solver=Solver
     )
     J = sim.getJ(model)
 

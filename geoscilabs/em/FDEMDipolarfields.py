@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
 from scipy.special import erf
-from SimPEG import utils
+from simpeg import utils
 
 
 def omega(f):

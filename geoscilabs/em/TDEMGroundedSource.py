@@ -3,7 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import deepdish as dd
 from discretize import TensorMesh
-from SimPEG import utils
+from simpeg import utils
 import tarfile
 import os
 
@@ -83,12 +83,14 @@ def choose_model(model):
 
 
 def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.01):
-    from SimPEG.electromagnetics import time_domain as tdem
-    from SimPEG.electromagnetics.utils import waveform_utils
+    from simpeg.electromagnetics import time_domain as tdem
+    from simpeg.electromagnetics.utils import waveform_utils
     from scipy.constants import mu_0
     import numpy as np
-    from SimPEG import maps, utils
-    from pymatsolver import Pardiso
+    from simpeg import maps, utils
+    from simpeg.utils.solver_utils import get_default_solver
+
+    Solver = get_default_solver()
 
     cs = 20
     ncx, ncy, ncz = 20, 20, 20
@@ -98,7 +100,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     hz = [(cs, npad, -1.5), (cs, ncz), (cs, npad, 1.5)]
     mesh = TensorMesh([hx, hy, hz], "CCC")
     sigma = np.ones(mesh.nC) * sigma_halfspace
-    blk_ind = utils.ModelBuilder.getIndicesBlock(
+    blk_ind = utils.ModelBuilder.get_indices_block(
         np.r_[-40, -40, -160], np.r_[40, 40, -80], mesh.gridCC
     )
     sigma[mesh.gridCC[:, 2] > 0.0] = 1e-8
@@ -126,7 +128,7 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
     rxList = [rx_ex, rx_ey, rx_by]
 
     sim = tdem.Simulation3DMagneticFluxDensity(mesh, sigma=sigma, verbose=True)
-    sim.Solver = Pardiso
+    sim.Solver = Solver
     sim.solverOpts = {"is_symmetric": False}
     sim.time_steps = [(1e-3, 10), (2e-5, 10), (1e-4, 10), (5e-4, 10), (1e-3, 10)]
     t0 = 0.01 + 1e-4
@@ -189,7 +191,7 @@ class PlotTDEM(object):
 
     def __init__(self, **kwargs):
         super(PlotTDEM, self).__init__()
-        utils.setKwargs(self, **kwargs)
+        utils.set_kwargs(self, **kwargs)
         self.xmin, self.xmax = self.mesh.cell_centers_x.min(), self.mesh.cell_centers_x.max()
         self.ymin, self.ymax = self.mesh.cell_centers_y.min(), self.mesh.cell_centers_y.max()
         self.zmin, self.zmax = self.mesh.cell_centers_z.min(), self.mesh.cell_centers_z.max()

@@ -1,5 +1,5 @@
 import numpy as np
-from SimPEG.electromagnetics.utils import waveform_utils
+from simpeg.electromagnetics.utils import waveform_utils
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib

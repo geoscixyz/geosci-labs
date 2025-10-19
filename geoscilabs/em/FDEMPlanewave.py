@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.constants import mu_0, pi, epsilon_0
-from SimPEG import utils
+from simpeg import utils
 
 
 def omega(f):
