@@ -53,6 +53,10 @@ jobs:
           conda info
           conda list
 
+      - name: Install geosci-labs
+        run: |
+          pip install -e .
+
       - name: Install test dependencies (pytest + testipynb)
         run: |
           n=0
