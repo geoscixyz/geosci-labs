@@ -1,5 +1,5 @@
-# .github/workflows/tests.yml
 name: Testing
+
 on:
   push:
     branches: ['*']
@@ -29,12 +29,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Switch to Miniforge/Mambaforge + mamba
-      - name: Setup Conda (Miniforge + mamba)
+      # Use Miniforge3 (not "latest" to avoid 404s) + mamba, strict conda-forge
+      - name: Setup Conda (Miniforge3 + mamba)
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-version: "latest"
-          miniforge-variant: "Mambaforge"   # brings mamba + conda-forge defaults
+          miniforge-variant: Miniforge3
+          miniforge-version: "24.11.0-0"     # pin to avoid 'latest' asset 404s
           python-version: ${{ matrix.python-version }}
           activate-environment: geosci-labs-dev
           environment-file: environment-dev.yml
@@ -43,15 +43,17 @@ jobs:
           auto-activate-base: false
           channels: conda-forge
           channel-priority: strict
+          condarc: |
+            channels:
+              - conda-forge
+            channel_priority: strict
 
-      # Optional: show config for debugging
-      - name: Conda/Mamba info
+      - name: Show environment info
         run: |
           conda info
-          conda config --show
+          conda list
 
-      # Retry wrapper: helpful if conda-forge hiccups mid-run
-      - name: Ensure pytest + testipynb (with retry)
+      - name: Install test dependencies (pytest + testipynb)
         run: |
           n=0
           until [ $n -ge 3 ]; do
@@ -60,9 +62,6 @@ jobs:
             echo "Retry $n/3 after transient fetch error..."
             sleep 10
           done
-
-      - name: List env
-        run: conda list
 
       - name: Run tests
         run: pytest -v ${{ matrix.test_file }}
