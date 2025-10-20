@@ -14,7 +14,7 @@ dependencies:
   - pip
   - pymatsolver
   - requests
-  - SimPEG==0.23.0
+  - simpeg
   - pytest
   - flake8
   - black

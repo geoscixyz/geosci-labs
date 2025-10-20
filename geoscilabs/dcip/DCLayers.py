@@ -8,6 +8,7 @@ from matplotlib.colors import LogNorm
 from matplotlib import rcParams
 
 from discretize import TensorMesh
+from discretize.utils import closest_points_index
 
 from simpeg import maps, utils
 from simpeg.utils.solver_utils import get_default_solver
@@ -161,8 +162,8 @@ def solve_2D_potentials(rho1, rho2, h, A, B):
     sigma[mesh.gridCC[:, 1] >= -h] = 1.0 / rho1  # since the model is 2D
 
     q = np.zeros(mesh.nC)
-    a = utils.closestPoints(mesh, A[:2])
-    b = utils.closestPoints(mesh, B[:2])
+    a = closest_points_index(mesh, A[:2])
+    b = closest_points_index(mesh, B[:2])
 
     q[a] = 1.0 / mesh.cell_volumes[a]
     q[b] = -1.0 / mesh.cell_volumes[b]
