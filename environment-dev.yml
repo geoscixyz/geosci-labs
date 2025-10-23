@@ -7,9 +7,9 @@ dependencies:
   - deepdish
   - discretize
   - empymod
-  - ipywidgets>=0.6.0
+  - ipywidgets
   - jupyter
-  - matplotlib=3.4.3
+  - matplotlib
   - Pillow
   - pip
   - pymatsolver

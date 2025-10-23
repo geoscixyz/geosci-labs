@@ -6,13 +6,13 @@ dependencies:
   - cvxopt
   - deepdish
   - discretize
-  - ipywidgets>=0.6.0
+  - ipywidgets
   - jupyter
-  - matplotlib<3.5
+  - matplotlib
   - Pillow
   - pip
   - pymatsolver
-  - python=3.10
+  - python=3.11
   - requests
   - simpeg
   - pip:
