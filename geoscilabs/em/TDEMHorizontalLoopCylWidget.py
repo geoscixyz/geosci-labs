@@ -2,6 +2,7 @@ from ipywidgets import widgets, FloatText
 from discretize import TensorMesh, CylindricalMesh
 from simpeg import maps, utils
 from simpeg.electromagnetics import time_domain as tdem
+from simpeg.utils import get_default_solver
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -76,17 +77,17 @@ class TDEMHorizontalLoopCylWidget(object):
     def getCoreModel(self, Type):
 
         if Type == "Layer":
-            active = self.mesh2D.vectorCCy < self.z0
-            ind1 = (self.mesh2D.vectorCCy < self.z0) & (
-                self.mesh2D.vectorCCy >= self.z1
+            active = self.mesh2D.cell_centers_y < self.z0
+            ind1 = (self.mesh2D.cell_centers_y < self.z0) & (
+                self.mesh2D.cell_centers_y >= self.z1
             )
-            ind2 = (self.mesh2D.vectorCCy < self.z1) & (
-                self.mesh2D.vectorCCy >= self.z2
+            ind2 = (self.mesh2D.cell_centers_y < self.z1) & (
+                self.mesh2D.cell_centers_y >= self.z2
             )
             mapping2D = maps.SurjectVertical1D(self.mesh2D) * maps.InjectActiveCells(
-                self.mesh2D, active, self.sig0, nC=self.mesh2D.nCy
+                self.mesh2D, active, self.sig0, nC=self.mesh2D.shape_cells[1]
             )
-            model2D = np.ones(self.mesh2D.nCy) * self.sig3
+            model2D = np.ones(self.mesh2D.shape_cells[1]) * self.sig3
             model2D[ind1] = self.sig1
             model2D[ind2] = self.sig2
             model2D = model2D[active]
@@ -104,9 +105,9 @@ class TDEMHorizontalLoopCylWidget(object):
             )
 
             mapping2D = maps.InjectActiveCells(
-                self.mesh2D, active, self.sig0, nC=self.mesh2D.nC
+                self.mesh2D, active, self.sig0, nC=self.mesh2D.n_cells
             )
-            model2D = np.ones(self.mesh2D.nC) * self.sigb
+            model2D = np.ones(self.mesh2D.n_cells) * self.sigb
             model2D[ind1] = self.sig1
             model2D[ind2] = self.sig2
             model2D = model2D[active]
@@ -133,17 +134,17 @@ class TDEMHorizontalLoopCylWidget(object):
         self.sig2 = sig2  # 2nd layer \sigma
         self.sig3 = sig3  # 3rd layer \sigma
 
-        active = self.mesh.vectorCCz < self.z0
-        ind1 = (self.mesh.vectorCCz < self.z0) & (self.mesh.vectorCCz >= self.z1)
-        ind2 = (self.mesh.vectorCCz < self.z1) & (self.mesh.vectorCCz >= self.z2)
+        active = self.mesh.cell_centers_z < self.z0
+        ind1 = (self.mesh.cell_centers_z < self.z0) & (self.mesh.cell_centers_z >= self.z1)
+        ind2 = (self.mesh.cell_centers_z < self.z1) & (self.mesh.cell_centers_z >= self.z2)
         self.mapping = maps.SurjectVertical1D(self.mesh) * maps.InjectActiveCells(
-            self.mesh, active, sig0, nC=self.mesh.nCz
+            self.mesh, active, sig0, nC=self.mesh.shape_cells[2]
         )
-        model = np.ones(self.mesh.nCz) * sig3
+        model = np.ones(self.mesh.shape_cells[2]) * sig3
         model[ind1] = sig1
         model[ind2] = sig2
         self.m = model[active]
-        self.mu = np.ones(self.mesh.nC) * mu_0
+        self.mu = np.ones(self.mesh.n_cells) * mu_0
         self.mu[self.mesh.gridCC[:, 2] < 0.0] = (1.0 + chi) * mu_0
         return self.m
 
@@ -171,12 +172,12 @@ class TDEMHorizontalLoopCylWidget(object):
             <= self.R
         )
 
-        self.mapping = maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.nC)
-        model = np.ones(self.mesh.nC) * sigb
+        self.mapping = maps.InjectActiveCells(self.mesh, active, sig0, nC=self.mesh.n_cells)
+        model = np.ones(self.mesh.n_cells) * sigb
         model[ind1] = sig1
         model[ind2] = sig2
         self.m = model[active]
-        self.mu = np.ones(self.mesh.nC) * mu_0
+        self.mu = np.ones(self.mesh.n_cells) * mu_0
         self.mu[self.mesh.gridCC[:, 2] < 0.0] = (1.0 + chi) * mu_0
         return self.m
 
@@ -191,7 +192,7 @@ class TDEMHorizontalLoopCylWidget(object):
         survey = tdem.survey.Survey(self.srcList)
 
         sim = tdem.Simulation3DMagneticFluxDensity(
-            self.mesh, survey=survey, sigmaMap=self.mapping
+            self.mesh, survey=survey, sigmaMap=self.mapping, solver=get_default_solver()
         )
         sim.time_steps = [
             (1e-06, 10),
@@ -211,16 +212,16 @@ class TDEMHorizontalLoopCylWidget(object):
     @property
     def Pfx(self):
         if getattr(self, "_Pfx", None) is None:
-            self._Pfx = self.mesh.getInterpolationMat(
-                self.mesh.gridCC[self.activeCC, :], locType="Fx"
+            self._Pfx = self.mesh.get_interpolation_matrix(
+                self.mesh.gridCC[self.activeCC, :], location_type="Fx"
             )
         return self._Pfx
 
     @property
     def Pfz(self):
         if getattr(self, "_Pfz", None) is None:
-            self._Pfz = self.mesh.getInterpolationMat(
-                self.mesh.gridCC[self.activeCC, :], locType="Fz"
+            self._Pfz = self.mesh.get_interpolation_matrix(
+                self.mesh.gridCC[self.activeCC, :], location_type="Fz"
             )
         return self._Pfz
 
@@ -240,26 +241,26 @@ class TDEMHorizontalLoopCylWidget(object):
         )
         self.dBxdt = utils.mkvc(
             self.mirrorArray(
-                -self.Pfx * self.mesh.edgeCurl * self.f[src, "e", itime], direction="x"
+                -self.Pfx * self.mesh.edge_curl * self.f[src, "e", itime], direction="x"
             )
         )
         self.dBzdt = utils.mkvc(
             self.mirrorArray(
-                -self.Pfz * self.mesh.edgeCurl * self.f[src, "e", itime], direction="z"
+                -self.Pfz * self.mesh.edge_curl * self.f[src, "e", itime], direction="z"
             )
         )
 
     def getData(self):
         src = self.srcList[0]
-        Pfx = self.mesh.getInterpolationMat(self.rxLoc, locType="Fx")
-        Pfz = self.mesh.getInterpolationMat(self.rxLoc, locType="Fz")
-        Pey = self.mesh.getInterpolationMat(self.rxLoc, locType="Ey")
+        Pfx = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Fx")
+        Pfz = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Fz")
+        Pey = self.mesh.get_interpolation_matrix(self.rxLoc, location_type="Ey")
 
         self.Ey = (Pey * self.f[src, "e", :]).flatten()
         self.Bx = (Pfx * self.f[src, "b", :]).flatten()
         self.Bz = (Pfz * self.f[src, "b", :]).flatten()
-        self.dBxdt = (-Pfx * self.mesh.edgeCurl * self.f[src, "e", :]).flatten()
-        self.dBzdt = (-Pfz * self.mesh.edgeCurl * self.f[src, "e", :]).flatten()
+        self.dBxdt = (-Pfx * self.mesh.edge_curl * self.f[src, "e", :]).flatten()
+        self.dBzdt = (-Pfz * self.mesh.edge_curl * self.f[src, "e", :]).flatten()
 
     def plotField(
         self,

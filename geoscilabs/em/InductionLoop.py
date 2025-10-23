@@ -156,7 +156,7 @@ class IndEx:
         bot = Z ** 2 + (s - a1) ** 2
 
         try:
-            bot[bot==0] = np.NaN
+            bot[bot==0] = np.nan
         except:
             pass
 
@@ -219,7 +219,7 @@ class IndEx:
 
         bot = z ** 2 + (s - a1) ** 2
         try:
-            bot[bot == 0.0] = np.NaN
+            bot[bot == 0.0] = np.nan
         except:
             pass
 
@@ -424,7 +424,7 @@ class IndEx:
         ax.plot(xRx, zRx, color="black", linewidth=6)
         ax.plot(xRx, zRx, color=((0.4, 0.4, 0.4)), linewidth=4)
         # Cplot = ax.contourf(X,Z,np.log10(Babs),40,cmap='ocean_r')
-        Babs[Babs == 0.0] = np.NaN
+        Babs[Babs == 0.0] = np.nan
         Cplot = ax.contourf(X, Z, np.log10(1e9 * Babs), 40, cmap="viridis")
         cbar = plt.colorbar(Cplot, ax=ax, pad=0.02)
         cbar.set_label(
