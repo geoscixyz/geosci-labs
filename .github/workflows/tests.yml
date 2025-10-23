@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.10"]
-        test-file: [
+        test_file: [
           "tests/test_dcip.py",
           "tests/test_em.py",
           "tests/test_gpr.py tests/test_seismic.py",
