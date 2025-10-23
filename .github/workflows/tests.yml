@@ -25,6 +25,9 @@ jobs:
           "tests/test_inversion.py",
           "tests/test_gravity.py tests/test_mag.py"
         ]
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+      MPLBACKEND: Agg        # avoid GUI backends import cost
 
     steps:
       - uses: actions/checkout@v4
