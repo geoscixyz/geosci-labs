@@ -2,7 +2,7 @@ from ipywidgets import widgets, FloatText
 from discretize import TensorMesh, CylindricalMesh
 from simpeg import maps, utils
 from simpeg.electromagnetics import time_domain as tdem
-from simpeg.utils import get_default_solver
+from simpeg.utils.solver_utils import get_default_solver
 
 import matplotlib.pyplot as plt
 import numpy as np
