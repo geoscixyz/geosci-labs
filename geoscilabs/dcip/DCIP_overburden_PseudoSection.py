@@ -397,7 +397,7 @@ def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
     for i in range(ntx):
         if flag == "PoleDipole":
             A = np.r_[xr[i], zloc]
-            B = np.r_[mesh.vectorCCx.min(), zloc]
+            B = np.r_[mesh.cell_centers_x.min(), zloc]
             if i < ntx - nmax + 1:
                 Mx = xr[i + 1 : i + 1 + nmax]
                 _, Mz = get_Surface(mtrue, Mx)
@@ -421,7 +421,7 @@ def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
             if i < ntx - nmax + 1:
                 Mx = xr[i + 2 : i + 2 + nmax]
                 _, Mz = get_Surface(mtrue, Mx)
-                Nx = np.ones(nmax) * mesh.vectorCCx.max()
+                Nx = np.ones(nmax) * mesh.cell_centers_x.max()
                 _, Nz = get_Surface(mtrue, Nx)
 
                 M = np.c_[Mx, Mz]
@@ -430,7 +430,7 @@ def DC2Dsimulation(mtrue, flag="PoleDipole", nmax=8):
             else:
                 Mx = xr[i + 2 : ntx + 2]
                 _, Mz = get_Surface(mtrue, Mx)
-                Nx = np.ones(ntx - i) * mesh.vectorCCx.max()
+                Nx = np.ones(ntx - i) * mesh.cell_centers_x.max()
                 _, Nz = get_Surface(mtrue, Nx)
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
@@ -483,7 +483,7 @@ def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
     for i in range(ntx):
         if flag == "PoleDipole":
             A = np.r_[xr[i], zloc]
-            B = np.r_[mesh.vectorCCx.min(), zloc]
+            B = np.r_[mesh.cell_centers_x.min(), zloc]
             if i < ntx - nmax + 1:
                 Mx = xr[i + 1 : i + 1 + nmax]
                 _, Mz = get_Surface(miptrue, Mx)
@@ -507,7 +507,7 @@ def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
             if i < ntx - nmax + 1:
                 Mx = xr[i + 2 : i + 2 + nmax]
                 _, Mz = get_Surface(miptrue, Mx)
-                Nx = np.ones(nmax) * mesh.vectorCCx.max()
+                Nx = np.ones(nmax) * mesh.cell_centers_x.max()
                 _, Nz = get_Surface(miptrue, Nx)
 
                 M = np.c_[Mx, Mz]
@@ -516,7 +516,7 @@ def IP2Dsimulation(miptrue, sigmadc, flag="PoleDipole", nmax=8):
             else:
                 Mx = xr[i + 2 : ntx + 2]
                 _, Mz = get_Surface(miptrue, Mx)
-                Nx = np.ones(ntx - i) * mesh.vectorCCx.max()
+                Nx = np.ones(ntx - i) * mesh.cell_centers_x.max()
                 _, Nz = get_Surface(miptrue, Nx)
                 M = np.c_[Mx, Mz]
                 N = np.c_[Nx, Nz]
@@ -862,7 +862,7 @@ def DCIP2Dfwdfun(
         ax=ax1,
         clim=(u.min(), u.max()),
         grid=True,
-        gridOpts={"color": "k", "alpha": 0.5},
+        grid_opts={"color": "k", "alpha": 0.5},
     )
 
     if which == "IP":
