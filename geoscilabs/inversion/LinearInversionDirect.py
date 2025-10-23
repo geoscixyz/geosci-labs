@@ -577,7 +577,7 @@ class LinearInversionDirectApp(properties.HasProperties):
         # survey_obj = survey.BaseSurvey()
         simulation_obj = simulation.LinearSimulation(
             # survey=survey_obj,
-            mesh=self.mesh_prop,
+            # mesh=self.mesh_prop,
             model_map=maps.IdentityMap(),
             G=self.G,
         )
@@ -612,7 +612,7 @@ class LinearInversionDirectApp(properties.HasProperties):
 
         m0 = np.ones(self.M) * m0
         mref = np.ones(self.M) * mref
-        reg = regularization.Tikhonov(
+        reg = regularization.WeightedLeastSquares(
             self.mesh_prop, alpha_s=alpha_s, alpha_x=alpha_x, reference_model=mref
         )
 
