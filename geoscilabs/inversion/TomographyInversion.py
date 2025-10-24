@@ -170,7 +170,7 @@ class TomographyInversionApp(object):
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
-                gridOpts={"color": "white", "alpha": 0.5},
+                grid_opts={"color": "white", "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
             ax.plot(
@@ -207,7 +207,7 @@ class TomographyInversionApp(object):
                 1.0 / self.slowness_prop,
                 ax=ax,
                 grid=show_grid,
-                gridOpts={"color": "white", "alpha": 0.5},
+                grid_opts={"color": "white", "alpha": 0.5},
             )
             plt.colorbar(out[0], ax=ax, fraction=0.02)
             ax.plot(

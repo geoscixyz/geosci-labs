@@ -10,17 +10,15 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 
 from ipywidgets import (
-    interact,
-    interact_manual,
-    IntSlider,
     FloatSlider,
     FloatText,
     ToggleButtons,
     fixed,
-    Widget,
 )
 
 from discretize import TensorMesh
+from discretize.utils import closest_points_index
+
 from simpeg import maps, utils
 from simpeg.utils import extract_core_mesh
 from simpeg.electromagnetics.static import resistivity as DC
@@ -216,7 +214,7 @@ def get_Surface_Potentials(mtrue, survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = closest_points_index(mesh, [xmax + 60.0, 0.0], grid_loc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -689,7 +687,7 @@ def PLOT(
         view=view,
         stream_opts=streamOpts,
         pcolor_opts=pcolorOpts,
-    )  # gridOpts ={'color':'k', 'alpha':0.5}
+    )  # grid_opts ={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc, zc, ellips_a, ellips_b)

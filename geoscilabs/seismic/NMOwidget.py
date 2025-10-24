@@ -1,6 +1,6 @@
 from IPython.display import set_matplotlib_formats
 import matplotlib
-from simpeg.utils import download, mkvc, sub2ind
+from SimPEG.utils import download, mkvc, sub2ind
 import numpy as np
 import scipy.io
 from ipywidgets import (

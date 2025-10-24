@@ -125,13 +125,13 @@ def top(thick):
 # matrix T for transition of Up and Down components accross a layer
 def T(h, k):
     return np.matrix(
-        [[np.exp(1j * k * h), 0.0], [0.0, np.exp(-1j * k * h)]], dtype="complex_"
+        [[np.exp(1j * k * h), 0.0], [0.0, np.exp(-1j * k * h)]], dtype="complex"
     )
 
 
 def Tinv(h, k):
     return np.matrix(
-        [[np.exp(-1j * k * h), 0.0], [0.0, np.exp(1j * k * h)]], dtype="complex_"
+        [[np.exp(-1j * k * h), 0.0], [0.0, np.exp(1j * k * h)]], dtype="complex"
     )
 
 
@@ -142,11 +142,11 @@ def UD_Z(UD, z, zj, k):
 
 # matrix P relating Up and Down components with E and H fields
 def P(z):
-    return np.matrix([[1.0, 1], [-1.0 / z, 1.0 / z]], dtype="complex_")
+    return np.matrix([[1.0, 1], [-1.0 / z, 1.0 / z]], dtype="complex")
 
 
 def Pinv(z):
-    return np.matrix([[1.0, -z], [1.0, z]], dtype="complex_") / 2.0
+    return np.matrix([[1.0, -z], [1.0, z]], dtype="complex") / 2.0
 
 
 # Time Variation of E and H
@@ -412,7 +412,7 @@ def PlotConfiguration(thick, sig, eps, mu, ax, widthg, z):
 
 def Propagate(f, H, sig, chg, taux, c, mu, eps, n):
 
-    sigcm = np.zeros_like(sig, dtype="complex_")
+    sigcm = np.zeros_like(sig, dtype="complex")
 
     for j in range(1, len(sig)):
         sigcm[j] = PCC(sig[j], chg[j], taux[j], c[j], f)
@@ -420,8 +420,8 @@ def Propagate(f, H, sig, chg, taux, c, mu, eps, n):
     K = k(mu, sigcm, eps, f)
     Z = ImpZ(f, mu, K)
 
-    EH = np.matrix(np.zeros((2, n + 1), dtype="complex_"), dtype="complex_")
-    UD = np.matrix(np.zeros((2, n + 1), dtype="complex_"), dtype="complex_")
+    EH = np.matrix(np.zeros((2, n + 1), dtype="complex"), dtype="complex")
+    UD = np.matrix(np.zeros((2, n + 1), dtype="complex"), dtype="complex")
 
     UD[1, -1] = 1.0
 
@@ -441,7 +441,7 @@ def appres(F, H, sig, chg, taux, c, mu, eps, n):
 
     Res = np.zeros_like(F)
     Phase = np.zeros_like(F)
-    App_ImpZ = np.zeros_like(F, dtype="complex_")
+    App_ImpZ = np.zeros_like(F, dtype="complex")
 
     for i in range(0, len(F)):
 
@@ -464,18 +464,18 @@ def calculateEHzt(F, H, sig, chg, taux, c, mu, eps, n, zsample, tsample):
     layer = np.zeros(len(zsample), dtype=int) - 1
 
     Exzt = np.matrix(
-        np.zeros((len(zsample), len(tsample)), dtype="complex_"), dtype="complex_"
+        np.zeros((len(zsample), len(tsample)), dtype="complex"), dtype="complex"
     )
     Hyzt = np.matrix(
-        np.zeros((len(zsample), len(tsample)), dtype="complex_"), dtype="complex_"
+        np.zeros((len(zsample), len(tsample)), dtype="complex"), dtype="complex"
     )
     Uz = np.matrix(
-        np.zeros((len(zsample), len(tsample)), dtype="complex_"), dtype="complex_"
+        np.zeros((len(zsample), len(tsample)), dtype="complex"), dtype="complex"
     )
     Dz = np.matrix(
-        np.zeros((len(zsample), len(tsample)), dtype="complex_"), dtype="complex_"
+        np.zeros((len(zsample), len(tsample)), dtype="complex"), dtype="complex"
     )
-    UDaux = np.matrix(np.zeros((2, len(zsample)), dtype="complex_"), dtype="complex_")
+    UDaux = np.matrix(np.zeros((2, len(zsample)), dtype="complex"), dtype="complex")
 
     for i in range(0, n + 1, 1):
         layer = layer + (zsample >= topc[i]) * 1
@@ -535,8 +535,8 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
     ax = [ax0, ax1, ax2]
 
     ax[0].scatter(F, Res, color="black")
-    ax[0].set_xscale("Log")
-    ax[0].set_yscale("Log")
+    ax[0].set_xscale("log")
+    ax[0].set_yscale("log")
     ax[0].set_ylim(
         [
             10.0 ** (np.round(np.log10(Res.min())) - 1.0),
@@ -549,7 +549,7 @@ def PlotAppRes(F, H, sig, chg, taux, c, mu, eps, n, fenvelope, PlotEnvelope):
     ax[0].grid(which="major")
 
     ax[1].set_ylim([0.0, 90.0])
-    ax[1].set_xscale("Log")
+    ax[1].set_xscale("log")
     ax[1].set_xlim([F.max(), F.min()])
     ax[1].scatter(F, Phase, color="purple")
     ax[1].set_ylabel("Phase (Degrees)", fontsize=16.0, color="purple")

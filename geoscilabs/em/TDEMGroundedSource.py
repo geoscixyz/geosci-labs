@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+if not hasattr(np, "ComplexWarning"):
+    class ComplexWarning(RuntimeWarning): pass
+    np.ComplexWarning = ComplexWarning
+
+import deepdish
 import deepdish as dd
 from discretize import TensorMesh
 from simpeg import utils
@@ -145,12 +150,12 @@ def run_simulation(fname="tdem_gs_half.h5", sigma_block=0.01, sigma_halfspace=0.
 
     xyzlim = np.array([[xmin, xmax], [ymin, ymax], [-400, 0.0]])
     actinds, meshCore = utils.extract_core_mesh(xyzlim, mesh)
-    Pex = mesh.getInterpolationMat(meshCore.gridCC, locType="Ex")
-    Pey = mesh.getInterpolationMat(meshCore.gridCC, locType="Ey")
-    Pez = mesh.getInterpolationMat(meshCore.gridCC, locType="Ez")
-    Pfx = mesh.getInterpolationMat(meshCore.gridCC, locType="Fx")
-    Pfy = mesh.getInterpolationMat(meshCore.gridCC, locType="Fy")
-    Pfz = mesh.getInterpolationMat(meshCore.gridCC, locType="Fz")
+    Pex = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Ex")
+    Pey = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Ey")
+    Pez = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Ez")
+    Pfx = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Fx")
+    Pfy = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Fy")
+    Pfz = mesh.get_interpolation_matrix(meshCore.gridCC, location_type="Fz")
 
     sigma_core = sigma[actinds]
 
@@ -368,9 +373,9 @@ class PlotTDEM(object):
         VEC = vec[:, itime].reshape((mesh.nC, 3), order="F")
         if normal == "Z":
             ind = np.argmin(abs(mesh.cell_centers_z - loc))
-            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
-            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
-            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, :, ind]
+            vx = VEC[:, 0].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, :, ind]
+            vy = VEC[:, 1].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, :, ind]
+            vz = VEC[:, 2].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, :, ind]
             xy = utils.ndgrid(mesh.cell_centers_x, mesh.cell_centers_y)
             if isz:
                 return utils.mkvc(vz), xy
@@ -379,9 +384,9 @@ class PlotTDEM(object):
 
         elif normal == "Y":
             ind = np.argmin(abs(mesh.cell_centers_x - loc))
-            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
-            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
-            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[:, ind, :]
+            vx = VEC[:, 0].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, ind, :]
+            vy = VEC[:, 1].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, ind, :]
+            vz = VEC[:, 2].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[:, ind, :]
             xz = utils.ndgrid(mesh.cell_centers_x, mesh.cell_centers_z)
             if isz:
                 return utils.mkvc(vz), xy
@@ -390,9 +395,9 @@ class PlotTDEM(object):
 
         elif normal == "X":
             ind = np.argmin(abs(mesh.cell_centers_y - loc))
-            vx = VEC[:, 0].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
-            vy = VEC[:, 1].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
-            vz = VEC[:, 2].reshape((mesh.mesh.shape_cells[0], mesh.mesh.shape_cells[1], mesh.mesh.shape_cells[2]), order="F")[ind, :, :]
+            vx = VEC[:, 0].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[ind, :, :]
+            vy = VEC[:, 1].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[ind, :, :]
+            vz = VEC[:, 2].reshape((mesh.shape_cells[0], mesh.shape_cells[1], mesh.shape_cells[2]), order="F")[ind, :, :]
             yz = utils.ndgrid(mesh.cell_centers_y, mesh.cell_centers_z)
             if isz:
                 return utils.mkvc(vz), xy

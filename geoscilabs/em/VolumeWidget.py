@@ -10,15 +10,32 @@ from ..base import widgetify
 
 
 class Arrow3D(FancyArrowPatch):
+    """
+    3D arrow for mplot3d by projecting to 2D on draw/projection.
+    Compatible with Matplotlib >= 3.8 which requires do_3d_projection.
+    """
     def __init__(self, xs, ys, zs, *args, **kwargs):
-        FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
-        self._verts3d = xs, ys, zs
+        # FancyArrowPatch is 2D; initialize with dummy 2D endpoints.
+        super().__init__((0, 0), (0, 0), *args, **kwargs)
+        self._verts3d = (np.asarray(xs), np.asarray(ys), np.asarray(zs))
 
-    def draw(self, renderer):
+    def _project(self):
         xs3d, ys3d, zs3d = self._verts3d
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        # set 2D endpoints for the underlying 2D arrow
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
-        FancyArrowPatch.draw(self, renderer)
+        return zs
+
+    def draw(self, renderer):
+        # Update 2D positions right before drawing
+        self._project()
+        super().draw(renderer)
+
+    # Matplotlib >= 3.8 calls this during the 3D draw pass
+    def do_3d_projection(self, renderer=None):
+        zs = self._project()
+        # Return a depth value for z-sorting (min or mean both OK)
+        return float(np.min(zs))
 
 
 def polyplane(verts, alpha=0.2, color="green"):

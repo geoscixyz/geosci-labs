@@ -542,7 +542,7 @@ def DC2Dfwdfun(
             ax=ax1,
             clim=(1, 3),
             grid=True,
-            gridOpts={"color": "k", "alpha": 0.5},
+            grid_opts={"color": "k", "alpha": 0.5},
         )
         cb1ticks = [1.0, 2.0, 3.0]
         cb1 = plt.colorbar(dat1[0], ax=ax1, ticks=cb1ticks)
@@ -582,7 +582,7 @@ def DC2Dfwdfun(
             ax=ax1,
             clim=(1, 3),
             grid=True,
-            gridOpts={"color": "k", "alpha": 0.5},
+            grid_opts={"color": "k", "alpha": 0.5},
         )
         cb1ticks = [1.0, 2.0, 3.0]
         cb1 = plt.colorbar(dat1[0], ax=ax1, ticks=cb1ticks)

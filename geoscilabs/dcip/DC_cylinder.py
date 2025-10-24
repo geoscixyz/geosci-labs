@@ -9,6 +9,7 @@ import matplotlib.patches as patches
 
 from simpeg.utils.solver_utils import get_default_solver
 from discretize import TensorMesh
+from discretize.utils import closest_points_index
 
 from simpeg import maps, utils
 from simpeg.utils import extract_core_mesh, mkvc
@@ -139,7 +140,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = closest_points_index(mesh, [xmax + 60.0, 0.0], grid_loc="CC")
         phiScale = phi[refInd]
         phiSurface = phiSurface - phiScale
 
@@ -528,7 +529,7 @@ def plot_Surface_Potentials(
         view=view,
         stream_opts=streamOpts,
         pcolor_opts=pcolorOpts,
-    )  # gridOpts={'color':'k', 'alpha':0.5}
+    )  # grid_opts={'color':'k', 'alpha':0.5}
 
     # Get cylinder outline
     cylinderPoints = getCylinderPoints(xc, zc, r)

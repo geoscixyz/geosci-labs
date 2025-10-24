@@ -262,7 +262,7 @@ def plotAnomalyXYplane(Ax, f, X, Y, Z, H, Comp, Phase):
     H = np.abs(H)
     MAX = np.max(H)
 
-    H[H == 0] = np.NaN
+    H[H == 0] = np.nan
     H = np.log10(tol * H / MAX)
 
     Sign[H < 0] = 0.0

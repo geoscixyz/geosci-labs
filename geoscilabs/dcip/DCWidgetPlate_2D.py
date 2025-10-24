@@ -1,20 +1,18 @@
 import numpy as np
 
-from scipy.constants import epsilon_0
-from scipy.ndimage.measurements import center_of_mass
-
-from ipywidgets import IntSlider, FloatSlider, FloatText, ToggleButtons
+from ipywidgets import FloatSlider, FloatText, ToggleButtons
 
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.pylab as pylab
 from matplotlib.ticker import LogFormatter
 from matplotlib.path import Path
 import matplotlib.patches as patches
 from simpeg.utils.solver_utils import get_default_solver
 
 from discretize import TensorMesh
-from simpeg import maps, SolverLU, utils
+from discretize.utils import closest_points_index
+
+from simpeg import maps, utils
 from simpeg.utils import extract_core_mesh
 from simpeg.electromagnetics.static import resistivity as DC
 
@@ -200,7 +198,7 @@ def get_Surface_Potentials(survey, src, field_obj):
     phiScale = 0.0
 
     if survey == "Pole-Dipole" or survey == "Pole-Pole":
-        refInd = utils.closestPoints(mesh, [xmax + 60.0, 0.0], gridLoc="CC")
+        refInd = closest_points_index(mesh, [xmax + 60.0, 0.0], grid_loc="CC")
         # refPoint =  CCLoc[refInd]
         # refSurfaceInd = np.where(xSurface == refPoint[0])
         # phiScale = np.median(phiSurface)
@@ -649,7 +647,7 @@ def plot_Surface_Potentials(
         view=view,
         stream_opts=streamOpts,
         pcolor_opts=pcolorOpts,
-    )  # gridOpts={'color':'k', 'alpha':0.5}
+    )  # grid_opts={'color':'k', 'alpha':0.5}
 
     # Get plate corners
     if dx >= 80.0:
