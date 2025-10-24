@@ -1,6 +1,15 @@
-from IPython.display import set_matplotlib_formats
+try:
+    from matplotlib_inline.backend_inline import set_matplotlib_formats
+except Exception:  # pragma: no cover
+    try:
+        # for older IPython versions
+        from IPython.display import set_matplotlib_formats  # type: ignore[attr-defined]
+    except Exception:
+        # if we're not in a notebook or nothing available, make it a no-op
+        def set_matplotlib_formats(*args, **kwargs):
+            pass
 import matplotlib
-from SimPEG.utils import download, mkvc, sub2ind
+from simpeg.utils import download, mkvc, sub2ind
 import numpy as np
 import scipy.io
 from ipywidgets import (

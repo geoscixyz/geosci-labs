@@ -37,7 +37,7 @@ setup(
         "scipy>=1.7",
         "matplotlib>=3.4",
         "ipywidgets",
-        "SimPEG>=0.15.0",
+        "simpeg>=0.15.0",
         "discretize>=0.7.0",
         "empymod>=2.0.0",
         "jupyter",
