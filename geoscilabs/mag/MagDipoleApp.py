@@ -768,7 +768,7 @@ class MagneticDipoleApp(object):
             step=0.1,
             value=0.1,
         )
-        moment = widgets.FloatText(description="M", value=30)
+        moment = widgets.FloatText(description="moment", value=30)
         depth_n = widgets.FloatSlider(
             description="depth$_{-Q}$",
             continuous_update=False,
